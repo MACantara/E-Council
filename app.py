@@ -1,8 +1,8 @@
 import os
-from flask import Flask, request, render_template, Response
+from flask import Flask, request, render_template, Response, send_from_directory
 import google.generativeai as genai
 from dotenv import load_dotenv
-import docx
+from docx import Document
 import PyPDF2
 from werkzeug.utils import secure_filename
 
@@ -51,8 +51,15 @@ def stream_response(user_input, file_content=None):
 
     response = model.generate_content(user_input, stream=True)
 
+    final_response = ""
     for chunk in response:
-        yield chunk.text
+        final_response += chunk.text
+
+    return final_response
+
+@app.route('/uploads/<filename>')
+def uploads(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Route to handle the form and file upload
 @app.route('/', methods=['GET', 'POST'])
@@ -73,8 +80,21 @@ def index():
             elif filename.endswith('.pdf'):
                 file_content = extract_text_from_pdf(filepath)
 
-        # Stream the AI-generated response with file content as context
-        return Response(stream_response(user_input, file_content), content_type='text/html')
+        # Generate the AI response
+        ai_response = stream_response(user_input, file_content)
+
+        # Load the template
+        template_path = os.path.join('ms-word-templates', 'concept-paper-with-header-and-footer-template.docx')
+        doc = Document(template_path)
+
+        # Add the AI response to the template
+        doc.add_paragraph(ai_response)
+        response_filename = 'response.docx'
+        response_filepath = os.path.join(app.config['UPLOAD_FOLDER'], response_filename)
+        doc.save(response_filepath)
+
+        # Render the template with the download link
+        return render_template('index.html', download_link=response_filename)
 
     return render_template('index.html')
 

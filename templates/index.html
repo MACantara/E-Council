@@ -6,63 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask App - Real-time Streaming with File Upload</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script>
-        async function fetchAndStream() {
-            const user_input = document.getElementById("user_input").value;
-            const file_input = document.getElementById("file_input").files[0];
-
-            // Show the loader while waiting for the response
-            document.getElementById("loader").style.display = "block";
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = ''; // Clear previous result
-
-            const formData = new FormData();
-            formData.append('user_input', user_input);
-            if (file_input) {
-                formData.append('file', file_input);
-            }
-
-            // Fetch data from the server
-            const response = await fetch("/", {
-                method: "POST",
-                body: formData
-            });
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let done = false;
-            let responseText = '';
-
-            while (!done) {
-                const { value, done: readerDone } = await reader.read();
-                done = readerDone;
-
-                const chunk = decoder.decode(value, { stream: true });
-                responseText += chunk;
-                resultDiv.innerHTML += chunk;
-            }
-
-            // Hide the loader after receiving the response
-            document.getElementById("loader").style.display = "none";
-        }
-    </script>
 </head>
 
 <body>
     <h1>Enter a prompt and upload a file (optional)</h1>
 
-    <form id="promptForm" onsubmit="event.preventDefault(); fetchAndStream();">
-        <input type="text" id="user_input" name="user_input" placeholder="Enter a prompt" required>
-        <br>
-        <input type="file" id="file_input" name="file" accept=".docx,.pdf">
-        <br>
+    <form method="post" enctype="multipart/form-data">
+        <input type="text" name="user_input" placeholder="Enter your input">
+        <input type="file" name="file">
         <button type="submit">Submit</button>
     </form>
 
-    <div id="loader" style="display:none;"></div>
-
-    <h2>Response:</h2>
-    <div id="result"></div>
+    {% if download_link %}
+    <a href="{{ url_for('uploads', filename=download_link) }}" download>Download Response</a>
+    {% endif %}
 </body>
 
 </html>
