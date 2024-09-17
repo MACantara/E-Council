@@ -3,6 +3,7 @@ from flask import Flask, request, render_template, Response, send_from_directory
 import google.generativeai as genai
 from dotenv import load_dotenv
 from docx import Document
+import docx
 import PyPDF2
 from werkzeug.utils import secure_filename
 
