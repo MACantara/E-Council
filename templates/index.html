@@ -1,87 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask App - Real-time Streaming with File Upload</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        form {
-            margin-bottom: 20px;
-        }
-
-        input[type="text"], input[type="file"] {
-            padding: 10px;
-            font-size: 16px;
-            width: 80%;
-            max-width: 400px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        h2 {
-            color: #555;
-            margin-top: 30px;
-        }
-
-        #result {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #333;
-            min-height: 100px;
-            white-space: pre-wrap; /* Ensures new lines are rendered properly */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 80%;
-            margin-top: 10px;
-        }
-
-        #loader {
-            display: none;
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin-top: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
     <script>
         async function fetchAndStream() {
             const user_input = document.getElementById("user_input").value;
@@ -107,20 +32,216 @@
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let done = false;
+            let responseText = '';
 
             while (!done) {
                 const { value, done: readerDone } = await reader.read();
                 done = readerDone;
 
                 const chunk = decoder.decode(value, { stream: true });
+                responseText += chunk;
                 resultDiv.innerHTML += chunk;
             }
 
             // Hide the loader after receiving the response
             document.getElementById("loader").style.display = "none";
+
+            // Enable the download button
+            document.getElementById("downloadButton").style.display = "inline";
+            document.getElementById("downloadButton").onclick = () => downloadAsDocx(responseText);
+        }
+
+        async function downloadAsDocx(content) {
+            // Define image paths
+            const HEADER_IMAGE_URL = '/static/img/HEADER-PERPS.png';
+            const CCS_LOGO_URL = '/static/img/CCS-LOGO.png';
+            const ISO_IMAGE_URL = '/static/img/ISO.png';
+
+            // Function to fetch image data as ArrayBuffer
+            const fetchImage = async (url) => {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch image: ${url}`);
+                }
+                return await response.arrayBuffer();
+            };
+
+            // Fetch image buffers
+            const headerImage = await fetchImage(HEADER_IMAGE_URL);
+            const ccsLogo = await fetchImage(CCS_LOGO_URL);
+            const isoImage = await fetchImage(ISO_IMAGE_URL);
+
+            // Create docx document
+            const doc = new docx.Document({
+                sections: [
+                    {
+                        properties: {},
+                        headers: {
+                            default: new docx.Header({
+                                children: [
+                                    new docx.Table({
+                                        rows: [
+                                            // Row containing headerImage
+                                            new docx.TableRow({
+                                                children: [
+                                                    new docx.TableCell({
+                                                        width: { size: 50, type: docx.WidthType.PERCENT },
+                                                        children: [
+                                                            new docx.Paragraph({
+                                                                children: [
+                                                                    new docx.ImageRun({
+                                                                        data: headerImage,
+                                                                        transformation: { width: 400, height: 110 },
+                                                                    }),
+                                                                ],
+                                                            }),
+                                                        ],
+                                                        verticalAlign: docx.VerticalAlign.CENTER,
+                                                    }),
+                                                    new docx.TableCell({
+                                                        width: { size: 50, type: docx.WidthType.PERCENT },
+                                                        children: [
+                                                            new docx.Table({
+                                                                rows: [
+                                                                    // Row containing logos
+                                                                    new docx.TableRow({
+                                                                        children: [
+                                                                            new docx.TableCell({
+                                                                                width: { size: 50, type: docx.WidthType.PERCENT },
+                                                                                children: [
+                                                                                    new docx.Paragraph({
+                                                                                        children: [
+                                                                                            new docx.ImageRun({
+                                                                                                data: ccsLogo,
+                                                                                                transformation: { width: 70, height: 90 },
+                                                                                            }),
+                                                                                        ],
+                                                                                        alignment: docx.AlignmentType.CENTER,
+                                                                                        verticalAlign: docx.VerticalAlign.CENTER,
+                                                                                        indent: {
+                                                                                            right: 180,
+                                                                                        },
+                                                                                    }),
+                                                                                ],
+                                                                                verticalAlign: docx.VerticalAlign.CENTER,
+                                                                            }),
+                                                                            new docx.TableCell({
+                                                                                width: { size: 50, type: docx.WidthType.PERCENT },
+                                                                                children: [
+                                                                                    new docx.Paragraph({
+                                                                                        children: [
+                                                                                            new docx.ImageRun({
+                                                                                                data: isoImage,
+                                                                                                transformation: { width: 130, height: 50 },
+                                                                                            }),
+                                                                                        ],
+                                                                                        alignment: docx.AlignmentType.CENTER,
+                                                                                        verticalAlign: docx.VerticalAlign.CENTER,
+                                                                                    }),
+                                                                                ],
+                                                                                verticalAlign: docx.VerticalAlign.CENTER,
+                                                                            }),
+                                                                        ],
+                                                                    }),
+                                                                    // Row containing text below images
+                                                                    new docx.TableRow({
+                                                                        children: [
+                                                                            new docx.TableCell({
+                                                                                width: { size: 50, type: docx.WidthType.PERCENT },
+                                                                                columnSpan: 2,
+                                                                                children: [
+                                                                                    new docx.Paragraph({
+                                                                                        children: [
+                                                                                            new docx.TextRun({
+                                                                                                text: 'COLLEGE OF COMPUTER STUDIES',
+                                                                                                bold: true,
+                                                                                                alignment: docx.AlignmentType.CENTER,
+                                                                                            }),
+                                                                                        ],
+                                                                                        alignment: docx.AlignmentType.CENTER,
+                                                                                    }),
+                                                                                ],
+                                                                                verticalAlign: docx.VerticalAlign.CENTER,
+                                                                            }),
+                                                                        ],
+                                                                    }),
+                                                                ],
+                                                                width: { size: 100, type: docx.WidthType.PERCENT },
+                                                                borders: false,
+                                                            }),
+                                                        ],
+                                                        verticalAlign: docx.VerticalAlign.CENTER,
+                                                    }),
+                                                ],
+                                            }),
+                                        ],
+                                        width: { size: 100, type: docx.WidthType.PERCENT },
+                                        borders: false
+                                    }),
+                                ],
+                            }),
+                        },
+                        footers: {
+                            default: new docx.Footer({
+                                children: [
+                                    new docx.Paragraph({
+                                        children: [
+                                            new docx.TextRun({
+                                                text: 'UPHMO-CCS-GEN-922/rev0',
+                                                size: 24,
+                                                verticalAlign: docx.VerticalAlign.CENTER,
+                                            }),
+                                            new docx.TextRun({
+                                                text: '\t', // Tab space between the two texts
+                                            }),
+                                            new docx.TextRun({
+                                                text: 'Concept Paper for Activity',
+                                                size: 24,
+                                                bold: true,
+                                                verticalAlign: docx.VerticalAlign.CENTER,
+                                            }),
+                                        ],
+                                        tabStops: [
+                                            {
+                                                type: docx.TabStopType.RIGHT,
+                                                position: 9000, // Adjust based on page width
+                                            },
+                                        ],
+                                        verticalAlign: docx.VerticalAlign.CENTER,
+                                        border: {
+                                            top: {
+                                                style: docx.BorderStyle.SINGLE,
+                                                size: 6, // Thickness of the border
+                                                color: '000000', // Black color
+                                            },
+                                        }
+                                    }),
+                                ],
+                            }),
+                        },
+                        children: [
+                            new docx.Paragraph({
+                                text: content,
+                            }),
+                        ],
+                    },
+                ],
+            });
+
+            // Pack the document and create a download link
+            docx.Packer.toBlob(doc).then((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'response.docx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
         }
     </script>
 </head>
+
 <body>
     <h1>Enter a prompt and upload a file (optional)</h1>
 
@@ -132,9 +253,12 @@
         <button type="submit">Submit</button>
     </form>
 
-    <div id="loader"></div>
+    <div id="loader" style="display:none;"></div>
 
     <h2>Response:</h2>
     <div id="result"></div>
+
+    <button id="downloadButton" style="display:none;">Download as DOCX</button>
 </body>
+
 </html>
