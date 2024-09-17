@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask App - Real-time Streaming with File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="file"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+
+        #result {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            min-height: 100px;
+            white-space: pre-wrap; /* Ensures new lines are rendered properly */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            margin-top: 10px;
+        }
+
+        #loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script>
+        async function fetchAndStream() {
+            const user_input = document.getElementById("user_input").value;
+            const file_input = document.getElementById("file_input").files[0];
+
+            // Show the loader while waiting for the response
+            document.getElementById("loader").style.display = "block";
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = ''; // Clear previous result
+
+            const formData = new FormData();
+            formData.append('user_input', user_input);
+            if (file_input) {
+                formData.append('file', file_input);
+            }
+
+            // Fetch data from the server
+            const response = await fetch("/", {
+                method: "POST",
+                body: formData
+            });
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let done = false;
+
+            while (!done) {
+                const { value, done: readerDone } = await reader.read();
+                done = readerDone;
+
+                const chunk = decoder.decode(value, { stream: true });
+                resultDiv.innerHTML += chunk;
+            }
+
+            // Hide the loader after receiving the response
+            document.getElementById("loader").style.display = "none";
+        }
+    </script>
+</head>
+<body>
+    <h1>Enter a prompt and upload a file (optional)</h1>
+
+    <form id="promptForm" onsubmit="event.preventDefault(); fetchAndStream();">
+        <input type="text" id="user_input" name="user_input" placeholder="Enter a prompt" required>
+        <br>
+        <input type="file" id="file_input" name="file" accept=".docx,.pdf">
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="loader"></div>
+
+    <h2>Response:</h2>
+    <div id="result"></div>
+</body>
+</html>
