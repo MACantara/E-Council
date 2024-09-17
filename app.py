@@ -62,38 +62,37 @@ def uploads(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Route to handle the form and file upload
+def handle_file_upload(file):
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        if filename.endswith('.docx'):
+            return extract_text_from_docx(filepath)
+        elif filename.endswith('.pdf'):
+            return extract_text_from_pdf(filepath)
+    return None
+
+def create_docx_from_template(ai_response, template_path, output_path):
+    doc = Document(template_path)
+    doc.add_paragraph(ai_response)
+    doc.save(output_path)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         user_input = request.form['user_input']
         file = request.files.get('file')
 
-        file_content = None
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-
-            # Extract text based on file type
-            if filename.endswith('.docx'):
-                file_content = extract_text_from_docx(filepath)
-            elif filename.endswith('.pdf'):
-                file_content = extract_text_from_pdf(filepath)
-
-        # Generate the AI response
+        file_content = handle_file_upload(file)
         ai_response = stream_response(user_input, file_content)
 
-        # Load the template
         template_path = os.path.join('ms-word-templates', 'concept-paper-with-header-and-footer-template.docx')
-        doc = Document(template_path)
-
-        # Add the AI response to the template
-        doc.add_paragraph(ai_response)
         response_filename = 'response.docx'
         response_filepath = os.path.join(app.config['UPLOAD_FOLDER'], response_filename)
-        doc.save(response_filepath)
+        create_docx_from_template(ai_response, template_path, response_filepath)
 
-        # Render the template with the download link
         return render_template('index.html', download_link=response_filename)
 
     return render_template('index.html')
