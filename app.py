@@ -1,102 +1,96 @@
 import os
-from flask import Flask, request, render_template, Response, send_from_directory, stream_with_context
-import google.generativeai as genai
-from dotenv import load_dotenv
+from flask import Flask, request, render_template, send_from_directory
 from docx import Document
-import docx
-import PyPDF2
 from werkzeug.utils import secure_filename
-
-# Load environment variables
-load_dotenv()
-
-# Configure the API key for the generative model
-genai.configure(api_key=os.environ['GOOGLE_GEMINI_AI_API_KEY'])
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-ALLOWED_EXTENSIONS = {'pdf', 'docx'}
 
 # Create the uploads directory if it doesn't exist
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# Function to check allowed file types
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        form_data = request.form.to_dict()
+        response_filename = 'concept_paper.docx'
+        response_filepath = os.path.join(app.config['UPLOAD_FOLDER'], response_filename)
+        create_docx(form_data, response_filepath)
+        return render_template('index.html', download_link=response_filename)
+    return render_template('index.html')
 
-# Function to extract text from .docx files
-def extract_text_from_docx(filepath):
-    doc = docx.Document(filepath)
-    full_text = []
+def create_docx(data, output_path):
+    template_path = os.path.join('ms-word-templates', 'concept-paper-with-header-and-footer-template.docx')
+    doc = Document(template_path)
+
+    # Replace placeholders in paragraphs
+    replace_placeholder(doc, '{{ signatory_name_1 }}', data['signatory_name_1'])
+    replace_placeholder(doc, '{{ signatory_position_1 }}', data['signatory_position_1'])
+    replace_placeholder(doc, '{{ signatory_name_2 }}', data['signatory_name_2'])
+    replace_placeholder(doc, '{{ signatory_position_2 }}', data['signatory_position_2'])
+    replace_placeholder(doc, '{{ signatory_department_2 }}', data['signatory_department_2'])
+    replace_placeholder(doc, '{{ signatory_name_3 }}', data['signatory_name_3'])
+    replace_placeholder(doc, '{{ signatory_position_3 }}', data['signatory_position_3'])
+    replace_placeholder(doc, '{{ signatory_department_3 }}', data['signatory_department_3'])
+    replace_placeholder(doc, '{{ subject_title }}', data['subject_title'])
+    replace_placeholder(doc, '{{ date }}', data['date'])
+    replace_placeholder(doc, '{{ introductory_paragraph }}', data['introductory_paragraph'])
+    replace_placeholder(doc, '{{ time }}', data['time'])
+    replace_placeholder(doc, '{{ location }}', data['location'])
+    replace_placeholder(doc, '{{ participants }}', data['participants'])
+    replace_placeholder(doc, '{{ budget }}', data['budget'])
+    replace_placeholder(doc, '{{ descriptions }}', data['descriptions'])
+    replace_placeholder(doc, '{{ objective_of_the_activity_1 }}', data['objective_of_the_activity_1'])
+    replace_placeholder(doc, '{{ objective_of_the_activity_2 }}', data['objective_of_the_activity_2'])
+    replace_placeholder(doc, '{{ objective_of_the_activity_3 }}', data['objective_of_the_activity_3'])
+    replace_placeholder(doc, '{{ objective_of_the_activity_4 }}', data['objective_of_the_activity_4'])
+    replace_placeholder(doc, '{{ learning_outcome_1 }}', data['learning_outcome_1'])
+    replace_placeholder(doc, '{{ learning_outcome_2 }}', data['learning_outcome_2'])
+    replace_placeholder(doc, '{{ learning_outcome_3 }}', data['learning_outcome_3'])
+    replace_placeholder(doc, '{{ learning_outcome_4 }}', data['learning_outcome_4'])
+    replace_placeholder(doc, '{{ number_of_expected_students }}', data['number_of_expected_students'])
+    replace_placeholder(doc, '{{ number_of_expected_faculty }}', data['number_of_expected_faculty'])
+    replace_placeholder(doc, '{{ prepared_by_name }}', data['prepared_by_name'])
+    replace_placeholder(doc, '{{ prepared_by_position }}', data['prepared_by_position'])
+    replace_placeholder(doc, '{{ prepared_by_student_council }}', data['prepared_by_student_council'])
+    replace_placeholder(doc, '{{ signed_and_reviewed_by_name }}', data['signed_and_reviewed_by_name'])
+    replace_placeholder(doc, '{{ signed_and_reviewed_by_position }}', data['signed_and_reviewed_by_position'])
+    replace_placeholder(doc, '{{ signed_and_reviewed_by_student_council }}', data['signed_and_reviewed_by_student_council'])
+
+    doc.save(output_path)
+
+def replace_placeholder(doc, placeholder, replacement):
+    # Replace placeholders in paragraphs
     for paragraph in doc.paragraphs:
-        full_text.append(paragraph.text)
-    return '\n'.join(full_text)
+        if placeholder in paragraph.text:
+            replace_in_paragraph(paragraph, placeholder, replacement)
 
-# Function to extract text from .pdf files
-def extract_text_from_pdf(filepath):
-    pdf_text = []
-    with open(filepath, 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
-        for page in range(len(reader.pages)):
-            pdf_text.append(reader.pages[page].extract_text())
-    return '\n'.join(pdf_text)
+    # Replace placeholders in tables
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                replace_placeholder(cell, placeholder, replacement)
 
-# Function to handle streaming response from Gemini AI
-def stream_response(user_input, file_content=None):
-    model = genai.GenerativeModel("gemini-1.5-flash")
-
-    # Combine user input and file content for context
-    if file_content:
-        user_input += f"\n\nContext from file:\n{file_content}"
-
-    response = model.generate_content(user_input, stream=True)
-
-    final_response = ""
-    for chunk in response:
-        final_response += chunk.text
-
-    return final_response
+def replace_in_paragraph(paragraph, placeholder, replacement):
+    # Concatenate all runs' text
+    full_text = ''.join(run.text for run in paragraph.runs)
+    
+    # Replace the placeholder
+    if placeholder in full_text:
+        full_text = full_text.replace(placeholder, replacement)
+        
+        # Clear the paragraph's runs
+        for run in paragraph.runs:
+            run.text = ''
+        
+        # Add the new text back into the paragraph
+        paragraph.runs[0].text = full_text
 
 @app.route('/uploads/<filename>')
 def uploads(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-# Route to handle the form and file upload
-def handle_file_upload(file):
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-
-        if filename.endswith('.docx'):
-            return extract_text_from_docx(filepath)
-        elif filename.endswith('.pdf'):
-            return extract_text_from_pdf(filepath)
-    return None
-
-def create_docx_from_template(ai_response, template_path, output_path):
-    doc = Document(template_path)
-    doc.add_paragraph(ai_response)
-    doc.save(output_path)
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        user_input = request.form['user_input']
-        file = request.files.get('file')
-
-        file_content = handle_file_upload(file)
-        ai_response = stream_response(user_input, file_content)
-
-        template_path = os.path.join('ms-word-templates', 'concept-paper-with-header-and-footer-template.docx')
-        response_filename = 'response.docx'
-        response_filepath = os.path.join(app.config['UPLOAD_FOLDER'], response_filename)
-        create_docx_from_template(ai_response, template_path, response_filepath)
-
-        return render_template('index.html', download_link=response_filename)
-
-    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
