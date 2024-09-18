@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, Response, send_from_directory
+from flask import Flask, request, render_template, Response, send_from_directory, stream_with_context
 import google.generativeai as genai
 from dotenv import load_dotenv
 from docx import Document
