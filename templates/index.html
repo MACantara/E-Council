@@ -10,7 +10,7 @@
 
 <body>
     <h1>Fill in the Concept Paper Form</h1>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <h2>FOR</h2>
         <input type="text" name="signatory_name_1" placeholder="Signatory Name 1" value="RENO R. RAYEL, DBA">
         <input type="text" name="signatory_position_1" placeholder="Signatory Position 1" value="School Director">
@@ -27,19 +27,6 @@
 
         <h2>SUBJECT</h2>
         <input type="text" name="subject_title" placeholder="Subject Title" value="College of Computer Studies Christmas Party 202">
-
-        <h2>DATE</h2>
-        <input type="text" name="date" value="December 6, 2023">
-
-        <h2>INTRODUCTORY PARAGRAPH</h2>
-        <textarea name="introductory_paragraph" placeholder="Introductory Paragraph">The College of Computer Studies would like to request from your good office the approval to conduct a Christmas Party for all College of Computer Studies Student Officers. The said activity will be held on Wednesday, December 13, 2023, from 1:00 PM – 5:00 PM. The purpose of the Christmas Party is to create camaraderie between all student leaders and celebrate Christmas as one Perpetual family thus making them feel a sense of belongingness. The Christmas Party will also be a venue to celebrate all the successes and victories of the college for the year 2023 and to plan all upcoming activities for the year 2024.</textarea>
-
-        <h2>EVENT DETAILS</h2>
-        <input type="text" name="time" placeholder="Time" value="1:00 PM  – 5:00 PM">
-        <input type="text" name="location" placeholder="Location" value="RM 203 Main Building UPHSD-Molino">
-        <input type="text" name="participants" placeholder="Participants" value="18 Students and Faculties">
-        <input type="text" name="budget" placeholder="Budget" value="2,000.00 Pesos from council funs to aid food and prizes.
-        Voluntary fund from officer">
 
         <h2>CONCEPT PAPER FORM</h2>
         <textarea name="descriptions" placeholder="Descriptions">The College of Computer Studies Officers of the University of Perpetual Help – Molino intends to conduct a Christmas Party for all College of Computer Studies Officers on December 13, 2023, in Main Building Room 203. This Christmas Party aims to make the students’ Christmas special.</textarea>
@@ -67,6 +54,9 @@
         <input type="text" name="signed_and_reviewed_by_name" placeholder="Signed and Reviewed By Name" value="MHARTIN JOSHUA B. DEREZ">
         <input type="text" name="signed_and_reviewed_by_position" placeholder="Signed and Reviewed By Position" value="President">
         <input type="text" name="signed_and_reviewed_by_student_council" placeholder="Signed and Reviewed By Student Council" value="CCS Council">
+
+        <h2>UPLOAD ADDITIONAL CONTEXT</h2>
+        <input type="file" name="additional_context">
 
         <button type="submit">Generate Document</button>
     </form>
