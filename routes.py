@@ -20,7 +20,7 @@ def register_routes(app, db):
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
         """
-        Handles the registration page.
+        Handles the signup page.
         """
         if request.method == "GET":
             return render_template("signup.html")
