@@ -15,13 +15,13 @@ def register_routes(app, db):
         users = Users.query.all()
         return render_template("index.html", users=users)
 
-    @app.route("/register", methods=["GET", "POST"])
-    def register():
+    @app.route("/signup", methods=["GET", "POST"])
+    def signup():
         """
         Handles the registration page.
         """
         if request.method == "GET":
-            return render_template("register.html")
+            return render_template("signup.html")
         elif request.method == "POST":
             users_first_name = request.form.get("users_first_name")
             users_last_name = request.form.get("users_last_name")
