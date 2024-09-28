@@ -1,7 +1,12 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -14,8 +19,8 @@ def create_app():
         flask.app.Flask: The created Flask application.
     """
     app = Flask(__name__, template_folder="templates")
-    app.config["SECRET_KEY"] = "secret"
-    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:@localhost:3306/trackit"
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
 
     # Initialize the SQLAlchemy extension.
     db.init_app(app)
