@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept Paper Form</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <h1>Fill in the Concept Paper Form</h1>
+    <form method="post" enctype="multipart/form-data">
+        <h2>FOR</h2>
+        <input type="text" name="signatory_name_1" placeholder="Signatory Name 1" value="RENO R. RAYEL, DBA">
+        <input type="text" name="signatory_position_1" placeholder="Signatory Position 1" value="School Director">
+
+        <h2>THRU</h2>
+        <input type="text" name="signatory_name_2" placeholder="Signatory Name 2" value="MS. KRISTINA ROSE G. CARLOS, RGC, RPm">
+        <input type="text" name="signatory_position_2" placeholder="Signatory Position 2" value="Head">
+        <input type="text" name="signatory_department_2" placeholder="Signatory Department 2" value="Student Affairs & Services">
+
+        <h2>FROM</h2>
+        <input type="text" name="signatory_name_3" placeholder="Signatory Name 3" value="PASTOR ARGUELLES JR., Ph.D.c">
+        <input type="text" name="signatory_position_3" placeholder="Signatory Position 3" value="Dean">
+        <input type="text" name="signatory_department_3" placeholder="Signatory Department 3" value="College of Computer Studies">
+
+        <h2>SUBJECT</h2>
+        <input type="text" name="subject_title" placeholder="Subject Title" value="College of Computer Studies Christmas Party 202">
+
+        <h2>CONCEPT PAPER FORM</h2>
+        <textarea name="descriptions" placeholder="Descriptions">The College of Computer Studies Officers of the University of Perpetual Help – Molino intends to conduct a Christmas Party for all College of Computer Studies Officers on December 13, 2023, in Main Building Room 203. This Christmas Party aims to make the students’ Christmas special.</textarea>
+
+        <h2>OBJECTIVES AND LEARNING OUTCOMES</h2>
+        <input type="text" name="objective_of_the_activity_1" placeholder="Objective of the Activity 1" value="The activity aims to make the students remember and make them feel the presence of Christmas.">
+        <input type="text" name="objective_of_the_activity_2" placeholder="Objective of the Activity 2" value="Christmas Dinner a buffet-style dinner will be served to all attendees.">
+        <input type="text" name="objective_of_the_activity_3" placeholder="Objective of the Activity 3" value="Exchange gifts with student officers will have the opportunity to exchange gifts with their peers.">
+        <input type="text" name="objective_of_the_activity_4" placeholder="Objective of the Activity 4" value="A variety of games will be played, such as bingo, trivia, and karaoke.">
+        <input type="text" name="learning_outcome_1" placeholder="Learning Outcome 1" value="The students will feel the presence of Christmas and remember the birth of our Savior.">
+        <input type="text" name="learning_outcome_2" placeholder="Learning Outcome 2" value="Students will have the opportunity to socialize with their peers and faculty in a festive setting.">
+        <input type="text" name="learning_outcome_3" placeholder="Learning Outcome 3" value="Students will learn about the importance of giving and receiving.">
+        <input type="text" name="learning_outcome_4" placeholder="Learning Outcome 4" value="Students will develop their creative and problem-solving skills.">
+
+        <h2>EXPECTED NO. OF PARTICIPANTS</h2>
+        <input type="number" name="number_of_expected_students" placeholder="Number of Expected Students" value="18">
+        <input type="number" name="number_of_expected_faculty" placeholder="Number of Expected Faculty" value="7">
+
+        <h2>PREPARED BY</h2>
+        <input type="text" name="prepared_by_name" placeholder="Prepared By Name" value="ANGELO GABRIELLE D. RODRIGUEZ">
+        <input type="text" name="prepared_by_position" placeholder="Prepared By Position" value="President">
+        <input type="text" name="prepared_by_student_council" placeholder="Prepared By Student Council" value="JPCS Council">
+
+        <h2>SIGNED AND REVIEWED BY</h2>
+        <input type="text" name="signed_and_reviewed_by_name" placeholder="Signed and Reviewed By Name" value="MHARTIN JOSHUA B. DEREZ">
+        <input type="text" name="signed_and_reviewed_by_position" placeholder="Signed and Reviewed By Position" value="President">
+        <input type="text" name="signed_and_reviewed_by_student_council" placeholder="Signed and Reviewed By Student Council" value="CCS Council">
+
+        <h2>UPLOAD ADDITIONAL CONTEXT</h2>
+        <input type="file" name="additional_context">
+
+        <button type="submit">Generate Document</button>
+    </form>
+    {% if download_link %}
+    <a href="{{ url_for('uploads', filename=download_link) }}" download>Download Concept Paper</a>
+    {% endif %}
+</body>
+
+</html>
