@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Council - {% block title %}Home{% endblock %}</title>
+    <title>E-Council - {% block title %}{% endblock %}</title>
 </head>
 <body>
     <header>
         <h1>E-Council</h1>
+
         <nav>
             <ul>
                 <li><a href="{{ url_for('index') }}">Home</a></li>
                 <li><a href="{{ url_for('login') }}">Log In</a></li>
-                <li><a href="{{ url_for('signup')}}">Sign Up</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
             </ul>
         </nav>
     </header>
