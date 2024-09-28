@@ -1,8 +1,18 @@
 import os
+import json
+import fitz  # PyMuPDF
 from flask import Flask, request, render_template, send_from_directory
 from docx import Document
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Configure the API key for the generative model
+genai.configure(api_key=os.environ['GOOGLE_GEMINI_AI_API_KEY'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -15,11 +25,57 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 def index():
     if request.method == 'POST':
         form_data = request.form.to_dict()
+        subject_title = form_data.get('subject_title', '')
+
+        # Handle file upload
+        file = request.files.get('additional_context')
+        additional_context = ""
+        if file:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            if filename.endswith('.pdf'):
+                additional_context = extract_text_from_pdf(file_path)
+            else:
+                with open(file_path, 'r') as f:
+                    additional_context = f.read()
+
+        # Combine subject_title and additional_context for context
+        context = f"{subject_title}\n{additional_context}"
+
+        # Generate text using Gemini AI API with combined context
+        form_data['date'] = generate_text("Suggest a date and only output that date for the event in the format 'Month Day, Year' (e.g., January 20, 2024).", context)
+        form_data['introductory_paragraph'] = generate_text("Generate an introductory paragraph for the event.", context)
+        form_data['time'] = generate_text("Suggest a time and only output that time for the event in the format H:mm AM/PM without leading zeros and without seconds.", context)
+        form_data['location'] = generate_text("Suggest and only output a single location for the event.", context)
+        form_data['participants'] = generate_text("Generate/predict and only output the number of participants (inte) for the event.", context)
+        form_data['budget'] = generate_text("Suggest and only output an overall budget for the event in PHP currency.", context)
+
+        # Convert non-string values to strings
+        form_data['participants'] = str(form_data['participants'])
+        form_data['budget'] = str(form_data['budget'])
+
         response_filename = 'concept_paper.docx'
         response_filepath = os.path.join(app.config['UPLOAD_FOLDER'], response_filename)
         create_docx(form_data, response_filepath)
         return render_template('index.html', download_link=response_filename)
     return render_template('index.html')
+
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            text += page.get_text()
+    return text
+
+def generate_text(prompt, context):
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(f"{prompt} Context: {context}")
+    try:
+        response_json = json.loads(response.text)
+        return response_json
+    except json.JSONDecodeError:
+        return response.text
 
 def create_docx(data, output_path):
     template_path = os.path.join('ms-word-templates', 'concept-paper-with-header-and-footer-template.docx')
@@ -71,7 +127,8 @@ def replace_placeholder(doc, placeholder, replacement):
     for table in doc.tables:
         for row in table.rows:
             for cell in row.cells:
-                replace_placeholder(cell, placeholder, replacement)
+                for paragraph in cell.paragraphs:
+                    replace_in_paragraph(paragraph, placeholder, replacement)
 
 def replace_in_paragraph(paragraph, placeholder, replacement):
     # Concatenate all runs' text
@@ -86,11 +143,11 @@ def replace_in_paragraph(paragraph, placeholder, replacement):
             run.text = ''
         
         # Add the new text back into the paragraph
-        paragraph.runs[0].text = full_text
+        paragraph.add_run(full_text)
 
 @app.route('/uploads/<filename>')
 def uploads(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
