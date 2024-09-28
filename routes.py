@@ -10,10 +10,12 @@ def register_routes(app, db):
     @app.route("/")
     def index():
         """
-        Shows the index page with all the users.
+        Handles the home page.
+
+        Returns:
+            str: The rendered home page.
         """
-        users = Users.query.all()
-        return render_template("index.html", users=users)
+        return render_template("index.html")
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
