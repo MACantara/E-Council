@@ -102,11 +102,13 @@ nav ul li a:hover {
 .hero-button {
     display: inline-block;
     margin-top: 1rem;
-    padding: 0.5rem 1rem;
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
+    max-width: 200px;
+    text-align: center;
+    padding: 1rem;
 }
 
 .hero-button:hover {
