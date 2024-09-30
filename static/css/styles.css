@@ -179,6 +179,12 @@ nav ul li a {
     gap: 0.5rem;
 }
 
+.horizontal-input-pair {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .password-requirements-container {
     padding: 1.5rem;
     border-radius: var(--border-radius);
