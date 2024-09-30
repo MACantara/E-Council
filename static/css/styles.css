@@ -6,15 +6,13 @@
 
 :root {
     --font-family: Arial, Helvetica, sans-serif;
+    --primary-color: #FFFFFF;
+    --secondary-color: #000000;
     --background-color: #F2F2F2;
-    --header-background-color: #333;
-    --header-text-color: #fff;
-    --nav-link-hover-bg-color: #555;
-    --button-bg-color: #000000;
-    --button-text-color: #fff;
-    --button-hover-bg-color: #333;
+    --primary-text-color: #000000;
+    --secondary-text-color: #FFFFFF;
+    --button-hover-background-color: #555;
     --border-radius: 4px;
-    --column-max-width: 600px;
 }
 
 html {
@@ -28,8 +26,8 @@ body {
 
 /* Header Styles */
 header {
-    background-color: var(--header-background-color);
-    color: var(--header-text-color);
+    background-color: var(--primary-color);
+    color: var(--text-color);
     padding: 1rem 2.5rem;
     display: flex;
     justify-content: space-between;
@@ -47,22 +45,9 @@ nav ul li {
 }
 
 nav ul li a {
-    color: var(--header-text-color);
+    color: var(--primary-text-color);
     text-decoration: none;
     padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-}
-
-nav ul li a:hover {
-    background-color: var(--nav-link-hover-bg-color);
-}
-
-.nav-button {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: var(--button-bg-color);
-    color: var(--button-text-color);
-    text-decoration: none;
     border-radius: var(--border-radius);
 }
 
@@ -96,14 +81,43 @@ nav ul li a:hover {
 
 .hero-column img {
     max-width: 100%;
-    /* height: auto; */
+}
+
+/* Button Styles */
+
+.primary-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color)
+}
+
+.secondary-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: var(--primary-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color)
+}
+
+.text-button,
+.logo-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: var(--primary-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
 }
 
 .hero-button {
     display: inline-block;
     margin-top: 1rem;
-    background-color: var(--button-bg-color);
-    color: var(--button-text-color);
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
     max-width: 200px;
@@ -111,6 +125,9 @@ nav ul li a:hover {
     padding: 1rem;
 }
 
-.hero-button:hover {
-    background-color: var(--button-hover-bg-color);
+.hero-button:hover,
+.primary-button:hover,
+.secondary-button:hover,
+.text-button:hover {
+    background-color: var(--button-hover-background-color);
 }
