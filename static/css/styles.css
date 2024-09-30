@@ -74,7 +74,7 @@ nav ul li a:hover {
     align-items: center;
     padding: 1rem;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1250px;
     margin: 6rem auto 0 auto;
 }
 
@@ -96,7 +96,7 @@ nav ul li a:hover {
 
 .hero-column img {
     max-width: 100%;
-    height: auto;
+    /* height: auto; */
 }
 
 .hero-button {
