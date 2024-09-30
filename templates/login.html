@@ -1,10 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Log In</h1>
+<div class="container">
+    <h2>Log In</h2>
+
     <form method="post">
-        <input type="text" name="username" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
-        <button type="submit">Log In</button>
+        <div class="input-pair">
+            <label for="users-username">Username/Email</label>
+            <input type="text" name="users-username" id="users-username" placeholder="Username/Email" required>
+        </div>
+
+        <div class="input-pair">
+            <label for="users-password">Password</label>
+            <input type="password" name="users-password" id="users-password" placeholder="Password" required>
+            <button class="show-password-button">Show Password</button>
+        </div>
+
+        <button class="primary-button" type="submit">Log In</button>
+
+        <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
     </form>
+</div>
 {% endblock %}
