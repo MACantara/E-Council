@@ -16,6 +16,7 @@
     --primary-button-hover-background-color: #333333;
     --secondary-button-hover-background-color: #E0E0E0;
     --border-radius: 8px;
+    --form-background-color: #FFFFFF;
 }
 
 /* Global Styles */
@@ -156,6 +157,7 @@ nav ul li a {
     border: 1px solid var(--secondary-color);
     max-width: 500px;
     margin: 1.5rem auto;
+    background-color: var(--form-background-color);
 }
 
 .container > form {
