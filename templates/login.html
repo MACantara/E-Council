@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
+{% block title %}Log In{% endblock %}
+
 {% block content %}
 <div class="container">
     <h2>Log In</h2>
 
-    <form method="post">
+    <form method="POST">
         <div class="input-pair">
             <label for="users-username">Username/Email</label>
             <input type="text" name="users-username" id="users-username" placeholder="Username/Email" required>
@@ -13,6 +15,10 @@
         <div class="input-pair">
             <label for="users-password">Password</label>
             <input type="password" name="users-password" id="users-password" placeholder="Password" required>
+        </div>
+
+        <div class="horizontal-input-pair">
+            <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
             <button class="show-password-button">Show Password</button>
         </div>
 
