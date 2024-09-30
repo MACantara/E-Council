@@ -1,9 +1,11 @@
+/* Global Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* CSS Variables */
 :root {
     --font-family: Arial, Helvetica, sans-serif;
     --primary-color: #FFFFFF;
@@ -16,6 +18,7 @@
     --border-radius: 4px;
 }
 
+/* Global Styles */
 html {
     font-size: 16px; /* 1rem = 16px */
 }
@@ -23,6 +26,10 @@ html {
 body {
     font-family: var(--font-family);
     background-color: var(--background-color);
+}
+
+h2 {
+    font-size: 1.5rem;
 }
 
 /* Header Styles */
@@ -93,7 +100,9 @@ nav ul li a {
     color: var(--secondary-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
-    border: 1px solid var(--secondary-color)
+    border: 1px solid var(--secondary-color);
+    cursor: pointer;
+    font-size: 1rem;
 }
 
 .secondary-button {
@@ -102,7 +111,9 @@ nav ul li a {
     color: var(--primary-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
-    border: 1px solid var(--secondary-color)
+    border: 1px solid var(--secondary-color);
+    cursor: pointer;
+    font-size: 1rem;
 }
 
 .text-button,
@@ -112,6 +123,7 @@ nav ul li a {
     color: var(--primary-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
+    cursor: pointer;
 }
 
 .hero-button {
@@ -134,4 +146,62 @@ nav ul li a {
 .secondary-button:hover,
 .text-button:hover {
     background-color: var(--secondary-button-hover-background-color);
+}
+
+/* Container Styles */
+
+.container {
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    max-width: 500px;
+    margin: 1.5rem auto;
+}
+
+.container > form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.container > h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Input Styles */
+
+.input-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.password-requirements-container {
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+}
+
+.show-password-button {
+    font-size: 1rem;
+    align-self: flex-end;
+    border: none;
+    background: transparent;
+    display: inline-block;
+    cursor: pointer;
+}
+
+form > p {
+    text-align: center;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
 }
