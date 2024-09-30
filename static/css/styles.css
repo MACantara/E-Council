@@ -81,6 +81,9 @@ nav ul li a:hover {
 .column {
     flex: 1;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .column > h2 {
