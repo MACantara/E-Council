@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
+{% block title %}Sign Up{% endblock %}
+
 {% block content %}
 <div class="container">
     <h2>Sign Up</h2>
 
-    <form method="post">
+    <form method="POST">
         <div class="input-pair">
             <label for="users-first-name">First Name</label>
             <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name" required>
@@ -59,8 +61,9 @@
         <div class="input-pair">
             <label for="users-password">Password</label>
             <input type="password" name="users-password" id="users-password" placeholder="Password" required>
-            <button class="show-password-button">Show Password</button>
         </div>
+
+        <button class="show-password-button">Show Password</button>
 
         <div class="password-requirements-container">
             <p>Must be at least 8 characters long</p>
@@ -73,8 +76,9 @@
         <div class="input-pair">
             <label for="users-repeat-password">Repeat Password</label>
             <input type="password" name="users-repeat-password" id="users-repeat-password" placeholder="Repeat Password" required>
-            <button class="show-password-button">Show Password</button>
         </div>
+
+        <button class="show-password-button">Show Password</button>
 
         <button class="primary-button" type="submit">Sign Up</button>
 
