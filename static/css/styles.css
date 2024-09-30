@@ -11,7 +11,8 @@
     --background-color: #F2F2F2;
     --primary-text-color: #000000;
     --secondary-text-color: #FFFFFF;
-    --button-hover-background-color: #555;
+    --primary-button-hover-background-color: #333333;
+    --secondary-button-hover-background-color: #E0E0E0;
     --border-radius: 4px;
 }
 
@@ -126,8 +127,11 @@ nav ul li a {
 }
 
 .hero-button:hover,
-.primary-button:hover,
+.primary-button:hover {
+    background-color: var(--primary-button-hover-background-color);
+}
+
 .secondary-button:hover,
 .text-button:hover {
-    background-color: var(--button-hover-background-color);
+    background-color: var(--secondary-button-hover-background-color);
 }
