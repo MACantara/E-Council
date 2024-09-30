@@ -71,3 +71,10 @@ def register_routes(app, db):
             else:
                 flash("Login failed!", "error")
                 return redirect(url_for("login"))
+
+    @app.route("/forgot-password", methods=["GET", "POST"])
+    def forgot_password():
+        """
+        Handles the forgot password page.
+        """
+        return render_template("forgot-password.html")
