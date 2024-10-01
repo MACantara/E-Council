@@ -149,7 +149,7 @@ nav ul li a {
     background-color: var(--secondary-button-hover-background-color);
 }
 
-/* Container Styles */
+/* Base Container Styles */
 
 .container {
     padding: 1.5rem;
@@ -173,6 +173,31 @@ nav ul li a {
 
 .container > p {
     margin-bottom: 1.5rem;
+}
+
+/* Account Styles */
+
+.account-picture {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto;
+}
+
+/* Account Settings Container Styles */
+
+.account-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.account-details-container {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
 }
 
 /* Form Input Styles */
