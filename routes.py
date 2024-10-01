@@ -85,3 +85,10 @@ def register_routes(app, db):
         Handles the reset password page.
         """
         return render_template("reset-password.html")
+
+    @app.route("/account")
+    def account():
+        """
+        Handles the account page.
+        """
+        return render_template("account.html")
