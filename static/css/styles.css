@@ -185,7 +185,7 @@ nav ul li a {
     margin-bottom: 1.5rem;
 }
 
-/* Account Styles */
+/* Account Settings Styles */
 
 .account-picture {
     width: 160px;
@@ -232,6 +232,11 @@ nav ul li a {
     width: 30%;
 }
 
+.account-settings-sidebar-container > a {
+    color: var(--secondary-text-color);
+    text-decoration: none;
+}
+
 .account-settings-content-container {
     display: flex;
     flex-direction: column;
@@ -253,6 +258,15 @@ nav ul li a {
 
 .account-settings-content-container > h2 {
     text-align: center;
+}
+
+/* Email Settings Styles */
+
+.email-button-group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 /* Form Input Styles */
