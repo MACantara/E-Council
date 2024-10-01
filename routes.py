@@ -113,3 +113,10 @@ def register_routes(app, db):
         Handles the password & security settings page.
         """
         return render_template("password-security-settings.html")
+
+    @app.route("/council-overview")
+    def council_overview():
+        """
+        Handles the council overview page.
+        """
+        return render_template("council-overview.html")
