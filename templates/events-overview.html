@@ -1,0 +1,431 @@
+{% extends "base.html" %}
+
+{% block title %}Events Overview{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+        <h2>Events Overview</h2>
+
+        <button class="primary-button create-button" type="submit">Create New Event</button>
+
+        <div class="horizontal-input-pair">
+            <select name="council-overview-school-year" id="council-overview-school-year"
+                aria-label="Select a School Year" required>
+                <option value="" disabled selected>Select a School Year</option>
+                <option value="2024-2025">S.Y 2024-2025</option>
+            </select>
+
+            <div class="council-overview-select-group">
+                <select name="council-overview-filter-by-status" id="council-overview-filter-by-status"
+                    aria-label="Filter by Status" required>
+                    <option value="" disabled selected>Filter by Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                <select name="council-overview-filter-by-semester" id="council-overview-filter-by-semester"
+                    aria-label="Filter by Semester" required>
+                    <option value="" disabled selected>Filter by Semester</option>
+                    <option value="1st-semester">1st Semester</option>
+                    <option value="2nd-semester">2nd Semester</option>
+                </select>
+                <select name="council-overview-sort-by-date" id="council-overview-sort-by-date"
+                    aria-label="Sort by Date" required>
+                    <option value="" disabled selected>Sort by Date</option>
+                    <option value="recent-to-old">Recent to Old</option>
+                    <option value="old-to-recent">Old to Recent</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="council-overview-content-container-group">
+            <div class="council-overview-content-grid-item">
+                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
+                    required>
+                    <option value="" disabled selected>Select a Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <h3>Event No. 1</h3>
+
+                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
+                    second semester...</p>
+
+                <div class="grid-item-details">
+                    <div class="grid-item-details-pair">
+                        <p>Date:</p>
+                        <p>July 8, 2024</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Time:</p>
+                        <p>8:00 AM - 5:00 PM</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Venue:</p>
+                        <p>Computer Laboratory M-209 & M-210</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Budget:</p>
+                        <p>₱ 0.00</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="budget-chart-1"></canvas>
+                </div>
+
+                <div class="grid-item-button-group">
+                    <button class="primary-button">View</button>
+                    <button class="secondary-button">Update</button>
+                    <button class="secondary-button">Invite</button>
+                    <button class="secondary-button">Delete</button>
+                </div>
+            </div>
+            <div class="council-overview-content-grid-item">
+                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
+                    required>
+                    <option value="" disabled selected>Select a Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <h3>Event No. 2</h3>
+
+                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
+                    second semester...</p>
+
+                <div class="grid-item-details">
+                    <div class="grid-item-details-pair">
+                        <p>Date:</p>
+                        <p>July 8, 2024</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Time:</p>
+                        <p>8:00 AM - 5:00 PM</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Venue:</p>
+                        <p>Computer Laboratory M-209 & M-210</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Budget:</p>
+                        <p>₱ 0.00</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="budget-chart-2"></canvas>
+                </div>
+
+                <div class="grid-item-button-group">
+                    <button class="primary-button">View</button>
+                    <button class="secondary-button">Update</button>
+                    <button class="secondary-button">Invite</button>
+                    <button class="secondary-button">Delete</button>
+                </div>
+            </div>
+            <div class="council-overview-content-grid-item">
+                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
+                    required>
+                    <option value="" disabled selected>Select a Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <h3>Event No. 3</h3>
+
+                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
+                    second semester...</p>
+
+                <div class="grid-item-details">
+                    <div class="grid-item-details-pair">
+                        <p>Date:</p>
+                        <p>July 8, 2024</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Time:</p>
+                        <p>8:00 AM - 5:00 PM</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Venue:</p>
+                        <p>Computer Laboratory M-209 & M-210</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Budget:</p>
+                        <p>₱ 0.00</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="budget-chart-3"></canvas>
+                </div>
+
+                <div class="grid-item-button-group">
+                    <button class="primary-button">View</button>
+                    <button class="secondary-button">Update</button>
+                    <button class="secondary-button">Invite</button>
+                    <button class="secondary-button">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Data for remaining budget and expenses
+    const remainingBudget = 20000; // Example value
+    const expenses = 23000; // Example value
+    const overBudget = expenses > remainingBudget ? expenses - remainingBudget : 0; // Calculate over budget amount
+
+    // Initialize the budget chart 1
+    const ctx1 = document.getElementById('budget-chart-1').getContext('2d');
+    let budgetChart1 = new Chart(ctx1, {
+        type: 'bar', // Use 'bar' type for horizontal bars
+        data: {
+            labels: ['Budget Overview'], // Label for the dataset
+            datasets: [
+                {
+                    label: 'Remaining Budget',
+                    data: [remainingBudget],
+                    backgroundColor: getCssVariable('--remaining-budget-color'),
+                    borderColor: getCssVariable('--remaining-budget-color'),
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expenses (Within Budget)',
+                    data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
+                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
+                    borderColor: getCssVariable('--expenses-within-budget-color'),
+                    borderWidth: 1,
+                    stack: 'expenses' // Stack this dataset with the 'expenses' group
+                },
+                {
+                    label: 'Expenses (Over Budget)',
+                    data: [overBudget], // Show over budget amount to the right of the expenses within budget
+                    backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
+                    borderColor: getCssVariable('--expenses-over-budget-color'),
+                    borderWidth: 1,
+                    stack: 'expenses', // Stack this dataset with the 'expenses' group
+                }
+            ]
+        },
+        options: {
+            indexAxis: 'y', // Horizontal bars
+            responsive: true, // Make the chart responsive
+            maintainAspectRatio: false, // Allow the chart to resize based on its container
+            scales: {
+                y: {
+                    display: false // Hide the y-axis
+                },
+                x: {
+                    stacked: true, // Enable stacking for the x-axis
+                    beginAtZero: true, // Start the x-axis at 0
+                    ticks: {
+                        color: getCssVariable('--primary-text-color') // X-axis ticks color
+                    },
+                    title: {
+                        display: true, // Optionally add a title to the X-axis
+                        color: getCssVariable('--primary-text-color') // X-axis title color
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true, // Show the legend
+                    labels: {
+                        color: getLabelColor() // Set label color dynamically
+                    }
+                },
+            },
+        }
+    });
+
+    // Initialize the budget chart 2
+    const ctx2 = document.getElementById('budget-chart-2').getContext('2d');
+    let budgetChart2 = new Chart(ctx2, {
+        type: 'bar', // Use 'bar' type for horizontal bars
+        data: {
+            labels: ['Budget Overview'], // Label for the dataset
+            datasets: [
+                {
+                    label: 'Remaining Budget',
+                    data: [remainingBudget],
+                    backgroundColor: getCssVariable('--remaining-budget-color'),
+                    borderColor: getCssVariable('--remaining-budget-color'),
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expenses (Within Budget)',
+                    data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
+                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
+                    borderColor: getCssVariable('--expenses-within-budget-color'),
+                    borderWidth: 1,
+                    stack: 'expenses' // Stack this dataset with the 'expenses' group
+                },
+                {
+                    label: 'Expenses (Over Budget)',
+                    data: [overBudget], // Show over budget amount to the right of the expenses within budget
+                    backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
+                    borderColor: getCssVariable('--expenses-over-budget-color'),
+                    borderWidth: 1,
+                    stack: 'expenses', // Stack this dataset with the 'expenses' group
+                }
+            ]
+        },
+        options: {
+            indexAxis: 'y', // Horizontal bars
+            responsive: true, // Make the chart responsive
+            maintainAspectRatio: false, // Allow the chart to resize based on its container
+            scales: {
+                y: {
+                    display: false // Hide the y-axis
+                },
+                x: {
+                    stacked: true, // Enable stacking for the x-axis
+                    beginAtZero: true, // Start the x-axis at 0
+                    ticks: {
+                        color: getCssVariable('--primary-text-color') // X-axis ticks color
+                    },
+                    title: {
+                        display: true, // Optionally add a title to the X-axis
+                        color: getCssVariable('--primary-text-color') // X-axis title color
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true, // Show the legend
+                    labels: {
+                        color: getLabelColor() // Set label color dynamically
+                    }
+                },
+            },
+        }
+    });
+
+    // Initialize the budget chart 2
+    const ctx3 = document.getElementById('budget-chart-3').getContext('2d');
+    let budgetChart3 = new Chart(ctx3, {
+        type: 'bar', // Use 'bar' type for horizontal bars
+        data: {
+            labels: ['Budget Overview'], // Label for the dataset
+            datasets: [
+                {
+                    label: 'Remaining Budget',
+                    data: [remainingBudget],
+                    backgroundColor: getCssVariable('--remaining-budget-color'),
+                    borderColor: getCssVariable('--remaining-budget-color'),
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expenses (Within Budget)',
+                    data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
+                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
+                    borderColor: getCssVariable('--expenses-within-budget-color'),
+                    borderWidth: 1,
+                    stack: 'expenses' // Stack this dataset with the 'expenses' group
+                },
+                {
+                    label: 'Expenses (Over Budget)',
+                    data: [overBudget], // Show over budget amount to the right of the expenses within budget
+                    backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
+                    borderColor: getCssVariable('--expenses-over-budget-color'),
+                    borderWidth: 1,
+                    stack: 'expenses', // Stack this dataset with the 'expenses' group
+                }
+            ]
+        },
+        options: {
+            indexAxis: 'y', // Horizontal bars
+            responsive: true, // Make the chart responsive
+            maintainAspectRatio: false, // Allow the chart to resize based on its container
+            scales: {
+                y: {
+                    display: false // Hide the y-axis
+                },
+                x: {
+                    stacked: true, // Enable stacking for the x-axis
+                    beginAtZero: true, // Start the x-axis at 0
+                    ticks: {
+                        color: getCssVariable('--primary-text-color') // X-axis ticks color
+                    },
+                    title: {
+                        display: true, // Optionally add a title to the X-axis
+                        color: getCssVariable('--primary-text-color') // X-axis title color
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true, // Show the legend
+                    labels: {
+                        color: getLabelColor() // Set label color dynamically
+                    }
+                },
+            },
+        }
+    });
+
+    // Function to update the chart when color scheme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        updateChartColors();
+    });
+
+    // Function to update chart colors dynamically
+    function updateChartColors() {
+        const labelColor = getLabelColor();
+        const rangeColor = getCssVariable('--primary-text-color');
+
+        // Update dataset colors
+        budgetChart.data.datasets[0].backgroundColor = getCssVariable('--remaining-budget-color');
+        budgetChart.data.datasets[0].borderColor = getCssVariable('--remaining-budget-color');
+        budgetChart.data.datasets[1].backgroundColor = getCssVariable('--expenses-within-budget-color');
+        budgetChart.data.datasets[1].borderColor = getCssVariable('--expenses-within-budget-color');
+        budgetChart.data.datasets[2].backgroundColor = getCssVariable('--expenses-over-budget-color');
+        budgetChart.data.datasets[2].borderColor = getCssVariable('--expenses-over-budget-color');
+
+        // Update legend label colors
+        budgetChart.options.plugins.legend.labels.color = labelColor;
+
+        // Update X-axis title and tick colors
+        budgetChart.options.scales.x.ticks.color = rangeColor;
+        budgetChart.options.scales.x.title.color = rangeColor;
+
+        budgetChart.update();
+    }
+
+    // Function to get CSS variable value
+    function getCssVariable(variable) {
+        return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+    }
+
+    // Update the label and range colors using CSS variables
+    function getLabelColor() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? getCssVariable('--primary-text-color') // Dark mode
+            : getCssVariable('--primary-text-color'); // Light mode
+    }
+
+    // Initialize the chart with current colors
+    updateChartColors();
+</script>
+
+{% endblock %}
