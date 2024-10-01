@@ -93,9 +93,9 @@ def register_routes(app, db):
         """
         return render_template("account.html")
 
-    @app.route("/edit-account", methods=["GET", "POST"])
-    def edit_account():
+    @app.route("/account-settings", methods=["GET", "POST"])
+    def account_settings():
         """
         Handles the edit account page.
         """
-        return render_template("edit-account.html")
+        return render_template("account-settings.html")
