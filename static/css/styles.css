@@ -203,6 +203,26 @@ nav ul li a {
     gap: 0.5rem;
 }
 
+.account-settings-container {
+    display: flex;
+    flex-direction: row;
+    max-width: 900px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    margin: 1.5rem auto;
+    background-color: var(--form-background-color);
+}
+
+.account-settings-sidebar-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-right: 1px solid var(--secondary-color);
+    gap: 1rem;
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
+}
+
 /* Form Input Styles */
 
 .input-pair {
