@@ -33,6 +33,11 @@ h2 {
     font-size: 1.5rem;
 }
 
+main {
+    display: grid;
+    place-items: center;
+}
+
 /* Header Styles */
 header {
     background-color: var(--primary-color);
@@ -161,6 +166,7 @@ nav ul li a {
     max-width: 500px;
     margin: 1.5rem auto;
     background-color: var(--form-background-color);
+    width: 100%;
 }
 
 .container > form {
@@ -206,11 +212,12 @@ nav ul li a {
 .account-settings-container {
     display: flex;
     flex-direction: row;
-    max-width: 900px;
+    max-width: 950px;
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
-    margin: 1.5rem auto;
+    margin: 1.5rem;
     background-color: var(--form-background-color);
+    width: calc(100% - 3rem);
 }
 
 .account-settings-sidebar-container {
@@ -221,6 +228,19 @@ nav ul li a {
     gap: 1rem;
     background-color: var(--secondary-color);
     color: var(--secondary-text-color);
+    width: 30%;
+}
+
+.account-settings-content-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    width: 70%;
+}
+
+.account-settings-content-container > h2 {
+    text-align: center;
 }
 
 /* Form Input Styles */
@@ -229,12 +249,14 @@ nav ul li a {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
 }
 
 .horizontal-input-pair {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    gap: 1.5rem;
 }
 
 .password-requirements-container {
