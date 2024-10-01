@@ -28,7 +28,7 @@
     --secondary-button-hover-background-color: #828282; /* Darker grey for better hover contrast */
 
     /* Border and Radius */
-    --border-radius: 6px;
+    --border-radius: 8px;
 
     /* Spacing (Padding) */
     --padding-small: 0.5rem 1rem;
@@ -264,6 +264,16 @@ nav ul li a {
     margin: 0 auto;
 }
 
+.about-me-container {
+    padding: var(--padding-large);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    max-width: var(--max-width-container);
+    margin: 0 auto var(--padding-large) auto;
+    background-color: var(--form-background-color);
+    width: 100%;
+}
+
 /* Account Settings Container Styles */
 
 .account-container {
@@ -389,6 +399,7 @@ select {
     flex-direction: row;
     width: 100%;
     height: 100%;
+    min-height: 100vh;
 }
 
 .council-overview-sidebar-container {
@@ -399,7 +410,8 @@ select {
     gap: var(--gap-medium);
     background-color: var(--secondary-color);
     width: 20%;
-    flex: 1;
+    height: 100%;
+    flex-grow: 1;
 }
 
 .council-overview-content-container {
@@ -490,4 +502,28 @@ select {
 .council-overview-content-table th:nth-child(3),
 .council-overview-content-table td:nth-child(3) {
     width: 20%;
+}
+
+/* Council Overview Select Styles */
+
+.council-overview-select-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--gap-large);
+}
+
+/* Council Overview Grid Styles */
+
+.council-overview-content-grid-item {
+    padding: var(--padding-large);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    background-color: var(--form-background-color);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-large);
+    max-height: 660px;
+    height: 100%;
 }
