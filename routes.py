@@ -78,3 +78,10 @@ def register_routes(app, db):
         Handles the forgot password page.
         """
         return render_template("forgot-password.html")
+
+    @app.route("/reset-password", methods=["GET", "POST"])
+    def reset_password():
+        """
+        Handles the reset password page.
+        """
+        return render_template("reset-password.html")
