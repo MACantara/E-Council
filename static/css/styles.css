@@ -79,7 +79,7 @@ body {
     color: var(--primary-text-color);
 }
 
-h2 {
+h2:not(.hero-column > h2) {
     font-size: 1.5rem;
     color: var(--primary-text-color);
     text-align: center;
@@ -99,6 +99,10 @@ main {
 
 a {
     color: var(--primary-text-color);
+}
+
+select {
+    max-width: fit-content;
 }
 
 /* Header Styles */
@@ -407,4 +411,18 @@ select {
 
 .council-overview-content-container > h2 {
     font-size: var(--font-size-extra-large);
+}
+
+.council-overview-content-container-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--gap-large);
+}
+
+.council-overview-content-subcontainer {
+    padding: var(--padding-large);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    background-color: var(--form-background-color);
+    width: 100%;
 }
