@@ -120,3 +120,10 @@ def register_routes(app, db):
         Handles the council overview page.
         """
         return render_template("council-overview.html")
+
+    @app.route("/events-overview")
+    def events_overview():
+        """
+        Handles the events overview page.
+        """
+        return render_template("events-overview.html")
