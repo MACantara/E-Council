@@ -99,3 +99,17 @@ def register_routes(app, db):
         Handles the edit account page.
         """
         return render_template("account-settings.html")
+
+    @app.route("/email-settings", methods=["GET", "POST"])
+    def email_settings():
+        """
+        Handles the email settings page.
+        """
+        return render_template("email-settings.html")
+
+    @app.route("/password-security-settings", methods=["GET", "POST"])
+    def password_security_settings():
+        """
+        Handles the password & security settings page.
+        """
+        return render_template("password-security-settings.html")
