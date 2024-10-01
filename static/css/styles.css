@@ -8,7 +8,7 @@
 /* CSS Variables for Light Mode (Default) */
 :root {
     /* Font Settings */
-    --font-family: "Press Start 2P", sans-serif;
+    --font-family: "Arial", "Helvetica", sans-serif;
     --font-size-medium: 1rem;
     --font-size-large: 1.25rem;
     --font-size-extra-large: 3rem;
@@ -55,7 +55,7 @@
         --secondary-color: #e94560; /* Bold, neon red for attention-grabbing elements */
         --background-color: #0d1b2a; /* Dark blue-black for contrast and atmosphere */
         --primary-text-color: #e8f1f2; /* Soft off-white for readability against dark backgrounds */
-        --form-background-color: #4A5A7A; /* Light variant of the primary color for forms */
+        --form-background-color: #4a5a7a; /* Light variant of the primary color for forms */
         --white-background-color: #e8f1f2; /* Light off-white for readability against dark backgrounds */
 
         /* Button Hover Colors */
@@ -79,7 +79,7 @@ body {
     color: var(--primary-text-color);
 }
 
-h2:not(.hero-column > h2) {
+h2 {
     font-size: 1.5rem;
     color: var(--primary-text-color);
     text-align: center;
@@ -142,7 +142,7 @@ nav ul li a {
     width: 100%;
     max-width: var(--max-width-hero);
     margin: 6rem auto 0 auto;
-    color: var(--primary-text-color)
+    color: var(--primary-text-color);
 }
 
 .hero-column {
@@ -155,6 +155,7 @@ nav ul li a {
 
 .hero-column > h2 {
     font-size: 3.5rem;
+    text-align: left;
 }
 
 .hero-column > p {
@@ -386,7 +387,7 @@ select {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: calc(100vh - var(--header-height));
+    height: 100%;
 }
 
 .council-overview-sidebar-container {
@@ -425,4 +426,21 @@ select {
     border: 1px solid var(--secondary-color);
     background-color: var(--form-background-color);
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-large);
+}
+
+.council-overview-content-subcontainer > h3 {
+    font-size: var(--font-size-large);
+    text-align: center;
+}
+
+.council-overview-content-subcontainer > p {
+    text-align: center;
+}
+
+.council-overview-content-subcontainer:nth-child(1),
+.council-overview-content-subcontainer:nth-child(4) {
+    grid-column: span 2;
 }
