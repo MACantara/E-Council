@@ -10,7 +10,7 @@
     /* Font Settings */
     --font-family: "Arial", "Helvetica", sans-serif;
     --font-size-medium: 1rem;
-    --font-size-large: 1.25rem;
+    --font-size-large: 1.5rem;
     --font-size-extra-large: 3rem;
 
     /* Color Palette (Light Mode) */
@@ -46,6 +46,9 @@
 
     /* Other */
     --header-height: 5.28875rem;
+    --remaining-budget-color: green;
+    --expenses-within-budget-color: red;
+    --expenses-over-budget-color: darkred;
 }
 
 /* Dark Mode */
@@ -526,4 +529,43 @@ select {
     gap: var(--gap-large);
     max-height: 660px;
     height: 100%;
+}
+
+.council-overview-content-grid-item > h3 {
+    text-align: center;
+    font-size: var(--font-size-large);
+}
+
+.grid-item-details-pair {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-large);
+}
+
+.chart-container {
+    width: 100%;
+    height: 200px; /* Or adjust to fit your design */
+    position: relative;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.grid-item-button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--gap-large);
+}
+
+.grid-item-button-group button:nth-child(4) {
+    grid-column: span 3;
+}
+
+/* Council Overview Buttons */
+
+.create-button {
+    max-width: fit-content;
+    margin: 0 auto;
 }
