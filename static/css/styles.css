@@ -5,7 +5,7 @@
     box-sizing: border-box;
 }
 
-/* CSS Variables for Light Mode (Default) */
+/* Light Mode */
 :root {
     /* Font Settings */
     --font-family: "Arial", "Helvetica", sans-serif;
@@ -15,20 +15,20 @@
 
     /* Color Palette (Light Mode) */
     --primary-color: #f5f5f5; /* Light grey for a clean background */
-    --secondary-color: #e94560; /* Bold neon red for attention-grabbing elements */
+    --secondary-color: #00578a; /* Deeper blue for better contrast with light backgrounds */
     --background-color: #ffffff; /* White for a bright, light mode feel */
-    --primary-text-color: #0d1b2a; /* Dark navy for readable text */
-    --primary-button-text-color: #e8f1f2; /* Soft off-white for readability against light backgrounds */
-    --form-background-color: #ebf1f5; /* Light grey-blue for subtle contrast */
+    --primary-text-color: #1e1e1e; /* Very dark grey for optimal readability */
+    --primary-button-text-color: #ffffff; /* Pure white for button text */
+    --form-background-color: #e2e8f0; /* Slightly darker light grey for better contrast */
     --white-background-color: #ffffff; /* Pure white for form inputs */
-    --divider-color: #d3d3d3; /* Light grey for dividers */
+    --divider-color: #b0b0b0; /* Mid-grey for visible but subtle dividers */
 
     /* Button Hover Colors */
-    --primary-button-hover-background-color: #ff5714; /* Vivid orange for energetic hover effects */
-    --secondary-button-hover-background-color: #bdc3c7; /* Soft grey hover for neutral buttons */
+    --primary-button-hover-background-color: #00799f; /* Slightly darker cyan for contrast */
+    --secondary-button-hover-background-color: #828282; /* Darker grey for better hover contrast */
 
     /* Border and Radius */
-    --border-radius: 8px;
+    --border-radius: 6px;
 
     /* Spacing (Padding) */
     --padding-small: 0.5rem 1rem;
@@ -48,20 +48,20 @@
     --header-height: 5.28875rem;
 }
 
-/* Dark Mode Styles */
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
     :root {
         /* Color Palette for Dark Mode */
-        --primary-color: #1b263b; /* Deep navy blue for a sleek and immersive background */
-        --secondary-color: #e94560; /* Bold, neon red for attention-grabbing elements */
-        --background-color: #0d1b2a; /* Dark blue-black for contrast and atmosphere */
-        --primary-text-color: #e8f1f2; /* Soft off-white for readability against dark backgrounds */
-        --form-background-color: #4a5a7a; /* Light variant of the primary color for forms */
-        --white-background-color: #e8f1f2; /* Light off-white for readability against dark backgrounds */
+        --primary-color: #0a192f; /* Dark navy for a sleek, modern background */
+        --secondary-color: #00a2c7; /* Slightly darker cyan for better contrast */
+        --background-color: #0e2433; /* Very dark blue for better contrast and eye comfort */
+        --primary-text-color: #e0e0e0; /* Soft light grey for readability against dark backgrounds */
+        --form-background-color: #1a3b5a; /* Muted blue-grey for form contrast */
+        --white-background-color: #d1e0e6; /* Light off-white for form fields against dark backgrounds */
 
         /* Button Hover Colors */
-        --primary-button-hover-background-color: #ff5714; /* Vivid orange for energetic hover effects */
-        --secondary-button-hover-background-color: #52616b; /* Cool grey for a neutral hover state */
+        --primary-button-hover-background-color: #0091af; /* Slightly darker cyan for hover effect */
+        --secondary-button-hover-background-color: #3b4a5a; /* Dark grey for subtle hover on neutral buttons */
     }
 
     body {
@@ -303,7 +303,7 @@ nav ul li a {
 
 .account-settings-sidebar-container > a,
 .council-overview-sidebar-container > a {
-    color: var(--primary-text-color);
+    color: var(--primary-button-text-color);
     text-decoration: none;
 }
 
@@ -398,7 +398,6 @@ select {
     border-right: 1px solid var(--secondary-color);
     gap: var(--gap-medium);
     background-color: var(--secondary-color);
-    color: var(--primary-text-color);
     width: 20%;
     flex: 1;
 }
