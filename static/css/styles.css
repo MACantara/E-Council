@@ -5,27 +5,28 @@
     box-sizing: border-box;
 }
 
-/* CSS Variables */
+/* CSS Variables for Light Mode (Default) */
 :root {
     /* Font Settings */
-    --font-family: Arial, Helvetica, sans-serif;
+    --font-family: "Press Start 2P", sans-serif;
     --font-size-medium: 1rem;
     --font-size-large: 1.25rem;
 
-    /* Color Palette */
-    --primary-color: #FFFFFF;
-    --secondary-color: #000000;
-    --background-color: #F2F2F2;
-    --primary-text-color: #000000;
-    --secondary-text-color: #FFFFFF;
+    /* Color Palette (Light Mode) */
+    --primary-color: #f5f5f5; /* Light grey for a clean background */
+    --secondary-color: #e94560; /* Bold neon red for attention-grabbing elements */
+    --background-color: #ffffff; /* White for a bright, light mode feel */
+    --primary-text-color: #0d1b2a; /* Dark navy for readable text */
+    --primary-button-text-color: #e8f1f2; /* Soft off-white for readability against light backgrounds */
+    --form-background-color: #ebf1f5; /* Light grey-blue for subtle contrast */
+    --white-background-color: #ffffff; /* Pure white for form inputs */
 
     /* Button Hover Colors */
-    --primary-button-hover-background-color: #333333;
-    --secondary-button-hover-background-color: #E0E0E0;
+    --primary-button-hover-background-color: #ff5714; /* Vivid orange for energetic hover effects */
+    --secondary-button-hover-background-color: #bdc3c7; /* Soft grey hover for neutral buttons */
 
     /* Border and Radius */
     --border-radius: 8px;
-    --form-background-color: #FFFFFF;
 
     /* Spacing (Padding) */
     --padding-small: 0.5rem 1rem;
@@ -42,18 +43,48 @@
     --max-width-hero: 1250px;
 }
 
+/* Dark Mode Styles */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Color Palette for Dark Mode */
+        --primary-color: #1b263b; /* Deep navy blue for a sleek and immersive background */
+        --secondary-color: #e94560; /* Bold, neon red for attention-grabbing elements */
+        --background-color: #0d1b2a; /* Dark blue-black for contrast and atmosphere */
+        --primary-text-color: #e8f1f2; /* Soft off-white for readability against dark backgrounds */
+        --form-background-color: #4A5A7A; /* Light variant of the primary color for forms */
+        --white-background-color: #e8f1f2; /* Light off-white for readability against dark backgrounds */
+
+        /* Button Hover Colors */
+        --primary-button-hover-background-color: #ff5714; /* Vivid orange for energetic hover effects */
+        --secondary-button-hover-background-color: #52616b; /* Cool grey for a neutral hover state */
+    }
+
+    body {
+        background-color: var(--background-color);
+    }
+}
+
 /* Global Styles */
 html {
-    font-size: 16px; /* 1rem = 16px */
+    font-size: 16px;
 }
 
 body {
     font-family: var(--font-family);
     background-color: var(--background-color);
+    color: var(--primary-text-color);
 }
 
 h2 {
     font-size: 1.5rem;
+    color: var(--primary-text-color);
+}
+
+h3,
+label,
+p,
+button {
+    color: var(--primary-text-color);
 }
 
 main {
@@ -102,6 +133,7 @@ nav ul li a {
     width: 100%;
     max-width: var(--max-width-hero);
     margin: 6rem auto 0 auto;
+    color: var(--primary-text-color)
 }
 
 .hero-column {
@@ -130,7 +162,7 @@ nav ul li a {
     display: inline-block;
     padding: var(--padding-small);
     background-color: var(--secondary-color);
-    color: var(--secondary-text-color);
+    color: var(--primary-button-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
@@ -167,7 +199,7 @@ nav ul li a {
     display: inline-block;
     margin-top: 1rem;
     background-color: var(--secondary-color);
-    color: var(--secondary-text-color);
+    color: var(--primary-button-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
     max-width: 200px;
@@ -255,12 +287,12 @@ nav ul li a {
     border-right: 1px solid var(--secondary-color);
     gap: var(--gap-medium);
     background-color: var(--secondary-color);
-    color: var(--secondary-text-color);
+    color: var(--primary-text-color);
     width: 30%;
 }
 
 .account-settings-sidebar-container > a {
-    color: var(--secondary-text-color);
+    color: var(--primary-text-color);
     text-decoration: none;
 }
 
@@ -340,4 +372,5 @@ select {
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
+    background-color: var(--white-background-color);
 }
