@@ -11,6 +11,7 @@
     --font-family: "Press Start 2P", sans-serif;
     --font-size-medium: 1rem;
     --font-size-large: 1.25rem;
+    --font-size-extra-large: 3rem;
 
     /* Color Palette (Light Mode) */
     --primary-color: #f5f5f5; /* Light grey for a clean background */
@@ -41,6 +42,9 @@
     /* Layout Max Widths */
     --max-width-container: 500px;
     --max-width-hero: 1250px;
+
+    /* Other */
+    --header-height: 5.28875rem;
 }
 
 /* Dark Mode Styles */
@@ -78,6 +82,7 @@ body {
 h2 {
     font-size: 1.5rem;
     color: var(--primary-text-color);
+    text-align: center;
 }
 
 h3,
@@ -236,7 +241,6 @@ nav ul li a {
 }
 
 .container > h2 {
-    text-align: center;
     margin-bottom: var(--gap-large);
 }
 
@@ -297,8 +301,7 @@ nav ul li a {
     text-decoration: none;
 }
 
-.account-settings-content-container,
-.council-overview-content-container {
+.account-settings-content-container {
     display: flex;
     flex-direction: column;
     padding: var(--padding-large);
@@ -315,10 +318,6 @@ nav ul li a {
 
 .account-settings-content-container > h3 {
     font-size: var(--font-size-large);
-}
-
-.account-settings-content-container > h2 {
-    text-align: center;
 }
 
 /* Email Settings Styles */
@@ -383,6 +382,7 @@ select {
     display: flex;
     flex-direction: row;
     width: 100%;
+    height: calc(100vh - var(--header-height));
 }
 
 .council-overview-sidebar-container {
@@ -394,4 +394,17 @@ select {
     background-color: var(--secondary-color);
     color: var(--primary-text-color);
     width: 20%;
+    flex: 1;
+}
+
+.council-overview-content-container {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-large);
+    gap: var(--gap-large);
+    width: 80%;
+}
+
+.council-overview-content-container > h2 {
+    font-size: var(--font-size-extra-large);
 }
