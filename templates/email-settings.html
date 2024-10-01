@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Email Settings{% endblock %}
+
+{% block content %}
+
+<div class="account-settings-container">
+    {% include "account-settings-sidebar.html" %}
+
+    <div class="account-settings-content-container">
+        <h2>Email Settings</h2>
+
+        <form method="POST">
+            <div class="input-pair">
+                <div class="email-button-group">
+                    <label for="users-current-email">Current Email</label>
+
+                    <p class="secondary-button" type="submit">Not Verified</p>
+                    <button class="primary-button" type="submit">Verify Email</button>
+                </div>
+                <input type="email" name="users-current-email" id="users-current-email" placeholder="Current Email" disabled>
+            </div>
+
+            <div class="input-pair">
+                <label for="users-new-email">New Email</label>
+                <input type="email" name="users-new-email" id="users-new-email" placeholder="New Email" required>
+            </div>
+
+            <div class="input-pair">
+                <label for="users-current-password">Current Password</label>
+                <input type="password" name="users-current-password" id="users-current-password" placeholder="Current Password" required>
+            </div>
+
+            <button class="primary-button" type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
