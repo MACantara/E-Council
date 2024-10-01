@@ -7,16 +7,39 @@
 
 /* CSS Variables */
 :root {
+    /* Font Settings */
     --font-family: Arial, Helvetica, sans-serif;
+    --font-size-medium: 1rem;
+    --font-size-large: 1.25rem;
+
+    /* Color Palette */
     --primary-color: #FFFFFF;
     --secondary-color: #000000;
     --background-color: #F2F2F2;
     --primary-text-color: #000000;
     --secondary-text-color: #FFFFFF;
+
+    /* Button Hover Colors */
     --primary-button-hover-background-color: #333333;
     --secondary-button-hover-background-color: #E0E0E0;
+
+    /* Border and Radius */
     --border-radius: 8px;
     --form-background-color: #FFFFFF;
+
+    /* Spacing (Padding) */
+    --padding-small: 0.5rem 1rem;
+    --padding-medium: 1rem 2.5rem;
+    --padding-large: 1.5rem;
+
+    /* Spacing (Gap) */
+    --gap-small: 0.5rem;
+    --gap-medium: 1rem;
+    --gap-large: 1.5rem;
+
+    /* Layout Max Widths */
+    --max-width-container: 500px;
+    --max-width-hero: 1250px;
 }
 
 /* Global Styles */
@@ -38,11 +61,15 @@ main {
     place-items: center;
 }
 
+a {
+    color: var(--primary-text-color);
+}
+
 /* Header Styles */
 header {
     background-color: var(--primary-color);
     color: var(--primary-text-color);
-    padding: 1rem 2.5rem;
+    padding: var(--padding-medium);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -61,7 +88,7 @@ nav ul li {
 nav ul li a {
     color: var(--primary-text-color);
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: var(--padding-small);
     border-radius: var(--border-radius);
 }
 
@@ -71,18 +98,18 @@ nav ul li a {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: var(--padding-medium);
     width: 100%;
-    max-width: 1250px;
+    max-width: var(--max-width-hero);
     margin: 6rem auto 0 auto;
 }
 
 .hero-column {
     flex: 1;
-    padding: 1rem;
+    padding: var(--padding-medium);
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: var(--gap-large);
 }
 
 .hero-column > h2 {
@@ -90,7 +117,7 @@ nav ul li a {
 }
 
 .hero-column > p {
-    font-size: 1.25rem;
+    font-size: var(--font-size-large);
 }
 
 .hero-column img {
@@ -101,26 +128,26 @@ nav ul li a {
 
 .primary-button {
     display: inline-block;
-    padding: 0.5rem 1rem;
+    padding: var(--padding-small);
     background-color: var(--secondary-color);
     color: var(--secondary-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: var(--font-size-medium);
     text-align: center;
 }
 
 .secondary-button {
     display: inline-block;
-    padding: 0.5rem 1rem;
+    padding: var(--padding-small);
     color: var(--primary-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: var(--font-size-medium);
     text-align: center;
     background-color: var(--primary-color);
 }
@@ -128,7 +155,7 @@ nav ul li a {
 .text-button,
 .logo-button {
     display: inline-block;
-    padding: 0.5rem 1rem;
+    padding: var(--padding-small);
     color: var(--primary-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
@@ -161,11 +188,11 @@ nav ul li a {
 /* Base Container Styles */
 
 .container {
-    padding: 1.5rem;
+    padding: var(--padding-large);
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
-    max-width: 500px;
-    margin: 1.5rem auto;
+    max-width: var(--max-width-container);
+    margin: var(--padding-large) auto;
     background-color: var(--form-background-color);
     width: 100%;
 }
@@ -173,16 +200,16 @@ nav ul li a {
 .container > form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--gap-large);
 }
 
 .container > h2 {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--gap-large);
 }
 
 .container > p {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--gap-large);
 }
 
 /* Account Settings Styles */
@@ -200,14 +227,14 @@ nav ul li a {
 .account-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--gap-large);
 }
 
 .account-details-container {
     display: flex;
     flex-direction: column;
     text-align: center;
-    gap: 0.5rem;
+    gap: var(--gap-small);
 }
 
 .account-settings-container {
@@ -216,7 +243,7 @@ nav ul li a {
     max-width: 950px;
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
-    margin: 1.5rem;
+    margin: var(--padding-large);
     background-color: var(--form-background-color);
     width: calc(100% - 3rem);
 }
@@ -224,9 +251,9 @@ nav ul li a {
 .account-settings-sidebar-container {
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
+    padding: var(--padding-large);
     border-right: 1px solid var(--secondary-color);
-    gap: 1rem;
+    gap: var(--gap-medium);
     background-color: var(--secondary-color);
     color: var(--secondary-text-color);
     width: 30%;
@@ -240,20 +267,20 @@ nav ul li a {
 .account-settings-content-container {
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
-    gap: 1.5rem;
+    padding: var(--padding-large);
+    gap: var(--gap-large);
     width: 70%;
 }
 
 .account-settings-content-container > form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--gap-large);
     width: 100%;
 }
 
 .account-settings-content-container > h3 {
-    font-size: 1.25rem;
+    font-size: var(--font-size-large);
 }
 
 .account-settings-content-container > h2 {
@@ -265,7 +292,7 @@ nav ul li a {
 .email-button-group {
     display: flex;
     flex-direction: row;
-    gap: 0.5rem;
+    gap: var(--gap-small);
     align-items: center;
 }
 
@@ -274,7 +301,7 @@ nav ul li a {
 .input-pair {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--gap-small);
     width: 100%;
 }
 
@@ -282,17 +309,17 @@ nav ul li a {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: var(--gap-large);
 }
 
 .password-requirements-container {
-    padding: 1.5rem;
+    padding: var(--padding-large);
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
 }
 
 .show-password-button {
-    font-size: 1rem;
+    font-size: var(--font-size-medium);
     align-self: flex-end;
     border: none;
     background: transparent;
@@ -309,7 +336,7 @@ input[type="email"],
 input[type="password"],
 input[type="file"],
 select {
-    font-size: 1rem;
+    font-size: var(--font-size-medium);
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
