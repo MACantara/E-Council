@@ -291,12 +291,14 @@ nav ul li a {
     width: 30%;
 }
 
-.account-settings-sidebar-container > a {
+.account-settings-sidebar-container > a,
+.council-overview-sidebar-container > a {
     color: var(--primary-text-color);
     text-decoration: none;
 }
 
-.account-settings-content-container {
+.account-settings-content-container,
+.council-overview-content-container {
     display: flex;
     flex-direction: column;
     padding: var(--padding-large);
@@ -373,4 +375,23 @@ select {
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
     background-color: var(--white-background-color);
+}
+
+/* E-Council Overview Container Styles */
+
+.council-overview-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.council-overview-sidebar-container {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-large);
+    border-right: 1px solid var(--secondary-color);
+    gap: var(--gap-medium);
+    background-color: var(--secondary-color);
+    color: var(--primary-text-color);
+    width: 20%;
 }
