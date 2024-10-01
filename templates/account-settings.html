@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Account{% endblock %}
+
+{% block content %}
+
+<div class="account-settings-container">
+    {% include "account-settings-sidebar.html" %}
+
+    <div class="account-settings-content-container">
+        <h2>Account Settings</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="horizontal-input-pair">
+                <div class="input-pair">
+                    <label for="users-first-name">First Name</label>
+                    <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="users-last-name">Last Name</label>
+                    <input type="text" name="users-last-name" id="users-last-name" placeholder="Last Name" required>
+                </div>
+            </div>
+
+            <div class="input-pair">
+                <label for="users-username">Username</label>
+                <input type="text" name="users-username" id="users-username" placeholder="Username" required>
+            </div>
+
+            <div class="input-pair">
+                <label for="users-department">Department</label>
+                <select name="users-department" id="users-department" required>
+                    <option value="" disabled selected>Select a Department</option>
+                    <option value="college-of-computer-studies">College of Computer Studies</option>
+                    <option value="college-of-engineering">College of Engineering</option>
+                    <option value="college-of-architecture">College of Architecture</option>
+                    <option value="college-of-criminology">College of Criminology</option>
+                    <option value="college-of-nursing">College of Nursing</option>
+                    <option value="college-of-arts-sciences-and-education">College of Arts, Sciences and Education</option>
+                    <option value="college-of-business-administration-and-accountancy">College of Business Administration and
+                        Accountancy</option>
+                    <option value="college-of-physical-and-occupational-therapy">College of Physical and Occupational Therapy
+                    </option>
+                    <option value="college-of-international-tourism-and-hospitality-management">College of International Tourism
+                        and Hospitality Management</option>
+                    <option value="college-of-pharmacy">College of Pharmacy</option>
+                    <option value="college-of-radiologic-technology">College of Radiologic Technology</option>
+                </select>
+            </div>
+
+            <div class="input-pair">
+                <label for="users-role">Role</label>
+                <select name="users-role" id="users-role" required>
+                    <option value="" disabled selected>Select a Role</option>
+                    <option value="student-council-officer">Student Council Officer</option>
+                    <option value="faculty">Faculty</option>
+                    <option value="staff">Staff</option>
+                </select>
+            </div>
+
+            <div class="input-pair">
+                <label for="users-home-address">Home Address</label>
+                <input type="text" name="users-home-address" id="users-home-address" placeholder="Home Address">
+            </div>
+
+            <div class="input-pair">
+                <label for="users-contact-number">Contact Number</label>
+                <input type="text" name="users-contact-number" id="users-contact-number" placeholder="Contact Number">
+            </div>
+
+            <div class="input-pair">
+                <label for="users-signature">Signature</label>
+                <input type="file" name="users-signature" id="users-signature">
+            </div>
+
+            <div class="input-pair">
+                <label for="users-current-password">Current Password</label>
+                <input type="password" name="users-current-password" id="users-current-password" placeholder="Current Password" required>
+            </div>
+
+            <button class="primary-button" type="submit">Save Changes</button>
+        </form>
+
+        <h3>Delete Account</h3>
+
+        <button class="secondary-button" type="submit">Delete Account</button>
+    </div>
+</div>
+
+{% endblock %}
