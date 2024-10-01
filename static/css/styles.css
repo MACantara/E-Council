@@ -21,6 +21,7 @@
     --primary-button-text-color: #e8f1f2; /* Soft off-white for readability against light backgrounds */
     --form-background-color: #ebf1f5; /* Light grey-blue for subtle contrast */
     --white-background-color: #ffffff; /* Pure white for form inputs */
+    --divider-color: #d3d3d3; /* Light grey for dividers */
 
     /* Button Hover Colors */
     --primary-button-hover-background-color: #ff5714; /* Vivid orange for energetic hover effects */
@@ -418,6 +419,7 @@ select {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--gap-large);
+    height: 100%;
 }
 
 .council-overview-content-subcontainer {
@@ -429,6 +431,11 @@ select {
     display: flex;
     flex-direction: column;
     gap: var(--gap-large);
+    height: 100%;
+}
+
+.council-overview-content-subcontainer > button {
+    margin-top: auto
 }
 
 .council-overview-content-subcontainer > h3 {
@@ -443,4 +450,45 @@ select {
 .council-overview-content-subcontainer:nth-child(1),
 .council-overview-content-subcontainer:nth-child(4) {
     grid-column: span 2;
+}
+
+/* Council Overview Table Styles */
+
+.council-overview-content-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.council-overview-content-table th {
+    font-weight: bold;
+    border-bottom: 1px solid var(--divider-color);
+    padding: var(--padding-small);
+    font-size: var(--font-size-medium);
+    padding: var(--gap-medium);
+}
+
+.council-overview-content-table td {
+    border-bottom: 1px solid var(--divider-color);
+    padding: var(--padding-small);
+    font-size: var(--font-size-medium);
+    padding: var(--gap-medium);
+}
+
+.council-overview-content-table td:not(:first-child) {
+    text-align: center;
+}
+
+.council-overview-content-table th:nth-child(1),
+.council-overview-content-table td:nth-child(1) {
+    width: 55%;
+}
+
+.council-overview-content-table th:nth-child(2),
+.council-overview-content-table td:nth-child(2) {
+    width: 25%;
+}
+
+.council-overview-content-table th:nth-child(3),
+.council-overview-content-table td:nth-child(3) {
+    width: 20%;
 }
