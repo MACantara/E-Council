@@ -128,6 +128,13 @@ def register_routes(app, db):
         """
         return render_template("events-overview.html")
     
+    @app.route("/concept-papers-overview")
+    def concept_papers_overview():
+        """
+        Handles the concept papers overview page.
+        """
+        return render_template("concept-papers-overview.html")
+    
     @app.route("/documentation-overview")
     def documentation_overview():
         """
