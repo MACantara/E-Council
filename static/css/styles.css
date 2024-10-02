@@ -253,6 +253,8 @@ nav ul li a {
     margin-bottom: var(--gap-large);
 }
 
+
+
 /* Account Settings Styles */
 
 .account-picture {
@@ -302,12 +304,16 @@ nav ul li a {
 .account-settings-sidebar-container {
     display: flex;
     flex-direction: column;
-    padding: var(--padding-large);
+    padding: 0 var(--padding-large) var(--padding-large) var(--padding-large);
     border-right: 1px solid var(--secondary-color);
-    gap: var(--gap-medium);
     background-color: var(--secondary-color);
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
     color: var(--primary-text-color);
     width: 30%;
+}
+
+.account-settings-sidebar-container > a {
+    padding: var(--gap-large) 0;
 }
 
 .account-settings-sidebar-container > a,
@@ -404,7 +410,7 @@ select {
 .council-overview-sidebar-container {
     display: flex;
     flex-direction: column;
-    padding: var(--padding-large);
+    padding: 0 var(--padding-large) var(--padding-large) var(--padding-large);
     border-right: 1px solid var(--secondary-color);
     background-color: var(--secondary-color);
     width: 20%;
@@ -412,12 +418,8 @@ select {
     flex-grow: 1;
 }
 
-.council-overview-sidebar-container > a:nth-child(1) {
-    padding-top: 0;
-}
-
 .council-overview-sidebar-container > a {
-    padding: var(--gap-medium) 0;
+    padding: var(--gap-large) 0;
 }
 
 .council-overview-content-container {
