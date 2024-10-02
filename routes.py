@@ -162,3 +162,10 @@ def register_routes(app, db):
         Handles the board resolutions overview page.
         """
         return render_template("board-resolutions-overview.html")
+    
+    @app.route("/notable-achievement-reports-overview")
+    def notable_achievement_reports_overview():
+        """
+        Handles the notable achievement reports overview page.
+        """
+        return render_template("notable-achievement-reports-overview.html")
