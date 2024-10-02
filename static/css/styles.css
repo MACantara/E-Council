@@ -527,7 +527,7 @@ select {
     display: flex;
     flex-direction: column;
     gap: var(--gap-large);
-    max-height: 660px;
+    max-height: fit-content;
     height: 100%;
 }
 
