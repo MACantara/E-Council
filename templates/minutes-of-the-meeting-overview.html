@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Events Overview{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+        <h2>Minutes of the Meeting Overview</h2>
+
+        <button class="primary-button create-button" type="submit">Create New Minutes of the Meeting</button>
+
+        <div class="horizontal-input-pair">
+            <select name="council-overview-school-year" id="council-overview-school-year"
+                aria-label="Select a School Year" required>
+                <option value="" disabled selected>Select a School Year</option>
+                <option value="2024-2025">S.Y 2024-2025</option>
+            </select>
+
+            <div class="council-overview-select-group">
+                <select name="council-overview-filter-by-status" id="council-overview-filter-by-status"
+                    aria-label="Filter by Status" required>
+                    <option value="" disabled selected>Filter by Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                <select name="council-overview-filter-by-semester" id="council-overview-filter-by-semester"
+                    aria-label="Filter by Semester" required>
+                    <option value="" disabled selected>Filter by Semester</option>
+                    <option value="1st-semester">1st Semester</option>
+                    <option value="2nd-semester">2nd Semester</option>
+                </select>
+                <select name="council-overview-sort-by-date" id="council-overview-sort-by-date"
+                    aria-label="Sort by Date" required>
+                    <option value="" disabled selected>Sort by Date</option>
+                    <option value="recent-to-old">Recent to Old</option>
+                    <option value="old-to-recent">Old to Recent</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="council-overview-content-container-group">
+            <div class="council-overview-content-grid-item">
+                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
+                    required>
+                    <option value="" disabled selected>Select a Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <h3>Minutes of the Meeting No. 1</h3>
+
+                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
+                    second semester...</p>
+
+                <div class="grid-item-button-group">
+                    <button class="primary-button">View</button>
+                    <button class="secondary-button">Update</button>
+                    <button class="secondary-button">Delete</button>
+                </div>
+            </div>
+            <div class="council-overview-content-grid-item">
+                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
+                    required>
+                    <option value="" disabled selected>Select a Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <h3>Minutes of the Meeting No. 2</h3>
+
+                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
+                    second semester...</p>
+
+                <div class="grid-item-button-group">
+                    <button class="primary-button">View</button>
+                    <button class="secondary-button">Update</button>
+                    <button class="secondary-button">Delete</button>
+                </div>
+            </div>
+
+            <div class="council-overview-content-grid-item">
+                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
+                    required>
+                    <option value="" disabled selected>Select a Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+
+                <h3>Minutes of the Meeting No. 3</h3>
+
+                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
+                    second semester...</p>
+
+                <div class="grid-item-button-group">
+                    <button class="primary-button">View</button>
+                    <button class="secondary-button">Update</button>
+                    <button class="secondary-button">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
