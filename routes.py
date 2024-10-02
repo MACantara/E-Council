@@ -155,3 +155,10 @@ def register_routes(app, db):
         Handles the accreditation requirements overview page.
         """
         return render_template("accreditation-requirements-overview.html")
+    
+    @app.route("/board-resolutions-overview")
+    def board_resolutions_overview():
+        """
+        Handles the board resolutions overview page.
+        """
+        return render_template("board-resolutions-overview.html")
