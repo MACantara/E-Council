@@ -148,3 +148,10 @@ def register_routes(app, db):
         Handles the financial reports overview page.
         """
         return render_template("financial-reports-overview.html")
+    
+    @app.route("/accreditation-requirements-overview")
+    def accreditation_requirements_overview():
+        """
+        Handles the accreditation requirements overview page.
+        """
+        return render_template("accreditation-requirements-overview.html")
