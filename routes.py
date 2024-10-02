@@ -127,3 +127,10 @@ def register_routes(app, db):
         Handles the events overview page.
         """
         return render_template("events-overview.html")
+    
+    @app.route("/documentation-overview")
+    def documentation_overview():
+        """
+        Handles the documentation overview page.
+        """
+        return render_template("documentation-overview.html")
