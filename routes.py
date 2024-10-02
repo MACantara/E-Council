@@ -169,3 +169,10 @@ def register_routes(app, db):
         Handles the notable achievement reports overview page.
         """
         return render_template("notable-achievement-reports-overview.html")
+    
+    @app.route("/society-achievement-and-compliances-reports-overview")
+    def society_accomplishment_and_compliance_reports_overview():
+        """
+        Handles the society accomplishment and compliance reports overview page.
+        """
+        return render_template("society-accomplishment-and-compliance-reports-overview.html")
