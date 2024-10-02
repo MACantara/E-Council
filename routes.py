@@ -176,3 +176,10 @@ def register_routes(app, db):
         Handles the society accomplishment and compliance reports overview page.
         """
         return render_template("society-accomplishment-and-compliance-reports-overview.html")
+    
+    @app.route("/minutes-of-the-meeting-overview")
+    def minutes_of_the_meeting_overview():
+        """
+        Handles the minutes of the meeting overview page.
+        """
+        return render_template("minutes-of-the-meeting-overview.html")
