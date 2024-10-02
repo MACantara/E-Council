@@ -10,7 +10,8 @@
     <div class="council-overview-content-container">
         <h2>Student Enrichment Activity Reports Overview</h2>
 
-        <button class="primary-button create-button" type="submit">Create New Student Enrichment Activity Report</button>
+        <button class="primary-button create-button" type="submit">Create New Student Enrichment Activity
+            Report</button>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
@@ -20,6 +21,14 @@
             </select>
 
             <div class="council-overview-select-group">
+                <select name="council-overview-filter-by-status" id="council-overview-filter-by-status"
+                    aria-label="Filter by Status" required>
+                    <option value="" disabled selected>Filter by Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="postponed">Postponed</option>
+                    <option value="done">Done</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
                 <select name="council-overview-sort-by-date" id="council-overview-sort-by-date"
                     aria-label="Sort by Date" required>
                     <option value="" disabled selected>Sort by Date</option>
