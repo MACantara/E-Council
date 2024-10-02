@@ -481,14 +481,12 @@ select {
 .council-overview-content-table th {
     font-weight: bold;
     border-bottom: 1px solid var(--divider-color);
-    padding: var(--padding-small);
     font-size: var(--font-size-medium);
     padding: var(--gap-medium);
 }
 
 .council-overview-content-table td {
     border-bottom: 1px solid var(--divider-color);
-    padding: var(--padding-small);
     font-size: var(--font-size-medium);
     padding: var(--gap-medium);
 }
