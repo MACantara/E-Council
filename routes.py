@@ -204,3 +204,10 @@ def register_routes(app, db):
         Handles the calendar of activities overview page.
         """
         return render_template("calendar-of-activities-overview.html")
+    
+    @app.route("/semestral-clearance-overview")
+    def semestral_clearance_overview():
+        """
+        Handles the semestral clearance overview page.
+        """
+        return render_template("semestral-clearance-overview.html")
