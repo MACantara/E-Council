@@ -406,11 +406,18 @@ select {
     flex-direction: column;
     padding: var(--padding-large);
     border-right: 1px solid var(--secondary-color);
-    gap: var(--gap-medium);
     background-color: var(--secondary-color);
     width: 20%;
     height: 100%;
     flex-grow: 1;
+}
+
+.council-overview-sidebar-container > a:nth-child(1) {
+    padding-top: 0;
+}
+
+.council-overview-sidebar-container > a {
+    padding: var(--gap-medium) 0;
 }
 
 .council-overview-content-container {
