@@ -141,3 +141,10 @@ def register_routes(app, db):
         Handles the documentation overview page.
         """
         return render_template("documentation-overview.html")
+    
+    @app.route("/financial-reports-overview")
+    def financial_reports_overview():
+        """
+        Handles the financial reports overview page.
+        """
+        return render_template("financial-reports-overview.html")
