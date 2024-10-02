@@ -54,10 +54,10 @@ pip install -r requirements.txt
 Start the Flask development server with:
 
 ```bash
-python app.py
+python run.py
 ```
 
-Replace app.py with the name of your Flask application file if different.
+Replace run.py with the name of your Flask application file if different.
 
 ### 5. Access the Application
 
