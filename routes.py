@@ -183,3 +183,10 @@ def register_routes(app, db):
         Handles the minutes of the meeting overview page.
         """
         return render_template("minutes-of-the-meeting-overview.html")
+    
+    @app.route("/student-enrichment-activity-reports-overview")
+    def student_enrichment_activity_reports_overview():
+        """
+        Handles the student enrichment activity reports overview page.
+        """
+        return render_template("student-enrichment-activity-reports-overview.html")
