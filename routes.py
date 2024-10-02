@@ -190,3 +190,10 @@ def register_routes(app, db):
         Handles the student enrichment activity reports overview page.
         """
         return render_template("student-enrichment-activity-reports-overview.html")
+    
+    @app.route("/end-of-semester-reports-overview")
+    def end_of_semester_reports_overview():
+        """
+        Handles the end of semester reports overview page.
+        """
+        return render_template("end-of-semester-reports-overview.html")
