@@ -197,3 +197,10 @@ def register_routes(app, db):
         Handles the end of semester reports overview page.
         """
         return render_template("end-of-semester-reports-overview.html")
+    
+    @app.route("/calendar-of-activities-overview")
+    def calendar_of_activities_overview():
+        """
+        Handles the calendar of activities overview page.
+        """
+        return render_template("calendar-of-activities-overview.html")
