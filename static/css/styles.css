@@ -564,8 +564,8 @@ select {
 }
 
 .grid-item-details-pair {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
     gap: var(--gap-large);
 }
 
