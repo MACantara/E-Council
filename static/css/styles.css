@@ -472,7 +472,8 @@ select {
     height: 100%;
 }
 
-.council-overview-content-subcontainer > button {
+.council-overview-content-subcontainer > button,
+.council-overview-content-subcontainer > a {
     margin-top: auto
 }
 
