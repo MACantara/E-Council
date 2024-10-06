@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Event Invitation Rejected{% endblock %}
+
+{% block content %}
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+        <div class="container">
+            <h2>Event Invitation Rejected</h2>
+
+            <p>You have successfully rejected the invitation to manage the event: "TechTutor: Empowering Communities with AI-Assisted IT Skills"</p>
+
+            <a href="{{ url_for('events_overview') }}" class="primary-button">Back to Events Overview</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
