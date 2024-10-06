@@ -65,7 +65,7 @@
 
     // Initialize the top 5 expenses chart
     const ctx1 = document.getElementById('top-5-expenses-chart').getContext('2d');
-    let budgetChart1 = new Chart(ctx1, {
+    let top5ExpensesChart = new Chart(ctx1, {
         type: 'doughnut', // Change to 'doughnut' type
         data: {
             labels: ['Expenses'], // Update labels to include only expenses
@@ -101,7 +101,7 @@
     
     // Initialize the top 5 income chart
     const ctx2 = document.getElementById('top-5-income-chart').getContext('2d');
-    let budgetChart2 = new Chart(ctx2, {
+    let top5IncomeChart = new Chart(ctx2, {
         type: 'doughnut', // Change to 'doughnut' type
         data: {
             labels: ['Income 1', 'Income 2', 'Income 3', 'Income 4', 'Income 5'], // Update labels to include only income
@@ -135,7 +135,7 @@
     
     // Initialize the remaining budget chart
     const ctx3 = document.getElementById('remaining-budget-chart').getContext('2d');
-    let budgetChart3 = new Chart(ctx3, {
+    let remainingBudgetChart = new Chart(ctx3, {
         type: 'doughnut', // Change to 'doughnut' type
         data: {
             labels: ['Remaining Budget'], // Update labels to include only remaining budget
@@ -173,20 +173,20 @@
         const labelColor = getLabelColor();
         const rangeColor = getCssVariable('--primary-text-color');
 
-        // Update dataset colors
-        // budgetChart.data.datasets[0].backgroundColor = getCssVariable('--remaining-budget-color');
-        // budgetChart.data.datasets[0].borderColor = getCssVariable('--remaining-budget-color');
-        // budgetChart.data.datasets[1].backgroundColor = getCssVariable('--expenses-within-budget-color');
-        // budgetChart.data.datasets[1].borderColor = getCssVariable('--expenses-within-budget-color');
-
         // Update legend label colors
-        // budgetChart.options.plugins.legend.labels.color = labelColor;
+        top5ExpensesChart.options.plugins.legend.labels.color = labelColor;
+        top5IncomeChart.options.plugins.legend.labels.color = labelColor;
+        remainingBudgetChart.options.plugins.legend.labels.color = labelColor;
 
         // Update X-axis title and tick colors
-        // budgetChart.options.scales.x.ticks.color = rangeColor;
-        // budgetChart.options.scales.x.title.color = rangeColor;
+        top5ExpensesChart.options.scales.x.ticks.color = rangeColor;
+        top5ExpensesChart.options.scales.x.title.color = rangeColor;
+        top5IncomeChart.options.scales.x.ticks.color = rangeColor;
+        top5IncomeChart.options.scales.x.title.color = rangeColor;
+        remainingBudgetChart.options.scales.x.ticks.color = rangeColor;
+        remainingBudgetChart.options.scales.x.title.color = rangeColor;
 
-        // budgetChart.update();
+        budgetChart.update();
     }
 
     // Function to get CSS variable value
