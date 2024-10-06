@@ -80,6 +80,7 @@
         --secondary-color: #00a2c7; /* Slightly darker cyan for better contrast */
         --background-color: #0e2433; /* Very dark blue for better contrast and eye comfort */
         --primary-text-color: #e0e0e0; /* Soft light grey for readability against dark backgrounds */
+        --primary-text-color-dark: #1e1e1e; /* Very dark grey for optimal readability */
         --form-background-color: #1a3b5a; /* Muted blue-grey for form contrast */
         --white-background-color: #d1e0e6; /* Light off-white for form fields against dark backgrounds */
 
@@ -427,12 +428,23 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="file"],
+input[type="number"],
+input[type="datetime-local"],
 select {
     font-size: var(--font-size-medium);
     padding: var(--padding-small);
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
     background-color: var(--white-background-color);
+}
+
+.custom-file-upload-input {
+    font-size: var(--font-size-medium);
+    padding: var(--padding-small);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    background-color: var(--white-background-color);
+    color: var(--primary-text-color-dark);
 }
 
 /* E-Council Overview Container Styles */
