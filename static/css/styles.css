@@ -28,9 +28,11 @@
     --secondary-button-hover-background-color: #828282; /* Darker grey for better hover contrast */
 
     /* Border and Radius */
+    --small-border-radius: 4px;
     --border-radius: 8px;
 
     /* Spacing (Padding) */
+    --padding-extra-small: 0.25rem 0.5rem;
     --padding-small: 0.5rem 1rem;
     --padding-medium: 1rem 2.5rem;
     --padding-large: 1.5rem;
@@ -436,15 +438,38 @@ select {
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
     background-color: var(--white-background-color);
+    cursor: pointer;
 }
 
 .custom-file-upload-input {
     font-size: var(--font-size-medium);
-    padding: var(--padding-small);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--secondary-color);
-    background-color: var(--white-background-color);
+    padding: var(--padding-extra-small);
     color: var(--primary-text-color-dark);
+    cursor: pointer;
+    padding-left: 0;
+}
+
+/* Style for the "Choose File" text */
+.choose-file-text {
+    padding: var(--padding-extra-small);
+    color: var(--primary-text-color-dark);
+    border-radius: var(--small-border-radius);
+    background-color: var(--white-background-color);
+}
+
+/* Style for the file name display */
+.file-name {
+    display: inline-block;
+    margin-left: 10px;
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    color: var(--primary-text-color);
+}
+
+/* Container for custom file input and file name */
+.custom-file-container {
+    display: flex;
+    align-items: center;
 }
 
 /* E-Council Overview Container Styles */
