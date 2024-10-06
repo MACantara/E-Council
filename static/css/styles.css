@@ -620,3 +620,12 @@ select {
     height: 200px;
     position: relative;
 }
+
+.transaction-history-filter-container {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-large);
+    align-items: center;
+    margin: 0 auto;
+    width: fit-content;
+}
