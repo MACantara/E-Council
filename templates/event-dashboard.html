@@ -35,7 +35,7 @@
                     <canvas id="top-5-income-chart"></canvas>
                 </div>
 
-                <p>Total Income: ₱ 640.00</p>
+                <p>Total Income: ₱ 15,000.00</p>
             </div>
 
             <div class="council-overview-content-grid-item">
@@ -60,8 +60,9 @@
 <script>
     // Data for top 5 expenses, top 5 income, and remaining budget
     let top5Expenses = [4000, 5000, 3000, 6000, 2000]; // Adjusted array to total 20,000
+    let top5Income = [3000, 4000, 2000, 5000, 1000]; // Adjusted array to total 15,000
+    const expenses = 1;
     const remainingBudget = 20000; // Example value
-    const expenses = 23000; // Example value
     const overBudget = expenses > remainingBudget ? expenses - remainingBudget : 0; // Calculate over budget amount
 
     // Function to update the chart when color scheme changes
@@ -181,23 +182,23 @@
     let top5IncomeChart = new Chart(ctx2, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Remaining Budget', 'Expenses (Within Budget)', 'Expenses (Over Budget)'], // Labels for the datasets
+            labels: ['Income 1', 'Income 2', 'Income 3', 'Income 4', 'Income 5'], // Labels for the datasets
             datasets: [
                 {
-                    data: [
-                        remainingBudget,
-                        expenses <= remainingBudget ? expenses : remainingBudget,
-                        overBudget
-                    ],
+                    data: top5Income, // Use the array of top 5 income
                     backgroundColor: [
-                        getCssVariable('--remaining-budget-color'),
-                        getCssVariable('--expenses-within-budget-color'),
-                        getCssVariable('--expenses-over-budget-color')
+                        getCssVariable('--income-color-1'),
+                        getCssVariable('--income-color-2'),
+                        getCssVariable('--income-color-3'),
+                        getCssVariable('--income-color-4'),
+                        getCssVariable('--income-color-5')
                     ],
                     borderColor: [
-                        getCssVariable('--remaining-budget-color'),
-                        getCssVariable('--expenses-within-budget-color'),
-                        getCssVariable('--expenses-over-budget-color')
+                        getCssVariable('--income-color-1'),
+                        getCssVariable('--income-color-2'),
+                        getCssVariable('--income-color-3'),
+                        getCssVariable('--income-color-4'),
+                        getCssVariable('--income-color-5')
                     ],
                     borderWidth: 1
                 }

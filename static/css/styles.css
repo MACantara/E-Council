@@ -56,6 +56,13 @@
     --expense-color-4: #ff6666; /* Medium light red */
     --expense-color-5: #ff9999; /* Light red */
 
+    /* Top 5 Income Chart Colors */
+    --income-color-1: #00cc00; /* Dark green */
+    --income-color-2: #00ff00; /* Bright green */
+    --income-color-3: #33ff33; /* Medium green */
+    --income-color-4: #66ff66; /* Medium light green */
+    --income-color-5: #99ff99; /* Light green */
+
     /* Chart Font Styles */
     --chart-font-family: "Arial";
     --chart-font-size: 16px;
