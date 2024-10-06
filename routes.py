@@ -156,6 +156,13 @@ def register_routes(app, db):
         """
         return render_template("invite-user.html")
     
+    @app.route("/event-invite-rejected")
+    def event_invite_rejected():
+        """
+        Handles the event invite rejected page.
+        """
+        return render_template("event-invite-rejected.html")
+    
     @app.route("/concept-papers-overview")
     def concept_papers_overview():
         """
