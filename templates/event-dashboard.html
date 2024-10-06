@@ -129,7 +129,7 @@
             : chartFontWeight;
     }
 
-    // Initialize the budget chart 1
+    // Initialize the top 5 expenses chart
     const ctx1 = document.getElementById('top-5-expenses-chart').getContext('2d');
     let top5ExpensesChart = new Chart(ctx1, {
         type: 'bar', // Use 'bar' type for horizontal bars
@@ -197,7 +197,7 @@
         }
     });
 
-    // Initialize the budget chart 2
+    // Initialize the top 5 income chart
     const ctx2 = document.getElementById('top-5-income-chart').getContext('2d');
     let top5IncomeChart = new Chart(ctx2, {
         type: 'bar', // Use 'bar' type for horizontal bars
@@ -265,7 +265,7 @@
         }
     });
 
-    // Initialize the budget chart 2
+    // Initialize the remaining budget chart
     const ctx3 = document.getElementById('remaining-budget-chart').getContext('2d');
     let remainingBudgetChart = new Chart(ctx3, {
         type: 'bar', // Use 'bar' type for horizontal bars
