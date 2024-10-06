@@ -135,6 +135,13 @@ def register_routes(app, db):
         """
         return render_template("event-dashboard.html")
     
+    @app.route("/add-transaction")
+    def add_transaction():
+        """
+        Handles the add transaction page.
+        """
+        return render_template("add-transaction.html")
+    
     @app.route("/concept-papers-overview")
     def concept_papers_overview():
         """
