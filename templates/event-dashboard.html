@@ -132,55 +132,33 @@
     // Initialize the top 5 expenses chart
     const ctx1 = document.getElementById('top-5-expenses-chart').getContext('2d');
     let top5ExpensesChart = new Chart(ctx1, {
-        type: 'bar', // Use 'bar' type for horizontal bars
+        type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Budget Overview'], // Label for the dataset
+            labels: ['Remaining Budget', 'Expenses (Within Budget)', 'Expenses (Over Budget)'], // Labels for the datasets
             datasets: [
                 {
-                    label: 'Remaining Budget',
-                    data: [remainingBudget],
-                    backgroundColor: getCssVariable('--remaining-budget-color'),
-                    borderColor: getCssVariable('--remaining-budget-color'),
+                    data: [
+                        remainingBudget,
+                        expenses <= remainingBudget ? expenses : remainingBudget,
+                        overBudget
+                    ],
+                    backgroundColor: [
+                        getCssVariable('--remaining-budget-color'),
+                        getCssVariable('--expenses-within-budget-color'),
+                        getCssVariable('--expenses-over-budget-color')
+                    ],
+                    borderColor: [
+                        getCssVariable('--remaining-budget-color'),
+                        getCssVariable('--expenses-within-budget-color'),
+                        getCssVariable('--expenses-over-budget-color')
+                    ],
                     borderWidth: 1
-                },
-                {
-                    label: 'Expenses (Within Budget)',
-                    data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
-                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                    borderColor: getCssVariable('--expenses-within-budget-color'),
-                    borderWidth: 1,
-                    stack: 'expenses' // Stack this dataset with the 'expenses' group
-                },
-                {
-                    label: 'Expenses (Over Budget)',
-                    data: [overBudget], // Show over budget amount to the right of the expenses within budget
-                    backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                    borderColor: getCssVariable('--expenses-over-budget-color'),
-                    borderWidth: 1,
-                    stack: 'expenses', // Stack this dataset with the 'expenses' group
                 }
             ]
         },
         options: {
-            indexAxis: 'y', // Horizontal bars
             responsive: true, // Make the chart responsive
             maintainAspectRatio: false, // Allow the chart to resize based on its container
-            scales: {
-                y: {
-                    display: false // Hide the y-axis
-                },
-                x: {
-                    stacked: true, // Enable stacking for the x-axis
-                    beginAtZero: true, // Start the x-axis at 0
-                    ticks: {
-                        color: getCssVariable('--primary-text-color') // X-axis ticks color
-                    },
-                    title: {
-                        display: true, // Optionally add a title to the X-axis
-                        color: getCssVariable('--primary-text-color') // X-axis title color
-                    }
-                }
-            },
             plugins: {
                 legend: {
                     display: true, // Show the legend
@@ -192,63 +170,41 @@
                             weight: getFontWeight()
                         }
                     }
-                },
-            },
+                }
+            }
         }
     });
-
+    
     // Initialize the top 5 income chart
     const ctx2 = document.getElementById('top-5-income-chart').getContext('2d');
     let top5IncomeChart = new Chart(ctx2, {
-        type: 'bar', // Use 'bar' type for horizontal bars
+        type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Budget Overview'], // Label for the dataset
+            labels: ['Remaining Budget', 'Expenses (Within Budget)', 'Expenses (Over Budget)'], // Labels for the datasets
             datasets: [
                 {
-                    label: 'Remaining Budget',
-                    data: [remainingBudget],
-                    backgroundColor: getCssVariable('--remaining-budget-color'),
-                    borderColor: getCssVariable('--remaining-budget-color'),
+                    data: [
+                        remainingBudget,
+                        expenses <= remainingBudget ? expenses : remainingBudget,
+                        overBudget
+                    ],
+                    backgroundColor: [
+                        getCssVariable('--remaining-budget-color'),
+                        getCssVariable('--expenses-within-budget-color'),
+                        getCssVariable('--expenses-over-budget-color')
+                    ],
+                    borderColor: [
+                        getCssVariable('--remaining-budget-color'),
+                        getCssVariable('--expenses-within-budget-color'),
+                        getCssVariable('--expenses-over-budget-color')
+                    ],
                     borderWidth: 1
-                },
-                {
-                    label: 'Expenses (Within Budget)',
-                    data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
-                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                    borderColor: getCssVariable('--expenses-within-budget-color'),
-                    borderWidth: 1,
-                    stack: 'expenses' // Stack this dataset with the 'expenses' group
-                },
-                {
-                    label: 'Expenses (Over Budget)',
-                    data: [overBudget], // Show over budget amount to the right of the expenses within budget
-                    backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                    borderColor: getCssVariable('--expenses-over-budget-color'),
-                    borderWidth: 1,
-                    stack: 'expenses', // Stack this dataset with the 'expenses' group
                 }
             ]
         },
         options: {
-            indexAxis: 'y', // Horizontal bars
             responsive: true, // Make the chart responsive
             maintainAspectRatio: false, // Allow the chart to resize based on its container
-            scales: {
-                y: {
-                    display: false // Hide the y-axis
-                },
-                x: {
-                    stacked: true, // Enable stacking for the x-axis
-                    beginAtZero: true, // Start the x-axis at 0
-                    ticks: {
-                        color: getCssVariable('--primary-text-color') // X-axis ticks color
-                    },
-                    title: {
-                        display: true, // Optionally add a title to the X-axis
-                        color: getCssVariable('--primary-text-color') // X-axis title color
-                    }
-                }
-            },
             plugins: {
                 legend: {
                     display: true, // Show the legend
@@ -260,63 +216,41 @@
                             weight: getFontWeight()
                         }
                     }
-                },
-            },
+                }
+            }
         }
     });
-
+    
     // Initialize the remaining budget chart
     const ctx3 = document.getElementById('remaining-budget-chart').getContext('2d');
     let remainingBudgetChart = new Chart(ctx3, {
-        type: 'bar', // Use 'bar' type for horizontal bars
+        type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Budget Overview'], // Label for the dataset
+            labels: ['Remaining Budget', 'Expenses (Within Budget)', 'Expenses (Over Budget)'], // Labels for the datasets
             datasets: [
                 {
-                    label: 'Remaining Budget',
-                    data: [remainingBudget],
-                    backgroundColor: getCssVariable('--remaining-budget-color'),
-                    borderColor: getCssVariable('--remaining-budget-color'),
+                    data: [
+                        remainingBudget,
+                        expenses <= remainingBudget ? expenses : remainingBudget,
+                        overBudget
+                    ],
+                    backgroundColor: [
+                        getCssVariable('--remaining-budget-color'),
+                        getCssVariable('--expenses-within-budget-color'),
+                        getCssVariable('--expenses-over-budget-color')
+                    ],
+                    borderColor: [
+                        getCssVariable('--remaining-budget-color'),
+                        getCssVariable('--expenses-within-budget-color'),
+                        getCssVariable('--expenses-over-budget-color')
+                    ],
                     borderWidth: 1
-                },
-                {
-                    label: 'Expenses (Within Budget)',
-                    data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
-                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                    borderColor: getCssVariable('--expenses-within-budget-color'),
-                    borderWidth: 1,
-                    stack: 'expenses' // Stack this dataset with the 'expenses' group
-                },
-                {
-                    label: 'Expenses (Over Budget)',
-                    data: [overBudget], // Show over budget amount to the right of the expenses within budget
-                    backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                    borderColor: getCssVariable('--expenses-over-budget-color'),
-                    borderWidth: 1,
-                    stack: 'expenses', // Stack this dataset with the 'expenses' group
                 }
             ]
         },
         options: {
-            indexAxis: 'y', // Horizontal bars
             responsive: true, // Make the chart responsive
             maintainAspectRatio: false, // Allow the chart to resize based on its container
-            scales: {
-                y: {
-                    display: false // Hide the y-axis
-                },
-                x: {
-                    stacked: true, // Enable stacking for the x-axis
-                    beginAtZero: true, // Start the x-axis at 0
-                    ticks: {
-                        color: getCssVariable('--primary-text-color') // X-axis ticks color
-                    },
-                    title: {
-                        display: true, // Optionally add a title to the X-axis
-                        color: getCssVariable('--primary-text-color') // X-axis title color
-                    }
-                }
-            },
             plugins: {
                 legend: {
                     display: true, // Show the legend
@@ -328,8 +262,8 @@
                             weight: getFontWeight()
                         }
                     }
-                },
-            },
+                }
+            }
         }
     });
 </script>
