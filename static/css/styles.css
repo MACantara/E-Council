@@ -559,6 +559,10 @@ select {
     font-size: var(--font-size-large);
 }
 
+.council-overview-content-grid-item > p {
+    text-align: center;
+}
+
 .council-overview-content-grid-item > select,
 #council-overview-school-year {
     width: fit-content;
