@@ -631,6 +631,10 @@ select {
     width: fit-content;
 }
 
+.transaction-history-filter-container > label {
+    font-weight: bold;
+}
+
 .pagination-button-group {
     display: flex;
     flex-direction: row;
