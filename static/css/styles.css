@@ -432,12 +432,18 @@ input[type="password"],
 input[type="file"],
 input[type="number"],
 input[type="datetime-local"],
-select {
+select,
+textarea {
     font-size: var(--font-size-medium);
     padding: var(--padding-small);
     border-radius: var(--border-radius);
     border: 1px solid var(--secondary-color);
     background-color: var(--white-background-color);
+}
+
+input[type="file"],
+input[type="datetime-local"],
+select {
     cursor: pointer;
 }
 
