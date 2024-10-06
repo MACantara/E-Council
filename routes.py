@@ -149,6 +149,13 @@ def register_routes(app, db):
         """
         return render_template("add-transaction.html")
     
+    @app.route("/invite-user")
+    def invite_user():
+        """
+        Handles the invite user page.
+        """
+        return render_template("invite-user.html")
+    
     @app.route("/concept-papers-overview")
     def concept_papers_overview():
         """
