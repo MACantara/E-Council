@@ -22,39 +22,30 @@
                 <h3>Top 5 Expenses</h3>
 
                 <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-1"></canvas>
+                    <canvas id="top-5-expenses-chart"></canvas>
                 </div>
 
-                <div class="horizontal-input-pair">
-                    <p>Total Expenses:</p>
-                    <p>₱ 640.00</p>
-                </div>
+                <p>Total expenses: ₱ 640.00</p>
             </div>
 
             <div class="council-overview-content-grid-item">
                 <h3>Top 5 Income</h3>
 
                 <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-2"></canvas>
+                    <canvas id="top-5-income-chart"></canvas>
                 </div>
 
-                <div class="horizontal-input-pair">
-                    <p>Total Income:</p>
-                    <p>₱ 640.00</p>
-                </div>
+                <p>Total Income: ₱ 640.00</p>
             </div>
 
             <div class="council-overview-content-grid-item">
                 <h3>Remaining Budget</h3>
 
                 <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-3"></canvas>
+                    <canvas id="remaining-budget-chart"></canvas>
                 </div>
-
-                <div class="horizontal-input-pair">
-                    <p>Remaining Budget:</p>
-                    <p>₱ 640.00</p>
-                </div>
+                
+                <p>Remaining Budget: ₱ 640.00</p>
             </div>
         </div>
     </div>
@@ -73,7 +64,7 @@
     const overBudget = expenses > remainingBudget ? expenses - remainingBudget : 0; // Calculate over budget amount
 
     // Initialize the budget chart 1
-    const ctx1 = document.getElementById('budget-chart-1').getContext('2d');
+    const ctx1 = document.getElementById('top-5-expenses-chart').getContext('2d');
     let budgetChart1 = new Chart(ctx1, {
         type: 'bar', // Use 'bar' type for horizontal bars
         data: {
@@ -136,7 +127,7 @@
     });
 
     // Initialize the budget chart 2
-    const ctx2 = document.getElementById('budget-chart-2').getContext('2d');
+    const ctx2 = document.getElementById('top-5-income-chart').getContext('2d');
     let budgetChart2 = new Chart(ctx2, {
         type: 'bar', // Use 'bar' type for horizontal bars
         data: {
@@ -199,7 +190,7 @@
     });
 
     // Initialize the budget chart 2
-    const ctx3 = document.getElementById('budget-chart-3').getContext('2d');
+    const ctx3 = document.getElementById('remaining-budget-chart').getContext('2d');
     let budgetChart3 = new Chart(ctx3, {
         type: 'bar', // Use 'bar' type for horizontal bars
         data: {
