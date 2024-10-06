@@ -260,16 +260,16 @@ nav ul li a {
     margin: 0 auto;
 }
 
-.verify-email-button {
-    max-width: fit-content;
-}
-
 .horizontal-input-pair,
 .horizontal-button-group {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     gap: var(--gap-large);
+}
+
+.fit-content-button {
+    width: fit-content;
 }
 
 /* Base Container Styles */
@@ -631,11 +631,6 @@ select {
     width: fit-content;
 }
 
-.filter-button,
-.pagination-button {
-    width: fit-content;
-}
-
 .pagination-button-group {
     display: flex;
     flex-direction: row;
@@ -644,4 +639,24 @@ select {
     justify-content: center;
     margin: 0 auto;
     width: fit-content;
+}
+
+.transaction-history-table-container {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color); 
+}
+
+.transaction-history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-history-table th,
+.transaction-history-table td {
+    padding: var(--gap-small);
+    text-align: center;
+}
+
+.transaction-history-table td {
+    border-top: 1px solid var(--secondary-color);
 }
