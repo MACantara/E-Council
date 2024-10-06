@@ -195,6 +195,72 @@
     const expenses = 23000; // Example value
     const overBudget = expenses > remainingBudget ? expenses - remainingBudget : 0; // Calculate over budget amount
 
+    // Function to update the chart when color scheme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        updateChartColors();
+    });
+
+    // Function to update chart colors dynamically
+    function updateChartColors() {
+        const labelColor = getLabelColor();
+        const rangeColor = getRangeColor();
+
+        // Update legend label colors
+        budgetChart1.options.plugins.legend.labels.color = labelColor;
+        budgetChart1.options.scales.x.title.color = rangeColor;
+        budgetChart1.options.scales.x.ticks.color = rangeColor;
+        budgetChart1.update();
+
+        budgetChart2.options.plugins.legend.labels.color = labelColor;
+        budgetChart2.options.scales.x.title.color = rangeColor;
+        budgetChart2.options.scales.x.ticks.color = rangeColor;
+        budgetChart2.update();
+
+        budgetChart3.options.plugins.legend.labels.color = labelColor;
+        budgetChart3.options.scales.x.title.color = rangeColor;
+        budgetChart3.options.scales.x.ticks.color = rangeColor;
+        budgetChart3.update();
+    }
+
+    // Function to get CSS variable value
+    function getCssVariable(variable) {
+        return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+    }
+
+    // Update the label and range colors using CSS variables
+    function getLabelColor() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? getCssVariable('--primary-text-color') // Dark mode
+            : getCssVariable('--primary-text-color'); // Light mode
+    }
+
+    function getRangeColor() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? getCssVariable('--primary-text-color')
+            : getCssVariable('--primary-text-color');
+    }
+
+    function getFontFamily() {
+        chartFontFamily = getCssVariable('--chart-font-family');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontFamily
+            : chartFontFamily;
+    }
+
+    function getFontSize() {
+        chartFontSize = getCssVariable('--chart-font-size');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontSize
+            : chartFontSize;
+    }
+
+    function getFontWeight() {
+        chartFontWeight = getCssVariable('--chart-font-weight');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontWeight
+            : chartFontWeight;
+    }
+
     // Initialize the budget chart 1
     const ctx1 = document.getElementById('budget-chart-1').getContext('2d');
     let budgetChart1 = new Chart(ctx1, {
@@ -398,70 +464,6 @@
             },
         }
     });
-
-    // Function to update the chart when color scheme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        updateChartColors();
-    });
-
-    function getFontFamily() {
-        chartFontFamily = getCssVariable('--chart-font-family');
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? chartFontFamily
-            : chartFontFamily;
-    }
-
-    function getFontSize() {
-        chartFontSize = getCssVariable('--chart-font-size');
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? chartFontSize
-            : chartFontSize;
-    }
-
-    function getFontWeight() {
-        chartFontWeight = getCssVariable('--chart-font-weight');
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? chartFontWeight
-            : chartFontWeight;
-    }
-
-    // Function to update chart colors dynamically
-    function updateChartColors() {
-        const labelColor = getLabelColor();
-        const rangeColor = getCssVariable('--primary-text-color');
-
-        // Update dataset colors
-        budgetChart.data.datasets[0].backgroundColor = getCssVariable('--remaining-budget-color');
-        budgetChart.data.datasets[0].borderColor = getCssVariable('--remaining-budget-color');
-        budgetChart.data.datasets[1].backgroundColor = getCssVariable('--expenses-within-budget-color');
-        budgetChart.data.datasets[1].borderColor = getCssVariable('--expenses-within-budget-color');
-        budgetChart.data.datasets[2].backgroundColor = getCssVariable('--expenses-over-budget-color');
-        budgetChart.data.datasets[2].borderColor = getCssVariable('--expenses-over-budget-color');
-
-        // Update legend label colors
-        budgetChart.options.plugins.legend.labels.color = labelColor;
-
-        // Update X-axis title and tick colors
-        budgetChart.options.scales.x.ticks.color = rangeColor;
-        budgetChart.options.scales.x.title.color = rangeColor;
-
-        budgetChart.update();
-    }
-
-    // Function to get CSS variable value
-    function getCssVariable(variable) {
-        return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
-    }
-
-    // Update the label and range colors using CSS variables
-    function getLabelColor() {
-        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? getCssVariable('--primary-text-color') // Dark mode
-            : getCssVariable('--primary-text-color'); // Light mode
-    }
-
-    // Initialize the chart with current colors
-    updateChartColors();
 </script>
 
 {% endblock %}
