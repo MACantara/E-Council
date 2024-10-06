@@ -58,7 +58,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // Data for remaining budget and expenses
+    // Data for top 5 expenses, top 5 income, and remaining budget
+    let top5Expenses = [4000, 5000, 3000, 6000, 2000]; // Adjusted array to total 20,000
     const remainingBudget = 20000; // Example value
     const expenses = 23000; // Example value
     const overBudget = expenses > remainingBudget ? expenses - remainingBudget : 0; // Calculate over budget amount
@@ -134,23 +135,23 @@
     let top5ExpensesChart = new Chart(ctx1, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Remaining Budget', 'Expenses (Within Budget)', 'Expenses (Over Budget)'], // Labels for the datasets
+            labels: ['Expense 1', 'Expense 2', 'Expense 3', 'Expense 4', 'Expense 5'], // Labels for the datasets
             datasets: [
                 {
-                    data: [
-                        remainingBudget,
-                        expenses <= remainingBudget ? expenses : remainingBudget,
-                        overBudget
-                    ],
+                    data: top5Expenses, // Use the array of top 5 expenses
                     backgroundColor: [
-                        getCssVariable('--remaining-budget-color'),
-                        getCssVariable('--expenses-within-budget-color'),
-                        getCssVariable('--expenses-over-budget-color')
+                        getCssVariable('--expense-color-1'),
+                        getCssVariable('--expense-color-2'),
+                        getCssVariable('--expense-color-3'),
+                        getCssVariable('--expense-color-4'),
+                        getCssVariable('--expense-color-5')
                     ],
                     borderColor: [
-                        getCssVariable('--remaining-budget-color'),
-                        getCssVariable('--expenses-within-budget-color'),
-                        getCssVariable('--expenses-over-budget-color')
+                        getCssVariable('--expense-color-1'),
+                        getCssVariable('--expense-color-2'),
+                        getCssVariable('--expense-color-3'),
+                        getCssVariable('--expense-color-4'),
+                        getCssVariable('--expense-color-5')
                     ],
                     borderWidth: 1
                 }

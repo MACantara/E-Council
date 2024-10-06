@@ -46,9 +46,15 @@
 
     /* Chart Colors */
     --remaining-budget-color: green;
-    --income-color: green;
     --expenses-within-budget-color: red;
     --expenses-over-budget-color: darkred;
+
+    /* Top 5 Expenses Chart Colors */
+    --expense-color-1: #cc0000; /* Dark red */
+    --expense-color-2: #ff0000; /* Bright red */
+    --expense-color-3: #ff3333; /* Medium red */
+    --expense-color-4: #ff6666; /* Medium light red */
+    --expense-color-5: #ff9999; /* Light red */
 
     /* Chart Font Styles */
     --chart-font-family: "Arial";
