@@ -44,12 +44,19 @@
     --max-width-container: 500px;
     --max-width-hero: 1250px;
 
-    /* Other */
-    --header-height: 5.28875rem;
+    /* Chart Colors */
     --remaining-budget-color: green;
     --income-color: green;
     --expenses-within-budget-color: red;
     --expenses-over-budget-color: darkred;
+
+    /* Chart Font Styles */
+    --chart-font-family: "Arial";
+    --chart-font-size: 16px;
+    --chart-font-weight: normal;
+
+    /* Other */
+    --header-height: 5.28875rem;
 }
 
 /* Dark Mode */
