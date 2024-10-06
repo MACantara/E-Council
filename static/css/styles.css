@@ -621,11 +621,27 @@ select {
     position: relative;
 }
 
-.transaction-history-filter-container {
+.transaction-history-filter-container,
+.pagination-container {
     display: flex;
     flex-direction: row;
     gap: var(--gap-large);
     align-items: center;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.filter-button,
+.pagination-button {
+    width: fit-content;
+}
+
+.pagination-button-group {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-large);
+    align-items: center;
+    justify-content: center;
     margin: 0 auto;
     width: fit-content;
 }
