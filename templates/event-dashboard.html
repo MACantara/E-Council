@@ -45,7 +45,7 @@
                     <canvas id="remaining-budget-chart"></canvas>
                 </div>
 
-                <p>Remaining Budget: ₱ 640.00</p>
+                <p>Remaining Budget: ₱ -5,000.00</p>
             </div>
         </div>
     </div>
@@ -61,9 +61,12 @@
     // Data for top 5 expenses, top 5 income, and remaining budget
     let top5Expenses = [4000, 5000, 3000, 6000, 2000]; // Adjusted array to total 20,000
     let top5Income = [3000, 4000, 2000, 5000, 1000]; // Adjusted array to total 15,000
-    const expenses = 1;
-    const remainingBudget = 20000; // Example value
-    const overBudget = expenses > remainingBudget ? expenses - remainingBudget : 0; // Calculate over budget amount
+
+    // Calculate total expenses and total income
+    let totalExpenses = top5Expenses.reduce((amount, expense) => amount + expense, 0);
+    let totalIncome = top5Income.reduce((amount, income) => amount + income, 0);
+
+    let remainingBudget = totalIncome - totalExpenses;
 
     // Function to update the chart when color scheme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
@@ -176,7 +179,7 @@
             }
         }
     });
-    
+
     // Initialize the top 5 income chart
     const ctx2 = document.getElementById('top-5-income-chart').getContext('2d');
     let top5IncomeChart = new Chart(ctx2, {
@@ -222,29 +225,21 @@
             }
         }
     });
-    
+
     // Initialize the remaining budget chart
     const ctx3 = document.getElementById('remaining-budget-chart').getContext('2d');
     let remainingBudgetChart = new Chart(ctx3, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Remaining Budget', 'Expenses (Within Budget)', 'Expenses (Over Budget)'], // Labels for the datasets
+            labels: ['Remaining Budget'], // Labels for the datasets
             datasets: [
                 {
-                    data: [
-                        remainingBudget,
-                        expenses <= remainingBudget ? expenses : remainingBudget,
-                        overBudget
-                    ],
+                    data: [remainingBudget], // Use the remainingBudget variable
                     backgroundColor: [
-                        getCssVariable('--remaining-budget-color'),
-                        getCssVariable('--expenses-within-budget-color'),
-                        getCssVariable('--expenses-over-budget-color')
+                        getCssVariable('--remaining-budget-color')
                     ],
                     borderColor: [
-                        getCssVariable('--remaining-budget-color'),
-                        getCssVariable('--expenses-within-budget-color'),
-                        getCssVariable('--expenses-over-budget-color')
+                        getCssVariable('--remaining-budget-color')
                     ],
                     borderWidth: 1
                 }
