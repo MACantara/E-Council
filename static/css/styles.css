@@ -477,7 +477,7 @@ select {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--gap-large);
-    height: 100%;
+    height: fit-content;
 }
 
 .council-overview-content-subcontainer,
