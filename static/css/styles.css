@@ -664,3 +664,9 @@ select {
 .transaction-history-table td {
     border-top: 1px solid var(--secondary-color);
 }
+
+.event-dashboard-chart-container {
+    width: 100%;
+    height: auto;
+    position: relative;
+}
