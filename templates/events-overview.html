@@ -10,7 +10,7 @@
     <div class="council-overview-content-container">
         <h2>Events Overview</h2>
 
-        <button class="primary-button create-button" type="submit">Create New Event</button>
+        <a href="{{ url_for('add_event')}}" class="primary-button create-button" type="submit">Create New Event</a>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
