@@ -163,6 +163,13 @@ def register_routes(app, db):
         """
         return render_template("event-invite-rejected.html")
     
+    @app.route("/event-invite-accepted")
+    def event_invite_accepted():
+        """
+        Handles the event invite accepted page.
+        """
+        return render_template("event-invite-accepted.html")
+    
     @app.route("/concept-papers-overview")
     def concept_papers_overview():
         """
