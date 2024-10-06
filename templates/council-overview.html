@@ -186,6 +186,27 @@
             : getCssVariable('--primary-text-color');
     }
 
+    function getFontFamily() {
+        chartFontFamily = getCssVariable('--chart-font-family');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontFamily
+            : chartFontFamily;
+    }
+
+    function getFontSize() {
+        chartFontSize = getCssVariable('--chart-font-size');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontSize
+            : chartFontSize;
+    }
+
+    function getFontWeight() {
+        chartFontWeight = getCssVariable('--chart-font-weight');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontWeight
+            : chartFontWeight;
+    }
+
     // Create the charts
     var financialBankBookChart = new Chart(document.getElementById("financial-bank-book-chart"), {
         type: "doughnut",
@@ -204,9 +225,9 @@
                     labels: {
                         color: getLabelColor(),
                         font: {
-                            family: "Arial",
-                            size: 16,
-                            weight: "normal"
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
                         }
                     }
                 }
@@ -231,9 +252,9 @@
                     labels: {
                         color: getLabelColor(),
                         font: {
-                            family: "Arial",
-                            size: 16,
-                            weight: "normal"
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
                         }
                     }
                 }
@@ -258,9 +279,9 @@
                     labels: {
                         color: getLabelColor(),
                         font: {
-                            family: "Arial",
-                            size: 16,
-                            weight: "normal"
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
                         }
                     }
                 }
@@ -272,13 +293,13 @@
                         text: "Criteria",
                         color: getRangeColor(), // Set the x-axis title color
                         font: {
-                            size: 16
+                            size: getFontSize()
                         }
                     },
                     ticks: {
                         color: getRangeColor(), // Set the ticks color for x-axis
                         font: {
-                            size: 16
+                            size: getFontSize()
                         }
                     }
                 },
@@ -288,13 +309,13 @@
                         text: "Scores",
                         color: getRangeColor(), // Set the y-axis title color
                         font: {
-                            size: 16
+                            size: getFontSize()
                         }
                     },
                     ticks: {
                         color: getRangeColor(), // Set the ticks color for y-axis
                         font: {
-                            size: 16
+                            size: getFontSize()
                         }
                     }
                 }

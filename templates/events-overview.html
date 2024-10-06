@@ -251,7 +251,12 @@
                 legend: {
                     display: true, // Show the legend
                     labels: {
-                        color: getLabelColor() // Set label color dynamically
+                        color: getLabelColor(),
+                        font: {
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
+                        }
                     }
                 },
             },
@@ -314,7 +319,12 @@
                 legend: {
                     display: true, // Show the legend
                     labels: {
-                        color: getLabelColor() // Set label color dynamically
+                        color: getLabelColor(),
+                        font: {
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
+                        }
                     }
                 },
             },
@@ -377,7 +387,12 @@
                 legend: {
                     display: true, // Show the legend
                     labels: {
-                        color: getLabelColor() // Set label color dynamically
+                        color: getLabelColor(),
+                        font: {
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
+                        }
                     }
                 },
             },
@@ -388,6 +403,27 @@
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         updateChartColors();
     });
+
+    function getFontFamily() {
+        chartFontFamily = getCssVariable('--chart-font-family');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontFamily
+            : chartFontFamily;
+    }
+
+    function getFontSize() {
+        chartFontSize = getCssVariable('--chart-font-size');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontSize
+            : chartFontSize;
+    }
+
+    function getFontWeight() {
+        chartFontWeight = getCssVariable('--chart-font-weight');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontWeight
+            : chartFontWeight;
+    }
 
     // Function to update chart colors dynamically
     function updateChartColors() {
