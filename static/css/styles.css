@@ -47,6 +47,7 @@
     /* Other */
     --header-height: 5.28875rem;
     --remaining-budget-color: green;
+    --income-color: green;
     --expenses-within-budget-color: red;
     --expenses-over-budget-color: darkred;
 }
