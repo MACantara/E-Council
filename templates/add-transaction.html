@@ -7,7 +7,8 @@
     {% include "council-overview-sidebar.html" %}
 
     <div class="council-overview-content-container">
-        <a href="{{ url_for('event_dashboard') }}" class="secondary-button fit-content-button">Back to Event Dashboard</a>
+        <a href="{{ url_for('event_dashboard') }}" class="secondary-button fit-content-button">Back to Event
+            Dashboard</a>
 
         <div class="container">
             <h2>Add Transaction</h2>
@@ -20,7 +21,8 @@
 
                 <div class="input-pair">
                     <label for="transaction-name">Transaction Name</label>
-                    <input type="text" name="transaction-name" id="transaction-name" placeholder="Transaction Name" required>
+                    <input type="text" name="transaction-name" id="transaction-name" placeholder="Transaction Name"
+                        required>
                 </div>
 
                 <div class="input-pair">
@@ -59,7 +61,10 @@
                 <div class="input-pair">
                     <label for="receipt">Receipt</label>
                     <input type="file" name="receipt" id="receipt" hidden>
-                    <label for="receipt" class="custom-file-upload-input">Choose File</label>
+                    <label for="receipt" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose File</span>
+                        <span id="file-name" class="file-name">No file chosen</span>
+                    </label>
                 </div>
 
                 <button class="primary-button" type="submit">Add Transaction</button>
@@ -67,4 +72,15 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.getElementById('receipt').addEventListener('change', function () {
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
+    });
+</script>
+
 {% endblock %}
