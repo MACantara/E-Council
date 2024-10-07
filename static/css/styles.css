@@ -736,7 +736,7 @@ textarea {
 }
 
 .close-button {
-    color: var(--close-button-color);
+    color: var(--primary-text-color);
     float: right;
     font-size: 28px;
     font-weight: bold;
