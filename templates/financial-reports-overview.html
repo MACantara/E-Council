@@ -10,7 +10,25 @@
     <div class="council-overview-content-container">
         <h2>Financial Reports Overview</h2>
 
-        <button class="primary-button create-button" type="submit">Create New Financial Report</button>
+        <button id="open-modal-button" class="primary-button create-button" type="submit">Create New Financial Report</button>
+
+        <div id="concept-paper-modal" class="modal">
+            <div class="container">
+                <span class="close-button">&times;</span>
+                <h2>Create Financial Report</h2>
+                <form>
+                    <div class="input-pair">
+                        <label for="event">Event</label>
+                        <select name="event" id="event" required>
+                            <option value="" disabled selected>Select an Event for Financial Report</option>
+                            <option value="student-council-officer">"TechTutor: Empowering Communities with AI-Assisted IT Skills"</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="primary-button">Create New Financial Report</button>
+                </form>
+            </div>
+        </div>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
@@ -111,5 +129,25 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.getElementById('open-modal-button').addEventListener('click', function () {
+        document.getElementById('concept-paper-modal').style.display = 'block';
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('concept-paper-modal').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('concept-paper-modal')) {
+            document.getElementById('concept-paper-modal').style.display = 'none';
+        }
+    });
+</script>
 
 {% endblock %}
