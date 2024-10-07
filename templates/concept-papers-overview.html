@@ -10,7 +10,124 @@
     <div class="council-overview-content-container">
         <h2>Concept Papers Overview</h2>
 
-        <button class="primary-button create-button" type="submit">Create New Concept Paper</button>
+        <button id="open-modal-button" class="primary-button create-button" type="submit">Create New Concept
+            Paper</button>
+
+        <div id="concept-paper-modal" class="modal">
+            <div class="container">
+                <span class="close-button">&times;</span>
+                <h2>Create Concept Paper</h2>
+                <form>
+                    <!-- FOR Section -->
+                    <h3>FOR</h3>
+                    <div class="input-pair">
+                        <label for="signatory_name_1">Name:</label>
+                        <input type="text" id="signatory_name_1" name="signatory_name_1" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="signatory_position_1">Position:</label>
+                        <input type="text" id="signatory_position_1" name="signatory_position_1" required>
+                    </div>
+
+                    <!-- THRU Section -->
+                    <h3>THRU</h3>
+                    <div class="input-pair">
+                        <label for="signatory_name_2">Name:</label>
+                        <input type="text" id="signatory_name_2" name="signatory_name_2" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="signatory_position_2">Position:</label>
+                        <input type="text" id="signatory_position_2" name="signatory_position_2" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="signatory_department_2">Department:</label>
+                        <input type="text" id="signatory_department_2" name="signatory_department_2" required>
+                    </div>
+
+                    <!-- FROM Section -->
+                    <h3>FROM</h3>
+                    <div class="input-pair">
+                        <label for="signatory_name_3">Name:</label>
+                        <input type="text" id="signatory_name_3" name="signatory_name_3" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="signatory_position_3">Position:</label>
+                        <input type="text" id="signatory_position_3" name="signatory_position_3" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="signatory_department_3">Department:</label>
+                        <input type="text" id="signatory_department_3" name="signatory_department_3" required>
+                    </div>
+
+                    <!-- Subject and Description -->
+                    <h3>Subject</h3>
+                    <div class="input-pair">
+                        <label for="subject_title">Title:</label>
+                        <input type="text" id="subject_title" name="subject_title" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="description">Description:</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+
+                    <!-- Objectives and Learning Outcomes -->
+
+                    <div class="input-pair">
+                        <label for="objective_of_the_activity">Objectives</label>
+                        <textarea id="objective_of_the_activity" name="objective_of_the_activity" required></textarea>
+                    </div>
+                    <div class="input-pair">
+                        <label for="learning_outcome">Learning Outcomes</label>
+                        <textarea id="learning_outcome" name="learning_outcome" required></textarea>
+                    </div>
+
+                    <!-- Expected Participants -->
+                    <h3>Expected No. of Participants</h3>
+                    <div class="input-pair">
+                        <label for="number_of_expected_students">Students:</label>
+                        <input type="number" id="number_of_expected_students" name="number_of_expected_students" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="number_of_expected_faculty">Faculty:</label>
+                        <input type="number" id="number_of_expected_faculty" name="number_of_expected_faculty" required>
+                    </div>
+
+                    <!-- Prepared By -->
+                    <h3>Prepared By</h3>
+                    <div class="input-pair">
+                        <label for="prepared_by_name">Name:</label>
+                        <input type="text" id="prepared_by_name" name="prepared_by_name" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="prepared_by_position">Position:</label>
+                        <input type="text" id="prepared_by_position" name="prepared_by_position" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="prepared_by_student_council">Student Council:</label>
+                        <input type="text" id="prepared_by_student_council" name="prepared_by_student_council" required>
+                    </div>
+
+                    <!-- Signed and Reviewed By -->
+                    <h3>Signed and Reviewed By</h3>
+                    <div class="input-pair">
+                        <label for="signed_and_reviewed_by_name">Name:</label>
+                        <input type="text" id="signed_and_reviewed_by_name" name="signed_and_reviewed_by_name" required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="signed_and_reviewed_by_position">Position:</label>
+                        <input type="text" id="signed_and_reviewed_by_position" name="signed_and_reviewed_by_position"
+                            required>
+                    </div>
+                    <div class="input-pair">
+                        <label for="signed_and_reviewed_by_student_council">Student Council:</label>
+                        <input type="text" id="signed_and_reviewed_by_student_council"
+                            name="signed_and_reviewed_by_student_council" required>
+                    </div>
+
+                    <button type="submit" class="primary-button">Create New Concept Paper</button>
+                </form>
+            </div>
+        </div>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
@@ -167,5 +284,25 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.getElementById('open-modal-button').addEventListener('click', function () {
+        document.getElementById('concept-paper-modal').style.display = 'block';
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('concept-paper-modal').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('concept-paper-modal')) {
+            document.getElementById('concept-paper-modal').style.display = 'none';
+        }
+    });
+</script>
 
 {% endblock %}
