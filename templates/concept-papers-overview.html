@@ -13,7 +13,7 @@
         <button id="open-modal-button" class="primary-button create-button" type="submit">Create New Concept
             Paper</button>
 
-        <div id="concept-paper-modal" class="modal">
+        <div id="modal-content" class="modal">
             <div class="container">
                 <span class="close-button">&times;</span>
                 <h2>Create Concept Paper</h2>
@@ -291,16 +291,16 @@
 
 <script>
     document.getElementById('open-modal-button').addEventListener('click', function () {
-        document.getElementById('concept-paper-modal').style.display = 'block';
+        document.getElementById('modal-content').style.display = 'block';
     });
 
     document.querySelector('.close-button').addEventListener('click', function () {
-        document.getElementById('concept-paper-modal').style.display = 'none';
+        document.getElementById('modal-content').style.display = 'none';
     });
 
     window.addEventListener('click', function (event) {
-        if (event.target == document.getElementById('concept-paper-modal')) {
-            document.getElementById('concept-paper-modal').style.display = 'none';
+        if (event.target == document.getElementById('modal-content')) {
+            document.getElementById('modal-content').style.display = 'none';
         }
     });
 </script>
