@@ -10,7 +10,27 @@
     <div class="council-overview-content-container">
         <h2>Board Resolutions Overview</h2>
 
-        <button class="primary-button create-button" type="submit">Create New Board Resolution</button>
+        <button id="open-modal-button" class="primary-button create-button" type="submit">Create New Board Resolution</button>
+
+        <div id="modal-content" class="modal">
+            <div class="container">
+                <span class="close-button">&times;</span>
+                <h2>Create Board Resolution</h2>
+                <form>
+                    <div class="input-pair">
+                        <label for="event">Event</label>
+                        <select name="event" id="event" required>
+                            <option value="" disabled selected>Select an Event for Board Resolution</option>
+                            <option value="techtutor-empowering-communities-with-ai-assisted-it-skills">"TechTutor: Empowering Communities with AI-Assisted IT Skills"</option>
+                        </select>
+                        <label for="budget">Budget</label>
+                        <input type="number" name="budget" id="budget" placeholder="Budget" required>
+                    </div>
+
+                    <button type="submit" class="primary-button">Create New Board Resolutin</button>
+                </form>
+            </div>
+        </div>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
@@ -111,5 +131,25 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.getElementById('open-modal-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'block';
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('modal-content')) {
+            document.getElementById('modal-content').style.display = 'none';
+        }
+    });
+</script>
 
 {% endblock %}
