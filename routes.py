@@ -128,13 +128,6 @@ def register_routes(app, db):
         """
         return render_template("events-overview.html")
     
-    @app.route("/add-event")
-    def add_event():
-        """
-        Handles the add event page.
-        """
-        return render_template("add-event.html")
-    
     @app.route("/event-dashboard")
     def event_dashboard():
         """
