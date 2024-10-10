@@ -10,7 +10,21 @@
     <div class="council-overview-content-container">
         <h2>Calendar of Activities  Overview</h2>
 
-        <button class="primary-button create-button" type="submit">Create New Calendar of Activities</button>
+        <button id="open-modal-button" class="primary-button create-button" type="submit">Create New Calendar of Activities</button>
+
+        <div id="modal-content" class="modal">
+            <div class="container">
+                <span class="close-button">&times;</span>
+                <h2>Create Calendar of Activities</h2>
+                <form>
+                    <div class="input-pair">
+                        <p>Work in Progress</p>
+                    </div>
+
+                    <button type="submit" class="primary-button">Create New Calendar of Activities</button>
+                </form>
+            </div>
+        </div>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
@@ -105,5 +119,25 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.getElementById('open-modal-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'block';
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('modal-content')) {
+            document.getElementById('modal-content').style.display = 'none';
+        }
+    });
+</script>
 
 {% endblock %}
