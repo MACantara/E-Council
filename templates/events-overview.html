@@ -10,7 +10,125 @@
     <div class="council-overview-content-container">
         <h2>Events Overview</h2>
 
-        <a href="{{ url_for('add_event')}}" class="primary-button create-button" type="submit">Create New Event</a>
+        <button id="open-modal-button" class="primary-button create-button" type="submit">Create New Event</button>
+
+        <div id="modal-content" class="modal">
+            <div class="container">
+                <span class="close-button">&times;</span>
+                <h2>Add Event</h2>
+
+                <form method="POST">
+                    <div class="input-pair">
+                        <label for="event-name">Event Name</label>
+                        <input type="text" name="event-name" id="event-name" placeholder="Event Name" required>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="semester">Semester</label>
+                        <select name="semester" id="semester" required>
+                            <option value="" disabled selected>Select a Semester</option>
+                            <option value="1st-semester">1st Semester</option>
+                            <option value="2nd-semester">2nd Semester</option>
+                        </select>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="academic-year">Academic Year</label>
+                        <select name="academic-year" id="academic-year" required>
+                            <option value="" disabled selected>Select an Academic Year</option>
+                            <option value="2024-2025">2024-2025</option>
+                        </select>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="start-date-and-time">Start Date and Time</label>
+                        <input type="datetime-local" name="start-date-and-time" id="start-date-and-time" required>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="end-date-and-time">End Date and Time</label>
+                        <input type="datetime-local" name="end-date-and-time" id="end-date-and-time" required>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="venue">Venue</label>
+                        <input type="text" name="venue" id="venue" placeholder="Venue"
+                            required>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="budget">Budget</label>
+                        <input type="number" name="budget" id="budget" placeholder="Budget" required>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="event-status">Event Status</label>
+                        <select name="event-status" id="event-status" required>
+                            <option value="" disabled selected>Select an Event Status</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="postponed">Postponed</option>
+                            <option value="done">Done</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="description">Description</label>
+                        <textarea name="description" id="description" placeholder="Description" required></textarea>
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="objectives">Objectives</label>
+                        <textarea name="objectives" id="objectives" placeholder="Objectives (Optional)" required></textarea>
+                    </div>
+    
+                    <button class="secondary-button">Add Another Objective</button>
+    
+                    <div class="input-pair">
+                        <label for="problems-encountered">Problems Encountered</label>
+                        <textarea name="problem-encountered" id="problem-encountered"
+                            placeholder="Problems Encountered (Optional)" required></textarea>
+                    </div>
+    
+                    <button class="secondary-button">Add Another Problem Encountered</button>
+    
+                    <div class="input-pair">
+                        <label for="actions-taken">Actions Taken</label>
+                        <textarea name="actions-taken" id="actions-taken"
+                            placeholder="Actions Taken (Optional)" required></textarea>
+                    </div>
+    
+                    <button class="secondary-button">Add Another Action Taken</button>
+    
+                    <div class="input-pair">
+                        <label for="recommendations">Recommendations</label>
+                        <textarea name="recommendations" id="recommendations"
+                            placeholder="Recommendations (Optional)" required></textarea>
+                    </div>
+    
+                    <button class="secondary-button">Add Another Recommendation</button>
+    
+                    <div class="input-pair">
+                        <label for="remarks">Remarks</label>
+                        <input type="text" name="remarks" id="remarks" placeholder="Remarks (Optional)">
+                    </div>
+    
+                    <div class="input-pair">
+                        <label for="documentation-pictures">Documentation Pictures</label>
+                        <input type="file" name="documentation-pictures" id="documentation-pictures" hidden>
+                        <label for="documentation-pictures" class="custom-file-upload-input">
+                            <span class="choose-file-text">Choose File</span>
+                            <span id="file-name" class="file-name">No file chosen</span>
+                        </label>
+                    </div>
+    
+                    <div class="horizontal-input-pair">
+                        <a href="{{ url_for('events_overview') }}" class="secondary-button fit-content-button">Back</a>
+                        <button class="primary-button" type="submit">Add Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
@@ -462,6 +580,27 @@
                     }
                 },
             },
+        }
+    });
+
+    // File upload
+    document.getElementById('documentation-pictures').addEventListener('change', function () {
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
+    });
+
+    // Modal
+    document.getElementById('open-modal-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'block';
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('modal-content')) {
+            document.getElementById('modal-content').style.display = 'none';
         }
     });
 </script>
