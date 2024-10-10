@@ -10,7 +10,26 @@
     <div class="council-overview-content-container">
         <h2>Society Accomplishment and Compliance (SOAC) Reports Overview</h2>
 
-        <button class="primary-button create-button" type="submit">Create New SOAC Report</button>
+        <button id="open-modal-button" class="primary-button create-button" type="submit">Create New SOAC Report</button>
+
+        <div id="modal-content" class="modal">
+            <div class="container">
+                <span class="close-button">&times;</span>
+                <h2>Create SOAC Report</h2>
+                <form>
+                    <div class="input-pair">
+                        <label for="student-council">Student Council</label>
+                        <select name="student-council" id="student-council" required>
+                            <option value="" disabled selected>Select a Student Council for SOAC Report</option>
+                            <option value="junior-philippine-computer-society">Junior Philippine Computer Society (JPCS)</option>
+                            <option value="college-of-computer-studies-student-council">College of Computer Studies Student Council (CCS-SC)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="primary-button">Create New SOAC Report</button>
+                </form>
+            </div>
+        </div>
 
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
@@ -70,5 +89,25 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.getElementById('open-modal-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'block';
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('modal-content')) {
+            document.getElementById('modal-content').style.display = 'none';
+        }
+    });
+</script>
 
 {% endblock %}
