@@ -71,9 +71,13 @@
 
             <div class="input-pair">
                 <label for="users-signature">Signature</label>
-                <input type="file" name="users-signature" id="users-signature">
+                <input type="file" name="users-signature" id="users-signature" hidden>
+                <label for="users-signature" class="custom-file-upload-input">
+                    <span class="choose-file-text">Choose File</span>
+                    <span id="file-name" class="file-name">No file chosen</span>
+                </label>
             </div>
-
+            
             <div class="input-pair">
                 <label for="users-current-password">Current Password</label>
                 <input type="password" name="users-current-password" id="users-current-password" placeholder="Current Password" required>
@@ -87,5 +91,16 @@
         <button class="secondary-button" type="submit">Delete Account</button>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.getElementById('users-signature').addEventListener('change', function () {
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
+    });
+</script>
 
 {% endblock %}
