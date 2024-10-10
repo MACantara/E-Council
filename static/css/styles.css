@@ -263,6 +263,7 @@ nav ul li a {
 .create-button {
     max-width: fit-content;
     margin: 0 auto;
+    cursor: pointer;
 }
 
 .horizontal-input-pair,
