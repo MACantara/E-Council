@@ -2,14 +2,12 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
 db = SQLAlchemy()
-bcrypt = Bcrypt()
 
 def create_app():
     """
@@ -24,14 +22,9 @@ def create_app():
 
     # Initialize the SQLAlchemy extension.
     db.init_app(app)
-    # Initialize the Bcrypt extension.
-    bcrypt.init_app(app)
 
     # Register the routes.
     from routes import register_routes
     register_routes(app, db)
-
-    # Initialize the Migrate extension.
-    migrate = Migrate(app, db)
 
     return app
