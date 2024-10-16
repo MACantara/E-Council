@@ -15,7 +15,7 @@
         <!-- Add Event Modal -->
         <div id="add-event-modal-content" class="modal">
             <div class="container">
-                <span class="close-button">&times;</span>
+                <span id="close-add-event-modal-button" class="close-button">&times;</span>
                 <h2>Add Event</h2>
 
                 <form method="POST">
@@ -134,7 +134,7 @@
         <!-- Update Event Modal -->
         <div id="update-event-modal-content" class="modal">
             <div class="container">
-                <span class="close-button">&times;</span>
+                <span id="close-update-event-modal-button" class="close-button">&times;</span>
                 <h2>Update Event</h2>
 
                 <form method="POST">
@@ -253,7 +253,7 @@
         <!-- Invite User Modal -->
         <div id="invite-user-modal-content" class="modal">
             <div class="container">
-                <span class="close-button">&times;</span>
+                <span id="close-invite-user-modal-button" class="close-button">&times;</span>
                 <h2>Invite a User to Manage</h2>
 
                 <p>Enter the email address of the user you would like to invite to help you manage "TechTutor: Empowering Communities with AI-Assisted IT Skills".</p>
@@ -733,7 +733,7 @@
         document.getElementById('add-event-modal-content').style.display = 'block';
     });
 
-    document.querySelector('.close-button').addEventListener('click', function () {
+    document.getElementById('close-add-event-modal-button').addEventListener('click', function () {
         document.getElementById('add-event-modal-content').style.display = 'none';
     });
 
@@ -748,7 +748,7 @@
         document.getElementById('update-event-modal-content').style.display = 'block';
     });
 
-    document.querySelector('.close-button').addEventListener('click', function () {
+    document.getElementById('close-update-event-modal-button').addEventListener('click', function () {
         document.getElementById('update-event-modal-content').style.display = 'none';
     });
 
@@ -763,7 +763,7 @@
         document.getElementById('invite-user-modal-content').style.display = 'block';
     });
 
-    document.querySelector('.close-button').addEventListener('click', function () {
+    document.getElementById('close-invite-user-modal-button').addEventListener('click', function () {
         document.getElementById('invite-user-modal-content').style.display = 'none';
     });
 
