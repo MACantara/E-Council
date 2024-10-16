@@ -250,6 +250,25 @@
             </div>
         </div>
 
+        <!-- Invite User Modal -->
+        <div id="invite-user-modal-content" class="modal">
+            <div class="container">
+                <span class="close-button">&times;</span>
+                <h2>Invite a User to Manage</h2>
+
+                <p>Enter the email address of the user you would like to invite to help you manage "TechTutor: Empowering Communities with AI-Assisted IT Skills".</p>
+    
+                <form method="POST">
+                    <div class="input-pair">
+                        <label for="users-email">User's Email</label>
+                        <input type="password" name="users-email" id="users-email" placeholder="User's Email" required>
+                    </div>
+    
+                    <button class="primary-button" type="submit">Send Email Invite</button>
+                </form>
+            </div>
+        </div>
+
         <div class="horizontal-input-pair">
             <select name="council-overview-school-year" id="council-overview-school-year"
                 aria-label="Select a School Year" required>
@@ -323,7 +342,7 @@
                 <div class="grid-item-button-group">
                     <a href="{{ url_for('event_dashboard') }}" class="primary-button">View</a>
                     <button id="open-update-event-modal-button" class="secondary-button">Update</button>
-                    <a href="{{ url_for('invite_user')}}" class="secondary-button">Invite</a>
+                    <button id="open-invite-user-modal-button" class="secondary-button">Invite</button>
                     <button class="secondary-button">Delete</button>
                 </div>
             </div>
@@ -736,6 +755,21 @@
     window.addEventListener('click', function (event) {
         if (event.target == document.getElementById('update-event-modal-content')) {
             document.getElementById('update-event-modal-content').style.display = 'none';
+        }
+    });
+
+    // Invite User Modal
+    document.getElementById('open-invite-user-modal-button').addEventListener('click', function () {
+        document.getElementById('invite-user-modal-content').style.display = 'block';
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('invite-user-modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('invite-user-modal-content')) {
+            document.getElementById('invite-user-modal-content').style.display = 'none';
         }
     });
 </script>
