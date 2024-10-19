@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, current_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -29,14 +29,14 @@ def unauthorized():
     flash("You need to be logged in to access this page.", "error")
     return redirect(url_for("login"))
 
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
     users_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     users_first_name = db.Column(db.String(50), nullable=False)
     users_last_name = db.Column(db.String(50), nullable=False)
     users_username = db.Column(db.String(50), unique=True, nullable=False)
-    users_email = db.Column(db.String(100), nullable=False)
+    users_email = db.Column(db.String(100), unique=True, nullable=False)
     users_department = db.Column(db.String(100), nullable=False)
     users_role = db.Column(db.String(50), nullable=False)
     users_password = db.Column(db.String(255), nullable=False)
@@ -47,6 +47,9 @@ class Users(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.users_password, password)
+
+    def get_id(self):
+        return str(self.users_id)
 
     def __repr__(self):
         return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_password}, {self.users_email_verified})"
@@ -140,13 +143,7 @@ def login():
                 return redirect(url_for("login"))
 
             if user.check_password(users_password):
-                session['users_id'] = user.users_id
-                session['users_first_name'] = user.users_first_name
-                session['users_last_name'] = user.users_last_name
-                session['users_username'] = user.users_username
-                session['users_email'] = user.users_email
-                session['users_department'] = user.users_department
-                session['users_role'] = user.users_role
+                login_user(user)
                 flash("Login successful!", "success")
                 return redirect(url_for("council_overview"))
 
@@ -157,7 +154,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    session.clear()
     flash("You have been logged out.", "success")
     return redirect(url_for("login"))
 
