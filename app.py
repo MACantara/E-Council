@@ -112,10 +112,13 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
     elif request.method == "POST":
-        users_username = request.form.get("users-username")
+        users_username_email = request.form.get("users-username-email")
         users_password = request.form.get("users-password")
 
-        user = Users.query.filter_by(users_username=users_username).first()
+        # Check if the identifier is an email or username
+        user = Users.query.filter(
+            (Users.users_username == users_username_email) | (Users.users_email == users_username_email)
+        ).first()
 
         if user and user.check_password(users_password):
             session['users_id'] = user.users_id
