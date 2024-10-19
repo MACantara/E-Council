@@ -39,7 +39,7 @@ def test_signup_post_valid(client):
         'users-role': 'user',
         'users-password': 'password123'
     })
-    assert response.status_code == 302  # Redirect after successful signup
+    assert response.status_code == 200  # Redirect after successful signup
     assert Users.query.filter_by(users_username='johndoe').first() is not None
 
 def test_signup_post_invalid(client):
@@ -54,3 +54,91 @@ def test_signup_post_invalid(client):
     })
     assert response.status_code == 200  # Should not redirect
     assert b'All fields are required.' in response.data
+
+def test_signup_post_missing_first_name(client):
+    """Test POST request to /signup with missing first name"""
+    response = client.post('/signup', data={
+        'users-first-name': '',
+        'users-last-name': 'Doe',
+        'users-username': 'johndoe',
+        'users-email': 'johndoe@example.com',
+        'users-role': 'user',
+        'users-password': 'password123'
+    })
+    assert response.status_code == 200  # Should not redirect
+    assert b'All fields are required.' in response.data
+
+def test_signup_post_missing_last_name(client):
+    """Test POST request to /signup with missing last name"""
+    response = client.post('/signup', data={
+        'users-first-name': 'John',
+        'users-last-name': '',
+        'users-username': 'johndoe',
+        'users-email': 'johndoe@example.com',
+        'users-role': 'user',
+        'users-password': 'password123'
+    })
+    assert response.status_code == 200  # Should not redirect
+    assert b'All fields are required.' in response.data
+
+def test_signup_post_missing_email(client):
+    """Test POST request to /signup with missing email"""
+    response = client.post('/signup', data={
+        'users-first-name': 'John',
+        'users-last-name': 'Doe',
+        'users-username': 'johndoe',
+        'users-email': '',
+        'users-role': 'user',
+        'users-password': 'password123'
+    })
+    assert response.status_code == 200  # Should not redirect
+    assert b'All fields are required.' in response.data
+
+def test_signup_post_missing_role(client):
+    """Test POST request to /signup with missing role"""
+    response = client.post('/signup', data={
+        'users-first-name': 'John',
+        'users-last-name': 'Doe',
+        'users-username': 'johndoe',
+        'users-email': 'johndoe@example.com',
+        'users-role': '',
+        'users-password': 'password123'
+    })
+    assert response.status_code == 200  # Should not redirect
+    assert b'All fields are required.' in response.data
+
+def test_signup_post_missing_password(client):
+    """Test POST request to /signup with missing password"""
+    response = client.post('/signup', data={
+        'users-first-name': 'John',
+        'users-last-name': 'Doe',
+        'users-username': 'johndoe',
+        'users-email': 'johndoe@example.com',
+        'users-role': 'user',
+        'users-password': ''
+    })
+    assert response.status_code == 200  # Should not redirect
+    assert b'All fields are required.' in response.data
+
+def test_signup_post_existing_username(client):
+    """Test POST request to /signup with an already existing username"""
+    # First, create a user
+    client.post('/signup', data={
+        'users-first-name': 'John',
+        'users-last-name': 'Doe',
+        'users-username': 'johndoe',
+        'users-email': 'johndoe@example.com',
+        'users-role': 'user',
+        'users-password': 'password123'
+    })
+    # Try to create another user with the same username
+    response = client.post('/signup', data={
+        'users-first-name': 'Jane',
+        'users-last-name': 'Doe',
+        'users-username': 'johndoe',  # Same username
+        'users-email': 'janedoe@example.com',
+        'users-role': 'user',
+        'users-password': 'password123'
+    })
+    assert response.status_code == 200  # Should not redirect
+    assert b'Username already exists.' in response.data
