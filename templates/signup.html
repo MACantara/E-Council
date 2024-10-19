@@ -79,6 +79,7 @@
             <div id="password-strength">
                 <div id="password-strength-bar"></div>
             </div>
+            <p id="password-strength-text"></p>
         </div>
 
         <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-password')">Show
@@ -137,7 +138,9 @@
         var password = this.value;
         var strengthBarContainer = document.getElementById('password-strength');
         var strengthBar = document.getElementById('password-strength-bar');
+        var strengthText = document.getElementById('password-strength-text');
         var strengthColors = ['#ff4b4b', '#ff7f50', '#ffd700', '#9acd32', '#00c853'];
+        var strengthDescriptions = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
 
         // Check password requirements
         var lengthValid = password.length >= 8;
@@ -166,11 +169,13 @@
             strengthBarContainer.style.display = 'none';
             strengthBar.style.width = '0%';
             strengthBar.style.backgroundColor = '#e0e0e0';
+            strengthText.textContent = '';
         } else {
             var result = zxcvbn(password);
             strengthBarContainer.style.display = 'block';
             strengthBar.style.width = (result.score + 1) * 20 + '%';
             strengthBar.style.backgroundColor = strengthColors[result.score];
+            strengthText.textContent = 'Password Strength: ' + strengthDescriptions[result.score];
         }
     });
 
