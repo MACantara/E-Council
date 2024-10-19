@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     
     <!-- Include Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
 </head>
 <body>
     <header>
@@ -16,8 +16,13 @@
         <nav>
             <ul>
                 <li><a class="text-button" href="{{ url_for('index') }}">Home</a></li>
-                <li><a class="secondary-button" href="{{ url_for('login') }}">Log In</a></li>
-                <li><a class="primary-button" href="{{ url_for('signup') }}">Sign Up</a></li>
+                {% if 'user_id' in session %}
+                    <li><a class="text-button" href="{{ url_for('account') }}">Account</a></li>
+                    <li><a class="secondary-button" href="{{ url_for('logout') }}">Log Out</a></li>
+                {% else %}
+                    <li><a class="secondary-button" href="{{ url_for('login') }}">Log In</a></li>
+                    <li><a class="primary-button" href="{{ url_for('signup') }}">Sign Up</a></li>
+                {% endif %}
             </ul>
         </nav>
     </header>
