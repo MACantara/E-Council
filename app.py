@@ -254,7 +254,7 @@ def board_resolutions_overview():
 def notable_achievement_reports_overview():
     return render_template("notable-achievement-reports-overview.html")
 
-@app.route("/society-achievement-and-compliances-reports-overview")
+@app.route("/society-achievement-and-compliance-reports-overview")
 @login_required
 def society_accomplishment_and_compliance_reports_overview():
     return render_template("society-accomplishment-and-compliance-reports-overview.html")
