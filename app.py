@@ -53,6 +53,11 @@ def signup():
         users_password = request.form.get("users-password")
         users_email_verified = 0
 
+        # Validation
+        if not users_first_name or not users_last_name or not users_username or not users_email or not users_role or not users_password:
+            flash("All fields are required.", "error")
+            return render_template("signup.html")
+
         user = Users(
             users_first_name=users_first_name,
             users_last_name=users_last_name,
