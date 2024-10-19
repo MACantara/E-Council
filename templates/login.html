@@ -3,6 +3,18 @@
 {% block title %}Log In{% endblock %}
 
 {% block content %}
+
+<!-- Flash messages section -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
 <div class="container">
     <h2>Log In</h2>
 

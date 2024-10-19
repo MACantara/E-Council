@@ -70,6 +70,20 @@
     --chart-font-size: 16px;
     --chart-font-weight: normal;
 
+    /* Flash Message Colors */
+    --color-success-light: #d4edda;
+    --color-success-dark: #155724;
+    --color-error-light: #f8d7da;
+    --color-error-dark: #721c24;
+    --color-success-border: #c3e6cb;
+    --color-error-border: #f5c6cb;
+
+    /* Flash Message Styles */
+    --color-success-bg: var(--color-success-light);
+    --color-success-text: var(--color-success-dark);
+    --color-error-bg: var(--color-error-light);
+    --color-error-text: var(--color-error-dark);
+    
     /* Other */
     --header-height: 5.28875rem;
     --close-button-color: #000000;
@@ -91,6 +105,12 @@
         /* Button Hover Colors */
         --primary-button-hover-background-color: #0091af; /* Slightly darker cyan for hover effect */
         --secondary-button-hover-background-color: #3b4a5a; /* Dark grey for subtle hover on neutral buttons */
+
+        /* Flash Message Styles */
+        --color-success-bg: var(--color-success-dark);
+        --color-success-text: var(--color-success-light);
+        --color-error-bg: var(--color-error-dark);
+        --color-error-text: var(--color-error-light);
     }
 
     body {
@@ -748,4 +768,30 @@ textarea {
     color: var(--close-button-hover-color);
     text-decoration: none;
     cursor: pointer;
+}
+
+/* Flash Message Styles */
+
+.flash-messages {
+    margin-top: var(--padding-large);
+    max-width: var(--max-width-container);
+    width: 100%;
+}
+
+.alert {
+    padding: var(--padding-large);
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+    border-color: var(--color-success-border);
+}
+
+.alert-error {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    border-color: var(--color-error-border);
 }
