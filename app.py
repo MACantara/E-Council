@@ -126,7 +126,7 @@ def login():
             session['users_department'] = user.users_department
             session['users_role'] = user.users_role
             flash("Login successful!", "success")
-            return redirect(url_for("index"))
+            return redirect(url_for("council_overview"))
         else:
             flash("Login failed!", "error")
             return redirect(url_for("login"))
