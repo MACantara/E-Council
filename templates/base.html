@@ -18,7 +18,7 @@
                 <li>
                     <a class="text-button" href="{{ url_for('index') }}">Home</a>
                 </li>
-                {% if 'user_id' in session %}
+                {% if 'users_id' in session %}
                     <li>
                         <a class="text-button account-image-container" href="{{ url_for('account') }}">
                             <img class="small-account-picture" src="https://placehold.co/40x40.png" alt="Small Account Picture">
