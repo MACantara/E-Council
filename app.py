@@ -23,6 +23,7 @@ class Users(db.Model):
     users_last_name = db.Column(db.String(50), nullable=False)
     users_username = db.Column(db.String(50), unique=True, nullable=False)
     users_email = db.Column(db.String(100), nullable=False)
+    users_department = db.Column(db.String(100), nullable=False)
     users_role = db.Column(db.String(50), nullable=False)
     users_password = db.Column(db.String(255), nullable=False)
     users_email_verified = db.Column(db.Integer, nullable=False)
@@ -34,7 +35,7 @@ class Users(db.Model):
         return check_password_hash(self.users_password, password)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_role}, {self.users_password}, {self.users_email_verified})"
+        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_password}, {self.users_email_verified})"
 
 @app.route("/")
 def index():
@@ -49,13 +50,14 @@ def signup():
         users_last_name = request.form.get("users-last-name")
         users_username = request.form.get("users-username")
         users_email = request.form.get("users-email")
+        users_department = request.form.get("users-department")
         users_role = request.form.get("users-role")
         users_password = request.form.get("users-password")
         users_repeat_password = request.form.get("users-repeat-password")
         users_email_verified = 0
 
         # Validation
-        if not users_first_name or not users_last_name or not users_username or not users_email or not users_role or not users_password:
+        if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_password:
             flash("All fields are required.", "error")
             return render_template("signup.html")
 
@@ -91,6 +93,7 @@ def signup():
             users_last_name=users_last_name,
             users_username=users_username,
             users_email=users_email,
+            users_department=users_department,
             users_role=users_role,
             users_email_verified=users_email_verified,
         )
@@ -115,8 +118,13 @@ def login():
         user = Users.query.filter_by(users_username=users_username).first()
 
         if user and user.check_password(users_password):
-            session['user_id'] = user.users_id
-            session['username'] = user.users_username
+            session['users_id'] = user.users_id
+            session['users_first_name'] = user.users_first_name
+            session['users_last_name'] = user.users_last_name
+            session['users_username'] = user.users_username
+            session['users_email'] = user.users_email
+            session['users_department'] = user.users_department
+            session['users_role'] = user.users_role
             flash("Login successful!", "success")
             return redirect(url_for("index"))
         else:
