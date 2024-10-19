@@ -81,11 +81,11 @@
         <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-password')">Show Password</button>
 
         <div class="password-requirements-container">
-            <p>Must be at least 8 characters long</p>
-            <p>Must contain at least one uppercase letter</p>
-            <p>Must contain at least one lowercase letter</p>
-            <p>Must contain at least one number</p>
-            <p>Must contain at least one special character</p>
+            <p id="length-requirement"><i class="bi bi-x-circle" id="length-icon"></i> Must be at least 8 characters long</p>
+            <p id="uppercase-requirement"><i class="bi bi-x-circle" id="uppercase-icon"></i> Must contain at least one uppercase letter</p>
+            <p id="lowercase-requirement"><i class="bi bi-x-circle" id="lowercase-icon"></i> Must contain at least one lowercase letter</p>
+            <p id="number-requirement"><i class="bi bi-x-circle" id="number-icon"></i> Must contain at least one number</p>
+            <p id="special-requirement"><i class="bi bi-x-circle" id="special-icon"></i> Must contain at least one special character</p>
         </div>
 
         <div class="input-pair">
@@ -112,6 +112,43 @@
         var strengthBarContainer = document.getElementById('password-strength');
         var strengthBar = document.getElementById('password-strength-bar');
         var strengthColors = ['#ff4b4b', '#ff7f50', '#ffd700', '#9acd32', '#00c853'];
+
+        // Password requirements
+        var lengthRequirement = document.getElementById('length-requirement');
+        var uppercaseRequirement = document.getElementById('uppercase-requirement');
+        var lowercaseRequirement = document.getElementById('lowercase-requirement');
+        var numberRequirement = document.getElementById('number-requirement');
+        var specialRequirement = document.getElementById('special-requirement');
+
+        // Password requirement icons
+        var lengthIcon = document.getElementById('length-icon');
+        var uppercaseIcon = document.getElementById('uppercase-icon');
+        var lowercaseIcon = document.getElementById('lowercase-icon');
+        var numberIcon = document.getElementById('number-icon');
+        var specialIcon = document.getElementById('special-icon');
+
+        // Check password requirements
+        var lengthValid = password.length >= 8;
+        var uppercaseValid = /[A-Z]/.test(password);
+        var lowercaseValid = /[a-z]/.test(password);
+        var numberValid = /[0-9]/.test(password);
+        var specialValid = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        // Update requirement compliance
+        lengthRequirement.style.color = lengthValid ? 'green' : 'red';
+        lengthIcon.className = lengthValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
+
+        uppercaseRequirement.style.color = uppercaseValid ? 'green' : 'red';
+        uppercaseIcon.className = uppercaseValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
+
+        lowercaseRequirement.style.color = lowercaseValid ? 'green' : 'red';
+        lowercaseIcon.className = lowercaseValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
+
+        numberRequirement.style.color = numberValid ? 'green' : 'red';
+        numberIcon.className = numberValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
+
+        specialRequirement.style.color = specialValid ? 'green' : 'red';
+        specialIcon.className = specialValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
 
         if (password === '') {
             strengthBarContainer.style.display = 'none';
