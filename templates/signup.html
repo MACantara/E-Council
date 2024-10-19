@@ -73,9 +73,10 @@
         <div class="input-pair">
             <label for="users-password">Password</label>
             <input type="password" name="users-password" id="users-password" placeholder="Password" required>
+            <div id="password-strength"></div>
         </div>
 
-        <button class="show-password-button">Show Password</button>
+        <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-password')">Show Password</button>
 
         <div class="password-requirements-container">
             <p>Must be at least 8 characters long</p>
@@ -90,11 +91,52 @@
             <input type="password" name="users-repeat-password" id="users-repeat-password" placeholder="Repeat Password" required>
         </div>
 
-        <button class="show-password-button">Show Password</button>
+        <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-repeat-password')">Show Password</button>
 
         <button class="primary-button" type="submit">Sign Up</button>
 
         <p>Already have an account? <a href="{{ url_for('login') }}">Log In</a></p>
     </form>
 </div>
+{% endblock %}
+
+{% block script %}
+
+<!-- Include zxcvbn library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<script>
+    document.getElementById('users-password').addEventListener('input', function() {
+        var password = this.value;
+        var result = zxcvbn(password);
+        var strengthText;
+        switch (result.score) {
+            case 0:
+                strengthText = 'Very Weak';
+                break;
+            case 1:
+                strengthText = 'Weak';
+                break;
+            case 2:
+                strengthText = 'Fair';
+                break;
+            case 3:
+                strengthText = 'Good';
+                break;
+            case 4:
+                strengthText = 'Strong';
+                break;
+        }
+        document.getElementById('password-strength').innerText = 'Password Strength: ' + strengthText;
+    });
+
+    function togglePasswordVisibility(id) {
+        var input = document.getElementById(id);
+        if (input.type === 'password') {
+            input.type = 'text';
+        } else {
+            input.type = 'password';
+        }
+    }
+</script>
+
 {% endblock %}
