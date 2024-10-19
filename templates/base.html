@@ -15,13 +15,26 @@
 
         <nav>
             <ul>
-                <li><a class="text-button" href="{{ url_for('index') }}">Home</a></li>
+                <li>
+                    <a class="text-button" href="{{ url_for('index') }}">Home</a>
+                </li>
                 {% if 'user_id' in session %}
-                    <li><a class="text-button" href="{{ url_for('account') }}">Account</a></li>
-                    <li><a class="secondary-button" href="{{ url_for('logout') }}">Log Out</a></li>
+                    <li>
+                        <a class="text-button account-image-container" href="{{ url_for('account') }}">
+                            <img class="small-account-picture" src="https://placehold.co/40x40.png" alt="Small Account Picture">
+                            Account
+                        </a>
+                    </li>
+                    <li>
+                        <a class="secondary-button" href="{{ url_for('logout') }}">Log Out</a>
+                    </li>
                 {% else %}
-                    <li><a class="secondary-button" href="{{ url_for('login') }}">Log In</a></li>
-                    <li><a class="primary-button" href="{{ url_for('signup') }}">Sign Up</a></li>
+                    <li>
+                        <a class="secondary-button" href="{{ url_for('login') }}">Log In</a>
+                    </li>
+                    <li>
+                        <a class="primary-button" href="{{ url_for('signup') }}">Sign Up</a>
+                    </li>
                 {% endif %}
             </ul>
         </nav>
