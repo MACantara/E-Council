@@ -300,6 +300,12 @@ nav ul li a {
     width: fit-content;
 }
 
+.horizontal-grid-input-pair {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-large);
+}
+
 /* Base Container Styles */
 
 .container {
@@ -373,11 +379,11 @@ nav ul li a {
     gap: var(--gap-small);
 }
 
-.account-details-container > .horizontal-input-pair > p:nth-child(1) {
+.account-details-container > .horizontal-grid-input-pair > p:nth-child(1) {
     text-align: left;
 }
 
-.account-details-container > .horizontal-input-pair > p:nth-child(2) {
+.account-details-container > .horizontal-grid-input-pair > p:nth-child(2) {
     text-align: right;
 }
 
