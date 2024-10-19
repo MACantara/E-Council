@@ -9,9 +9,9 @@
         <img class="account-picture" src="https://placehold.co/160x160.png" alt="Account Picture">
 
         <div class="account-details-container">
-            <h2>[Name]</h2>
-            <p>[Username]</p>
-            <p>Contact me through e-mail: [E-Mail]</p>
+            <h2>{{ current_user.users_first_name }} {{ current_user.users_last_name }}</h2>
+            <p>@{{ current_user.users_username }}</p>
+            <p>Contact me through e-mail: {{ current_user.users_email }}</p>
         </div>
 
         <a class="primary-button" href="{{ url_for('account_settings') }}">Edit Account Settings</a>
@@ -24,17 +24,22 @@
 
         <div class="horizontal-input-pair">
             <p>Department</p>
-            <p>[Department Name]</p>
+            <p>{{ current_user.users_department }}</p>
         </div>
 
         <div class="horizontal-input-pair">
             <p>Student Organization</p>
-            <p>[Student Organization Name]</p>
+            <p>{{ current_user.users_student_organization }}</p>
         </div>
 
         <div class="horizontal-input-pair">
-            <p>Position</p>
-            <p>[Position Name]</p>
+            <p>Student Organization Position</p>
+            <p>{{ current_user.users_student_organization_position }}</p>
+        </div>
+
+        <div class="horizontal-input-pair">
+            <p>Role</p>
+            <p>{{ current_user.users_role }}</p>
         </div>
     </div>
 </div>
