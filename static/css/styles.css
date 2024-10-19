@@ -43,7 +43,7 @@
     --gap-large: 1.5rem;
 
     /* Layout Max Widths */
-    --max-width-container: 500px;
+    --max-width-container: 600px;
     --max-width-hero: 1250px;
 
     /* Chart Colors */
@@ -371,6 +371,14 @@ nav ul li a {
     flex-direction: column;
     text-align: center;
     gap: var(--gap-small);
+}
+
+.account-details-container > .horizontal-input-pair > p:nth-child(1) {
+    text-align: left;
+}
+
+.account-details-container > .horizontal-input-pair > p:nth-child(2) {
+    text-align: right;
 }
 
 .account-settings-container {
