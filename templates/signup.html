@@ -3,6 +3,18 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
+
+<!-- Flash messages section -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
 <div class="container">
     <h2>Sign Up</h2>
 
@@ -28,57 +40,14 @@
         </div>
 
         <div class="input-pair">
-            <label for="users-department">Department</label>
-            <select name="users-department" id="users-department" required>
-                <option value="" disabled selected>Select a Department</option>
-                <option value="college-of-computer-studies">College of Computer Studies</option>
-                <option value="college-of-engineering">College of Engineering</option>
-                <option value="college-of-architecture">College of Architecture</option>
-                <option value="college-of-criminology">College of Criminology</option>
-                <option value="college-of-nursing">College of Nursing</option>
-                <option value="college-of-arts-sciences-and-education">College of Arts, Sciences and Education</option>
-                <option value="college-of-business-administration-and-accountancy">College of Business Administration and
-                    Accountancy</option>
-                <option value="college-of-physical-and-occupational-therapy">College of Physical and Occupational Therapy
-                </option>
-                <option value="college-of-international-tourism-and-hospitality-management">College of International Tourism
-                    and Hospitality Management</option>
-                <option value="college-of-pharmacy">College of Pharmacy</option>
-                <option value="college-of-radiologic-technology">College of Radiologic Technology</option>
-            </select>
-        </div>
-
-        <div class="input-pair">
             <label for="users-role">Role</label>
-            <select name="users-role" id="users-role" required>
-                <option value="" disabled selected>Select a Role</option>
-                <option value="student-council-officer">Student Council Officer</option>
-                <option value="faculty">Faculty</option>
-                <option value="staff">Staff</option>
-            </select>
+            <input type="text" name="users-role" id="users-role" placeholder="Role" required>
         </div>
 
         <div class="input-pair">
             <label for="users-password">Password</label>
             <input type="password" name="users-password" id="users-password" placeholder="Password" required>
         </div>
-
-        <button class="show-password-button">Show Password</button>
-
-        <div class="password-requirements-container">
-            <p>Must be at least 8 characters long</p>
-            <p>Must contain at least one uppercase letter</p>
-            <p>Must contain at least one lowercase letter</p>
-            <p>Must contain at least one number</p>
-            <p>Must contain at least one special character</p>
-        </div>
-
-        <div class="input-pair">
-            <label for="users-repeat-password">Repeat Password</label>
-            <input type="password" name="users-repeat-password" id="users-repeat-password" placeholder="Repeat Password" required>
-        </div>
-
-        <button class="show-password-button">Show Password</button>
 
         <button class="primary-button" type="submit">Sign Up</button>
 
