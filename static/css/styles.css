@@ -814,3 +814,8 @@ textarea {
     border-radius: 5px;
     transition: width 0.3s, background-color 0.3s;
 }
+
+#password-match {
+    color: red; 
+    display: none;
+}

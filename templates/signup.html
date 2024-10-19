@@ -101,6 +101,7 @@
             <label for="users-repeat-password">Repeat Password</label>
             <input type="password" name="users-repeat-password" id="users-repeat-password" placeholder="Repeat Password"
                 required>
+            <p id="password-match">Passwords do not match</p>
         </div>
 
         <button class="show-password-button" type="button"
@@ -170,6 +171,19 @@
             strengthBarContainer.style.display = 'block';
             strengthBar.style.width = (result.score + 1) * 20 + '%';
             strengthBar.style.backgroundColor = strengthColors[result.score];
+        }
+    });
+
+    document.getElementById('users-repeat-password').addEventListener('input', function () {
+        var password = document.getElementById('users-password').value;
+        var repeatPassword = this.value;
+        var passwordMatch = document.getElementById('password-match');
+        if (password !== repeatPassword) {
+            passwordMatch.style.display = 'block';
+            passwordMatch.style.color = 'red';
+            passwordMatch.textContent = 'Passwords do not match';
+        } else {
+            passwordMatch.style.display = 'none';
         }
     });
 
