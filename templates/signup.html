@@ -109,14 +109,17 @@
 <script>
     document.getElementById('users-password').addEventListener('input', function() {
         var password = this.value;
+        var strengthBarContainer = document.getElementById('password-strength');
         var strengthBar = document.getElementById('password-strength-bar');
         var strengthColors = ['#ff4b4b', '#ff7f50', '#ffd700', '#9acd32', '#00c853'];
 
         if (password === '') {
+            strengthBarContainer.style.display = 'none';
             strengthBar.style.width = '0%';
             strengthBar.style.backgroundColor = '#e0e0e0';
         } else {
             var result = zxcvbn(password);
+            strengthBarContainer.style.display = 'block';
             strengthBar.style.width = (result.score + 1) * 20 + '%';
             strengthBar.style.backgroundColor = strengthColors[result.score];
         }
