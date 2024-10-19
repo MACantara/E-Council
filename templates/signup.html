@@ -73,7 +73,9 @@
         <div class="input-pair">
             <label for="users-password">Password</label>
             <input type="password" name="users-password" id="users-password" placeholder="Password" required>
-            <div id="password-strength"></div>
+            <div id="password-strength">
+                <div id="password-strength-bar"></div>
+            </div>
         </div>
 
         <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-password')">Show Password</button>
@@ -107,26 +109,17 @@
 <script>
     document.getElementById('users-password').addEventListener('input', function() {
         var password = this.value;
-        var result = zxcvbn(password);
-        var strengthText;
-        switch (result.score) {
-            case 0:
-                strengthText = 'Very Weak';
-                break;
-            case 1:
-                strengthText = 'Weak';
-                break;
-            case 2:
-                strengthText = 'Fair';
-                break;
-            case 3:
-                strengthText = 'Good';
-                break;
-            case 4:
-                strengthText = 'Strong';
-                break;
+        var strengthBar = document.getElementById('password-strength-bar');
+        var strengthColors = ['#ff4b4b', '#ff7f50', '#ffd700', '#9acd32', '#00c853'];
+
+        if (password === '') {
+            strengthBar.style.width = '0%';
+            strengthBar.style.backgroundColor = '#e0e0e0';
+        } else {
+            var result = zxcvbn(password);
+            strengthBar.style.width = (result.score + 1) * 20 + '%';
+            strengthBar.style.backgroundColor = strengthColors[result.score];
         }
-        document.getElementById('password-strength').innerText = 'Password Strength: ' + strengthText;
     });
 
     function togglePasswordVisibility(id) {
