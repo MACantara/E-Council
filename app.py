@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,6 +15,19 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash("You need to be logged in to access this page.", "error")
+    return redirect(url_for("login"))
 
 class Users(db.Model):
     __tablename__ = "users"
@@ -134,9 +148,10 @@ def login():
             flash("Login failed!", "error")
             return redirect(url_for("login"))
 
-# Ensure you have a logout route to clear the session
 @app.route("/logout")
+@login_required
 def logout():
+    logout_user()
     session.clear()
     flash("You have been logged out.", "success")
     return redirect(url_for("login"))
@@ -150,94 +165,117 @@ def reset_password():
     return render_template("reset-password.html")
 
 @app.route("/account")
+@login_required
 def account():
     return render_template("account.html")
 
 @app.route("/account-settings", methods=["GET", "POST"])
+@login_required
 def account_settings():
     return render_template("account-settings.html")
 
 @app.route("/email-settings", methods=["GET", "POST"])
+@login_required
 def email_settings():
     return render_template("email-settings.html")
 
 @app.route("/password-security-settings", methods=["GET", "POST"])
+@login_required
 def password_security_settings():
     return render_template("password-security-settings.html")
 
 @app.route("/council-overview")
+@login_required
 def council_overview():
     return render_template("council-overview.html")
 
 @app.route("/events-overview")
+@login_required
 def events_overview():
     return render_template("events-overview.html")
 
 @app.route("/event-dashboard")
+@login_required
 def event_dashboard():
     return render_template("event-dashboard.html")
 
 @app.route("/add-transaction")
+@login_required
 def add_transaction():
     return render_template("add-transaction.html")
 
 @app.route("/invite-user")
+@login_required
 def invite_user():
     return render_template("invite-user.html")
 
 @app.route("/event-invite-rejected")
+@login_required
 def event_invite_rejected():
     return render_template("event-invite-rejected.html")
 
 @app.route("/event-invite-accepted")
+@login_required
 def event_invite_accepted():
     return render_template("event-invite-accepted.html")
 
 @app.route("/concept-papers-overview")
+@login_required
 def concept_papers_overview():
     return render_template("concept-papers-overview.html")
 
 @app.route("/documentation-overview")
+@login_required
 def documentation_overview():
     return render_template("documentation-overview.html")
 
 @app.route("/financial-reports-overview")
+@login_required
 def financial_reports_overview():
     return render_template("financial-reports-overview.html")
 
 @app.route("/accreditation-requirements-overview")
+@login_required
 def accreditation_requirements_overview():
     return render_template("accreditation-requirements-overview.html")
 
 @app.route("/board-resolutions-overview")
+@login_required
 def board_resolutions_overview():
     return render_template("board-resolutions-overview.html")
 
 @app.route("/notable-achievement-reports-overview")
+@login_required
 def notable_achievement_reports_overview():
     return render_template("notable-achievement-reports-overview.html")
 
 @app.route("/society-achievement-and-compliances-reports-overview")
+@login_required
 def society_accomplishment_and_compliance_reports_overview():
     return render_template("society-accomplishment-and-compliance-reports-overview.html")
 
 @app.route("/minutes-of-the-meeting-overview")
+@login_required
 def minutes_of_the_meeting_overview():
     return render_template("minutes-of-the-meeting-overview.html")
 
 @app.route("/student-enrichment-activity-reports-overview")
+@login_required
 def student_enrichment_activity_reports_overview():
     return render_template("student-enrichment-activity-reports-overview.html")
 
 @app.route("/end-of-semester-reports-overview")
+@login_required
 def end_of_semester_reports_overview():
     return render_template("end-of-semester-reports-overview.html")
 
 @app.route("/calendar-of-activities-overview")
+@login_required
 def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 @app.route("/semestral-clearance-overview")
+@login_required
 def semestral_clearance_overview():
     return render_template("semestral-clearance-overview.html")
 
