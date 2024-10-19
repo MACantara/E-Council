@@ -39,6 +39,8 @@ class Users(db.Model, UserMixin):
     users_email = db.Column(db.String(100), unique=True, nullable=False)
     users_department = db.Column(db.String(100), nullable=False)
     users_role = db.Column(db.String(50), nullable=False)
+    users_student_organization = db.Column(db.String(100), nullable=False)
+    users_student_organization_position = db.Column(db.String(100), nullable=False)
     users_password = db.Column(db.String(255), nullable=False)
     users_email_verified = db.Column(db.Integer, nullable=False)
 
@@ -52,7 +54,7 @@ class Users(db.Model, UserMixin):
         return str(self.users_id)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_password}, {self.users_email_verified})"
+        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified})"
 
 @app.route("/")
 def index():
@@ -69,12 +71,14 @@ def signup():
         users_email = request.form.get("users-email")
         users_department = request.form.get("users-department")
         users_role = request.form.get("users-role")
+        users_student_organization = request.form.get("users-student-organization")
+        users_student_organization_position = request.form.get("users-student-organization-position")
         users_password = request.form.get("users-password")
         users_repeat_password = request.form.get("users-repeat-password")
         users_email_verified = 0
 
         # Validation
-        if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_password:
+        if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_student_organization or not users_student_organization_position or not users_password:
             flash("All fields are required.", "error")
             return render_template("signup.html")
 
@@ -112,6 +116,8 @@ def signup():
             users_email=users_email,
             users_department=users_department,
             users_role=users_role,
+            users_student_organization=users_student_organization,
+            users_student_organization_position=users_student_organization_position,
             users_email_verified=users_email_verified,
         )
 
@@ -120,7 +126,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
 
-        flash("Account created!", "success")
+        flash("Account created successfully.", "success")
 
         return redirect(url_for("login"))
 
@@ -144,7 +150,6 @@ def login():
 
             if user.check_password(users_password):
                 login_user(user)
-                flash("Login successful!", "success")
                 return redirect(url_for("council_overview"))
 
         flash("Login failed!", "error")
