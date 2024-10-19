@@ -27,15 +27,17 @@
             <p>{{ current_user.users_department }}</p>
         </div>
 
-        <div class="horizontal-input-pair">
-            <p>Student Organization</p>
-            <p>{{ current_user.users_student_organization }}</p>
-        </div>
+        {% if current_user.users_role == "Student Council Officer" %}
+            <div class="horizontal-input-pair">
+                <p>Student Organization</p>
+                <p>{{ current_user.users_student_organization }}</p>
+            </div>
 
-        <div class="horizontal-input-pair">
-            <p>Student Organization Position</p>
-            <p>{{ current_user.users_student_organization_position }}</p>
-        </div>
+            <div class="horizontal-input-pair">
+                <p>Student Organization Position</p>
+                <p>{{ current_user.users_student_organization_position }}</p>
+            </div>
+        {% endif %}
 
         <div class="horizontal-input-pair">
             <p>Role</p>
