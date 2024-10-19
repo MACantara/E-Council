@@ -134,19 +134,24 @@ def login():
             (Users.users_username == users_username_email) | (Users.users_email == users_username_email)
         ).first()
 
-        if user and user.check_password(users_password):
-            session['users_id'] = user.users_id
-            session['users_first_name'] = user.users_first_name
-            session['users_last_name'] = user.users_last_name
-            session['users_username'] = user.users_username
-            session['users_email'] = user.users_email
-            session['users_department'] = user.users_department
-            session['users_role'] = user.users_role
-            flash("Login successful!", "success")
-            return redirect(url_for("council_overview"))
-        else:
-            flash("Login failed!", "error")
-            return redirect(url_for("login"))
+        if user:
+            if user.users_email_verified == 0:
+                flash("Please verify your email before logging in.", "error")
+                return redirect(url_for("login"))
+
+            if user.check_password(users_password):
+                session['users_id'] = user.users_id
+                session['users_first_name'] = user.users_first_name
+                session['users_last_name'] = user.users_last_name
+                session['users_username'] = user.users_username
+                session['users_email'] = user.users_email
+                session['users_department'] = user.users_department
+                session['users_role'] = user.users_role
+                flash("Login successful!", "success")
+                return redirect(url_for("council_overview"))
+
+        flash("Login failed!", "error")
+        return redirect(url_for("login"))
 
 @app.route("/logout")
 @login_required
