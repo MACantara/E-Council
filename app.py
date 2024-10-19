@@ -45,13 +45,13 @@ def signup():
     if request.method == "GET":
         return render_template("signup.html")
     elif request.method == "POST":
-        users_first_name = request.form.get("users_first_name")
-        users_last_name = request.form.get("users_last_name")
-        users_username = request.form.get("users_username")
-        users_email = request.form.get("users_email")
-        users_role = request.form.get("users_role")
-        users_password = request.form.get("users_password")
-        users_email_verified = request.form.get("users_email_verified")
+        users_first_name = request.form.get("users-first-name")
+        users_last_name = request.form.get("users-last-name")
+        users_username = request.form.get("users-username")
+        users_email = request.form.get("users-email")
+        users_role = request.form.get("users-role")
+        users_password = request.form.get("users-password")
+        users_email_verified = 0
 
         user = Users(
             users_first_name=users_first_name,
@@ -67,17 +67,17 @@ def signup():
         db.session.add(user)
         db.session.commit()
 
-        flash("User created!", "success")
+        flash("Account created!", "success")
 
-        return redirect(url_for("index"))
+        return redirect(url_for("login"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
         return render_template("login.html")
     elif request.method == "POST":
-        users_username = request.form.get("users_username")
-        users_password = request.form.get("users_password")
+        users_username = request.form.get("users-username")
+        users_password = request.form.get("users-password")
 
         user = Users.query.filter_by(users_username=users_username).first()
 
