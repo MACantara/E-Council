@@ -73,7 +73,7 @@
             </select>
         </div>
 
-        <div class="input-pair">
+        <div class="input-pair" id="users-student-organization-container">
             <label for="users-student-organization">Student Organization</label>
             <select name="users-student-organization" id="users-student-organization" required>
                 <option value="" disabled selected>Select a Student Organization</option>
@@ -82,7 +82,7 @@
             </select>
         </div>
 
-        <div class="input-pair">
+        <div class="input-pair" id="users-student-organization-position-container">
             <label for="users-student-organization-position">Student Organization Position</label>
             <select name="users-student-organization-position" id="users-student-organization-position" required>
                 <option value="" disabled selected>Select a Student Organization Position</option>
@@ -245,6 +245,27 @@
             input.type = 'password';
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('users-role');
+        const studentOrgSelect = document.getElementById('users-student-organization-container');
+        const studentOrgPositionSelect = document.getElementById('users-student-organization-position-container');
+
+        function toggleStudentOrganizationFields() {
+            if (roleSelect.value === 'Student Council Officer') {
+                studentOrgSelect.style.display = 'flex';
+                studentOrgPositionSelect.style.display = 'flex';
+            } else {
+                studentOrgSelect.style.display = 'none';
+                studentOrgPositionSelect.style.display = 'none';
+            }
+        }
+
+        roleSelect.addEventListener('change', toggleStudentOrganizationFields);
+
+        // Initial check
+        toggleStudentOrganizationFields();
+    });
 </script>
 
 {% endblock %}

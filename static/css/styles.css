@@ -831,3 +831,10 @@ textarea {
     color: red; 
     display: none;
 }
+
+/* Student Organization and Positions Styles */
+
+#users-student-organization-container,
+#users-student-organization-position-container {
+    display: none;
+}
