@@ -126,7 +126,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
 
-        flash("Account created successfully.", "success")
+        flash("Verify your email before logging in.", "success")
 
         return redirect(url_for("login"))
 
