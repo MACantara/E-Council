@@ -57,6 +57,11 @@ def signup():
         if not users_first_name or not users_last_name or not users_username or not users_email or not users_role or not users_password:
             flash("All fields are required.", "error")
             return render_template("signup.html")
+        
+        # Check if username already exists
+        if Users.query.filter_by(users_username=users_username).first():
+            flash("Username already exists.", "error")
+            return render_template("signup.html")
 
         user = Users(
             users_first_name=users_first_name,
