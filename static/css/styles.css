@@ -170,10 +170,12 @@ header {
 nav ul {
     list-style: none;
     display: flex;
+    align-items: center;
+    gap: var(--gap-medium);
 }
 
 nav ul li {
-    margin-left: 1rem;
+    align-items: center;
 }
 
 nav ul li a {
@@ -329,11 +331,21 @@ nav ul li a {
 /* Account Settings Styles */
 
 .account-picture {
-    width: 160px;
-    height: 160px;
     border-radius: 50%;
     object-fit: cover;
     margin: 0 auto;
+}
+
+.small-account-picture {
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.account-image-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-medium);
 }
 
 .about-me-container {
