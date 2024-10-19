@@ -51,16 +51,39 @@ def signup():
         users_email = request.form.get("users-email")
         users_role = request.form.get("users-role")
         users_password = request.form.get("users-password")
+        users_repeat_password = request.form.get("users-repeat-password")
         users_email_verified = 0
 
         # Validation
         if not users_first_name or not users_last_name or not users_username or not users_email or not users_role or not users_password:
             flash("All fields are required.", "error")
             return render_template("signup.html")
-        
+
         # Check if username already exists
         if Users.query.filter_by(users_username=users_username).first():
             flash("Username already exists.", "error")
+            return render_template("signup.html")
+
+        # Check if passwords match
+        if users_password != users_repeat_password:
+            flash("Passwords do not match.", "error")
+            return render_template("signup.html")
+
+        # Check password requirements
+        if len(users_password) < 8:
+            flash("Password must be at least 8 characters.", "error")
+            return render_template("signup.html")
+        if not any(char.isupper() for char in users_password):
+            flash("Password must contain at least one uppercase letter.", "error")
+            return render_template("signup.html")
+        if not any(char.islower() for char in users_password):
+            flash("Password must contain at least one lowercase letter.", "error")
+            return render_template("signup.html")
+        if not any(char.isdigit() for char in users_password):
+            flash("Password must contain at least one number.", "error")
+            return render_template("signup.html")
+        if not any(char in "!@#$%^&*(),.?\":{}|<>" for char in users_password):
+            flash("Password must contain at least one special character.", "error")
             return render_template("signup.html")
 
         user = Users(
