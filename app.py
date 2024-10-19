@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -115,11 +115,20 @@ def login():
         user = Users.query.filter_by(users_username=users_username).first()
 
         if user and user.check_password(users_password):
+            session['user_id'] = user.users_id
+            session['username'] = user.users_username
             flash("Login successful!", "success")
             return redirect(url_for("index"))
         else:
             flash("Login failed!", "error")
             return redirect(url_for("login"))
+
+# Ensure you have a logout route to clear the session
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("You have been logged out.", "success")
+    return redirect(url_for("login"))
 
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
