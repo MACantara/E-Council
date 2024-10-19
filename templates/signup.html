@@ -6,13 +6,13 @@
 
 <!-- Flash messages section -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
+{% if messages %}
+<div class="flash-messages">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
 {% endwith %}
 
 <div class="container">
@@ -49,11 +49,14 @@
                 <option value="college-of-criminology">College of Criminology</option>
                 <option value="college-of-nursing">College of Nursing</option>
                 <option value="college-of-arts-sciences-and-education">College of Arts, Sciences and Education</option>
-                <option value="college-of-business-administration-and-accountancy">College of Business Administration and
+                <option value="college-of-business-administration-and-accountancy">College of Business Administration
+                    and
                     Accountancy</option>
-                <option value="college-of-physical-and-occupational-therapy">College of Physical and Occupational Therapy
+                <option value="college-of-physical-and-occupational-therapy">College of Physical and Occupational
+                    Therapy
                 </option>
-                <option value="college-of-international-tourism-and-hospitality-management">College of International Tourism
+                <option value="college-of-international-tourism-and-hospitality-management">College of International
+                    Tourism
                     and Hospitality Management</option>
                 <option value="college-of-pharmacy">College of Pharmacy</option>
                 <option value="college-of-radiologic-technology">College of Radiologic Technology</option>
@@ -78,22 +81,30 @@
             </div>
         </div>
 
-        <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-password')">Show Password</button>
+        <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-password')">Show
+            Password</button>
 
         <div class="password-requirements-container">
-            <p id="length-requirement"><i class="bi bi-x-circle" id="length-icon"></i> Must be at least 8 characters long</p>
-            <p id="uppercase-requirement"><i class="bi bi-x-circle" id="uppercase-icon"></i> Must contain at least one uppercase letter</p>
-            <p id="lowercase-requirement"><i class="bi bi-x-circle" id="lowercase-icon"></i> Must contain at least one lowercase letter</p>
-            <p id="number-requirement"><i class="bi bi-x-circle" id="number-icon"></i> Must contain at least one number</p>
-            <p id="special-requirement"><i class="bi bi-x-circle" id="special-icon"></i> Must contain at least one special character</p>
+            <p id="length-requirement"><i class="bi bi-x-circle" id="length-icon"></i> Must be at least 8 characters
+                long</p>
+            <p id="uppercase-requirement"><i class="bi bi-x-circle" id="uppercase-icon"></i> Must contain at least one
+                uppercase letter</p>
+            <p id="lowercase-requirement"><i class="bi bi-x-circle" id="lowercase-icon"></i> Must contain at least one
+                lowercase letter</p>
+            <p id="number-requirement"><i class="bi bi-x-circle" id="number-icon"></i> Must contain at least one number
+            </p>
+            <p id="special-requirement"><i class="bi bi-x-circle" id="special-icon"></i> Must contain at least one
+                special character</p>
         </div>
 
         <div class="input-pair">
             <label for="users-repeat-password">Repeat Password</label>
-            <input type="password" name="users-repeat-password" id="users-repeat-password" placeholder="Repeat Password" required>
+            <input type="password" name="users-repeat-password" id="users-repeat-password" placeholder="Repeat Password"
+                required>
         </div>
 
-        <button class="show-password-button" type="button" onclick="togglePasswordVisibility('users-repeat-password')">Show Password</button>
+        <button class="show-password-button" type="button"
+            onclick="togglePasswordVisibility('users-repeat-password')">Show Password</button>
 
         <button class="primary-button" type="submit">Sign Up</button>
 
@@ -107,25 +118,25 @@
 <!-- Include zxcvbn library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 <script>
-    document.getElementById('users-password').addEventListener('input', function() {
+    // Password requirement icons
+    var lengthIcon = document.getElementById('length-icon');
+    var uppercaseIcon = document.getElementById('uppercase-icon');
+    var lowercaseIcon = document.getElementById('lowercase-icon');
+    var numberIcon = document.getElementById('number-icon');
+    var specialIcon = document.getElementById('special-icon');
+
+    // Initial color of password requirement icons
+    lengthIcon.style.color = 'red';
+    uppercaseIcon.style.color = 'red';
+    lowercaseIcon.style.color = 'red';
+    numberIcon.style.color = 'red';
+    specialIcon.style.color = 'red';
+
+    document.getElementById('users-password').addEventListener('input', function () {
         var password = this.value;
         var strengthBarContainer = document.getElementById('password-strength');
         var strengthBar = document.getElementById('password-strength-bar');
         var strengthColors = ['#ff4b4b', '#ff7f50', '#ffd700', '#9acd32', '#00c853'];
-
-        // Password requirements
-        var lengthRequirement = document.getElementById('length-requirement');
-        var uppercaseRequirement = document.getElementById('uppercase-requirement');
-        var lowercaseRequirement = document.getElementById('lowercase-requirement');
-        var numberRequirement = document.getElementById('number-requirement');
-        var specialRequirement = document.getElementById('special-requirement');
-
-        // Password requirement icons
-        var lengthIcon = document.getElementById('length-icon');
-        var uppercaseIcon = document.getElementById('uppercase-icon');
-        var lowercaseIcon = document.getElementById('lowercase-icon');
-        var numberIcon = document.getElementById('number-icon');
-        var specialIcon = document.getElementById('special-icon');
 
         // Check password requirements
         var lengthValid = password.length >= 8;
@@ -135,19 +146,19 @@
         var specialValid = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
         // Update requirement compliance
-        lengthRequirement.style.color = lengthValid ? 'green' : 'red';
+        lengthIcon.style.color = lengthValid ? 'green' : 'red';
         lengthIcon.className = lengthValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
 
-        uppercaseRequirement.style.color = uppercaseValid ? 'green' : 'red';
+        uppercaseIcon.style.color = uppercaseValid ? 'green' : 'red';
         uppercaseIcon.className = uppercaseValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
 
-        lowercaseRequirement.style.color = lowercaseValid ? 'green' : 'red';
+        lowercaseIcon.style.color = lowercaseValid ? 'green' : 'red';
         lowercaseIcon.className = lowercaseValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
 
-        numberRequirement.style.color = numberValid ? 'green' : 'red';
+        numberIcon.style.color = numberValid ? 'green' : 'red';
         numberIcon.className = numberValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
 
-        specialRequirement.style.color = specialValid ? 'green' : 'red';
+        specialIcon.style.color = specialValid ? 'green' : 'red';
         specialIcon.className = specialValid ? 'bi bi-check-circle' : 'bi bi-x-circle';
 
         if (password === '') {
