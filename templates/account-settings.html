@@ -14,48 +14,72 @@
             <div class="horizontal-input-pair">
                 <div class="input-pair">
                     <label for="users-first-name">First Name</label>
-                    <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name" required>
+                    <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name" value="{{ current_user.users_first_name }}" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="users-last-name">Last Name</label>
-                    <input type="text" name="users-last-name" id="users-last-name" placeholder="Last Name" required>
+                    <input type="text" name="users-last-name" id="users-last-name" placeholder="Last Name" value="{{ current_user.users_last_name }}" required>
                 </div>
             </div>
 
             <div class="input-pair">
                 <label for="users-username">Username</label>
-                <input type="text" name="users-username" id="users-username" placeholder="Username" required>
+                <input type="text" name="users-username" id="users-username" placeholder="Username" value="{{ current_user.users_username }}" required>
             </div>
 
             <div class="input-pair">
                 <label for="users-department">Department</label>
                 <select name="users-department" id="users-department" required>
-                    <option value="" disabled selected>Select a Department</option>
-                    <option value="college-of-computer-studies">College of Computer Studies</option>
-                    <option value="college-of-engineering">College of Engineering</option>
-                    <option value="college-of-architecture">College of Architecture</option>
-                    <option value="college-of-criminology">College of Criminology</option>
-                    <option value="college-of-nursing">College of Nursing</option>
-                    <option value="college-of-arts-sciences-and-education">College of Arts, Sciences and Education</option>
-                    <option value="college-of-business-administration-and-accountancy">College of Business Administration and
-                        Accountancy</option>
-                    <option value="college-of-physical-and-occupational-therapy">College of Physical and Occupational Therapy
-                    </option>
-                    <option value="college-of-international-tourism-and-hospitality-management">College of International Tourism
-                        and Hospitality Management</option>
-                    <option value="college-of-pharmacy">College of Pharmacy</option>
-                    <option value="college-of-radiologic-technology">College of Radiologic Technology</option>
+                    <option value="" disabled>Select a Department</option>
+                    <option value="college-of-computer-studies" {% if current_user.users_department == "College of Computer Studies" %}selected{% endif %}>College of Computer Studies</option>
+                    <option value="college-of-engineering" {% if current_user.users_department == "College of Engineering" %}selected{% endif %}>College of Engineering</option>
+                    <option value="college-of-architecture" {% if current_user.users_department == "College of Architecture" %}selected{% endif %}>College of Architecture</option>
+                    <option value="college-of-criminology" {% if current_user.users_department == "College of Criminology" %}selected{% endif %}>College of Criminology</option>
+                    <option value="college-of-nursing" {% if current_user.users_department == "College of Nursing" %}selected{% endif %}>College of Nursing</option>
+                    <option value="college-of-arts-sciences-and-education" {% if current_user.users_department == "College of Arts, Sciences and Education" %}selected{% endif %}>College of Arts, Sciences and Education</option>
+                    <option value="college-of-business-administration-and-accountancy" {% if current_user.users_department == "College of Business Administration and Accountancy" %}selected{% endif %}>College of Business Administration and Accountancy</option>
+                    <option value="college-of-physical-and-occupational-therapy" {% if current_user.users_department == "College of Physical and Occupational Therapy" %}selected{% endif %}>College of Physical and Occupational Therapy</option>
+                    <option value="college-of-international-tourism-and-hospitality-management" {% if current_user.users_department == "College of International Tourism and Hospitality Management" %}selected{% endif %}>College of International Tourism and Hospitality Management</option>
+                    <option value="college-of-pharmacy" {% if current_user.users_department == "College of Pharmacy" %}selected{% endif %}>College of Pharmacy</option>
+                    <option value="college-of-radiologic-technology" {% if current_user.users_department == "College of Radiologic Technology" %}selected{% endif %}>College of Radiologic Technology</option>
                 </select>
             </div>
-
+            
             <div class="input-pair">
                 <label for="users-role">Role</label>
                 <select name="users-role" id="users-role" required>
-                    <option value="" disabled selected>Select a Role</option>
-                    <option value="student-council-officer">Student Council Officer</option>
-                    <option value="faculty">Faculty</option>
-                    <option value="staff">Staff</option>
+                    <option value="" disabled>Select a Role</option>
+                    <option value="Student Council Officer" {% if current_user.users_role == "Student Council Officer" %}selected{% endif %}>Student Council Officer</option>
+                    <option value="Faculty" {% if current_user.users_role == "Faculty" %}selected{% endif %}>Faculty</option>
+                    <option value="Staff" {% if current_user.users_role == "Staff" %}selected{% endif %}>Staff</option>
+                </select>
+            </div>
+
+            <div class="input-pair" id="users-student-organization-container">
+                <label for="users-student-organization">Student Organization</label>
+                <select name="users-student-organization" id="users-student-organization">
+                    <option value="" disabled>Select a Student Organization</option>
+                    <option value="College of Computer Studies - Student Council" {% if current_user.users_student_organization == "College of Computer Studies - Student Council" %}selected{% endif %}>College of Computer Studies - Student Council (CCS-SC)</option>
+                    <option value="Junior Philippine Computer Society" {% if current_user.users_student_organization == "Junior Philippine Computer Society" %}selected{% endif %}>Junior Philippine Computer Society (JPCS)</option>
+                </select>
+            </div>
+
+            <div class="input-pair" id="users-student-organization-position-container">
+                <label for="users-student-organization-position">Student Organization Position</label>
+                <select name="users-student-organization-position" id="users-student-organization-position">
+                    <option value="" disabled selected>Select a Student Organization Position</option>
+                    <option value="President" {% if current_user.users_student_organization_position == "President" %}selected{% endif %}>President</option>
+                    <option value="Vice President" {% if current_user.users_student_organization_position == "Vice President" %}selected{% endif %}>Vice President</option>
+                    <option value="Secretary" {% if current_user.users_student_organization_position == "Secretary" %}selected{% endif %}>Secretary</option>
+                    <option value="Treasurer" {% if current_user.users_student_organization_position == "Treasurer" %}selected{% endif %}>Treasurer</option>
+                    <option value="Auditor" {% if current_user.users_student_organization_position == "Auditor" %}selected{% endif %}>Auditor</option>
+                    <option value="Business Manager" {% if current_user.users_student_organization_position == "Business Manager" %}selected{% endif %}>Business Manager</option>
+                    <option value="Public Relations Officer" {% if current_user.users_student_organization_position == "Public Relations Officer" %}selected{% endif %}>Public Relations Officer (P.R.O)</option>
+                    <option value="1st Year Representative" {% if current_user.users_student_organization_position == "1st Year Representative" %}selected{% endif %}>1st Year Representative</option>
+                    <option value="2nd Year Representative" {% if current_user.users_student_organization_position == "2nd Year Representative" %}selected{% endif %}>2nd Year Representative</option>
+                    <option value="3rd Year Representative" {% if current_user.users_student_organization_position == "3rd Year Representative" %}selected{% endif %}>3rd Year Representative</option>
+                    <option value="4th Year Representative" {% if current_user.users_student_organization_position == "4th Year Representative" %}selected{% endif %}>4th Year Representative</option>
                 </select>
             </div>
 
@@ -100,6 +124,33 @@
     document.getElementById('users-signature').addEventListener('change', function () {
         const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
         document.getElementById('file-name').textContent = fileName;
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('users-role');
+        const studentOrgContainer = document.getElementById('users-student-organization-container');
+        const studentOrgSelect = document.getElementById('users-student-organization');
+        const studentOrgPositionContainer = document.getElementById('users-student-organization-position-container');
+        const studentOrgPositionSelect = document.getElementById('users-student-organization-position');
+
+        function toggleStudentOrganizationFields() {
+            if (roleSelect.value === 'Student Council Officer') {
+                studentOrgContainer.style.display = 'flex';
+                studentOrgSelect.setAttribute('required', 'required');
+                studentOrgPositionContainer.style.display = 'flex';
+                studentOrgPositionSelect.setAttribute('required', 'required');
+            } else {
+                studentOrgContainer.style.display = 'none';
+                studentOrgSelect.removeAttribute('required');
+                studentOrgPositionContainer.style.display = 'none';
+                studentOrgPositionSelect.removeAttribute('required');
+            }
+        }
+
+        roleSelect.addEventListener('change', toggleStudentOrganizationFields);
+
+        // Initial check
+        toggleStudentOrganizationFields();
     });
 </script>
 
