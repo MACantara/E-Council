@@ -7,6 +7,7 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
+from markupsafe import Markup
 
 # Load environment variables from .env file
 load_dotenv()
@@ -104,6 +105,16 @@ def send_verification_email(user_email):
     """
     
     mail.send(msg)
+    
+@app.route("/send_verification_email/<email>")
+def send_verification_email_route(email):
+    user = Users.query.filter_by(users_email=email).first_or_404()
+    if user.users_email_verified == 0:
+        send_verification_email(user.users_email)
+        flash(f"A verification email has been sent to your email.", "success")
+    else:
+        flash("This email is already verified.", "info")
+    return redirect(url_for("login"))
 
 @app.route("/")
 def index():
@@ -223,7 +234,10 @@ def login():
 
         if user:
             if user.users_email_verified == 0:
-                flash("Please verify your email before logging in.", "error")
+                # Generate verification link
+                verification_link = url_for('send_verification_email_route', email=user.users_email, _external=True)
+                
+                flash(Markup(f"Please verify your email before logging in. <a href='{verification_link}'>Click here to resend the verification email.</a>"), "error")
                 return redirect(url_for("login"))
 
             if user.check_password(users_password):
