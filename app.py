@@ -392,7 +392,12 @@ def forgot_password():
 
 @app.route("/reset-password/<selector>/<token>", methods=["GET", "POST"])
 def reset_password(selector, token):
-    password_reset = PasswordReset.query.filter_by(password_reset_selector=selector).first_or_404()
+    password_reset = PasswordReset.query.filter_by(password_reset_selector=selector).first()
+
+    # Check if there is a password reset record
+    if not password_reset:
+        flash("The password reset link is invalid or has expired.", "error")
+        return redirect(url_for("login"))
 
     # Convert password_reset_expires to a datetime object
     expires = datetime.strptime(password_reset.password_reset_expires, '%Y-%m-%d %H:%M:%S.%f')
