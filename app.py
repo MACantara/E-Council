@@ -8,6 +8,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from markupsafe import Markup
+from datetime import datetime
 
 # Load environment variables from .env file
 load_dotenv()
@@ -80,6 +81,17 @@ class EmailVerification(db.Model):
 
     user = db.relationship('Users', backref=db.backref('email_verifications', lazy=True))
 
+class PasswordReset(db.Model):
+    __tablename__ = "password_reset"
+
+    password_reset_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    password_reset_users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=False)
+    password_reset_selector = db.Column(db.String(255), nullable=False)
+    password_reset_token = db.Column(db.String(255), nullable=False)
+    password_reset_expires = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship('Users', backref=db.backref('password_resets', lazy=True))
+
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     token = s.dumps(users_email, salt='email-confirm')
@@ -138,8 +150,13 @@ def send_verification_email(users_email):
     db.session.commit()
     
 def send_reset_password_email(user_email):
-    token = s.dumps(user_email, salt='password-reset')
-    link = url_for('reset_password', token=token, _external=True)
+    user = Users.query.filter_by(users_email=user_email).first_or_404()
+    selector = os.urandom(16).hex()
+    token = os.urandom(32).hex()
+    expires = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    
+    # Create the password reset link
+    link = url_for('reset_password', selector=selector, token=token, _external=True)
     msg = Message('Password Reset Request', recipients=[user_email])
     
     # HTML email body
@@ -173,6 +190,16 @@ def send_reset_password_email(user_email):
     """
     
     mail.send(msg)
+
+    # Track password reset in the database
+    password_reset = PasswordReset(
+        password_reset_users_id=user.users_id,
+        password_reset_selector=selector,
+        password_reset_token=token,
+        password_reset_expires=expires
+    )
+    db.session.add(password_reset)
+    db.session.commit()
 
 @app.route("/")
 def index():
@@ -363,15 +390,16 @@ def forgot_password():
         return redirect(url_for("forgot_password"))
     return render_template("forgot-password.html")
 
-@app.route("/reset-password/<token>", methods=["GET", "POST"])
-def reset_password(token):
-    try:
-        email = s.loads(token, salt='password-reset', max_age=3600)
-    except SignatureExpired:
-        flash("The password reset link has expired.", "error")
-        return redirect(url_for("forgot_password"))
-    except BadSignature:
-        flash("The password reset link is invalid.", "error")
+@app.route("/reset-password/<selector>/<token>", methods=["GET", "POST"])
+def reset_password(selector, token):
+    password_reset = PasswordReset.query.filter_by(password_reset_selector=selector).first_or_404()
+
+    # Convert password_reset_expires to a datetime object
+    expires = datetime.strptime(password_reset.password_reset_expires, '%Y-%m-%d %H:%M:%S.%f')
+
+    # Check if the token matches and is not expired
+    if password_reset.password_reset_token != token or expires < datetime.utcnow():
+        flash("The password reset link is invalid or has expired.", "error")
         return redirect(url_for("forgot_password"))
 
     if request.method == "POST":
@@ -380,15 +408,20 @@ def reset_password(token):
 
         if users_password != users_repeat_password:
             flash("Passwords do not match.", "error")
-            return redirect(url_for("reset_password", token=token))
+            return redirect(url_for("reset_password", selector=selector, token=token))
 
-        user = Users.query.filter_by(users_email=email).first_or_404()
+        user = Users.query.filter_by(users_id=password_reset.password_reset_users_id).first_or_404()
         user.set_password(users_password)
         db.session.commit()
+
+        # Delete the password reset record
+        db.session.delete(password_reset)
+        db.session.commit()
+
         flash("Your password has been reset. Please log in.", "success")
         return redirect(url_for("login"))
 
-    return render_template("reset-password.html", token=token)
+    return render_template("reset-password.html", selector=selector, token=token)
 
 @app.route("/account")
 @login_required
