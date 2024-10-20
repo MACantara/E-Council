@@ -71,8 +71,38 @@ class Users(db.Model, UserMixin):
 def send_verification_email(user_email):
     token = s.dumps(user_email, salt='email-confirm')
     link = url_for('confirm_email', token=token, _external=True)
-    msg = Message('Confirm Your Email', recipients=[user_email])
-    msg.body = f'Your link is {link}'
+    msg = Message('New Account Email Verification', recipients=[user_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body>
+        <h1>Welcome to our website!</h1>
+        <p>You have successfully created an account. Please click the button below to verify your email:</p>
+        <a href="{link}" style="background-color: #007BFF; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block;">Verify Email</a>
+        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}">{link}</a></p>
+        <p>If you didn't create this account, you can safely ignore this email.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    Welcome to our website!
+
+    You have successfully created an account. Please click the link below to verify your email:
+    {link}
+
+    Or copy and paste this link into your browser:
+    {link}
+
+    If you didn't create this account, you can safely ignore this email.
+
+    Sincerely,
+    E-Council Team
+    """
+    
     mail.send(msg)
 
 @app.route("/")
