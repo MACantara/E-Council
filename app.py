@@ -71,16 +71,22 @@ def signup():
         users_email = request.form.get("users-email")
         users_department = request.form.get("users-department")
         users_role = request.form.get("users-role")
-        users_student_organization = request.form.get("users-student-organization")
-        users_student_organization_position = request.form.get("users-student-organization-position")
         users_password = request.form.get("users-password")
         users_repeat_password = request.form.get("users-repeat-password")
         users_email_verified = 0
+        
+        users_student_organization = request.form.get("users-student-organization") if request.form.get("users-student-organization") else ""
+        users_student_organization_position = request.form.get("users-student-organization-position") if request.form.get("users-student-organization-position") else ""
 
         # Validation
-        if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_student_organization or not users_student_organization_position or not users_password:
+        if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_password:
             flash("All fields are required.", "error")
             return render_template("signup.html")
+
+        if users_role == "Student Council Officer":
+            if not users_student_organization or not users_student_organization_position:
+                flash("Student Organization and Position are required for Student Council Officers.", "error")
+                return render_template("signup.html")
 
         # Check if username already exists
         if Users.query.filter_by(users_username=users_username).first():
