@@ -106,15 +106,42 @@ def send_verification_email(user_email):
     
     mail.send(msg)
     
-@app.route("/send_verification_email/<email>")
-def send_verification_email_route(email):
-    user = Users.query.filter_by(users_email=email).first_or_404()
-    if user.users_email_verified == 0:
-        send_verification_email(user.users_email)
-        flash(f"A verification email has been sent to your email.", "success")
-    else:
-        flash("This email is already verified.", "info")
-    return redirect(url_for("login"))
+def send_reset_password_email(user_email):
+    token = s.dumps(user_email, salt='password-reset')
+    link = url_for('reset_password', token=token, _external=True)
+    msg = Message('Password Reset Request', recipients=[user_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Password Reset Request</h1>
+        <p>To reset your password, click the button below:</p>
+        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Reset Password</a>
+        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
+        <p>If you didn't request a password reset, you can safely ignore this email.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    Password Reset Request
+
+    To reset your password, click the link below:
+    {link}
+
+    Or copy and paste this link into your browser:
+    {link}
+
+    If you didn't request a password reset, you can safely ignore this email.
+
+    Sincerely,
+    E-Council Team
+    """
+    
+    mail.send(msg)
 
 @app.route("/")
 def index():
@@ -132,7 +159,7 @@ def signup():
         users_department = request.form.get("users-department")
         users_role = request.form.get("users-role")
         users_password = request.form.get("users-password")
-        users_repeat_password = request.form.get("users-repeat-password")
+        users_users_repeat_password = request.form.get("users-repeat-password")
         users_email_verified = 0
         
         users_student_organization = request.form.get("users-student-organization") if request.form.get("users-student-organization") else ""
@@ -154,7 +181,7 @@ def signup():
             return render_template("signup.html")
 
         # Check if passwords match
-        if users_password != users_repeat_password:
+        if users_password != users_users_repeat_password:
             flash("Passwords do not match.", "error")
             return render_template("signup.html")
 
@@ -246,6 +273,16 @@ def login():
 
         flash("Invalid username/email or password.", "error")
         return redirect(url_for("login"))
+    
+@app.route("/send_verification_email/<email>")
+def send_verification_email_route(email):
+    user = Users.query.filter_by(users_email=email).first_or_404()
+    if user.users_email_verified == 0:
+        send_verification_email(user.users_email)
+        flash(f"A verification email has been sent to your email.", "success")
+    else:
+        flash("This email is already verified.", "info")
+    return redirect(url_for("login"))
 
 @app.route("/logout")
 @login_required
@@ -256,11 +293,45 @@ def logout():
 
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
+    if request.method == "POST":
+        users_email = request.form.get("users-email")
+        user = Users.query.filter_by(users_email=users_email).first()
+        if user:
+            send_reset_password_email(user.users_email)
+            flash("A password reset link has been sent to your email.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash("Email address not found.", "error")
+            return redirect(url_for("login"))
+        return redirect(url_for("forgot_password"))
     return render_template("forgot-password.html")
 
-@app.route("/reset-password", methods=["GET", "POST"])
-def reset_password():
-    return render_template("reset-password.html")
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    try:
+        email = s.loads(token, salt='password-reset', max_age=3600)
+    except SignatureExpired:
+        flash("The password reset link has expired.", "error")
+        return redirect(url_for("forgot_password"))
+    except BadSignature:
+        flash("The password reset link is invalid.", "error")
+        return redirect(url_for("forgot_password"))
+
+    if request.method == "POST":
+        users_password = request.form.get("users-password")
+        users_repeat_password = request.form.get("users-repeat-password")
+
+        if users_password != users_repeat_password:
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("reset_password", token=token))
+
+        user = Users.query.filter_by(users_email=email).first_or_404()
+        user.set_password(users_password)
+        db.session.commit()
+        flash("Your password has been reset. Please log in.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("reset-password.html", token=token)
 
 @app.route("/account")
 @login_required
