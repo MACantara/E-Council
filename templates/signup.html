@@ -75,7 +75,7 @@
 
         <div class="input-pair" id="users-student-organization-container">
             <label for="users-student-organization">Student Organization</label>
-            <select name="users-student-organization" id="users-student-organization" required>
+            <select name="users-student-organization" id="users-student-organization">
                 <option value="" disabled selected>Select a Student Organization</option>
                 <option value="College of Computer Studies - Student Council">College of Computer Studies - Student Council (CCS-SC)</option>
                 <option value="Junior Philippine Computer Society">Junior Philippine Computer Society (JPCS)</option>
@@ -84,7 +84,7 @@
 
         <div class="input-pair" id="users-student-organization-position-container">
             <label for="users-student-organization-position">Student Organization Position</label>
-            <select name="users-student-organization-position" id="users-student-organization-position" required>
+            <select name="users-student-organization-position" id="users-student-organization-position">
                 <option value="" disabled selected>Select a Student Organization Position</option>
                 <option value="President">President</option>
                 <option value="Vice President">Vice President</option>
@@ -247,25 +247,31 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const roleSelect = document.getElementById('users-role');
-        const studentOrgSelect = document.getElementById('users-student-organization-container');
-        const studentOrgPositionSelect = document.getElementById('users-student-organization-position-container');
+            const roleSelect = document.getElementById('users-role');
+            const studentOrgContainer = document.getElementById('users-student-organization-container');
+            const studentOrgSelect = document.getElementById('users-student-organization');
+            const studentOrgPositionContainer = document.getElementById('users-student-organization-position-container');
+            const studentOrgPositionSelect = document.getElementById('users-student-organization-position');
 
-        function toggleStudentOrganizationFields() {
-            if (roleSelect.value === 'Student Council Officer') {
-                studentOrgSelect.style.display = 'flex';
-                studentOrgPositionSelect.style.display = 'flex';
-            } else {
-                studentOrgSelect.style.display = 'none';
-                studentOrgPositionSelect.style.display = 'none';
+            function toggleStudentOrganizationFields() {
+                if (roleSelect.value === 'Student Council Officer') {
+                    studentOrgContainer.style.display = 'flex';
+                    studentOrgSelect.setAttribute('required', 'required');
+                    studentOrgPositionContainer.style.display = 'flex';
+                    studentOrgPositionSelect.setAttribute('required', 'required');
+                } else {
+                    studentOrgContainer.style.display = 'none';
+                    studentOrgSelect.removeAttribute('required');
+                    studentOrgPositionContainer.style.display = 'none';
+                    studentOrgPositionSelect.removeAttribute('required');
+                }
             }
-        }
 
-        roleSelect.addEventListener('change', toggleStudentOrganizationFields);
+            roleSelect.addEventListener('change', toggleStudentOrganizationFields);
 
-        // Initial check
-        toggleStudentOrganizationFields();
-    });
+            // Initial check
+            toggleStudentOrganizationFields();
+        });
 </script>
 
 {% endblock %}
