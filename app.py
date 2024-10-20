@@ -303,8 +303,8 @@ def login():
 
         if user:
             if user.users_email_verified == 0:
-                # Generate verification link
-                verification_link = url_for('send_verification_email_route', users_email=user.users_email, _external=True)
+                # Generate verification link with 'next' parameter
+                verification_link = url_for('send_verification_email_route', users_email=user.users_email, next='login', _external=True)
                 
                 flash(Markup(f"Please verify your email before logging in. <a href='{verification_link}'>Click here to resend the verification email.</a>"), "error")
                 return redirect(url_for("login"))
@@ -318,6 +318,7 @@ def login():
     
 @app.route("/send_verification_email/<users_email>")
 def send_verification_email_route(users_email):
+    next_route = request.args.get('next', 'login')  # Default to 'login' if 'next' is not provided
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     if user.users_email_verified == 0:
         # Check for existing email verification records
@@ -333,7 +334,12 @@ def send_verification_email_route(users_email):
             flash("A verification email has been sent to your email.", "success")
     else:
         flash("This email is already verified.", "info")
-    return redirect(url_for("login"))
+
+    # Redirect to the appropriate route based on the 'next' query parameter
+    if next_route == 'email_settings':
+        return redirect(url_for("email_settings"))
+    else:
+        return redirect(url_for("login"))
 
 @app.route("/logout")
 @login_required
