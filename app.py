@@ -261,25 +261,30 @@ def confirm_email(token):
     try:
         email = s.loads(token, salt='email-confirm', max_age=3600)
     except SignatureExpired:
-        flash("The confirmation link has expired.", "error")
+        flash("The email confirmation link has expired.", "error")
         return redirect(url_for("signup"))
     except BadSignature:
-        flash("The confirmation link is invalid.", "error")
+        flash("The email confirmation link is invalid.", "error")
         return redirect(url_for("signup"))
 
     user = Users.query.filter_by(users_email=email).first_or_404()
+
+    # Check for the existence of the email verification record
+    email_verification = EmailVerification.query.filter_by(email_verification_users_id=user.users_id).first()
+    if not email_verification:
+        flash("The email confirmation link is invalid.", "error")
+        return redirect(url_for("login"))
+
     if user.users_email_verified:
-        flash("Account already verified. Please log in.", "info")
+        flash("Account already verified. Please log in.", "error")
     else:
         user.users_email_verified = 1
         db.session.commit()
         flash("Your account has been verified. Please log in.", "success")
 
-        # Delete the email verification record by using the user's email instead of the token
-        email_verification = EmailVerification.query.filter_by(email_verification_users_id=user.users_id).first()
-        if email_verification:
-            db.session.delete(email_verification)
-            db.session.commit()
+        # Delete the email verification record
+        db.session.delete(email_verification)
+        db.session.commit()
 
     return redirect(url_for("login"))
 
