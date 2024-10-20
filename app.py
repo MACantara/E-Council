@@ -269,7 +269,7 @@ def confirm_email(token):
 
     user = Users.query.filter_by(users_email=email).first_or_404()
     if user.users_email_verified:
-        flash("Account already verified. Please log in.", "info")
+        flash("Account already verified. Please log in.", "error")
     else:
         user.users_email_verified = 1
         db.session.commit()
