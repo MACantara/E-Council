@@ -8,7 +8,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from markupsafe import Markup
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Load environment variables from .env file
 load_dotenv()
@@ -153,7 +153,7 @@ def send_reset_password_email(user_email):
     user = Users.query.filter_by(users_email=user_email).first_or_404()
     selector = os.urandom(16).hex()
     token = os.urandom(32).hex()
-    expires = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    expires = datetime.utcnow() + timedelta(hours=1)
     
     # Create the password reset link
     link = url_for('reset_password', selector=selector, token=token, _external=True)
@@ -188,6 +188,15 @@ def send_reset_password_email(user_email):
     Sincerely,
     E-Council Team
     """
+    
+    # Check for existing password reset records
+    existing_reset = PasswordReset.query.filter_by(
+        password_reset_users_id=user.users_id
+    ).first()
+
+    if existing_reset:
+        flash("A password reset email has already been sent to this email address. Please check your email.", "error")
+        return
     
     mail.send(msg)
 
@@ -381,13 +390,21 @@ def forgot_password():
         users_email = request.form.get("users-email")
         user = Users.query.filter_by(users_email=users_email).first()
         if user:
+            # Check for existing password reset records
+            existing_reset = PasswordReset.query.filter_by(
+                password_reset_users_id=user.users_id
+            ).first()
+
+            if existing_reset:
+                flash("A password reset email has already been sent to this email address. Please check your email.", "error")
+                return redirect(url_for("login"))
+
             send_reset_password_email(user.users_email)
             flash("A password reset link has been sent to your email.", "success")
             return redirect(url_for("login"))
         else:
             flash("Email address not found.", "error")
-            return redirect(url_for("login"))
-        return redirect(url_for("forgot_password"))
+            return redirect(url_for("forgot_password"))
     return render_template("forgot-password.html")
 
 @app.route("/reset-password/<selector>/<token>", methods=["GET", "POST"])
