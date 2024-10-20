@@ -69,10 +69,22 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified})"
 
-def send_verification_email(user_email):
-    token = s.dumps(user_email, salt='email-confirm')
+class EmailVerification(db.Model):
+    __tablename__ = "email_verification"
+
+    email_verification_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    email_verification_users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=False)
+    email_verification_token = db.Column(db.String(255), nullable=False)
+    email_verification_new_email = db.Column(db.String(100), nullable=False)
+    email_verification_created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
+
+    user = db.relationship('Users', backref=db.backref('email_verifications', lazy=True))
+
+def send_verification_email(users_email):
+    user = Users.query.filter_by(users_email=users_email).first_or_404()
+    token = s.dumps(users_email, salt='email-confirm')
     link = url_for('confirm_email', token=token, _external=True)
-    msg = Message('New Account Email Verification', recipients=[user_email])
+    msg = Message('New Account Email Verification', recipients=[users_email])
     
     # HTML email body
     msg.html = f"""
@@ -105,6 +117,25 @@ def send_verification_email(user_email):
     """
     
     mail.send(msg)
+
+    # Check for existing email verification records
+    existing_verification = EmailVerification.query.filter_by(
+        email_verification_users_id=user.users_id,
+        email_verification_new_email=users_email
+    ).first()
+
+    if existing_verification:
+        db.session.delete(existing_verification)
+        db.session.commit()
+
+    # Track email verification in the database
+    email_verification = EmailVerification(
+        email_verification_users_id=user.users_id,
+        email_verification_token=token,
+        email_verification_new_email=users_email
+    )
+    db.session.add(email_verification)
+    db.session.commit()
     
 def send_reset_password_email(user_email):
     token = s.dumps(user_email, salt='password-reset')
@@ -244,6 +275,12 @@ def confirm_email(token):
         db.session.commit()
         flash("Your account has been verified. Please log in.", "success")
 
+    # Delete the email verification record
+    email_verification = EmailVerification.query.filter_by(email_verification_token=token).first()
+    if email_verification:
+        db.session.delete(email_verification)
+        db.session.commit()
+
     return redirect(url_for("login"))
 
 @app.route("/login", methods=["GET", "POST"])
@@ -262,7 +299,7 @@ def login():
         if user:
             if user.users_email_verified == 0:
                 # Generate verification link
-                verification_link = url_for('send_verification_email_route', email=user.users_email, _external=True)
+                verification_link = url_for('send_verification_email_route', users_email=user.users_email, _external=True)
                 
                 flash(Markup(f"Please verify your email before logging in. <a href='{verification_link}'>Click here to resend the verification email.</a>"), "error")
                 return redirect(url_for("login"))
@@ -274,9 +311,9 @@ def login():
         flash("Invalid username/email or password.", "error")
         return redirect(url_for("login"))
     
-@app.route("/send_verification_email/<email>")
-def send_verification_email_route(email):
-    user = Users.query.filter_by(users_email=email).first_or_404()
+@app.route("/send_verification_email/<users_email>")
+def send_verification_email_route(users_email):
+    user = Users.query.filter_by(users_email=users_email).first_or_404()
     if user.users_email_verified == 0:
         send_verification_email(user.users_email)
         flash(f"A verification email has been sent to your email.", "success")
