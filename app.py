@@ -158,7 +158,7 @@ def login():
                 login_user(user)
                 return redirect(url_for("council_overview"))
 
-        flash("Login failed!", "error")
+        flash("Invalid username/email or password.", "error")
         return redirect(url_for("login"))
 
 @app.route("/logout")
