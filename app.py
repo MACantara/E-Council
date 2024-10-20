@@ -76,11 +76,11 @@ def send_verification_email(user_email):
     # HTML email body
     msg.html = f"""
     <html>
-    <body>
-        <h1>Welcome to our website!</h1>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Welcome to E-Council!</h1>
         <p>You have successfully created an account. Please click the button below to verify your email:</p>
-        <a href="{link}" style="background-color: #007BFF; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block;">Verify Email</a>
-        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}">{link}</a></p>
+        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Verify Email</a>
+        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
         <p>If you didn't create this account, you can safely ignore this email.</p>
         <p>Sincerely,<br>E-Council Team</p>
     </body>
