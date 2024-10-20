@@ -80,62 +80,62 @@ class EmailVerification(db.Model):
 
     user = db.relationship('Users', backref=db.backref('email_verifications', lazy=True))
 
-def send_verification_email(users_email):
-    user = Users.query.filter_by(users_email=users_email).first_or_404()
-    token = s.dumps(users_email, salt='email-confirm')
-    link = url_for('confirm_email', token=token, _external=True)
-    msg = Message('New Account Email Verification', recipients=[users_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Welcome to E-Council!</h1>
-        <p>You have successfully created an account. Please click the button below to verify your email:</p>
-        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Verify Email</a>
-        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
-        <p>If you didn't create this account, you can safely ignore this email.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Welcome to our website!
+    def send_verification_email(users_email):
+        user = Users.query.filter_by(users_email=users_email).first_or_404()
+        token = s.dumps(users_email, salt='email-confirm')
+        link = url_for('confirm_email', token=token, _external=True)
+        msg = Message('New Account Email Verification', recipients=[users_email])
+        
+        # HTML email body
+        msg.html = f"""
+        <html>
+        <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+            <h1 style="color: #00578a;">Welcome to E-Council!</h1>
+            <p>You have successfully created an account. Please click the button below to verify your email:</p>
+            <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Verify Email</a>
+            <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
+            <p>If you didn't create this account, you can safely ignore this email.</p>
+            <p>Sincerely,<br>E-Council Team</p>
+        </body>
+        </html>
+        """
+        
+        # Plain text email body as a fallback
+        msg.body = f"""
+        Welcome to our website!
 
-    You have successfully created an account. Please click the link below to verify your email:
-    {link}
+        You have successfully created an account. Please click the link below to verify your email:
+        {link}
 
-    Or copy and paste this link into your browser:
-    {link}
+        Or copy and paste this link into your browser:
+        {link}
 
-    If you didn't create this account, you can safely ignore this email.
+        If you didn't create this account, you can safely ignore this email.
 
-    Sincerely,
-    E-Council Team
-    """
-    
-    mail.send(msg)
+        Sincerely,
+        E-Council Team
+        """
+        
+        # Check for existing email verification records
+        existing_verification = EmailVerification.query.filter_by(
+            email_verification_users_id=user.users_id,
+            email_verification_new_email=users_email
+        ).first()
 
-    # Check for existing email verification records
-    existing_verification = EmailVerification.query.filter_by(
-        email_verification_users_id=user.users_id,
-        email_verification_new_email=users_email
-    ).first()
+        if existing_verification:
+            flash("A verification email has already been sent to this email address. Please check your email.", "error")
+            return
 
-    if existing_verification:
-        db.session.delete(existing_verification)
+        mail.send(msg)
+
+        # Track email verification in the database
+        email_verification = EmailVerification(
+            email_verification_users_id=user.users_id,
+            email_verification_token=token,
+            email_verification_new_email=users_email
+        )
+        db.session.add(email_verification)
         db.session.commit()
-
-    # Track email verification in the database
-    email_verification = EmailVerification(
-        email_verification_users_id=user.users_id,
-        email_verification_token=token,
-        email_verification_new_email=users_email
-    )
-    db.session.add(email_verification)
-    db.session.commit()
     
 def send_reset_password_email(user_email):
     token = s.dumps(user_email, salt='password-reset')
@@ -315,8 +315,17 @@ def login():
 def send_verification_email_route(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     if user.users_email_verified == 0:
-        send_verification_email(user.users_email)
-        flash(f"A verification email has been sent to your email.", "success")
+        # Check for existing email verification records
+        existing_verification = EmailVerification.query.filter_by(
+            email_verification_users_id=user.users_id,
+            email_verification_new_email=users_email
+        ).first()
+
+        if existing_verification:
+            flash("A verification email has already been sent to this email address. Please check your email.", "error")
+        else:
+            send_verification_email(user.users_email)
+            flash("A verification email has been sent to your email.", "success")
     else:
         flash("This email is already verified.", "info")
     return redirect(url_for("login"))
