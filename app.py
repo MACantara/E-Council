@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from flask_migrate import Migrate
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -12,9 +14,19 @@ load_dotenv()
 app = Flask(__name__, template_folder="templates")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
+app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
+app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT"))
+app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS") == 'True'
+app.config["MAIL_USE_SSL"] = os.getenv("MAIL_USE_SSL") == 'True'
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER")
+
+s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+mail = Mail(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -55,6 +67,13 @@ class Users(db.Model, UserMixin):
 
     def __repr__(self):
         return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified})"
+
+def send_verification_email(user_email):
+    token = s.dumps(user_email, salt='email-confirm')
+    link = url_for('confirm_email', token=token, _external=True)
+    msg = Message('Confirm Your Email', recipients=[user_email])
+    msg.body = f'Your link is {link}'
+    mail.send(msg)
 
 @app.route("/")
 def index():
@@ -131,10 +150,33 @@ def signup():
 
         db.session.add(user)
         db.session.commit()
+        
+        send_verification_email(users_email)
 
-        flash("Verify your email before logging in.", "success")
+        flash("Account created! Please check your email to verify your account.", "success")
 
         return redirect(url_for("login"))
+
+@app.route("/confirm_email/<token>")
+def confirm_email(token):
+    try:
+        email = s.loads(token, salt='email-confirm', max_age=3600)
+    except SignatureExpired:
+        flash("The confirmation link has expired.", "error")
+        return redirect(url_for("signup"))
+    except BadSignature:
+        flash("The confirmation link is invalid.", "error")
+        return redirect(url_for("signup"))
+
+    user = Users.query.filter_by(users_email=email).first_or_404()
+    if user.users_email_verified:
+        flash("Account already verified. Please log in.", "info")
+    else:
+        user.users_email_verified = 1
+        db.session.commit()
+        flash("Your account has been verified. Please log in.", "success")
+
+    return redirect(url_for("login"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
