@@ -306,6 +306,18 @@ nav ul li a {
     gap: var(--gap-large);
 }
 
+.email-verified-button {
+    display: inline-block;
+    padding: var(--padding-small);
+    color: var(--primary-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    font-size: var(--font-size-medium);
+    text-align: center;
+    background-color: var(--primary-color);
+}
+
 /* Base Container Styles */
 
 .container {
