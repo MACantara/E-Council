@@ -247,31 +247,31 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-            const roleSelect = document.getElementById('users-role');
-            const studentOrgContainer = document.getElementById('users-student-organization-container');
-            const studentOrgSelect = document.getElementById('users-student-organization');
-            const studentOrgPositionContainer = document.getElementById('users-student-organization-position-container');
-            const studentOrgPositionSelect = document.getElementById('users-student-organization-position');
+        const roleSelect = document.getElementById('users-role');
+        const studentOrgContainer = document.getElementById('users-student-organization-container');
+        const studentOrgSelect = document.getElementById('users-student-organization');
+        const studentOrgPositionContainer = document.getElementById('users-student-organization-position-container');
+        const studentOrgPositionSelect = document.getElementById('users-student-organization-position');
 
-            function toggleStudentOrganizationFields() {
-                if (roleSelect.value === 'Student Council Officer') {
-                    studentOrgContainer.style.display = 'flex';
-                    studentOrgSelect.setAttribute('required', 'required');
-                    studentOrgPositionContainer.style.display = 'flex';
-                    studentOrgPositionSelect.setAttribute('required', 'required');
-                } else {
-                    studentOrgContainer.style.display = 'none';
-                    studentOrgSelect.removeAttribute('required');
-                    studentOrgPositionContainer.style.display = 'none';
-                    studentOrgPositionSelect.removeAttribute('required');
-                }
+        function toggleStudentOrganizationFields() {
+            if (roleSelect.value === 'Student Council Officer') {
+                studentOrgContainer.style.display = 'flex';
+                studentOrgSelect.setAttribute('required', 'required');
+                studentOrgPositionContainer.style.display = 'flex';
+                studentOrgPositionSelect.setAttribute('required', 'required');
+            } else {
+                studentOrgContainer.style.display = 'none';
+                studentOrgSelect.removeAttribute('required');
+                studentOrgPositionContainer.style.display = 'none';
+                studentOrgPositionSelect.removeAttribute('required');
             }
+        }
 
-            roleSelect.addEventListener('change', toggleStudentOrganizationFields);
+        roleSelect.addEventListener('change', toggleStudentOrganizationFields);
 
-            // Initial check
-            toggleStudentOrganizationFields();
-        });
+        // Initial check
+        toggleStudentOrganizationFields();
+    });
 </script>
 
 {% endblock %}
