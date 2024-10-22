@@ -289,6 +289,7 @@ def send_email_change_confirmation(users_old_email, users_new_email):
     mail.send(msg)
 
 def send_new_email_verification(users_new_email):
+    user = current_user
     token = s.dumps(users_new_email, salt='email-change')
     link = url_for('confirm_new_email', token=token, _external=True)
     msg = Message('Email Change Verification', recipients=[users_new_email])
@@ -324,6 +325,15 @@ def send_new_email_verification(users_new_email):
     """
     
     mail.send(msg)
+
+    # Track email verification in the database
+    email_verification = EmailVerification(
+        email_verification_users_id=user.users_id,
+        email_verification_token=token,
+        email_verification_new_email=users_new_email
+    )
+    db.session.add(email_verification)
+    db.session.commit()
 
 @app.route("/")
 def index():
@@ -587,6 +597,15 @@ def email_settings():
             flash("The new email address is already in use.", "error")
             return redirect(url_for("email_settings"))
 
+        # Check for existing email verification records
+        existing_verification = EmailVerification.query.filter_by(
+            email_verification_users_id=current_user.users_id
+        ).first()
+
+        if existing_verification:
+            flash("A verification email has already been sent to this email address. Please check your email.", "error")
+            return redirect(url_for("email_settings"))
+
         # Send verification email to the new email address
         send_new_email_verification(users_new_email)
 
@@ -607,6 +626,12 @@ def confirm_new_email(token):
         flash("The email confirmation link is invalid.", "error")
         return redirect(url_for("email_settings"))
 
+    # Retrieve the email verification record
+    email_verification = EmailVerification.query.filter_by(email_verification_token=token).first()
+    if not email_verification:
+        flash("The email confirmation link is invalid.", "error")
+        return redirect(url_for("email_settings"))
+
     # Retrieve the current email from the database
     user = Users.query.filter_by(users_id=current_user.users_id).first()
     users_old_email = user.users_email
@@ -620,6 +645,10 @@ def confirm_new_email(token):
 
     # Send confirmation email to the new email address
     send_email_change_confirmation(users_old_email, users_new_email)
+
+    # Delete the email verification record
+    db.session.delete(email_verification)
+    db.session.commit()
 
     flash("Your email has been updated successfully.", "success")
     return redirect(url_for("email_settings"))
