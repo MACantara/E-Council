@@ -236,6 +236,32 @@ def send_password_change_notification_email(users_email):
     
     mail.send(msg)
 
+def send_email_change_confirmation(new_email):
+    msg = Message('Email Change Confirmation', recipients=[new_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Email Change Confirmation</h1>
+        <p>Your email has been successfully changed to {new_email}. If you did not make this change, please contact support immediately.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    Email Change Confirmation
+
+    Your email has been successfully changed to {new_email}. If you did not make this change, please contact support immediately.
+
+    Sincerely,
+    E-Council Team
+    """
+    
+    mail.send(msg)
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -484,6 +510,31 @@ def account_settings():
 @app.route("/email-settings", methods=["GET", "POST"])
 @login_required
 def email_settings():
+    if request.method == "POST":
+        current_email = request.form.get("users-current-email")
+        new_email = request.form.get("users-new-email")
+        current_password = request.form.get("users-current-password")
+
+        # Validate the current password
+        if not current_user.check_password(current_password):
+            flash("Current password is incorrect.", "error")
+            return redirect(url_for("email_settings"))
+
+        # Check if the new email is already in use
+        if Users.query.filter_by(users_email=new_email).first():
+            flash("The new email address is already in use.", "error")
+            return redirect(url_for("email_settings"))
+
+        # Update the user's email in the database
+        current_user.users_email = new_email
+        db.session.commit()
+
+        # Send confirmation email to the new email address
+        send_email_change_confirmation(new_email)
+
+        flash("Your email has been updated successfully. Please check your new email for confirmation.", "success")
+        return redirect(url_for("email_settings"))
+
     return render_template("email-settings.html")
 
 @app.route("/password-security-settings", methods=["GET", "POST"])
