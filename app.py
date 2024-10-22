@@ -7,6 +7,7 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from markupsafe import Markup
 from datetime import datetime, timedelta
 
@@ -55,6 +56,9 @@ class Users(db.Model, UserMixin):
     users_role = db.Column(db.String(50), nullable=False)
     users_student_organization = db.Column(db.String(100), nullable=False)
     users_student_organization_position = db.Column(db.String(100), nullable=False)
+    users_home_address = db.Column(db.String(255), nullable=True)
+    users_contact_number = db.Column(db.String(20), nullable=True)
+    users_signature = db.Column(db.String(255), nullable=True)
     users_password = db.Column(db.String(255), nullable=False)
     users_email_verified = db.Column(db.Integer, nullable=False)
 
@@ -68,7 +72,7 @@ class Users(db.Model, UserMixin):
         return str(self.users_id)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified})"
+        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
 
 class EmailVerification(db.Model):
     __tablename__ = "email_verification"
@@ -578,6 +582,48 @@ def account():
 @app.route("/account-settings", methods=["GET", "POST"])
 @login_required
 def account_settings():
+    if request.method == "POST":
+        users_first_name = request.form.get("users-first-name")
+        users_last_name = request.form.get("users-last-name")
+        users_username = request.form.get("users-username")
+        users_department = request.form.get("users-department")
+        users_role = request.form.get("users-role")
+        users_student_organization = request.form.get("users-student-organization")
+        users_student_organization_position = request.form.get("users-student-organization-position")
+        users_home_address = request.form.get("users-home-address")
+        users_contact_number = request.form.get("users-contact-number")
+        users_current_password = request.form.get("users-current-password")
+
+        # Validate the current password
+        if not current_user.check_password(users_current_password):
+            flash("Current password is incorrect.", "error")
+            return redirect(url_for("account_settings"))
+
+        # Handle file upload for the user's signature
+        # users_signature = request.files.get("users-signature")
+        # if users_signature:
+        #     filename = secure_filename(users_signature.filename)
+        #     signature_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        #     users_signature.save(signature_path)
+        #     current_user.users_signature = signature_path
+
+        # Update the user's information in the database
+        user = Users.query.filter_by(users_id=current_user.users_id).first()
+        user.users_first_name = users_first_name
+        user.users_last_name = users_last_name
+        user.users_username = users_username
+        user.users_department = users_department
+        user.users_role = users_role
+        user.users_student_organization = users_student_organization
+        user.users_student_organization_position = users_student_organization_position
+        user.users_home_address = users_home_address
+        user.users_contact_number = users_contact_number
+
+        db.session.commit()
+
+        flash("Your account settings have been updated successfully.", "success")
+        return redirect(url_for("account_settings"))
+
     return render_template("account-settings.html")
 
 @app.route("/email-settings", methods=["GET", "POST"])
