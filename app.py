@@ -210,7 +210,7 @@ def send_reset_password_email(users_email):
     db.session.add(password_reset)
     db.session.commit()
 
-def send_password_change_email(users_email):
+def send_password_change_notification_email(users_email):
     msg = Message('Password Change Notification', recipients=[users_email])
     
     # HTML email body
@@ -523,7 +523,7 @@ def password_security_settings():
         db.session.commit()
         
         # Send password change update email
-        send_password_change_email(current_user.users_email)
+        send_password_change_notification_email(current_user.users_email)
 
         flash("Your password has been updated successfully.", "success")
         return redirect(url_for("password_security_settings"))
