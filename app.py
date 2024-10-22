@@ -511,7 +511,6 @@ def account_settings():
 @login_required
 def email_settings():
     if request.method == "POST":
-        users_current_email = request.form.get("users-current-email")
         users_new_email = request.form.get("users-new-email")
         current_password = request.form.get("users-current-password")
 
@@ -525,12 +524,16 @@ def email_settings():
             flash("The new email address is already in use.", "error")
             return redirect(url_for("email_settings"))
 
+        # Retrieve the current email from the database
+        user = Users.query.filter_by(users_id=current_user.users_id).first()
+        users_old_email = user.users_email
+
         # Update the user's email in the database
-        current_user.users_email = users_new_email
+        user.users_email = users_new_email
         db.session.commit()
 
         # Send confirmation email to the new email address
-        send_email_change_confirmation(users_new_email)
+        send_email_change_confirmation(users_old_email, users_new_email)
 
         flash("Your email has been updated successfully. Please check your new email for confirmation.", "success")
         return redirect(url_for("email_settings"))
