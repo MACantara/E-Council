@@ -262,6 +262,43 @@ def send_email_change_confirmation(users_old_email, users_new_email):
     
     mail.send(msg)
 
+def send_new_email_verification(users_new_email):
+    token = s.dumps(users_new_email, salt='email-change')
+    link = url_for('confirm_new_email', token=token, _external=True)
+    msg = Message('Email Change Verification', recipients=[users_new_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Email Change Verification</h1>
+        <p>To verify your new email address, click the button below:</p>
+        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Verify Email</a>
+        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
+        <p>If you didn't request this change, you can safely ignore this email.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    Email Change Verification
+
+    To verify your new email address, click the link below:
+    {link}
+
+    Or copy and paste this link into your browser:
+    {link}
+
+    If you didn't request this change, you can safely ignore this email.
+
+    Sincerely,
+    E-Council Team
+    """
+    
+    mail.send(msg)
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -524,21 +561,39 @@ def email_settings():
             flash("The new email address is already in use.", "error")
             return redirect(url_for("email_settings"))
 
-        # Retrieve the current email from the database
-        user = Users.query.filter_by(users_id=current_user.users_id).first()
-        users_old_email = user.users_email
+        # Send verification email to the new email address
+        send_new_email_verification(users_new_email)
 
-        # Update the user's email in the database
-        user.users_email = users_new_email
-        db.session.commit()
-
-        # Send confirmation email to the new email address
-        send_email_change_confirmation(users_old_email, users_new_email)
-
-        flash("Your email has been updated successfully. Please check your new email for confirmation.", "success")
+        flash("A verification email has been sent to your new email address. Please check your email to confirm the change.", "success")
         return redirect(url_for("email_settings"))
 
     return render_template("email-settings.html")
+
+@app.route("/confirm_new_email/<token>")
+@login_required
+def confirm_new_email(token):
+    try:
+        new_email = s.loads(token, salt='email-change', max_age=3600)
+    except SignatureExpired:
+        flash("The email confirmation link has expired.", "error")
+        return redirect(url_for("email_settings"))
+    except BadSignature:
+        flash("The email confirmation link is invalid.", "error")
+        return redirect(url_for("email_settings"))
+
+    # Retrieve the current email from the database
+    user = Users.query.filter_by(users_id=current_user.users_id).first()
+    users_old_email = user.users_email
+
+    # Update the user's email in the database
+    user.users_email = new_email
+    db.session.commit()
+
+    # Send confirmation email to the new email address
+    send_email_change_confirmation(users_old_email, new_email)
+
+    flash("Your email has been updated successfully.", "success")
+    return redirect(url_for("email_settings"))
 
 @app.route("/password-security-settings", methods=["GET", "POST"])
 @login_required
