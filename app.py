@@ -463,6 +463,42 @@ def email_settings():
 @app.route("/password-security-settings", methods=["GET", "POST"])
 @login_required
 def password_security_settings():
+    if request.method == "POST":
+        users_password = request.form.get("users-password")
+        users_repeat_password = request.form.get("users-repeat-password")
+
+        # Validate the new password
+        if users_password != users_repeat_password:
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("password_security_settings"))
+
+        if len(users_password) < 8:
+            flash("Password must be at least 8 characters long.", "error")
+            return redirect(url_for("password_security_settings"))
+
+        if not any(char.isupper() for char in users_password):
+            flash("Password must contain at least one uppercase letter.", "error")
+            return redirect(url_for("password_security_settings"))
+
+        if not any(char.islower() for char in users_password):
+            flash("Password must contain at least one lowercase letter.", "error")
+            return redirect(url_for("password_security_settings"))
+
+        if not any(char.isdigit() for char in users_password):
+            flash("Password must contain at least one number.", "error")
+            return redirect(url_for("password_security_settings"))
+
+        if not any(char in "!@#$%^&*(),.?\":{}|<>" for char in users_password):
+            flash("Password must contain at least one special character.", "error")
+            return redirect(url_for("password_security_settings"))
+
+        # Update the user's password in the database
+        current_user.users_password = generate_password_hash(users_password)
+        db.session.commit()
+
+        flash("Your password has been updated successfully.", "success")
+        return redirect(url_for("password_security_settings"))
+
     return render_template("password-security-settings.html")
 
 @app.route("/council-overview")
