@@ -236,6 +236,32 @@ def send_password_change_notification_email(users_email):
     
     mail.send(msg)
 
+def send_email_change_notification(users_old_email, users_new_email):
+    msg = Message('Email Change Notification', recipients=[users_old_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Email Change Notification</h1>
+        <p>Your email has been successfully changed from {users_old_email} to {users_new_email}. If you did not make this change, please contact support immediately.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    Email Change Notification
+
+    Your email has been successfully changed from {users_old_email} to {users_new_email}. If you did not make this change, please contact support immediately.
+
+    Sincerely,
+    E-Council Team
+    """
+    
+    mail.send(msg)
+
 def send_email_change_confirmation(users_old_email, users_new_email):
     msg = Message('Email Change Confirmation', recipients=[users_new_email])
     
@@ -573,7 +599,7 @@ def email_settings():
 @login_required
 def confirm_new_email(token):
     try:
-        new_email = s.loads(token, salt='email-change', max_age=3600)
+        users_new_email = s.loads(token, salt='email-change', max_age=3600)
     except SignatureExpired:
         flash("The email confirmation link has expired.", "error")
         return redirect(url_for("email_settings"))
@@ -585,12 +611,15 @@ def confirm_new_email(token):
     user = Users.query.filter_by(users_id=current_user.users_id).first()
     users_old_email = user.users_email
 
+    # Send an email change notification to the old email address
+    send_email_change_notification(users_old_email, users_new_email)
+
     # Update the user's email in the database
-    user.users_email = new_email
+    user.users_email = users_new_email
     db.session.commit()
 
     # Send confirmation email to the new email address
-    send_email_change_confirmation(users_old_email, new_email)
+    send_email_change_confirmation(users_old_email, users_new_email)
 
     flash("Your email has been updated successfully.", "success")
     return redirect(url_for("email_settings"))
