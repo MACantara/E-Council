@@ -592,6 +592,11 @@ def email_settings():
             flash("Current password is incorrect.", "error")
             return redirect(url_for("email_settings"))
 
+        # Check if the new email is the same as the current email
+        if users_new_email == current_user.users_email:
+            flash("The new email address is the same as the current email address.", "error")
+            return redirect(url_for("email_settings"))
+
         # Check if the new email is already in use
         if Users.query.filter_by(users_email=users_new_email).first():
             flash("The new email address is already in use.", "error")
