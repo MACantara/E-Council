@@ -149,15 +149,15 @@ def send_verification_email(users_email):
     db.session.add(email_verification)
     db.session.commit()
     
-def send_reset_password_email(user_email):
-    user = Users.query.filter_by(users_email=user_email).first_or_404()
+def send_reset_password_email(users_email):
+    user = Users.query.filter_by(users_email=users_email).first_or_404()
     selector = os.urandom(16).hex()
     token = os.urandom(32).hex()
     expires = datetime.utcnow() + timedelta(hours=1)
     
     # Create the password reset link
     link = url_for('reset_password', selector=selector, token=token, _external=True)
-    msg = Message('Password Reset Request', recipients=[user_email])
+    msg = Message('Password Reset Request', recipients=[users_email])
     
     # HTML email body
     msg.html = f"""
@@ -209,6 +209,32 @@ def send_reset_password_email(user_email):
     )
     db.session.add(password_reset)
     db.session.commit()
+
+def send_password_change_email(users_email):
+    msg = Message('Password Change Notification', recipients=[users_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Password Change Notification</h1>
+        <p>Your password has been successfully changed. If you did not make this change, please contact support immediately.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    Password Change Notification
+
+    Your password has been successfully changed. If you did not make this change, please contact support immediately.
+
+    Sincerely,
+    E-Council Team
+    """
+    
+    mail.send(msg)
 
 @app.route("/")
 def index():
@@ -495,6 +521,9 @@ def password_security_settings():
         # Update the user's password in the database
         current_user.users_password = generate_password_hash(users_password)
         db.session.commit()
+        
+        # Send password change update email
+        send_password_change_email(current_user.users_email)
 
         flash("Your password has been updated successfully.", "success")
         return redirect(url_for("password_security_settings"))
