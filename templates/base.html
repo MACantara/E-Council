@@ -21,7 +21,7 @@
                 {% if current_user.is_authenticated %}
                     <li>
                         <a class="text-button account-image-container" href="{{ url_for('account') }}">
-                            <img class="small-account-picture" src="https://placehold.co/40x40.png" alt="Small Account Picture">
+                            <img class="small-account-picture" src="{{ current_user.users_profile_picture or 'https://placehold.co/40x40.png' }}" alt="Account Picture">
                             Account
                         </a>
                     </li>
