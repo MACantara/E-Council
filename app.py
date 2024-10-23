@@ -742,6 +742,12 @@ def delete_user_account():
         if public_id:
             cloudinary.uploader.destroy(public_id)
 
+    # Delete the user's profile picture from Cloudinary if it exists
+    if current_user.users_profile_picture:
+        profile_picture_public_id = current_user.users_profile_picture_cloudinary_public_id
+        if profile_picture_public_id:
+            cloudinary.uploader.destroy(profile_picture_public_id)
+
     # Delete the user account from the database
     user = Users.query.filter_by(users_id=current_user.users_id).first()
     db.session.delete(user)
