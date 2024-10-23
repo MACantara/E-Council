@@ -20,6 +20,9 @@
                 </li>
                 {% if current_user.is_authenticated %}
                     <li>
+                        <a href="{{ url_for('council_overview') }}" class="text-button">E-Council Overview</a>
+                    </li>
+                    <li>
                         <a class="text-button account-image-container" href="{{ url_for('account') }}">
                             <img class="small-account-picture" src="{{ current_user.users_profile_picture or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
                             Account
