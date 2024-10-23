@@ -621,6 +621,12 @@ def account_settings():
         # Handle file upload for the user's signature using Cloudinary
         users_signature = request.files.get("users-signature")
         if users_signature:
+            # Server-side validation for image file types
+            valid_image_types = ['image/jpeg', 'image/jpg', 'image/png']
+            if users_signature.mimetype not in valid_image_types:
+                flash("Invalid file type. Please upload an image file.", "error")
+                return redirect(url_for("account_settings"))
+
             # Delete the previous image from Cloudinary if it exists
             if current_user.users_signature:
                 public_id = current_user.users_signature_cloudinary_public_id

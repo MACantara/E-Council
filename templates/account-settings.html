@@ -106,11 +106,12 @@
 
             <div class="input-pair">
                 <label for="users-signature">Signature</label>
-                <input type="file" name="users-signature" id="users-signature" hidden>
+                <input type="file" name="users-signature" id="users-signature" hidden accept="image/jpeg, image/jpg, image/png">
                 <label for="users-signature" class="custom-file-upload-input">
                     <span class="choose-file-text">Choose File</span>
                     <span id="file-name" class="file-name">No file chosen</span>
                 </label>
+                <p>Supported file types: .jpeg, .jpg, .png</p>
                 <img src="{{ current_user.users_signature }}" alt="User's Signature">
             </div>
             
