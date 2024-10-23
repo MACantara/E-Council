@@ -6,13 +6,13 @@
 
 <!-- Flash messages section -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
+{% if messages %}
+<div class="flash-messages">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
 {% endwith %}
 
 <div class="account-settings-container">
@@ -21,49 +21,94 @@
     <div class="account-settings-content-container">
         <h2>Account Settings</h2>
 
+        <!-- Delete User Account Modal -->
+        <div id="delete-user-account-modal-content" class="modal">
+            <div class="container">
+                <span id="close-delete-user-account-modal-button" class="close-button">&times;</span>
+                <h2>Delete Account</h2>
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+
+                <form method="POST">
+                    <div class="input-pair">
+                        <label for="users-current-password-account-deletion">Current Password</label>
+                        <input type="password" name="users-current-password-account-deletion" id="users-current-password-account-deletion" placeholder="Current Password" required>
+                    </div>
+
+
+                    <div class="horizontal-account-deletion-pair">
+                        <button class="secondary-button fit-content-button" type="submit">Delete Account</button>
+                        <a href="{{ url_for('account_settings') }}" class="primary-button fit-content-button">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <form method="POST" enctype="multipart/form-data">
             <div class="horizontal-input-pair">
                 <div class="input-pair">
                     <label for="users-first-name">First Name</label>
-                    <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name" value="{{ current_user.users_first_name }}" required>
+                    <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name"
+                        value="{{ current_user.users_first_name }}" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="users-last-name">Last Name</label>
-                    <input type="text" name="users-last-name" id="users-last-name" placeholder="Last Name" value="{{ current_user.users_last_name }}" required>
+                    <input type="text" name="users-last-name" id="users-last-name" placeholder="Last Name"
+                        value="{{ current_user.users_last_name }}" required>
                 </div>
             </div>
 
             <div class="input-pair">
                 <label for="users-username">Username</label>
-                <input type="text" name="users-username" id="users-username" placeholder="Username" value="{{ current_user.users_username }}" required>
+                <input type="text" name="users-username" id="users-username" placeholder="Username"
+                    value="{{ current_user.users_username }}" required>
             </div>
 
             <div class="input-pair">
                 <label for="users-department">Department</label>
                 <select name="users-department" id="users-department" required>
                     <option value="" disabled>Select a Department</option>
-                    <option value="College of Computer Studies" {% if current_user.users_department == "College of Computer Studies" %}selected{% endif %}>College of Computer Studies</option>
-                    <option value="College of Engineering" {% if current_user.users_department == "College of Engineering" %}selected{% endif %}>College of Engineering</option>
-                    <option value="College of Architecture" {% if current_user.users_department == "College of Architecture" %}selected{% endif %}>College of Architecture</option>
-                    <option value="College of Criminology" {% if current_user.users_department == "College of Criminology" %}selected{% endif %}>College of Criminology</option>
-                    <option value="College of Nursing" {% if current_user.users_department == "College of Nursing" %}selected{% endif %}>College of Nursing</option>
-                    <option value="College of Arts, Sciences and Education" {% if current_user.users_department == "College of Arts, Sciences and Education" %}selected{% endif %}>College of Arts, Sciences and Education</option>
-                    <option value="College of Business Administration and Accountancy" {% if current_user.users_department == "College of Business Administration and Accountancy" %}selected{% endif %}>College of Business Administration and Accountancy</option>
-                    <option value="College of Physical and Occupational Therapy" {% if current_user.users_department == "College of Physical and Occupational Therapy" %}selected{% endif %}>College of Physical and Occupational Therapy</option>
-                    <option value="College of International Tourism and Hospitality Management" {% if current_user.users_department == "College of International Tourism and Hospitality Management" %}selected{% endif %}>College of International Tourism and Hospitality Management</option>
-                    <option value="College of Pharmacy" {% if current_user.users_department == "College of Pharmacy" %}selected{% endif %}>College of Pharmacy</option>
-                    <option value="College of Radiologic Technology" {% if current_user.users_department == "College of Radiologic Technology" %}selected{% endif %}>College of Radiologic Technology</option>
+                    <option value="College of Computer Studies" {% if
+                        current_user.users_department=="College of Computer Studies" %}selected{% endif %}>College of
+                        Computer Studies</option>
+                    <option value="College of Engineering" {% if current_user.users_department=="College of Engineering"
+                        %}selected{% endif %}>College of Engineering</option>
+                    <option value="College of Architecture" {% if
+                        current_user.users_department=="College of Architecture" %}selected{% endif %}>College of
+                        Architecture</option>
+                    <option value="College of Criminology" {% if current_user.users_department=="College of Criminology"
+                        %}selected{% endif %}>College of Criminology</option>
+                    <option value="College of Nursing" {% if current_user.users_department=="College of Nursing"
+                        %}selected{% endif %}>College of Nursing</option>
+                    <option value="College of Arts, Sciences and Education" {% if
+                        current_user.users_department=="College of Arts, Sciences and Education" %}selected{% endif %}>
+                        College of Arts, Sciences and Education</option>
+                    <option value="College of Business Administration and Accountancy" {% if
+                        current_user.users_department=="College of Business Administration and Accountancy" %}selected{%
+                        endif %}>College of Business Administration and Accountancy</option>
+                    <option value="College of Physical and Occupational Therapy" {% if
+                        current_user.users_department=="College of Physical and Occupational Therapy" %}selected{% endif
+                        %}>College of Physical and Occupational Therapy</option>
+                    <option value="College of International Tourism and Hospitality Management" {% if
+                        current_user.users_department=="College of International Tourism and Hospitality Management"
+                        %}selected{% endif %}>College of International Tourism and Hospitality Management</option>
+                    <option value="College of Pharmacy" {% if current_user.users_department=="College of Pharmacy"
+                        %}selected{% endif %}>College of Pharmacy</option>
+                    <option value="College of Radiologic Technology" {% if
+                        current_user.users_department=="College of Radiologic Technology" %}selected{% endif %}>College
+                        of Radiologic Technology</option>
                 </select>
             </div>
-            
+
             <div class="input-pair">
                 <label for="users-role">Role</label>
                 <select name="users-role" id="users-role" required>
                     <option value="" disabled>Select a Role</option>
-                    <option value="Student Council Officer" {% if current_user.users_role == "Student Council Officer" %}selected{% endif %}>Student Council Officer</option>
-                    <option value="Faculty" {% if current_user.users_role == "Faculty" %}selected{% endif %}>Faculty</option>
-                    <option value="Staff" {% if current_user.users_role == "Staff" %}selected{% endif %}>Staff</option>
+                    <option value="Student Council Officer" {% if current_user.users_role=="Student Council Officer"
+                        %}selected{% endif %}>Student Council Officer</option>
+                    <option value="Faculty" {% if current_user.users_role=="Faculty" %}selected{% endif %}>Faculty
+                    </option>
+                    <option value="Staff" {% if current_user.users_role=="Staff" %}selected{% endif %}>Staff</option>
                 </select>
             </div>
 
@@ -71,8 +116,12 @@
                 <label for="users-student-organization">Student Organization</label>
                 <select name="users-student-organization" id="users-student-organization">
                     <option value="" disabled>Select a Student Organization</option>
-                    <option value="College of Computer Studies - Student Council" {% if current_user.users_student_organization == "College of Computer Studies - Student Council" %}selected{% endif %}>College of Computer Studies - Student Council (CCS-SC)</option>
-                    <option value="Junior Philippine Computer Society" {% if current_user.users_student_organization == "Junior Philippine Computer Society" %}selected{% endif %}>Junior Philippine Computer Society (JPCS)</option>
+                    <option value="College of Computer Studies - Student Council" {% if
+                        current_user.users_student_organization=="College of Computer Studies - Student Council"
+                        %}selected{% endif %}>College of Computer Studies - Student Council (CCS-SC)</option>
+                    <option value="Junior Philippine Computer Society" {% if
+                        current_user.users_student_organization=="Junior Philippine Computer Society" %}selected{% endif
+                        %}>Junior Philippine Computer Society (JPCS)</option>
                 </select>
             </div>
 
@@ -80,44 +129,67 @@
                 <label for="users-student-organization-position">Student Organization Position</label>
                 <select name="users-student-organization-position" id="users-student-organization-position">
                     <option value="" disabled selected>Select a Student Organization Position</option>
-                    <option value="President" {% if current_user.users_student_organization_position == "President" %}selected{% endif %}>President</option>
-                    <option value="Vice President" {% if current_user.users_student_organization_position == "Vice President" %}selected{% endif %}>Vice President</option>
-                    <option value="Secretary" {% if current_user.users_student_organization_position == "Secretary" %}selected{% endif %}>Secretary</option>
-                    <option value="Treasurer" {% if current_user.users_student_organization_position == "Treasurer" %}selected{% endif %}>Treasurer</option>
-                    <option value="Auditor" {% if current_user.users_student_organization_position == "Auditor" %}selected{% endif %}>Auditor</option>
-                    <option value="Business Manager" {% if current_user.users_student_organization_position == "Business Manager" %}selected{% endif %}>Business Manager</option>
-                    <option value="Public Relations Officer" {% if current_user.users_student_organization_position == "Public Relations Officer" %}selected{% endif %}>Public Relations Officer (P.R.O)</option>
-                    <option value="1st Year Representative" {% if current_user.users_student_organization_position == "1st Year Representative" %}selected{% endif %}>1st Year Representative</option>
-                    <option value="2nd Year Representative" {% if current_user.users_student_organization_position == "2nd Year Representative" %}selected{% endif %}>2nd Year Representative</option>
-                    <option value="3rd Year Representative" {% if current_user.users_student_organization_position == "3rd Year Representative" %}selected{% endif %}>3rd Year Representative</option>
-                    <option value="4th Year Representative" {% if current_user.users_student_organization_position == "4th Year Representative" %}selected{% endif %}>4th Year Representative</option>
+                    <option value="President" {% if current_user.users_student_organization_position=="President"
+                        %}selected{% endif %}>President</option>
+                    <option value="Vice President" {% if
+                        current_user.users_student_organization_position=="Vice President" %}selected{% endif %}>Vice
+                        President</option>
+                    <option value="Secretary" {% if current_user.users_student_organization_position=="Secretary"
+                        %}selected{% endif %}>Secretary</option>
+                    <option value="Treasurer" {% if current_user.users_student_organization_position=="Treasurer"
+                        %}selected{% endif %}>Treasurer</option>
+                    <option value="Auditor" {% if current_user.users_student_organization_position=="Auditor"
+                        %}selected{% endif %}>Auditor</option>
+                    <option value="Business Manager" {% if
+                        current_user.users_student_organization_position=="Business Manager" %}selected{% endif %}>
+                        Business Manager</option>
+                    <option value="Public Relations Officer" {% if
+                        current_user.users_student_organization_position=="Public Relations Officer" %}selected{% endif
+                        %}>Public Relations Officer (P.R.O)</option>
+                    <option value="1st Year Representative" {% if
+                        current_user.users_student_organization_position=="1st Year Representative" %}selected{% endif
+                        %}>1st Year Representative</option>
+                    <option value="2nd Year Representative" {% if
+                        current_user.users_student_organization_position=="2nd Year Representative" %}selected{% endif
+                        %}>2nd Year Representative</option>
+                    <option value="3rd Year Representative" {% if
+                        current_user.users_student_organization_position=="3rd Year Representative" %}selected{% endif
+                        %}>3rd Year Representative</option>
+                    <option value="4th Year Representative" {% if
+                        current_user.users_student_organization_position=="4th Year Representative" %}selected{% endif
+                        %}>4th Year Representative</option>
                 </select>
             </div>
 
             <div class="input-pair">
                 <label for="users-home-address">Home Address</label>
-                <input type="text" name="users-home-address" id="users-home-address" placeholder="Home Address" value="{{ current_user.users_home_address }}">
+                <input type="text" name="users-home-address" id="users-home-address" placeholder="Home Address"
+                    value="{{ current_user.users_home_address }}">
             </div>
 
             <div class="input-pair">
                 <label for="users-contact-number">Contact Number</label>
-                <input type="text" name="users-contact-number" id="users-contact-number" placeholder="Contact Number" value="{{ current_user.users_contact_number }}">
+                <input type="text" name="users-contact-number" id="users-contact-number" placeholder="Contact Number"
+                    value="{{ current_user.users_contact_number }}">
             </div>
 
             <div class="input-pair">
                 <label for="users-signature">Signature</label>
-                <input type="file" name="users-signature" id="users-signature" hidden accept="image/jpeg, image/jpg, image/png">
+                <input type="file" name="users-signature" id="users-signature" hidden
+                    accept="image/jpeg, image/jpg, image/png">
                 <label for="users-signature" class="custom-file-upload-input">
                     <span class="choose-file-text">Choose File</span>
                     <span id="file-name" class="file-name">No file chosen</span>
                 </label>
                 <p>Supported file types: .jpeg, .jpg, .png</p>
-                <img id="signature-preview" src="{{ current_user.users_signature }}" alt="User's Signature" class="image-preview">
+                <img id="signature-preview" src="{{ current_user.users_signature }}" alt="User's Signature"
+                    class="image-preview">
             </div>
-            
+
             <div class="input-pair">
                 <label for="users-current-password">Current Password</label>
-                <input type="password" name="users-current-password" id="users-current-password" placeholder="Current Password" required>
+                <input type="password" name="users-current-password" id="users-current-password"
+                    placeholder="Current Password" required>
             </div>
 
             <button class="primary-button" type="submit">Save Changes</button>
@@ -125,7 +197,7 @@
 
         <h3>Delete Account</h3>
 
-        <button class="secondary-button" type="submit">Delete Account</button>
+        <button id="open-delete-user-account-modal-button" class="secondary-button" type="submit">Delete Account</button>
     </div>
 </div>
 
@@ -139,7 +211,7 @@
         document.getElementById('file-name').textContent = fileName;
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const roleSelect = document.getElementById('users-role');
         const studentOrgContainer = document.getElementById('users-student-organization-container');
         const studentOrgSelect = document.getElementById('users-student-organization');
@@ -177,7 +249,7 @@
             if (validImageTypes.includes(file.type)) {
                 fileName.textContent = file.name;
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     preview.src = e.target.result;
                 }
                 reader.readAsDataURL(file);
@@ -188,6 +260,21 @@
             }
         }
     }
+
+    // Delete User Account Modal
+    document.getElementById('open-delete-user-account-modal-button').addEventListener('click', function () {
+        document.getElementById('delete-user-account-modal-content').style.display = 'block';
+    });
+
+    document.getElementById('close-delete-user-account-modal-button').addEventListener('click', function () {
+        document.getElementById('delete-user-account-modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('delete-user-account-modal-content')) {
+            document.getElementById('delete-user-account-modal-content').style.display = 'none';
+        }
+    });
 </script>
 
 {% endblock %}

@@ -386,6 +386,13 @@ nav ul li a {
     border-radius: var(--border-radius);
 }
 
+.horizontal-account-deletion-pair {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: var(--gap-large);
+}
+
 /* Account Settings Container Styles */
 
 .account-container {
