@@ -164,13 +164,17 @@
             <div class="input-pair">
                 <label for="users-home-address">Home Address</label>
                 <input type="text" name="users-home-address" id="users-home-address" placeholder="Home Address"
-                    value="{{ current_user.users_home_address }}">
+                    {% if current_user.users_home_address is not none and current_user.users_home_address|lower != 'none' %}
+                    value="{{ current_user.users_home_address }}"
+                    {% endif %}>
             </div>
-
+            
             <div class="input-pair">
                 <label for="users-contact-number">Contact Number</label>
                 <input type="text" name="users-contact-number" id="users-contact-number" placeholder="Contact Number"
-                    value="{{ current_user.users_contact_number }}">
+                    {% if current_user.users_contact_number is not none and current_user.users_contact_number|lower != 'none' %}
+                    value="{{ current_user.users_contact_number }}"
+                    {% endif %}>
             </div>
 
             <div class="input-pair">
