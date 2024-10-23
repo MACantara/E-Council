@@ -624,6 +624,11 @@ def reset_password(selector, token):
 def account():
     return render_template("account.html")
 
+@app.route("/upload-profile-picture", methods=["GET", "POST"])
+@login_required
+def upload_profile_picture():
+    return render_template("account.html")
+
 @app.route("/account-settings", methods=["GET", "POST"])
 @login_required
 def account_settings():
