@@ -75,6 +75,7 @@ class Users(db.Model, UserMixin):
     users_home_address = db.Column(db.String(255), nullable=True)
     users_contact_number = db.Column(db.String(20), nullable=True)
     users_signature = db.Column(db.String(255), nullable=True)
+    users_signature_cloudinary_public_id = db.Column(db.String(255), nullable=True)
     users_password = db.Column(db.String(255), nullable=False)
     users_email_verified = db.Column(db.Integer, nullable=False)
 
@@ -620,9 +621,20 @@ def account_settings():
         # Handle file upload for the user's signature using Cloudinary
         users_signature = request.files.get("users-signature")
         if users_signature:
+            # Delete the previous image from Cloudinary if it exists
+            if current_user.users_signature:
+                public_id = current_user.users_signature_cloudinary_public_id
+                if public_id:
+                    cloudinary.uploader.destroy(public_id)
+
+            # Upload the new image to Cloudinary
             upload_result = cloudinary.uploader.upload(users_signature)
             signature_url = upload_result["secure_url"]
+            signature_public_id = upload_result["public_id"]
+
+            # Update the user's signature URL and public ID
             current_user.users_signature = signature_url
+            current_user.users_signature_cloudinary_public_id = signature_public_id
 
         # Update the user's information in the database
         user = Users.query.filter_by(users_id=current_user.users_id).first()
