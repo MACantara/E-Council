@@ -268,7 +268,6 @@ nav ul li a {
     color: var(--primary-button-text-color);
     text-decoration: none;
     border-radius: var(--border-radius);
-    max-width: 200px;
     text-align: center;
     padding: 1rem;
 }
