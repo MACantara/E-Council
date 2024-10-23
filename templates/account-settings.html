@@ -4,6 +4,17 @@
 
 {% block content %}
 
+<!-- Flash messages section -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
 <div class="account-settings-container">
     {% include "account-settings-sidebar.html" %}
 
@@ -100,6 +111,7 @@
                     <span class="choose-file-text">Choose File</span>
                     <span id="file-name" class="file-name">No file chosen</span>
                 </label>
+                <img src="{{ current_user.users_signature }}" alt="User's Signature">
             </div>
             
             <div class="input-pair">
