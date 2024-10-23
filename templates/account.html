@@ -6,7 +6,7 @@
 
 <!-- Flash messages section -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
+    {% if messages %}
         <div class="flash-messages">
             {% for category, message in messages %}
                 <div class="alert alert-{{ category }}">{{ message }}</div>
@@ -15,9 +15,32 @@
     {% endif %}
 {% endwith %}
 
+<!-- Upload/Change Account Profile Picture Modal -->
+<div id="upload-change-account-profile-picture-modal-content" class="modal">
+    <div class="container">
+        <span id="close-upload-change-account-profile-picture-modal-button" class="close-button">&times;</span>
+        <h2>Upload/Change Profile Picture</h2>
+        <form method="POST" action="{{ url_for('upload_profile_picture') }}" enctype="multipart/form-data">
+            <div class="input-pair">
+                <label for="profile-picture">Choose a profile picture</label>
+                <input type="file" name="profile-picture" id="profile-picture" accept="image/*" required>
+            </div>
+            <div class="horizontal-input-pair">
+                <button class="primary-button fit-content-button" type="submit">Upload</button>
+                <button type="button" class="secondary-button fit-content-button" id="cancel-upload-profile-picture">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="container">
     <div class="account-container">
-        <img class="account-picture" src="https://placehold.co/160x160.png" alt="Account Picture">
+        <div class="account-picture-container">
+            <img class="account-picture" src="{{ current_user.users_profile_picture or 'https://placehold.co/160x160.png' }}" alt="Account Picture">
+            <button id="open-upload-change-account-profile-picture-modal-button" class="upload-icon-button">
+                <i class="bi bi-camera-fill"></i>
+            </button>
+        </div>
 
         <div class="account-details-container">
             <h2>{{ current_user.users_first_name }} {{ current_user.users_last_name }}</h2>
@@ -56,5 +79,30 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    // Upload/Change Account Profile Picture Modal
+    document.getElementById('open-upload-change-account-profile-picture-modal-button').addEventListener('click', function () {
+        document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'block';
+    });
+
+    document.getElementById('close-upload-change-account-profile-picture-modal-button').addEventListener('click', function () {
+        document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'none';
+    });
+
+    document.getElementById('cancel-upload-profile-picture').addEventListener('click', function () {
+        document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('upload-change-account-profile-picture-modal-content')) {
+            document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'none';
+        }
+    });
+</script>
 
 {% endblock %}
