@@ -661,6 +661,33 @@ def account_settings():
 
     return render_template("account-settings.html")
 
+@app.route("/delete-user-account", methods=["POST"])
+@login_required
+def delete_user_account():
+    users_current_password = request.form.get("users-current-password-account-deletion")
+
+    # Validate the current password
+    if not current_user.check_password(users_current_password):
+        flash("Current password is incorrect.", "error")
+        return redirect(url_for("account_settings"))
+
+    # Delete the user's signature image from Cloudinary if it exists
+    if current_user.users_signature:
+        public_id = current_user.users_signature_cloudinary_public_id
+        if public_id:
+            cloudinary.uploader.destroy(public_id)
+
+    # Delete the user account from the database
+    user = Users.query.filter_by(users_id=current_user.users_id).first()
+    db.session.delete(user)
+    db.session.commit()
+
+    # Log the user out
+    logout_user()
+
+    flash("Your account has been deleted successfully.", "success")
+    return redirect(url_for("login"))
+
 @app.route("/email-settings", methods=["GET", "POST"])
 @login_required
 def email_settings():
