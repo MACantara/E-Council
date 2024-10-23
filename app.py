@@ -357,6 +357,32 @@ def send_new_email_verification(users_new_email):
     db.session.add(email_verification)
     db.session.commit()
 
+def send_account_deletion_notification_email(users_email):
+    msg = Message('Account Deletion Notification', recipients=[users_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Account Deletion Notification</h1>
+        <p>Your account has been successfully deleted. If you did not request this deletion, please contact support immediately.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    Account Deletion Notification
+
+    Your account has been successfully deleted. If you did not request this deletion, please contact support immediately.
+
+    Sincerely,
+    E-Council Team
+    """
+    
+    mail.send(msg)
+
 # Routes
 @app.route("/")
 def index():
@@ -670,6 +696,9 @@ def delete_user_account():
     if not current_user.check_password(users_current_password):
         flash("Current password is incorrect.", "error")
         return redirect(url_for("account_settings"))
+
+    # Send account deletion notification email
+    send_account_deletion_notification_email(current_user.users_email)
 
     # Delete the user's signature image from Cloudinary if it exists
     if current_user.users_signature:
