@@ -64,6 +64,8 @@ class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
     users_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    users_profile_picture = db.Column(db.String(255), nullable=True)
+    users_profile_picture_cloudinary_public_id = db.Column(db.String(255), nullable=True)
     users_first_name = db.Column(db.String(50), nullable=False)
     users_last_name = db.Column(db.String(50), nullable=False)
     users_username = db.Column(db.String(50), unique=True, nullable=False)
@@ -89,7 +91,7 @@ class Users(db.Model, UserMixin):
         return str(self.users_id)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
+        return f"Users({self.users_id}, {self.users_profile_picture}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
 
 class EmailVerification(db.Model):
     __tablename__ = "email_verification"
@@ -624,10 +626,39 @@ def reset_password(selector, token):
 def account():
     return render_template("account.html")
 
-@app.route("/upload-profile-picture", methods=["GET", "POST"])
+@app.route("/upload-profile-picture", methods=["POST"])
 @login_required
 def upload_profile_picture():
-    return render_template("account.html")
+    profile_picture = request.files.get("profile-picture")
+    if profile_picture:
+        # Server-side validation for image file types
+        valid_image_types = ['image/jpeg', 'image/png', 'image/jpg']
+        if profile_picture.mimetype not in valid_image_types:
+            flash("Invalid file type. Please upload an image file.", "error")
+            return redirect(url_for("account"))
+
+        # Delete the previous profile picture from Cloudinary if it exists
+        if current_user.users_profile_picture:
+            public_id = current_user.users_profile_picture_cloudinary_public_id
+            if public_id:
+                cloudinary.uploader.destroy(public_id)
+
+        # Upload the new profile picture to Cloudinary
+        upload_result = cloudinary.uploader.upload(profile_picture)
+        profile_picture_url = upload_result["secure_url"]
+        profile_picture_public_id = upload_result["public_id"]
+
+        # Update the user's profile picture URL and public ID
+        current_user.users_profile_picture = profile_picture_url
+        current_user.users_profile_picture_cloudinary_public_id = profile_picture_public_id
+
+        db.session.commit()
+
+        flash("Your profile picture has been updated successfully.", "success")
+    else:
+        flash("No file selected. Please choose a file to upload.", "error")
+
+    return redirect(url_for("account"))
 
 @app.route("/account-settings", methods=["GET", "POST"])
 @login_required
