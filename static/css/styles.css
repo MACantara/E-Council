@@ -319,6 +319,10 @@ nav ul li a {
     background-color: var(--primary-color);
 }
 
+.center-button {
+    margin: 0 auto;
+}
+
 /* Base Container Styles */
 
 .container {
@@ -393,26 +397,6 @@ nav ul li a {
     gap: var(--gap-large);
 }
 
-.upload-icon-button {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background-color: var(--secondary-color);
-    border: none;
-    color: var(--primary-button-text-color);
-    padding: 5px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.upload-icon-button i {
-    font-size: 1.2em;
-}
-
-.upload-icon-button:hover {
-    background-color: var(--primary-button-hover-background-color);
-}
-
 /* Account Settings Container Styles */
 
 .account-container {
@@ -426,11 +410,6 @@ nav ul li a {
     flex-direction: column;
     text-align: center;
     gap: var(--gap-small);
-}
-
-.account-picture-container {
-    position: relative;
-    display: inline-block;
 }
 
 .account-details-container > .horizontal-grid-input-pair > p:nth-child(1) {
