@@ -11,12 +11,19 @@ from werkzeug.utils import secure_filename
 from markupsafe import Markup
 from datetime import datetime, timedelta
 
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+
 # Load environment variables from .env file
 load_dotenv()
 
+# Flask Configuration
 app = Flask(__name__, template_folder="templates")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
+
+# Flask Mail Configuration
 app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
 app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT"))
 app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS") == 'True'
@@ -35,6 +42,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
+# Cloudinary Configuration       
+cloudinary.config( 
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+    api_key = os.getenv("CLOUDINARY_API_KEY"), 
+    api_secret = os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(Users, int(user_id))
@@ -44,6 +59,7 @@ def unauthorized():
     flash("You need to be logged in to access this page.", "error")
     return redirect(url_for("login"))
 
+# Database models
 class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
@@ -96,6 +112,7 @@ class PasswordReset(db.Model):
 
     user = db.relationship('Users', backref=db.backref('password_resets', lazy=True))
 
+# Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     token = s.dumps(users_email, salt='email-confirm')
@@ -339,6 +356,7 @@ def send_new_email_verification(users_new_email):
     db.session.add(email_verification)
     db.session.commit()
 
+# Routes
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -599,13 +617,12 @@ def account_settings():
             flash("Current password is incorrect.", "error")
             return redirect(url_for("account_settings"))
 
-        # Handle file upload for the user's signature
-        # users_signature = request.files.get("users-signature")
-        # if users_signature:
-        #     filename = secure_filename(users_signature.filename)
-        #     signature_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        #     users_signature.save(signature_path)
-        #     current_user.users_signature = signature_path
+        # Handle file upload for the user's signature using Cloudinary
+        users_signature = request.files.get("users-signature")
+        if users_signature:
+            upload_result = cloudinary.uploader.upload(users_signature)
+            signature_url = upload_result["secure_url"]
+            current_user.users_signature = signature_url
 
         # Update the user's information in the database
         user = Users.query.filter_by(users_id=current_user.users_id).first()
