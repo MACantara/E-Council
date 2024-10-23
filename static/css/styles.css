@@ -297,6 +297,13 @@ nav ul li a {
     gap: var(--gap-large);
 }
 
+.horizontal-button-pair-positioned-right {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: var(--gap-large);
+}
+
 .fit-content-button {
     width: fit-content;
 }
@@ -388,13 +395,6 @@ nav ul li a {
     border: 1px solid var(--secondary-color);
     padding: var(--even-padding-extra-small);
     border-radius: var(--border-radius);
-}
-
-.horizontal-account-deletion-pair {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    gap: var(--gap-large);
 }
 
 /* Account Settings Container Styles */
