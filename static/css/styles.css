@@ -32,7 +32,8 @@
     --border-radius: 8px;
 
     /* Spacing (Padding) */
-    --padding-extra-small: 0.25rem 0.5rem;
+    --even-padding-extra-small: 0.25rem;
+    --odd-padding-extra-small: 0.25rem 0.5rem;
     --padding-small: 0.5rem 1rem;
     --padding-medium: 1rem 2.5rem;
     --padding-large: 1.5rem;
@@ -376,6 +377,15 @@ nav ul li a {
     width: 100%;
 }
 
+.image-preview {
+    display: block;
+    max-width: 200px;
+    max-height: 200px;
+    border: 1px solid var(--secondary-color);
+    padding: var(--even-padding-extra-small);
+    border-radius: var(--border-radius);
+}
+
 /* Account Settings Container Styles */
 
 .account-container {
@@ -514,7 +524,7 @@ textarea {
 
 .custom-file-upload-input {
     font-size: var(--font-size-medium);
-    padding: var(--padding-extra-small);
+    padding: var(--odd-padding-extra-small);
     color: var(--primary-text-color-dark);
     cursor: pointer;
     padding-left: 0;
@@ -522,7 +532,7 @@ textarea {
 
 /* Style for the "Choose File" text */
 .choose-file-text {
-    padding: var(--padding-extra-small);
+    padding: var(--odd-padding-extra-small);
     color: var(--primary-text-color-dark);
     border-radius: var(--small-border-radius);
     background-color: var(--white-background-color);

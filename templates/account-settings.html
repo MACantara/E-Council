@@ -112,7 +112,7 @@
                     <span id="file-name" class="file-name">No file chosen</span>
                 </label>
                 <p>Supported file types: .jpeg, .jpg, .png</p>
-                <img src="{{ current_user.users_signature }}" alt="User's Signature">
+                <img id="signature-preview" src="{{ current_user.users_signature }}" alt="User's Signature" class="image-preview">
             </div>
             
             <div class="input-pair">
@@ -165,6 +165,29 @@
         // Initial check
         toggleStudentOrganizationFields();
     });
+
+    function previewImage() {
+        const fileInput = document.getElementById('users-signature');
+        const fileName = document.getElementById('file-name');
+        const file = fileInput.files[0];
+        const preview = document.getElementById('signature-preview');
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+        if (file) {
+            if (validImageTypes.includes(file.type)) {
+                fileName.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                fileName.textContent = 'No file chosen';
+                fileInput.value = ''; // Clear the input
+                preview.src = ''; // Clear the preview
+            }
+        }
+    }
 </script>
 
 {% endblock %}
