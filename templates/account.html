@@ -23,9 +23,14 @@
         <form method="POST" action="{{ url_for('upload_profile_picture') }}" enctype="multipart/form-data">
             <div class="input-pair">
                 <label for="profile-picture">Choose a profile picture</label>
-                <input type="file" name="profile-picture" id="profile-picture" accept="image/*" required>
+                <input type="file" name="profile-picture" id="profile-picture" accept="image/*" hidden required>
+                <label for="profile-picture" class="custom-file-upload-input">
+                    <span class="choose-file-text">Choose File</span>
+                    <span id="file-name" class="file-name">No file chosen</span>
+                </label>
             </div>
-            <div class="horizontal-input-pair">
+
+            <div class="horizontal-button-pair-positioned-right">
                 <button class="primary-button fit-content-button" type="submit">Upload</button>
                 <button type="button" class="secondary-button fit-content-button" id="cancel-upload-profile-picture">Cancel</button>
             </div>
@@ -35,12 +40,9 @@
 
 <div class="container">
     <div class="account-container">
-        <div class="account-picture-container">
-            <img class="account-picture" src="{{ current_user.users_profile_picture or 'https://placehold.co/160x160.png' }}" alt="Account Picture">
-            <button id="open-upload-change-account-profile-picture-modal-button" class="upload-icon-button">
-                <i class="bi bi-camera-fill"></i>
-            </button>
-        </div>
+        <img class="account-picture" src="{{ current_user.users_profile_picture or 'https://placehold.co/160x160.png' }}" alt="Account Picture">
+
+        <button id="open-upload-change-account-profile-picture-modal-button" class="secondary-button fit-content-button center-button">Upload/Change Profile Picture</button>
 
         <div class="account-details-container">
             <h2>{{ current_user.users_first_name }} {{ current_user.users_last_name }}</h2>
@@ -85,6 +87,11 @@
 {% block script %}
 
 <script>
+    document.getElementById('profile-picture').addEventListener('change', function () {
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
+    });
+
     // Upload/Change Account Profile Picture Modal
     document.getElementById('open-upload-change-account-profile-picture-modal-button').addEventListener('click', function () {
         document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'block';
