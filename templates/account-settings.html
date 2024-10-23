@@ -175,6 +175,7 @@
                     {% if current_user.users_contact_number is not none and current_user.users_contact_number|lower != 'none' %}
                     value="{{ current_user.users_contact_number }}"
                     {% endif %}>
+                <small class="form-text text-muted">Format: +639123456789</small>
             </div>
 
             <div class="input-pair">
