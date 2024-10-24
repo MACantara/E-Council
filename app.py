@@ -790,6 +790,20 @@ def account_settings():
             flash("Current password is incorrect.", "error")
             return redirect(url_for("account_settings"))
 
+        # Ensure the department, role, student organization, and position are valid Enum values
+        if users_department not in Users.users_department.type.enums:
+            flash("Invalid department.", "error")
+            return redirect(url_for("account_settings"))
+        if users_role not in Users.users_role.type.enums:
+            flash("Invalid role.", "error")
+            return redirect(url_for("account_settings"))
+        if users_student_organization and users_student_organization not in Users.users_student_organization.type.enums:
+            flash("Invalid student organization.", "error")
+            return redirect(url_for("account_settings"))
+        if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
+            flash("Invalid student organization position.", "error")
+            return redirect(url_for("account_settings"))
+
         # Handle file upload for the user's signature using Cloudinary
         users_signature = request.files.get("users-signature")
         if users_signature:
