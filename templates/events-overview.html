@@ -8,12 +8,14 @@
     {% include "council-overview-sidebar.html" %}
 
     <div class="council-overview-content-container">
-        <!-- Flash messages section -->
+        <!-- Flash messages section for the main page -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="flash-messages center no-top-margin">
             {% for category, message in messages %}
+            {% if category != 'modal-error' %}
             <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endif %}
             {% endfor %}
         </div>
         {% endif %}
@@ -28,19 +30,20 @@
         <div id="add-event-modal-content" class="modal">
             <div class="container">
                 <span id="close-add-event-modal-button" class="close-button">&times;</span>
+                <h2>Add Event</h2>
 
-                <!-- Flash messages section -->
+                <!-- Flash messages section for the modal -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                <div class="flash-messages center no-top-margin">
+                <div class="flash-messages center no-top-margin bottom-margin">
                     {% for category, message in messages %}
+                    {% if category == 'modal-error' %}
                     <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endif %}
                     {% endfor %}
                 </div>
                 {% endif %}
                 {% endwith %}
-
-                <h2>Add Event</h2>
 
                 <form method="POST" action="{{ url_for('add_event') }}">
                     <input type="hidden" name="show_modal" id="show_modal"
@@ -69,12 +72,14 @@
 
                     <div class="input-pair">
                         <label for="events-start-date-and-time">Start Date and Time</label>
-                        <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time" required>
+                        <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time"
+                            required>
                     </div>
 
                     <div class="input-pair">
                         <label for="events-end-date-and-time">End Date and Time</label>
-                        <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time" required>
+                        <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time"
+                            required>
                     </div>
 
                     <div class="input-pair">
@@ -122,6 +127,19 @@
             <div class="container">
                 <span id="close-update-event-modal-button" class="close-button">&times;</span>
                 <h2>Update Event</h2>
+
+                <!-- Flash messages section for the modal -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages center no-top-margin bottom-margin">
+                    {% for category, message in messages %}
+                    {% if category == 'modal-error' %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
 
                 <form method="POST">
                     <div class="input-pair">
@@ -241,6 +259,19 @@
             <div class="container">
                 <span id="close-invite-user-modal-button" class="close-button">&times;</span>
                 <h2>Invite a User to Manage</h2>
+
+                <!-- Flash messages section for the modal -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages center no-top-margin bottom-margin">
+                    {% for category, message in messages %}
+                    {% if category == 'modal-error' %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
 
                 <p>Enter the email address of the user you would like to invite to help you manage "TechTutor:
                     Empowering Communities with AI-Assisted IT Skills".</p>
