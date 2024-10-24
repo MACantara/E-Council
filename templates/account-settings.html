@@ -68,35 +68,11 @@
                 <label for="users-department">Department</label>
                 <select name="users-department" id="users-department" required>
                     <option value="" disabled>Select a Department</option>
-                    <option value="College of Computer Studies" {% if
-                        current_user.users_department=="College of Computer Studies" %}selected{% endif %}>College of
-                        Computer Studies</option>
-                    <option value="College of Engineering" {% if current_user.users_department=="College of Engineering"
-                        %}selected{% endif %}>College of Engineering</option>
-                    <option value="College of Architecture" {% if
-                        current_user.users_department=="College of Architecture" %}selected{% endif %}>College of
-                        Architecture</option>
-                    <option value="College of Criminology" {% if current_user.users_department=="College of Criminology"
-                        %}selected{% endif %}>College of Criminology</option>
-                    <option value="College of Nursing" {% if current_user.users_department=="College of Nursing"
-                        %}selected{% endif %}>College of Nursing</option>
-                    <option value="College of Arts, Sciences and Education" {% if
-                        current_user.users_department=="College of Arts, Sciences and Education" %}selected{% endif %}>
-                        College of Arts, Sciences and Education</option>
-                    <option value="College of Business Administration and Accountancy" {% if
-                        current_user.users_department=="College of Business Administration and Accountancy" %}selected{%
-                        endif %}>College of Business Administration and Accountancy</option>
-                    <option value="College of Physical and Occupational Therapy" {% if
-                        current_user.users_department=="College of Physical and Occupational Therapy" %}selected{% endif
-                        %}>College of Physical and Occupational Therapy</option>
-                    <option value="College of International Tourism and Hospitality Management" {% if
-                        current_user.users_department=="College of International Tourism and Hospitality Management"
-                        %}selected{% endif %}>College of International Tourism and Hospitality Management</option>
-                    <option value="College of Pharmacy" {% if current_user.users_department=="College of Pharmacy"
-                        %}selected{% endif %}>College of Pharmacy</option>
-                    <option value="College of Radiologic Technology" {% if
-                        current_user.users_department=="College of Radiologic Technology" %}selected{% endif %}>College
-                        of Radiologic Technology</option>
+                    {% for department in departments %}
+                        <option value="{{ department.departments_id }}" {% if current_user.users_departments_id == department.departments_id %}selected{% endif %}>
+                            {{ department.departments_name }}
+                        </option>
+                    {% endfor %}
                 </select>
             </div>
 
