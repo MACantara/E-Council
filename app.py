@@ -486,6 +486,19 @@ def signup():
             flash("Password must contain at least one special character.", "error")
             return render_template("signup.html")
 
+        # Ensure the department and role are valid Enum values
+        if users_department not in Users.users_department.type.enums:
+            flash("Invalid department.", "error")
+            return render_template("signup.html")
+        if users_role not in Users.users_role.type.enums:
+            flash("Invalid role.", "error")
+            return render_template("signup.html")
+        if users_student_organization and users_student_organization not in Users.users_student_organization.type.enums:
+            flash("Invalid student organization.", "error")
+            return render_template("signup.html")
+        if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
+            flash("Invalid student organization position.", "error")
+
         user = Users(
             users_first_name=users_first_name,
             users_last_name=users_last_name,
