@@ -108,10 +108,14 @@ class Users(db.Model, UserMixin):
         'Auditor',
         'Business Manager',
         'Public Relations Officer',
-        '1st Year Representative',
-        '2nd Year Representative',
-        '3rd Year Representative',
-        '4th Year Representative',
+        '1st Year IT Representative',
+        '1st Year CS Representative',
+        '2nd Year IT Representative',
+        '2nd Year CS Representative',
+        '3rd Year IT Representative',
+        '3rd Year CS Representative',
+        '4th Year IT Representative',
+        '4th Year CS Representative',
         name='position_enum'
     ), nullable=False)
 
