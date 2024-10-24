@@ -78,7 +78,7 @@
 
         <div class="horizontal-grid-input-pair">
             <p>Department:</p>
-            <p>{{ current_user.users_department }}</p>
+            <p>{{ current_user.department.departments_name }}</p>
         </div>
 
         {% if current_user.users_role == "Student Council Officer" %}
