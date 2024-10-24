@@ -820,7 +820,7 @@ def account_settings():
         users_first_name = request.form.get("users-first-name")
         users_last_name = request.form.get("users-last-name")
         users_username = request.form.get("users-username")
-        users_department = request.form.get("users-department")
+        users_departments_id = request.form.get("users-department")
         users_role = request.form.get("users-role")
         users_student_organization = request.form.get("users-student-organization")
         users_student_organization_position = request.form.get("users-student-organization-position")
@@ -833,10 +833,7 @@ def account_settings():
             flash("Current password is incorrect.", "error")
             return redirect(url_for("account_settings"))
 
-        # Ensure the department, role, student organization, and position are valid Enum values
-        if users_department not in Users.users_department.type.enums:
-            flash("Invalid department.", "error")
-            return redirect(url_for("account_settings"))
+        # Ensure the role, student organization, and position are valid Enum values
         if users_role not in Users.users_role.type.enums:
             flash("Invalid role.", "error")
             return redirect(url_for("account_settings"))
@@ -845,6 +842,12 @@ def account_settings():
             return redirect(url_for("account_settings"))
         if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
             flash("Invalid student organization position.", "error")
+            return redirect(url_for("account_settings"))
+
+        # Get the departments_id through the departments_id
+        department = Departments.query.filter_by(departments_id=users_departments_id).first()
+        if not department:
+            flash("Department not found.", "error")
             return redirect(url_for("account_settings"))
 
         # Clear student organization fields if the role is Faculty or Staff
@@ -881,7 +884,7 @@ def account_settings():
         user.users_first_name = users_first_name
         user.users_last_name = users_last_name
         user.users_username = users_username
-        user.users_department = users_department
+        user.users_departments_id = users_departments_id
         user.users_role = users_role
         user.users_student_organization = users_student_organization
         user.users_student_organization_position = users_student_organization_position
@@ -893,7 +896,9 @@ def account_settings():
         flash("Your account settings have been updated successfully.", "success")
         return redirect(url_for("account_settings"))
 
-    return render_template("account-settings.html")
+    # Query all departments to pass to the template
+    departments = Departments.query.all()
+    return render_template("account-settings.html", departments=departments)
 
 @app.route("/delete-user-account", methods=["POST"])
 @login_required
