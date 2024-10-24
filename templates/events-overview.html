@@ -18,69 +18,69 @@
                 <span id="close-add-event-modal-button" class="close-button">&times;</span>
                 <h2>Add Event</h2>
 
-                <form method="POST">
+                <form method="POST" action="{{ url_for('add_event') }}">
                     <div class="input-pair">
-                        <label for="event-name">Event Name</label>
-                        <input type="text" name="event-name" id="event-name" placeholder="Event Name" required>
+                        <label for="events-name">Event Name</label>
+                        <input type="text" name="events-name" id="events-name" placeholder="Event Name" required>
                     </div>
     
                     <div class="input-pair">
-                        <label for="semester">Semester</label>
-                        <select name="semester" id="semester" required>
+                        <label for="events-semester">Semester</label>
+                        <select name="events-semester" id="events-semester" required>
                             <option value="" disabled selected>Select a Semester</option>
-                            <option value="1st-semester">1st Semester</option>
-                            <option value="2nd-semester">2nd Semester</option>
+                            <option value="1st Semester">1st Semester</option>
+                            <option value="2nd Semester">2nd Semester</option>
                         </select>
                     </div>
     
                     <div class="input-pair">
-                        <label for="academic-year">Academic Year</label>
-                        <select name="academic-year" id="academic-year" required>
+                        <label for="events-academic-year">Academic Year</label>
+                        <select name="events-academic-year" id="events-academic-year" required>
                             <option value="" disabled selected>Select an Academic Year</option>
                             <option value="2024-2025">2024-2025</option>
                         </select>
                     </div>
     
                     <div class="input-pair">
-                        <label for="start-date-and-time">Start Date and Time</label>
-                        <input type="datetime-local" name="start-date-and-time" id="start-date-and-time" required>
+                        <label for="events-start-date-and-time">Start Date and Time</label>
+                        <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time" required>
                     </div>
     
                     <div class="input-pair">
-                        <label for="end-date-and-time">End Date and Time</label>
-                        <input type="datetime-local" name="end-date-and-time" id="end-date-and-time" required>
+                        <label for="events-end-date-and-time">End Date and Time</label>
+                        <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time" required>
                     </div>
     
                     <div class="input-pair">
-                        <label for="venue">Venue</label>
-                        <input type="text" name="venue" id="venue" placeholder="Venue"
+                        <label for="events-venue">Venue</label>
+                        <input type="text" name="events-venue" id="events-venue" placeholder="Venue"
                             required>
                     </div>
     
                     <div class="input-pair">
-                        <label for="budget">Budget</label>
-                        <input type="number" name="budget" id="budget" placeholder="Budget" required>
+                        <label for="events-budget">Budget</label>
+                        <input type="number" name="events-budget" id="events-budget" placeholder="Budget" required>
                     </div>
     
                     <div class="input-pair">
-                        <label for="event-status">Event Status</label>
-                        <select name="event-status" id="event-status" required>
+                        <label for="events-status">Event Status</label>
+                        <select name="events-status" id="events-status" required>
                             <option value="" disabled selected>Select an Event Status</option>
-                            <option value="upcoming">Upcoming</option>
-                            <option value="postponed">Postponed</option>
-                            <option value="done">Done</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="Upcoming">Upcoming</option>
+                            <option value="Postponed">Postponed</option>
+                            <option value="Done">Done</option>
+                            <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>
     
                     <div class="input-pair">
-                        <label for="description">Description</label>
-                        <textarea name="description" id="description" placeholder="Description" required></textarea>
+                        <label for="events-description">Description</label>
+                        <textarea name="events-description" id="events-description" placeholder="Description" required></textarea>
                     </div>
     
                     <div class="input-pair">
-                        <label for="remarks">Remarks</label>
-                        <input type="text" name="remarks" id="remarks" placeholder="Remarks (Optional)">
+                        <label for="events-remarks">Remarks</label>
+                        <input type="text" name="events-remarks" id="events-remarks" placeholder="Remarks (Optional)">
                     </div>
     
                     <div class="horizontal-input-pair">

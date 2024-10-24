@@ -168,6 +168,24 @@ class LoginAttempts(db.Model):
     login_attempt_count = db.Column(db.Integer, nullable=False, default=0)
     login_attempt_last_attempt_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class Events(db.Model):
+    __tablename__ = "events"
+
+    events_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    events_name = db.Column(db.String(255), nullable=True)
+    events_semester = db.Column(db.String(50), nullable=False)
+    events_academic_year = db.Column(db.String(50), nullable=False)
+    events_start_date_and_time = db.Column(db.DateTime, nullable=True)
+    events_end_date_and_time = db.Column(db.DateTime, nullable=True)
+    events_venue = db.Column(db.String(255), nullable=True)
+    events_budget = db.Column(db.Numeric(20, 2), nullable=True)
+    events_status = db.Column(db.String(50), nullable=True)
+    events_description = db.Column(db.Text, nullable=True)
+    events_remarks = db.Column(db.String(255), nullable=True)
+
+    def __repr__(self):
+        return f"Events({self.events_id}, {self.events_name}, {self.events_semester}, {self.events_academic_year}, {self.events_start_date_and_time}, {self.events_end_date_and_time}, {self.events_venue}, {self.events_budget}, {self.events_status}, {self.events_description}, {self.events_remarks})"
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -1019,6 +1037,48 @@ def council_overview():
 @login_required
 def events_overview():
     return render_template("events-overview.html")
+
+@app.route("/add-event", methods=["GET", "POST"])
+@login_required
+def add_event():
+    if request.method == "POST":
+        events_name = request.form.get("events-name")
+        events_semester = request.form.get("events-semester")
+        events_academic_year = request.form.get("events-academic-year")
+        events_start_date_and_time = request.form.get("events-start-date-and-time")
+        events_end_date_and_time = request.form.get("events-end-date-and-time")
+        events_venue = request.form.get("events-venue")
+        events_budget = request.form.get("events-budget")
+        events_status = request.form.get("events-status")
+        events_description = request.form.get("events-description")
+        events_remarks = request.form.get("events-remarks")
+
+        # Convert dates to datetime objects
+        if events_start_date_and_time:
+            events_start_date_and_time = datetime.strptime(events_start_date_and_time, '%Y-%m-%dT%H:%M')
+        if events_end_date_and_time:
+            events_end_date_and_time = datetime.strptime(events_end_date_and_time, '%Y-%m-%dT%H:%M')
+
+        event = Events(
+            events_name=events_name,
+            events_semester=events_semester,
+            events_academic_year=events_academic_year,
+            events_start_date_and_time=events_start_date_and_time,
+            events_end_date_and_time=events_end_date_and_time,
+            events_venue=events_venue,
+            events_budget=events_budget,
+            events_status=events_status,
+            events_description=events_description,
+            events_remarks=events_remarks
+        )
+
+        db.session.add(event)
+        db.session.commit()
+
+        flash("Event added successfully!", "success")
+        return redirect(url_for("events_overview"))
+
+    return render_template("add-event.html")
 
 @app.route("/event-dashboard")
 @login_required
