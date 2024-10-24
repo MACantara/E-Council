@@ -290,26 +290,28 @@
         <form method="GET" action="{{ url_for('events_overview') }}">
             <div class="horizontal-input-pair">
                 <select name="events-overview-academic-year" id="events-overview-academic-year" aria-label="Select an Academic Year">
-                    <option value="" disabled {% if not request.args.get('events-overview-academic-year') %}selected{% endif %}>Select an Academic Year</option>
-                    <option value="2024-2025" {% if request.args.get('events-overview-academic-year') == '2024-2025' %}selected{% endif %}>S.Y 2024-2025</option>
+                    <option value="" disabled>Select an Academic Year</option>
+                    <option value="2024-2025" {% if request.args.get('events-overview-academic-year') == '2024-2025' or not request.args.get('events-overview-academic-year') %}selected{% endif %}>S.Y 2024-2025</option>
                 </select>
 
                 <div class="events-overview-select-group">
                     <select name="events-overview-filter-by-status" id="events-overview-filter-by-status" aria-label="Filter by Status">
-                        <option value="" disabled {% if not request.args.get('events-overview-filter-by-status') %}selected{% endif %}>Filter by Status</option>
+                        <option value="" disabled>Filter by Status</option>
+                        <option value="All" {% if not request.args.get('events-overview-filter-by-status') or request.args.get('events-overview-filter-by-status') == 'All' %}selected{% endif %}>All</option>
                         <option value="Upcoming" {% if request.args.get('events-overview-filter-by-status') == 'Upcoming' %}selected{% endif %}>Upcoming</option>
                         <option value="Postponed" {% if request.args.get('events-overview-filter-by-status') == 'Postponed' %}selected{% endif %}>Postponed</option>
                         <option value="Done" {% if request.args.get('events-overview-filter-by-status') == 'Done' %}selected{% endif %}>Done</option>
                         <option value="Cancelled" {% if request.args.get('events-overview-filter-by-status') == 'Cancelled' %}selected{% endif %}>Cancelled</option>
                     </select>
                     <select name="events-overview-filter-by-semester" id="events-overview-filter-by-semester" aria-label="Filter by Semester">
-                        <option value="" disabled {% if not request.args.get('events-overview-filter-by-semester') %}selected{% endif %}>Filter by Semester</option>
+                        <option value="" disabled>Filter by Semester</option>
+                        <option value="All" {% if not request.args.get('events-overview-filter-by-semester') or request.args.get('events-overview-filter-by-semester') == 'All' %}selected{% endif %}>All</option>
                         <option value="1st Semester" {% if request.args.get('events-overview-filter-by-semester') == '1st Semester' %}selected{% endif %}>1st Semester</option>
                         <option value="2nd Semester" {% if request.args.get('events-overview-filter-by-semester') == '2nd Semester' %}selected{% endif %}>2nd Semester</option>
                     </select>
                     <select name="events-overview-sort-by-date" id="events-overview-sort-by-date" aria-label="Sort by Date">
                         <option value="" disabled {% if not request.args.get('events-overview-sort-by-date') %}selected{% endif %}>Sort by Date</option>
-                        <option value="recent-to-old" {% if request.args.get('events-overview-sort-by-date') == 'recent-to-old' %}selected{% endif %}>Recent to Old</option>
+                        <option value="recent-to-old" {% if request.args.get('events-overview-sort-by-date') == 'recent-to-old' or not request.args.get('events-overview-sort-by-date') %}selected{% endif %}>Recent to Old</option>
                         <option value="old-to-recent" {% if request.args.get('events-overview-sort-by-date') == 'old-to-recent' %}selected{% endif %}>Old to Recent</option>
                     </select>
                     <button type="submit" class="primary-button fit-content-button">Apply Filters</button>
