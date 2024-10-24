@@ -1055,14 +1055,14 @@ def add_event():
         events_remarks = request.form.get("events-remarks")
 
         # Validation
-        if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time or not events_venue or not events_description:
-            flash("Please fill out all required fields.", "error")
+        if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time:
+            flash("Please fill out all required fields.", "modal-error")
             return render_template("events-overview.html", show_modal=True)
 
         # Check if event name already exists
         existing_event = Events.query.filter_by(events_name=events_name).first()
         if existing_event:
-            flash("An event with this name already exists. Please choose a different name.", "error")
+            flash("An event with this name already exists. Please choose a different name.", "modal-error")
             return render_template("events-overview.html", show_modal=True)
 
         # Validate date format
@@ -1070,7 +1070,7 @@ def add_event():
             events_start_date_and_time = datetime.strptime(events_start_date_and_time, '%Y-%m-%dT%H:%M')
             events_end_date_and_time = datetime.strptime(events_end_date_and_time, '%Y-%m-%dT%H:%M')
         except ValueError:
-            flash("Invalid date format. Please use the format YYYY-MM-DDTHH:MM.", "error")
+            flash("Invalid date format. Please use the format YYYY-MM-DDTHH:MM.", "modal-error")
             return render_template("events-overview.html", show_modal=True)
 
         # Validate budget format
@@ -1078,15 +1078,15 @@ def add_event():
             try:
                 events_budget = float(events_budget)
             except ValueError:
-                flash("Invalid budget format. Please enter a valid number.", "error")
+                flash("Invalid budget format. Please enter a valid number.", "modal-error")
                 return render_template("events-overview.html", show_modal=True)
 
         event = Events(
             events_name=events_name,
             events_semester=events_semester,
             events_academic_year=events_academic_year,
-            events_start_date_and_time=events_start_date_and_time,
-            events_end_date_and_time=events_end_date_and_time,
+            events_start_date=events_start_date_and_time,
+            events_end_date=events_end_date_and_time,
             events_venue=events_venue,
             events_budget=events_budget,
             events_status=events_status,
