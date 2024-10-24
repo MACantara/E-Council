@@ -319,141 +319,51 @@
         </div>
 
         <div class="council-overview-content-container-group">
+            {% for event in events %}
             <div class="council-overview-content-grid-item">
-                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
-                    required>
+                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status" required>
                     <option value="" disabled selected>Select a Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="postponed">Postponed</option>
-                    <option value="done">Done</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="upcoming" {% if event.events_status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                    <option value="postponed" {% if event.events_status == 'postponed' %}selected{% endif %}>Postponed</option>
+                    <option value="done" {% if event.events_status == 'done' %}selected{% endif %}>Done</option>
+                    <option value="cancelled" {% if event.events_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
                 </select>
 
-                <h3>Event No. 1</h3>
+                <h3>{{ event.events_name }}</h3>
 
-                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
-                    second semester...</p>
+                <p>{{ event.events_description }}</p>
 
                 <div class="grid-item-details">
                     <div class="grid-item-details-pair">
                         <p>Date:</p>
-                        <p>July 8, 2024</p>
+                        <p>{{ event.events_start_date_and_time.strftime('%B %d, %Y') if event.events_start_date_and_time else 'N/A' }}</p>
                     </div>
                     <div class="grid-item-details-pair">
                         <p>Time:</p>
-                        <p>8:00 AM - 5:00 PM</p>
+                        <p>{{ event.events_start_date_and_time.strftime('%I:%M %p') if event.events_start_date_and_time else 'N/A' }} - {{ event.events_end_date_and_time.strftime('%I:%M %p') if event.events_end_date_and_time else 'N/A' }}</p>
                     </div>
                     <div class="grid-item-details-pair">
                         <p>Venue:</p>
-                        <p>Computer Laboratory M-209 & M-210</p>
+                        <p>{{ event.events_venue }}</p>
                     </div>
                     <div class="grid-item-details-pair">
                         <p>Budget:</p>
-                        <p>₱ 0.00</p>
+                        <p>₱ {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}</p>
                     </div>
                 </div>
 
                 <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-1"></canvas>
+                    <canvas id="budget-chart-{{ loop.index }}"></canvas>
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('event_dashboard') }}" class="primary-button">View</a>
+                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
                     <button id="open-update-event-modal-button" class="secondary-button">Update</button>
-                    <button id="open-invite-user-modal-button" class="secondary-button">Invite</button>
+                    <a href="{{ url_for('invite_user', event_id=event.events_id) }}" class="secondary-button">Invite</a>
                     <button class="secondary-button">Delete</button>
                 </div>
             </div>
-            <div class="council-overview-content-grid-item">
-                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
-                    required>
-                    <option value="" disabled selected>Select a Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="postponed">Postponed</option>
-                    <option value="done">Done</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-
-                <h3>Event No. 2</h3>
-
-                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
-                    second semester...</p>
-
-                <div class="grid-item-details">
-                    <div class="grid-item-details-pair">
-                        <p>Date:</p>
-                        <p>July 8, 2024</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Time:</p>
-                        <p>8:00 AM - 5:00 PM</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Venue:</p>
-                        <p>Computer Laboratory M-209 & M-210</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Budget:</p>
-                        <p>₱ 0.00</p>
-                    </div>
-                </div>
-
-                <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-2"></canvas>
-                </div>
-
-                <div class="grid-item-button-group">
-                    <a href="{{ url_for('event_dashboard') }}" class="primary-button">View</a>
-                    <button id="open-update-event-modal-button" class="secondary-button">Update</button>
-                    <a href="{{ url_for('invite_user')}}" class="secondary-button">Invite</a>
-                    <button class="secondary-button">Delete</button>
-                </div>
-            </div>
-            <div class="council-overview-content-grid-item">
-                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
-                    required>
-                    <option value="" disabled selected>Select a Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="postponed">Postponed</option>
-                    <option value="done">Done</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-
-                <h3>Event No. 3</h3>
-
-                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
-                    second semester...</p>
-
-                <div class="grid-item-details">
-                    <div class="grid-item-details-pair">
-                        <p>Date:</p>
-                        <p>July 8, 2024</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Time:</p>
-                        <p>8:00 AM - 5:00 PM</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Venue:</p>
-                        <p>Computer Laboratory M-209 & M-210</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Budget:</p>
-                        <p>₱ 0.00</p>
-                    </div>
-                </div>
-
-                <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-3"></canvas>
-                </div>
-
-                <div class="grid-item-button-group">
-                    <a href="{{ url_for('event_dashboard') }}" class="primary-button">View</a>
-                    <button id="open-update-event-modal-button" class="secondary-button">Update</button>
-                    <a href="{{ url_for('invite_user')}}" class="secondary-button">Invite</a>
-                    <button class="secondary-button">Delete</button>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
