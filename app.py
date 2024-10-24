@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from markupsafe import Markup
 from datetime import datetime, timedelta
+from sqlalchemy import Enum
 
 import cloudinary
 import cloudinary.uploader
@@ -70,10 +71,50 @@ class Users(db.Model, UserMixin):
     users_last_name = db.Column(db.String(50), nullable=False)
     users_username = db.Column(db.String(50), unique=True, nullable=False)
     users_email = db.Column(db.String(100), unique=True, nullable=False)
-    users_department = db.Column(db.String(100), nullable=False)
-    users_role = db.Column(db.String(50), nullable=False)
-    users_student_organization = db.Column(db.String(100), nullable=False)
-    users_student_organization_position = db.Column(db.String(100), nullable=False)
+    
+    users_department = db.Column(Enum(
+        'College of Computer Studies',
+        'College of Engineering',
+        'College of Architecture',
+        'College of Criminology',
+        'College of Nursing',
+        'College of Arts, Sciences and Education',
+        'College of Business Administration and Accountancy',
+        'College of Physical and Occupational Therapy',
+        'College of International Tourism and Hospitality Management',
+        'College of Pharmacy',
+        'College of Radiologic Technology',
+        name='department_enum'
+    ), nullable=False)
+    
+    users_role = db.Column(Enum(
+        'Student Council Officer',
+        'Faculty',
+        'Staff',
+        name='role_enum'
+    ), nullable=False)
+
+    users_student_organization = db.Column(Enum(
+        'College of Computer Studies - Student Council',
+        'Junior Philippine Computer Society',
+        name='organization_enum'
+    ), nullable=False)
+
+    users_student_organization_position = db.Column(Enum(
+        'President',
+        'Vice President',
+        'Secretary',
+        'Treasurer',
+        'Auditor',
+        'Business Manager',
+        'Public Relations Officer',
+        '1st Year Representative',
+        '2nd Year Representative',
+        '3rd Year Representative',
+        '4th Year Representative',
+        name='position_enum'
+    ), nullable=False)
+
     users_home_address = db.Column(db.String(255), nullable=True)
     users_contact_number = db.Column(db.String(20), nullable=True)
     users_signature = db.Column(db.String(255), nullable=True)
