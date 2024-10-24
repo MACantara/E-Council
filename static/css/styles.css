@@ -157,6 +157,14 @@ canvas {
     height: 100% !important;
 }
 
+.center {
+    margin: 0 auto;
+}
+
+.no-top-margin {
+    margin-top: 0 !important;
+}
+
 /* Header Styles */
 header {
     background-color: var(--primary-color);
@@ -323,10 +331,6 @@ nav ul li a {
     font-size: var(--font-size-medium);
     text-align: center;
     background-color: var(--primary-color);
-}
-
-.center-button {
-    margin: 0 auto;
 }
 
 /* Base Container Styles */
