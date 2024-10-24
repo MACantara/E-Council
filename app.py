@@ -804,6 +804,11 @@ def account_settings():
             flash("Invalid student organization position.", "error")
             return redirect(url_for("account_settings"))
 
+        # Clear student organization fields if the role is Faculty or Staff
+        if users_role in ["Faculty", "Staff"]:
+            users_student_organization = None
+            users_student_organization_position = None
+
         # Handle file upload for the user's signature using Cloudinary
         users_signature = request.files.get("users-signature")
         if users_signature:
