@@ -287,63 +287,46 @@
             </div>
         </div>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const selects = document.querySelectorAll('select');
+                selects.forEach(select => {
+                    select.addEventListener('change', function() {
+                        this.form.submit();
+                    });
+                });
+            });
+        </script>
+
         <form method="GET" action="{{ url_for('events_overview') }}">
             <div class="horizontal-input-pair">
-                <select name="events-overview-academic-year" id="events-overview-academic-year"
-                    aria-label="Select an Academic Year">
+                <select name="events-overview-academic-year" id="events-overview-academic-year" aria-label="Select an Academic Year">
                     <option value="" disabled>Select an Academic Year</option>
                     {% for year in academic_years %}
-                    <option value="{{ year.events_academic_year }}" {% if
-                        request.args.get('events-overview-academic-year')==year.events_academic_year or not
-                        request.args.get('events-overview-academic-year') and loop.first %}selected{% endif %}>S.Y {{
-                        year.events_academic_year }}</option>
+                        <option value="{{ year.events_academic_year }}" {% if request.args.get('events-overview-academic-year') == year.events_academic_year or not request.args.get('events-overview-academic-year') and loop.first %}selected{% endif %}>S.Y {{ year.events_academic_year }}</option>
                     {% endfor %}
                 </select>
 
                 <div class="events-overview-select-group">
-                    <select name="events-overview-filter-by-status" id="events-overview-filter-by-status"
-                        aria-label="Filter by Status">
+                    <select name="events-overview-filter-by-status" id="events-overview-filter-by-status" aria-label="Filter by Status">
                         <option value="" disabled>Filter by Status</option>
-                        <option value="All" {% if not request.args.get('events-overview-filter-by-status') or
-                            request.args.get('events-overview-filter-by-status')=='All' %}selected{% endif %}>All
-                        </option>
-                        <option value="Upcoming" {% if request.args.get('events-overview-filter-by-status')=='Upcoming'
-                            %}selected{% endif %}>Upcoming</option>
-                        <option value="Postponed" {% if
-                            request.args.get('events-overview-filter-by-status')=='Postponed' %}selected{% endif %}>
-                            Postponed</option>
-                        <option value="Done" {% if request.args.get('events-overview-filter-by-status')=='Done'
-                            %}selected{% endif %}>Done</option>
-                        <option value="Cancelled" {% if
-                            request.args.get('events-overview-filter-by-status')=='Cancelled' %}selected{% endif %}>
-                            Cancelled</option>
+                        <option value="All" {% if not request.args.get('events-overview-filter-by-status') or request.args.get('events-overview-filter-by-status') == 'All' %}selected{% endif %}>All</option>
+                        <option value="Upcoming" {% if request.args.get('events-overview-filter-by-status') == 'Upcoming' %}selected{% endif %}>Upcoming</option>
+                        <option value="Postponed" {% if request.args.get('events-overview-filter-by-status') == 'Postponed' %}selected{% endif %}>Postponed</option>
+                        <option value="Done" {% if request.args.get('events-overview-filter-by-status') == 'Done' %}selected{% endif %}>Done</option>
+                        <option value="Cancelled" {% if request.args.get('events-overview-filter-by-status') == 'Cancelled' %}selected{% endif %}>Cancelled</option>
                     </select>
-                    <select name="events-overview-filter-by-semester" id="events-overview-filter-by-semester"
-                        aria-label="Filter by Semester">
+                    <select name="events-overview-filter-by-semester" id="events-overview-filter-by-semester" aria-label="Filter by Semester">
                         <option value="" disabled>Filter by Semester</option>
-                        <option value="All" {% if not request.args.get('events-overview-filter-by-semester') or
-                            request.args.get('events-overview-filter-by-semester')=='All' %}selected{% endif %}>All
-                        </option>
-                        <option value="1st Semester" {% if
-                            request.args.get('events-overview-filter-by-semester')=='1st Semester' %}selected{% endif
-                            %}>1st Semester</option>
-                        <option value="2nd Semester" {% if
-                            request.args.get('events-overview-filter-by-semester')=='2nd Semester' %}selected{% endif
-                            %}>2nd Semester</option>
+                        <option value="All" {% if not request.args.get('events-overview-filter-by-semester') or request.args.get('events-overview-filter-by-semester') == 'All' %}selected{% endif %}>All</option>
+                        <option value="1st Semester" {% if request.args.get('events-overview-filter-by-semester') == '1st Semester' %}selected{% endif %}>1st Semester</option>
+                        <option value="2nd Semester" {% if request.args.get('events-overview-filter-by-semester') == '2nd Semester' %}selected{% endif %}>2nd Semester</option>
                     </select>
-                    <select name="events-overview-sort-by-date" id="events-overview-sort-by-date"
-                        aria-label="Sort by Date">
-                        <option value="" disabled {% if not request.args.get('events-overview-sort-by-date')
-                            %}selected{% endif %}>Sort by Date</option>
-                        <option value="recent-to-old" {% if
-                            request.args.get('events-overview-sort-by-date')=='recent-to-old' or not
-                            request.args.get('events-overview-sort-by-date') %}selected{% endif %}>Recent to Old
-                        </option>
-                        <option value="old-to-recent" {% if
-                            request.args.get('events-overview-sort-by-date')=='old-to-recent' %}selected{% endif %}>Old
-                            to Recent</option>
+                    <select name="events-overview-sort-by-date" id="events-overview-sort-by-date" aria-label="Sort by Date">
+                        <option value="" disabled {% if not request.args.get('events-overview-sort-by-date') %}selected{% endif %}>Sort by Date</option>
+                        <option value="recent-to-old" {% if request.args.get('events-overview-sort-by-date') == 'recent-to-old' or not request.args.get('events-overview-sort-by-date') %}selected{% endif %}>Recent to Old</option>
+                        <option value="old-to-recent" {% if request.args.get('events-overview-sort-by-date') == 'old-to-recent' %}selected{% endif %}>Old to Recent</option>
                     </select>
-                    <button type="submit" class="primary-button fit-content-button">Apply Filters</button>
                 </div>
             </div>
         </form>
