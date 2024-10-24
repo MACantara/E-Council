@@ -124,10 +124,11 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select');
+                const form = document.getElementById('events-overview-filters-and-sorting-form');
+                const selects = form.querySelectorAll('select');
                 selects.forEach(select => {
                     select.addEventListener('change', function () {
-                        this.form.submit();
+                        form.submit();
                     });
                 });
 
