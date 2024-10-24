@@ -573,8 +573,11 @@ def login():
 
         # Check login attempts
         login_attempt = LoginAttempts.query.filter_by(login_attempt_ip_address=ip_address).first()
-        if login_attempt and login_attempt.login_attempt_count >= 5:
+        if login_attempt and login_attempt.login_attempt_count > 4:
             if datetime.utcnow() - login_attempt.login_attempt_last_attempt_time < timedelta(minutes=15):
+                # Increment login attempts even if the limit is exceeded
+                login_attempt.login_attempt_count += 1
+                db.session.commit()
                 flash("Too many login attempts. Please try again later.", "error")
                 return redirect(url_for("login"))
             else:
@@ -620,7 +623,15 @@ def login():
             db.session.add(login_attempt)
         db.session.commit()
 
-        flash("Invalid username/email or password.", "error")
+        # Flash message for remaining attempts if login_attempt_count is at least 2
+        attempts_left = 5 - login_attempt.login_attempt_count
+        if attempts_left == 0:
+            flash("Too many login attempts. Please try again later.", "error")
+        elif login_attempt.login_attempt_count >= 2:
+            flash(f"Invalid username/email or password. You have {attempts_left} login attempts left.", "error")
+        else:
+            flash("Invalid username/email or password.", "error")
+
         return redirect(url_for("login"))
     
 @app.route("/send_verification_email/<users_email>")
