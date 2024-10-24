@@ -187,6 +187,20 @@ class Events(db.Model):
     def __repr__(self):
         return f"Events({self.events_id}, {self.events_name}, {self.events_semester}, {self.events_academic_year}, {self.events_start_date_and_time}, {self.events_end_date_and_time}, {self.events_venue}, {self.events_budget}, {self.events_status}, {self.events_description}, {self.events_remarks})"
 
+class DepartmentsEvents(db.Model):
+    __tablename__ = "departments_events"
+
+    # Composite primary key: departments_id and events_id
+    departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), primary_key=True, nullable=False)
+    events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), primary_key=True, nullable=False)
+
+    # Relationship to Departments and Events models
+    department = db.relationship('Departments', backref='departments_events')
+    event = db.relationship('Events', backref='departments_events')
+
+    def __repr__(self):
+        return f"DepartmentsEvents({self.departments_id}, {self.events_id})"
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -1095,8 +1109,8 @@ def add_event():
             events_name=events_name,
             events_semester=events_semester,
             events_academic_year=events_academic_year,
-            events_start_date=events_start_date_and_time,
-            events_end_date=events_end_date_and_time,
+            events_start_date_and_time=events_start_date_and_time,
+            events_end_date_and_time=events_end_date_and_time,
             events_venue=events_venue,
             events_budget=events_budget,
             events_status=events_status,
@@ -1105,6 +1119,15 @@ def add_event():
         )
 
         db.session.add(event)
+        db.session.commit()
+
+        # Insert into departments_events table
+        departments_id = current_user.users_departments_id
+        departments_event = DepartmentsEvents(
+            departments_id=departments_id,
+            events_id=event.events_id
+        )
+        db.session.add(departments_event)
         db.session.commit()
 
         flash("Event added successfully!", "success")
