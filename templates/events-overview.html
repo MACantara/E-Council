@@ -182,9 +182,31 @@
                     });
                 });
             });
+
+            // Add Event Modal
+            document.getElementById('open-add-event-modal-button').addEventListener('click', function () {
+                document.getElementById('add-event-modal-content').style.display = 'block';
+            });
+
+            document.getElementById('close-add-event-modal-button').addEventListener('click', function () {
+                document.getElementById('add-event-modal-content').style.display = 'none';
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target == document.getElementById('add-event-modal-content')) {
+                    document.getElementById('add-event-modal-content').style.display = 'none';
+                }
+            });
+
+            // Show modal if validation error occurs
+            window.addEventListener('DOMContentLoaded', function () {
+                if (document.getElementById('show_modal').value === 'true') {
+                    document.getElementById('add-event-modal-content').style.display = 'block';
+                }
+            });
         </script>
 
-        <form method="GET" action="{{ url_for('events_overview') }}">
+        <form id="events-overview-filters-and-sorting-form" method="GET" action="{{ url_for('events_overview') }}">
             <div class="horizontal-input-pair">
                 <select name="events-overview-academic-year" id="events-overview-academic-year"
                     aria-label="Select an Academic Year">
@@ -722,28 +744,6 @@
     document.getElementById('documentation-pictures').addEventListener('change', function () {
         const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
         document.getElementById('file-name').textContent = fileName;
-    });
-
-    // Add Event Modal
-    document.getElementById('open-add-event-modal-button').addEventListener('click', function () {
-        document.getElementById('add-event-modal-content').style.display = 'block';
-    });
-
-    document.getElementById('close-add-event-modal-button').addEventListener('click', function () {
-        document.getElementById('add-event-modal-content').style.display = 'none';
-    });
-
-    window.addEventListener('click', function (event) {
-        if (event.target == document.getElementById('add-event-modal-content')) {
-            document.getElementById('add-event-modal-content').style.display = 'none';
-        }
-    });
-
-    // Show modal if validation error occurs
-    window.addEventListener('DOMContentLoaded', function () {
-        if (document.getElementById('show_modal').value === 'true') {
-            document.getElementById('add-event-modal-content').style.display = 'block';
-        }
     });
 </script>
 
