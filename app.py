@@ -73,35 +73,23 @@ class Users(db.Model, UserMixin):
     users_username = db.Column(db.String(50), unique=True, nullable=False)
     users_email = db.Column(db.String(100), unique=True, nullable=False)
     
-    users_department = db.Column(Enum(
-        'College of Computer Studies',
-        'College of Engineering',
-        'College of Architecture',
-        'College of Criminology',
-        'College of Nursing',
-        'College of Arts, Sciences and Education',
-        'College of Business Administration and Accountancy',
-        'College of Physical and Occupational Therapy',
-        'College of International Tourism and Hospitality Management',
-        'College of Pharmacy',
-        'College of Radiologic Technology',
-        name='department_enum'
-    ), nullable=False)
+    # Changed users_department to reference the Departments model
+    users_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=False)
     
-    users_role = db.Column(Enum(
+    users_role = db.Column(db.Enum(
         'Student Council Officer',
         'Faculty',
         'Staff',
         name='role_enum'
     ), nullable=False)
 
-    users_student_organization = db.Column(Enum(
+    users_student_organization = db.Column(db.Enum(
         'College of Computer Studies - Student Council',
         'Junior Philippine Computer Society',
         name='organization_enum'
     ), nullable=False)
 
-    users_student_organization_position = db.Column(Enum(
+    users_student_organization_position = db.Column(db.Enum(
         'President',
         'Vice President',
         'Secretary',
@@ -127,6 +115,9 @@ class Users(db.Model, UserMixin):
     users_password = db.Column(db.String(255), nullable=False)
     users_email_verified = db.Column(db.Integer, nullable=False)
 
+    # Relationship to Departments
+    department = db.relationship('Departments', backref='users')
+
     def set_password(self, password):
         self.users_password = generate_password_hash(password)
 
@@ -137,7 +128,16 @@ class Users(db.Model, UserMixin):
         return str(self.users_id)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.users_profile_picture}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_department}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
+        return f"Users({self.users_id}, {self.users_profile_picture}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_departments_id}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
+
+class Departments(db.Model):
+    __tablename__ = "departments"
+
+    departments_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    departments_name = db.Column(db.String(255), nullable=False, unique=True)
+
+    def __repr__(self):
+        return f"Departments({self.departments_id}, {self.departments_name})"
 
 class EmailVerification(db.Model):
     __tablename__ = "email_verification"
@@ -474,7 +474,7 @@ def signup():
         users_department = request.form.get("users-department")
         users_role = request.form.get("users-role")
         users_password = request.form.get("users-password")
-        users_users_repeat_password = request.form.get("users-repeat-password")
+        users_repeat_password = request.form.get("users-repeat-password")
         users_email_verified = 0
         
         users_student_organization = request.form.get("users-student-organization") if request.form.get("users-student-organization") else ""
@@ -496,7 +496,7 @@ def signup():
             return render_template("signup.html")
 
         # Check if passwords match
-        if users_password != users_users_repeat_password:
+        if users_password != users_repeat_password:
             flash("Passwords do not match.", "error")
             return render_template("signup.html")
 
@@ -517,10 +517,7 @@ def signup():
             flash("Password must contain at least one special character.", "error")
             return render_template("signup.html")
 
-        # Ensure the department and role are valid Enum values
-        if users_department not in Users.users_department.type.enums:
-            flash("Invalid department.", "error")
-            return render_template("signup.html")
+        # Ensure the role, student organization, and position are valid Enum values
         if users_role not in Users.users_role.type.enums:
             flash("Invalid role.", "error")
             return render_template("signup.html")
@@ -529,13 +526,26 @@ def signup():
             return render_template("signup.html")
         if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
             flash("Invalid student organization position.", "error")
+            return render_template("signup.html")
+
+        # Get the departments_id through the departments_name
+        department = Departments.query.filter_by(departments_name=users_department).first()
+        if not department:
+            flash("Department not found.", "error")
+            return render_template("signup.html")
+        users_departments_id = department.departments_id
+
+        # Clear student organization fields if the role is Faculty or Staff
+        if users_role in ["Faculty", "Staff"]:
+            users_student_organization = None
+            users_student_organization_position = None
 
         user = Users(
             users_first_name=users_first_name,
             users_last_name=users_last_name,
             users_username=users_username,
             users_email=users_email,
-            users_department=users_department,
+            users_departments_id=users_departments_id,
             users_role=users_role,
             users_student_organization=users_student_organization,
             users_student_organization_position=users_student_organization_position,
