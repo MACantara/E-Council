@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
@@ -1053,11 +1054,32 @@ def add_event():
         events_description = request.form.get("events-description")
         events_remarks = request.form.get("events-remarks")
 
-        # Convert dates to datetime objects
-        if events_start_date_and_time:
+        # Validation
+        if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time or not events_venue or not events_description:
+            flash("Please fill out all required fields.", "error")
+            return render_template("events-overview.html", show_modal=True)
+
+        # Check if event name already exists
+        existing_event = Events.query.filter_by(events_name=events_name).first()
+        if existing_event:
+            flash("An event with this name already exists. Please choose a different name.", "error")
+            return render_template("events-overview.html", show_modal=True)
+
+        # Validate date format
+        try:
             events_start_date_and_time = datetime.strptime(events_start_date_and_time, '%Y-%m-%dT%H:%M')
-        if events_end_date_and_time:
             events_end_date_and_time = datetime.strptime(events_end_date_and_time, '%Y-%m-%dT%H:%M')
+        except ValueError:
+            flash("Invalid date format. Please use the format YYYY-MM-DDTHH:MM.", "error")
+            return render_template("events-overview.html", show_modal=True)
+
+        # Validate budget format
+        if events_budget:
+            try:
+                events_budget = float(events_budget)
+            except ValueError:
+                flash("Invalid budget format. Please enter a valid number.", "error")
+                return render_template("events-overview.html", show_modal=True)
 
         event = Events(
             events_name=events_name,
@@ -1078,7 +1100,7 @@ def add_event():
         flash("Event added successfully!", "success")
         return redirect(url_for("events_overview"))
 
-    return render_template("add-event.html")
+    return render_template("events-overview.html")
 
 @app.route("/event-dashboard")
 @login_required
