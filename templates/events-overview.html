@@ -10,13 +10,13 @@
     <div class="council-overview-content-container">
         <!-- Flash messages section -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages center no-top-margin">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
 
         <h2>Events Overview</h2>
@@ -28,9 +28,23 @@
         <div id="add-event-modal-content" class="modal">
             <div class="container">
                 <span id="close-add-event-modal-button" class="close-button">&times;</span>
+
+                <!-- Flash messages section -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages center no-top-margin">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
                 <h2>Add Event</h2>
 
                 <form method="POST" action="{{ url_for('add_event') }}">
+                    <input type="hidden" name="show_modal" id="show_modal"
+                        value="{{ 'true' if show_modal else 'false' }}">
                     <div class="input-pair">
                         <label for="events-name">Event Name</label>
                         <input type="text" name="events-name" id="events-name" placeholder="Event Name" required>
@@ -55,14 +69,12 @@
 
                     <div class="input-pair">
                         <label for="events-start-date-and-time">Start Date and Time</label>
-                        <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time"
-                            required>
+                        <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time" required>
                     </div>
 
                     <div class="input-pair">
                         <label for="events-end-date-and-time">End Date and Time</label>
-                        <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time"
-                            required>
+                        <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time" required>
                     </div>
 
                     <div class="input-pair">
@@ -715,6 +727,13 @@
     window.addEventListener('click', function (event) {
         if (event.target == document.getElementById('add-event-modal-content')) {
             document.getElementById('add-event-modal-content').style.display = 'none';
+        }
+    });
+
+    // Show modal if validation error occurs
+    window.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('show_modal').value === 'true') {
+            document.getElementById('add-event-modal-content').style.display = 'block';
         }
     });
 
