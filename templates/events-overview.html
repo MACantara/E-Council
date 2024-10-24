@@ -122,138 +122,6 @@
             </div>
         </div>
 
-        <!-- Update Event Modal -->
-        <div id="update-event-modal-content" class="modal">
-            <div class="container">
-                <span id="close-update-event-modal-button" class="close-button">&times;</span>
-                <h2>Update Event</h2>
-
-                <!-- Flash messages section for the modal -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                <div class="flash-messages center no-top-margin bottom-margin">
-                    {% for category, message in messages %}
-                    {% if category == 'modal-error' %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-                {% endif %}
-                {% endwith %}
-
-                <form method="POST">
-                    <div class="input-pair">
-                        <label for="event-name">Event Name</label>
-                        <input type="text" name="event-name" id="event-name" placeholder="Event Name" required>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="semester">Semester</label>
-                        <select name="semester" id="semester" required>
-                            <option value="" disabled selected>Select a Semester</option>
-                            <option value="1st-semester">1st Semester</option>
-                            <option value="2nd-semester">2nd Semester</option>
-                        </select>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="academic-year">Academic Year</label>
-                        <select name="academic-year" id="academic-year" required>
-                            <option value="" disabled selected>Select an Academic Year</option>
-                            <option value="2024-2025">2024-2025</option>
-                        </select>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="start-date-and-time">Start Date and Time</label>
-                        <input type="datetime-local" name="start-date-and-time" id="start-date-and-time" required>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="end-date-and-time">End Date and Time</label>
-                        <input type="datetime-local" name="end-date-and-time" id="end-date-and-time" required>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="venue">Venue</label>
-                        <input type="text" name="venue" id="venue" placeholder="Venue" required>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="budget">Budget</label>
-                        <input type="number" name="budget" id="budget" placeholder="Budget" required>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="event-status">Event Status</label>
-                        <select name="event-status" id="event-status" required>
-                            <option value="" disabled selected>Select an Event Status</option>
-                            <option value="upcoming">Upcoming</option>
-                            <option value="postponed">Postponed</option>
-                            <option value="done">Done</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="description">Description</label>
-                        <textarea name="description" id="description" placeholder="Description" required></textarea>
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="objectives">Objectives</label>
-                        <textarea name="objectives" id="objectives" placeholder="Objectives (Optional)"
-                            required></textarea>
-                    </div>
-
-                    <button class="secondary-button">Add Another Objective</button>
-
-                    <div class="input-pair">
-                        <label for="problems-encountered">Problems Encountered</label>
-                        <textarea name="problem-encountered" id="problem-encountered"
-                            placeholder="Problems Encountered (Optional)" required></textarea>
-                    </div>
-
-                    <button class="secondary-button">Add Another Problem Encountered</button>
-
-                    <div class="input-pair">
-                        <label for="actions-taken">Actions Taken</label>
-                        <textarea name="actions-taken" id="actions-taken" placeholder="Actions Taken (Optional)"
-                            required></textarea>
-                    </div>
-
-                    <button class="secondary-button">Add Another Action Taken</button>
-
-                    <div class="input-pair">
-                        <label for="recommendations">Recommendations</label>
-                        <textarea name="recommendations" id="recommendations" placeholder="Recommendations (Optional)"
-                            required></textarea>
-                    </div>
-
-                    <button class="secondary-button">Add Another Recommendation</button>
-
-                    <div class="input-pair">
-                        <label for="remarks">Remarks</label>
-                        <input type="text" name="remarks" id="remarks" placeholder="Remarks (Optional)">
-                    </div>
-
-                    <div class="input-pair">
-                        <label for="documentation-pictures">Documentation Pictures</label>
-                        <input type="file" name="documentation-pictures" id="documentation-pictures" hidden>
-                        <label for="documentation-pictures" class="custom-file-upload-input">
-                            <span class="choose-file-text">Choose File</span>
-                            <span id="file-name" class="file-name">No file chosen</span>
-                        </label>
-                    </div>
-
-                    <div class="horizontal-input-pair">
-                        <a href="{{ url_for('events_overview') }}" class="secondary-button fit-content-button">Back</a>
-                        <button class="primary-button" type="submit">Update Event</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
         <!-- Invite User Modal -->
         <div id="invite-user-modal-content" class="modal">
             <div class="container">
@@ -299,6 +167,29 @@
                 const resetButton = document.getElementById('reset-filters-button');
                 resetButton.addEventListener('click', function () {
                     window.location.href = "{{ url_for('events_overview') }}";
+                });
+
+                // Update Event Modal
+                document.querySelectorAll('[id^="open-update-event-modal-button-"]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        document.getElementById(`update-event-modal-content-${index}`).style.display = 'block';
+                    });
+                });
+
+                document.querySelectorAll('[id^="close-update-event-modal-button-"]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        document.getElementById(`update-event-modal-content-${index}`).style.display = 'none';
+                    });
+                });
+
+                window.addEventListener('click', function (event) {
+                    document.querySelectorAll('[id^="update-event-modal-content-"]').forEach(modal => {
+                        if (event.target == modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
                 });
             });
         </script>
@@ -359,7 +250,8 @@
                             request.args.get('events-overview-sort-by-date')=='old-to-recent' %}selected{% endif %}>Old
                             to Recent</option>
                     </select>
-                    <button type="button" id="reset-filters-button" class="secondary-button fit-content-button">Reset Filters</button>
+                    <button type="button" id="reset-filters-button" class="secondary-button fit-content-button">Reset
+                        Filters</button>
                 </div>
             </div>
         </form>
@@ -412,9 +304,143 @@
 
                 <div class="grid-item-button-group">
                     <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
-                    <button id="open-update-event-modal-button" class="secondary-button">Update</button>
-                    <a href="{{ url_for('invite_user', event_id=event.events_id) }}" class="secondary-button">Invite</a>
+                    <button id="open-update-event-modal-button-{{ loop.index }}" class="secondary-button" data-index="{{ loop.index }}">Update</button>
+                    <a href="{{ url_for('invite_user', event_id=event.events_id) }}" class="secondary-button" id="invite-user-button-{{ loop.index }}">Invite</a>
                     <button class="secondary-button">Delete</button>
+                </div>
+            </div>
+
+            <!-- Update Event Modal -->
+            <div id="update-event-modal-content-{{ loop.index }}" class="modal">
+                <div class="container">
+                    <span id="close-update-event-modal-button-{{ loop.index }}" class="close-button"
+                        data-index="{{ loop.index }}">&times;</span>
+                    <h2>Update Event</h2>
+
+                    <!-- Flash messages section for the modal -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="flash-messages center no-top-margin bottom-margin">
+                        {% for category, message in messages %}
+                        {% if category == 'modal-error' %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="input-pair">
+                            <label for="event-name">Event Name</label>
+                            <input type="text" name="event-name" id="event-name" placeholder="Event Name" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="semester">Semester</label>
+                            <select name="semester" id="semester" required>
+                                <option value="" disabled selected>Select a Semester</option>
+                                <option value="1st-semester">1st Semester</option>
+                                <option value="2nd-semester">2nd Semester</option>
+                            </select>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="academic-year">Academic Year</label>
+                            <select name="academic-year" id="academic-year" required>
+                                <option value="" disabled selected>Select an Academic Year</option>
+                                <option value="2024-2025">2024-2025</option>
+                            </select>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="start-date-and-time">Start Date and Time</label>
+                            <input type="datetime-local" name="start-date-and-time" id="start-date-and-time" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="end-date-and-time">End Date and Time</label>
+                            <input type="datetime-local" name="end-date-and-time" id="end-date-and-time" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="venue">Venue</label>
+                            <input type="text" name="venue" id="venue" placeholder="Venue" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="budget">Budget</label>
+                            <input type="number" name="budget" id="budget" placeholder="Budget" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="event-status">Event Status</label>
+                            <select name="event-status" id="event-status" required>
+                                <option value="" disabled selected>Select an Event Status</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="postponed">Postponed</option>
+                                <option value="done">Done</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="description">Description</label>
+                            <textarea name="description" id="description" placeholder="Description" required></textarea>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="objectives">Objectives</label>
+                            <textarea name="objectives" id="objectives" placeholder="Objectives (Optional)"
+                                required></textarea>
+                        </div>
+
+                        <button class="secondary-button">Add Another Objective</button>
+
+                        <div class="input-pair">
+                            <label for="problems-encountered">Problems Encountered</label>
+                            <textarea name="problem-encountered" id="problem-encountered"
+                                placeholder="Problems Encountered (Optional)" required></textarea>
+                        </div>
+
+                        <button class="secondary-button">Add Another Problem Encountered</button>
+
+                        <div class="input-pair">
+                            <label for="actions-taken">Actions Taken</label>
+                            <textarea name="actions-taken" id="actions-taken" placeholder="Actions Taken (Optional)"
+                                required></textarea>
+                        </div>
+
+                        <button class="secondary-button">Add Another Action Taken</button>
+
+                        <div class="input-pair">
+                            <label for="recommendations">Recommendations</label>
+                            <textarea name="recommendations" id="recommendations"
+                                placeholder="Recommendations (Optional)" required></textarea>
+                        </div>
+
+                        <button class="secondary-button">Add Another Recommendation</button>
+
+                        <div class="input-pair">
+                            <label for="remarks">Remarks</label>
+                            <input type="text" name="remarks" id="remarks" placeholder="Remarks (Optional)">
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="documentation-pictures">Documentation Pictures</label>
+                            <input type="file" name="documentation-pictures" id="documentation-pictures" hidden>
+                            <label for="documentation-pictures" class="custom-file-upload-input">
+                                <span class="choose-file-text">Choose File</span>
+                                <span id="file-name" class="file-name">No file chosen</span>
+                            </label>
+                        </div>
+
+                        <div class="horizontal-input-pair">
+                            <a href="{{ url_for('events_overview') }}"
+                                class="secondary-button fit-content-button">Back</a>
+                            <button class="primary-button" type="submit">Update Event</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             {% endfor %}
@@ -732,21 +758,6 @@
     window.addEventListener('DOMContentLoaded', function () {
         if (document.getElementById('show_modal').value === 'true') {
             document.getElementById('add-event-modal-content').style.display = 'block';
-        }
-    });
-
-    // Update Event Modal
-    document.getElementById('open-update-event-modal-button').addEventListener('click', function () {
-        document.getElementById('update-event-modal-content').style.display = 'block';
-    });
-
-    document.getElementById('close-update-event-modal-button').addEventListener('click', function () {
-        document.getElementById('update-event-modal-content').style.display = 'none';
-    });
-
-    window.addEventListener('click', function (event) {
-        if (event.target == document.getElementById('update-event-modal-content')) {
-            document.getElementById('update-event-modal-content').style.display = 'none';
         }
     });
 
