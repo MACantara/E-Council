@@ -9,9 +9,77 @@
 
     <div class="council-overview-content-container">
 
+        <!-- Add Transaction Modal -->
+        <div id="add-transaction-modal-content" class="modal">
+            <div class="container">
+                <span id="close-add-transaction-modal-button" class="close-button">&times;</span>
+                <h2>Add Transaction</h2>
+
+                <form method="POST">
+                    <div class="input-pair">
+                        <label for="date">Date</label>
+                        <input type="datetime-local" name="date" id="date" required>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="transaction-name">Transaction Name</label>
+                        <input type="text" name="transaction-name" id="transaction-name" placeholder="Transaction Name"
+                            required>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="unit-amount">Unit Amount</label>
+                        <input type="number" name="unit-amount" id="unit-amount" placeholder="Unit Amount" required>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="unit-price">Unit Price</label>
+                        <input type="number" name="unit-price" id="unit-price" placeholder="Unit Price" required>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="total">Total</label>
+                        <input type="number" name="total" id="total" placeholder="Total" required>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="category">Category</label>
+                        <select name="category" id="category" required>
+                            <option value="" disabled selected>Select a Category</option>
+                            <option value="1">Category 1</option>
+                            <option value="2">Category 2</option>
+                            <option value="3">Category 3</option>
+                        </select>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="transaction-type">Transaction Type</label>
+                        <select name="transaction-type" id="transaction-type" required>
+                            <option value="expense" selected>Expense</option>
+                            <option value="income">Income</option>
+                        </select>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="receipt">Receipt</label>
+                        <input type="file" name="receipt" id="receipt" hidden>
+                        <label for="receipt" class="custom-file-upload-input">
+                            <span class="choose-file-text">Choose File</span>
+                            <span id="file-name" class="file-name">No file chosen</span>
+                        </label>
+                    </div>
+
+                    <div class="horizontal-input-pair">
+                        <a href="{{ url_for('event_dashboard') }}" class="secondary-button fit-content-button">Back</a>
+                        <button class="primary-button" type="submit">Add Transaction</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div class="horizontal-button-group">
             <a href="{{ url_for('events_overview') }}" class="primary-button">Back to Events Overview</a>
-            <a href="{{ url_for('add_transaction') }}" class="secondary-button">Add Transaction</a>
+            <button id="open-add-transaction-modal-button" class="secondary-button">Add Transaction</button>
             <a href="{{ url_for('invite_user') }}" class="secondary-button">Invite User</a>
             <a class="secondary-button">Generate Financial Report</a>
         </div>
@@ -118,7 +186,7 @@
                                 <button class="primary-button fit-content-button">View Receipt</button>
                             </td>
                         </tr>
-        
+
                         <tr>
                             <td>2024-06-05 6:46 PM</td>
                             <td>Food</td>
@@ -343,6 +411,27 @@
                 }
             }
         }
+    });
+
+    // Delete User Account Modal
+    document.getElementById('open-add-transaction-modal-button').addEventListener('click', function () {
+        document.getElementById('add-transaction-modal-content').style.display = 'block';
+    });
+
+    document.getElementById('close-add-transaction-modal-button').addEventListener('click', function () {
+        document.getElementById('add-transaction-modal-content').style.display = 'none';
+    });
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('add-transaction-modal-content')) {
+            document.getElementById('add-transaction-modal-content').style.display = 'none';
+        }
+    });
+
+    // File upload
+    document.getElementById('receipt').addEventListener('change', function () {
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
     });
 </script>
 
