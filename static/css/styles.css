@@ -165,6 +165,10 @@ canvas {
     margin-top: 0 !important;
 }
 
+.bottom-margin {
+    margin-bottom: 1.5rem;
+}
+
 /* Header Styles */
 header {
     background-color: var(--primary-color);
@@ -857,6 +861,12 @@ textarea {
 }
 
 .alert-error {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    border-color: var(--color-error-border);
+}
+
+.alert-modal-error {
     background-color: var(--color-error-bg);
     color: var(--color-error-text);
     border-color: var(--color-error-border);
