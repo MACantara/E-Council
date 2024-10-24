@@ -1063,14 +1063,37 @@ def password_security_settings():
 def council_overview():
     return render_template("council-overview.html")
 
-@app.route("/events-overview")
+@app.route("/events-overview", methods=["GET", "POST"])
 @login_required
 def events_overview():
     # Get the current user's department ID
     users_departments_id = current_user.users_departments_id
 
-    # Query the events associated with the user's department
-    events = db.session.query(Events).join(DepartmentsEvents).filter(DepartmentsEvents.departments_id == users_departments_id).all()
+    # Get filter and sort parameters from the request
+    academic_year = request.args.get("events-overview-academic-year")
+    status = request.args.get("events-overview-filter-by-status")
+    semester = request.args.get("events-overview-filter-by-semester")
+    sort_by_date = request.args.get("events-overview-sort-by-date")
+
+    # Base query for events associated with the user's department
+    query = db.session.query(Events).join(DepartmentsEvents).filter(DepartmentsEvents.departments_id == users_departments_id)
+
+    # Apply filters
+    if academic_year:
+        query = query.filter(Events.events_academic_year == academic_year)
+    if status:
+        query = query.filter(Events.events_status == status)
+    if semester:
+        query = query.filter(Events.events_semester == semester)
+
+    # Apply sorting
+    if sort_by_date == "recent-to-old":
+        query = query.order_by(Events.events_start_date_and_time.desc())
+    elif sort_by_date == "old-to-recent":
+        query = query.order_by(Events.events_start_date_and_time.asc())
+
+    # Execute the query
+    events = query.all()
 
     return render_template("events-overview.html", events=events)
 
