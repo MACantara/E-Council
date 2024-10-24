@@ -156,6 +156,14 @@ class PasswordReset(db.Model):
 
     user = db.relationship('Users', backref=db.backref('password_resets', lazy=True))
 
+class LoginAttempts(db.Model):
+    __tablename__ = "login_attempts"
+
+    login_attempt_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    login_attempt_ip_address = db.Column(db.String(45), nullable=False)
+    login_attempt_count = db.Column(db.Integer, nullable=False, default=0)
+    login_attempt_last_attempt_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -561,6 +569,18 @@ def login():
     elif request.method == "POST":
         users_username_email = request.form.get("users-username-email")
         users_password = request.form.get("users-password")
+        ip_address = request.remote_addr
+
+        # Check login attempts
+        login_attempt = LoginAttempts.query.filter_by(login_attempt_ip_address=ip_address).first()
+        if login_attempt and login_attempt.login_attempt_count >= 5:
+            if datetime.utcnow() - login_attempt.login_attempt_last_attempt_time < timedelta(minutes=15):
+                flash("Too many login attempts. Please try again later.", "error")
+                return redirect(url_for("login"))
+            else:
+                # Reset login attempts after 15 minutes
+                login_attempt.login_attempt_count = 0
+                db.session.commit()
 
         # Check if the identifier is an email or username
         user = Users.query.filter(
@@ -577,7 +597,28 @@ def login():
 
             if user.check_password(users_password):
                 login_user(user)
+                # Reset login attempts on successful login
+                if login_attempt:
+                    login_attempt.login_attempt_count = 0
+                else:
+                    login_attempt = LoginAttempts(
+                        login_attempt_ip_address=ip_address,
+                        login_attempt_count=0
+                    )
+                    db.session.add(login_attempt)
+                db.session.commit()
                 return redirect(url_for("council_overview"))
+
+        # Increment login attempts on failure
+        if login_attempt:
+            login_attempt.login_attempt_count += 1
+        else:
+            login_attempt = LoginAttempts(
+                login_attempt_ip_address=ip_address,
+                login_attempt_count=1
+            )
+            db.session.add(login_attempt)
+        db.session.commit()
 
         flash("Invalid username/email or password.", "error")
         return redirect(url_for("login"))
