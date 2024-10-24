@@ -1081,9 +1081,9 @@ def events_overview():
     # Apply filters
     if academic_year:
         query = query.filter(Events.events_academic_year == academic_year)
-    if status:
+    if status and status != "All":
         query = query.filter(Events.events_status == status)
-    if semester:
+    if semester and semester != "All":
         query = query.filter(Events.events_semester == semester)
 
     # Apply sorting
@@ -1095,7 +1095,10 @@ def events_overview():
     # Execute the query
     events = query.all()
 
-    return render_template("events-overview.html", events=events)
+    # Query distinct academic years
+    academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+
+    return render_template("events-overview.html", events=events, academic_years=academic_years)
 
 @app.route("/add-event", methods=["GET", "POST"])
 @login_required
