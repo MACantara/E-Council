@@ -8,9 +8,21 @@
     {% include "council-overview-sidebar.html" %}
 
     <div class="council-overview-content-container">
+        <!-- Flash messages section -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages center no-top-margin">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <h2>Events Overview</h2>
 
-        <button id="open-add-event-modal-button" class="primary-button create-button" type="submit">Create New Event</button>
+        <button id="open-add-event-modal-button" class="primary-button create-button" type="submit">Create New
+            Event</button>
 
         <!-- Add Event Modal -->
         <div id="add-event-modal-content" class="modal">
@@ -23,7 +35,7 @@
                         <label for="events-name">Event Name</label>
                         <input type="text" name="events-name" id="events-name" placeholder="Event Name" required>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="events-semester">Semester</label>
                         <select name="events-semester" id="events-semester" required>
@@ -32,7 +44,7 @@
                             <option value="2nd Semester">2nd Semester</option>
                         </select>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="events-academic-year">Academic Year</label>
                         <select name="events-academic-year" id="events-academic-year" required>
@@ -40,28 +52,29 @@
                             <option value="2024-2025">2024-2025</option>
                         </select>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="events-start-date-and-time">Start Date and Time</label>
-                        <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time" required>
-                    </div>
-    
-                    <div class="input-pair">
-                        <label for="events-end-date-and-time">End Date and Time</label>
-                        <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time" required>
-                    </div>
-    
-                    <div class="input-pair">
-                        <label for="events-venue">Venue</label>
-                        <input type="text" name="events-venue" id="events-venue" placeholder="Venue"
+                        <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time"
                             required>
                     </div>
-    
+
+                    <div class="input-pair">
+                        <label for="events-end-date-and-time">End Date and Time</label>
+                        <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time"
+                            required>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="events-venue">Venue</label>
+                        <input type="text" name="events-venue" id="events-venue" placeholder="Venue" required>
+                    </div>
+
                     <div class="input-pair">
                         <label for="events-budget">Budget</label>
                         <input type="number" name="events-budget" id="events-budget" placeholder="Budget" required>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="events-status">Event Status</label>
                         <select name="events-status" id="events-status" required>
@@ -72,17 +85,18 @@
                             <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="events-description">Description</label>
-                        <textarea name="events-description" id="events-description" placeholder="Description" required></textarea>
+                        <textarea name="events-description" id="events-description" placeholder="Description"
+                            required></textarea>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="events-remarks">Remarks</label>
                         <input type="text" name="events-remarks" id="events-remarks" placeholder="Remarks (Optional)">
                     </div>
-    
+
                     <div class="horizontal-input-pair">
                         <a href="{{ url_for('events_overview') }}" class="secondary-button fit-content-button">Back</a>
                         <button class="primary-button" type="submit">Add Event</button>
@@ -102,7 +116,7 @@
                         <label for="event-name">Event Name</label>
                         <input type="text" name="event-name" id="event-name" placeholder="Event Name" required>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="semester">Semester</label>
                         <select name="semester" id="semester" required>
@@ -111,7 +125,7 @@
                             <option value="2nd-semester">2nd Semester</option>
                         </select>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="academic-year">Academic Year</label>
                         <select name="academic-year" id="academic-year" required>
@@ -119,28 +133,27 @@
                             <option value="2024-2025">2024-2025</option>
                         </select>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="start-date-and-time">Start Date and Time</label>
                         <input type="datetime-local" name="start-date-and-time" id="start-date-and-time" required>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="end-date-and-time">End Date and Time</label>
                         <input type="datetime-local" name="end-date-and-time" id="end-date-and-time" required>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="venue">Venue</label>
-                        <input type="text" name="venue" id="venue" placeholder="Venue"
-                            required>
+                        <input type="text" name="venue" id="venue" placeholder="Venue" required>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="budget">Budget</label>
                         <input type="number" name="budget" id="budget" placeholder="Budget" required>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="event-status">Event Status</label>
                         <select name="event-status" id="event-status" required>
@@ -151,48 +164,49 @@
                             <option value="cancelled">Cancelled</option>
                         </select>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="description">Description</label>
                         <textarea name="description" id="description" placeholder="Description" required></textarea>
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="objectives">Objectives</label>
-                        <textarea name="objectives" id="objectives" placeholder="Objectives (Optional)" required></textarea>
+                        <textarea name="objectives" id="objectives" placeholder="Objectives (Optional)"
+                            required></textarea>
                     </div>
-    
+
                     <button class="secondary-button">Add Another Objective</button>
-    
+
                     <div class="input-pair">
                         <label for="problems-encountered">Problems Encountered</label>
                         <textarea name="problem-encountered" id="problem-encountered"
                             placeholder="Problems Encountered (Optional)" required></textarea>
                     </div>
-    
+
                     <button class="secondary-button">Add Another Problem Encountered</button>
-    
+
                     <div class="input-pair">
                         <label for="actions-taken">Actions Taken</label>
-                        <textarea name="actions-taken" id="actions-taken"
-                            placeholder="Actions Taken (Optional)" required></textarea>
+                        <textarea name="actions-taken" id="actions-taken" placeholder="Actions Taken (Optional)"
+                            required></textarea>
                     </div>
-    
+
                     <button class="secondary-button">Add Another Action Taken</button>
-    
+
                     <div class="input-pair">
                         <label for="recommendations">Recommendations</label>
-                        <textarea name="recommendations" id="recommendations"
-                            placeholder="Recommendations (Optional)" required></textarea>
+                        <textarea name="recommendations" id="recommendations" placeholder="Recommendations (Optional)"
+                            required></textarea>
                     </div>
-    
+
                     <button class="secondary-button">Add Another Recommendation</button>
-    
+
                     <div class="input-pair">
                         <label for="remarks">Remarks</label>
                         <input type="text" name="remarks" id="remarks" placeholder="Remarks (Optional)">
                     </div>
-    
+
                     <div class="input-pair">
                         <label for="documentation-pictures">Documentation Pictures</label>
                         <input type="file" name="documentation-pictures" id="documentation-pictures" hidden>
@@ -201,7 +215,7 @@
                             <span id="file-name" class="file-name">No file chosen</span>
                         </label>
                     </div>
-    
+
                     <div class="horizontal-input-pair">
                         <a href="{{ url_for('events_overview') }}" class="secondary-button fit-content-button">Back</a>
                         <button class="primary-button" type="submit">Update Event</button>
@@ -216,14 +230,15 @@
                 <span id="close-invite-user-modal-button" class="close-button">&times;</span>
                 <h2>Invite a User to Manage</h2>
 
-                <p>Enter the email address of the user you would like to invite to help you manage "TechTutor: Empowering Communities with AI-Assisted IT Skills".</p>
-    
+                <p>Enter the email address of the user you would like to invite to help you manage "TechTutor:
+                    Empowering Communities with AI-Assisted IT Skills".</p>
+
                 <form method="POST">
                     <div class="input-pair">
                         <label for="users-email">User's Email</label>
                         <input type="password" name="users-email" id="users-email" placeholder="User's Email" required>
                     </div>
-    
+
                     <button class="primary-button" type="submit">Send Email Invite</button>
                 </form>
             </div>
