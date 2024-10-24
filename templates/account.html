@@ -54,7 +54,7 @@
     <div class="account-container">
         <img class="account-picture" src="{{ current_user.users_profile_picture or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
 
-        <button id="open-upload-change-account-profile-picture-modal-button" class="secondary-button fit-content-button center-button">
+        <button id="open-upload-change-account-profile-picture-modal-button" class="secondary-button fit-content-button center">
             {% if current_user.users_profile_picture is none or current_user.users_profile_picture|lower in ['none', 'null'] %}
                 Upload Profile Picture
             {% else %}
