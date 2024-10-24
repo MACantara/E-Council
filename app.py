@@ -1066,7 +1066,13 @@ def council_overview():
 @app.route("/events-overview")
 @login_required
 def events_overview():
-    return render_template("events-overview.html")
+    # Get the current user's department ID
+    users_departments_id = current_user.users_departments_id
+
+    # Query the events associated with the user's department
+    events = db.session.query(Events).join(DepartmentsEvents).filter(DepartmentsEvents.departments_id == users_departments_id).all()
+
+    return render_template("events-overview.html", events=events)
 
 @app.route("/add-event", methods=["GET", "POST"])
 @login_required
