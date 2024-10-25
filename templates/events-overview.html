@@ -205,6 +205,38 @@
                     document.getElementById('add-event-modal-content').style.display = 'block';
                 }
             });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const selects = document.querySelectorAll('select[name="event-status-select-button"]');
+                selects.forEach(select => {
+                    select.addEventListener('change', function () {
+                        const eventId = this.getAttribute('data-event-id');
+                        const newStatus = this.value;
+                        const eventName = this.getAttribute('data-event-name');
+
+                        fetch(`/update-event-status/${eventId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
+                            },
+                            body: JSON.stringify({ status: newStatus, name: eventName })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert(`Event status for "${eventName}" updated successfully.`);
+                                } else {
+                                    alert(`Failed to update event status for "${eventName}".`);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert(`An error occurred while updating the event status for "${eventName}".`);
+                            });
+                    });
+                });
+            });
         </script>
 
         <form id="events-overview-filters-and-sorting-form" method="GET" action="{{ url_for('events_overview') }}">
@@ -273,47 +305,16 @@
             {% if events %}
             {% for event in events %}
             <div class="council-overview-content-grid-item">
-                                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const selects = document.querySelectorAll('select[name="event-status-select-button"]');
-                        selects.forEach(select => {
-                            select.addEventListener('change', function () {
-                                const eventId = this.getAttribute('data-event-id');
-                                const newStatus = this.value;
-                                const eventName = this.getAttribute('data-event-name');
-                
-                                fetch(`/update-event-status/${eventId}`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
-                                    },
-                                    body: JSON.stringify({ status: newStatus, name: eventName })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        alert(`Event status for "${eventName}" updated successfully.`);
-                                    } else {
-                                        alert(`Failed to update event status for "${eventName}".`);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert(`An error occurred while updating the event status for "${eventName}".`);
-                                });
-                            });
-                        });
-                    });
-                </script>
-                
                 <select name="event-status-select-button" id="event-status-select-button-{{ loop.index }}"
-                    aria-label="Select an Event Status" data-event-id="{{ event.events_id }}" data-event-name="{{ event.events_name }}" required>
-                    <option value="" disabled>Select an Event Status</option>
-                    <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
-                    <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                    aria-label="Select an Event Status" data-event-id="{{ event.events_id }}"
+                    data-event-name="{{ event.events_name }}" required>
+                    <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming
+                    </option>
+                    <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed
+                    </option>
                     <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
-                    <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                    <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled
+                    </option>
                 </select>
 
                 <h3>{{ event.events_name }}</h3>
