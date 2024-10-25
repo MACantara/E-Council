@@ -1331,6 +1331,7 @@ def invite_user(event_id):
     return redirect(url_for("events_overview"))
 
 @app.route("/accept-invite/<token>")
+@login_required
 def accept_invite(token):
     try:
         # Decode the token
@@ -1344,6 +1345,11 @@ def accept_invite(token):
 
     # Find the invitation by token
     invitation = EventInvitations.query.filter_by(event_invitations_token=token).first_or_404()
+
+    # Check if the invitation email matches the current user's email
+    if invitation.event_invitations_email != current_user.users_email:
+        flash("You are not authorized to accept this invitation.", "error")
+        return redirect(url_for("events_overview"))
 
     # Find the user by email
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -1368,6 +1374,7 @@ def accept_invite(token):
     return redirect(url_for("events_overview"))
 
 @app.route("/reject-invite/<token>")
+@login_required
 def reject_invite(token):
     try:
         # Decode the token
@@ -1381,6 +1388,11 @@ def reject_invite(token):
 
     # Find the invitation by token
     invitation = EventInvitations.query.filter_by(event_invitations_token=token).first_or_404()
+
+    # Check if the invitation email matches the current user's email
+    if invitation.event_invitations_email != current_user.users_email:
+        flash("You are not authorized to reject this invitation.", "error")
+        return redirect(url_for("events_overview"))
 
     # Get the event and department details
     event = Events.query.get_or_404(invitation.event_invitations_events_id)
