@@ -1327,6 +1327,11 @@ def accept_invite(token):
     # Link the user's department to the event in the departments_events junction table
     departments_event = DepartmentsEvents(departments_id=users_department_id, events_id=event_id)
     db.session.add(departments_event)
+
+    # Delete the invitation record from the event_invitations table
+    db.session.delete(invitation)
+
+    # Commit changes to the database
     db.session.commit()
 
     flash("You have successfully accepted the invitation to manage the event.", "success")
