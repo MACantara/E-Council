@@ -1382,11 +1382,16 @@ def reject_invite(token):
     # Find the invitation by token
     invitation = EventInvitations.query.filter_by(event_invitations_token=token).first_or_404()
 
+    # Get the event and department details
+    event = Events.query.get_or_404(invitation.event_invitations_events_id)
+    department_event = DepartmentsEvents.query.filter_by(events_id=event.events_id).first()
+    department = Departments.query.get_or_404(department_event.departments_id)
+
     # Delete the invitation record from the event_invitations table
     db.session.delete(invitation)
     db.session.commit()
 
-    flash("You have successfully rejected the invitation to manage the event.", "success")
+    flash(f"You have successfully rejected the invitation to manage the event '{event.events_name}' from the department '{department.departments_name}'.", "success")
     return redirect(url_for("events_overview"))
 
 @app.route("/event-invite-rejected")
