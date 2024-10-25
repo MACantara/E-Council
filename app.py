@@ -201,6 +201,21 @@ class DepartmentsEvents(db.Model):
     def __repr__(self):
         return f"DepartmentsEvents({self.departments_id}, {self.events_id})"
 
+class EventInvitations(db.Model):
+    __tablename__ = "event_invitations"
+
+    event_invitations_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    event_invitations_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=False)
+    event_invitations_email = db.Column(db.String(255), nullable=False)
+    event_invitations_token = db.Column(db.String(64), nullable=False)
+    event_invitations_created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False)
+
+    # Relationship to Events model
+    event = db.relationship('Events', backref='event_invitations')
+
+    def __repr__(self):
+        return f"EventInvitations({self.event_invitations_id}, {self.event_invitations_events_id}, {self.event_invitations_email}, {self.event_invitations_token}, {self.event_invitations_created_at})"
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -470,6 +485,50 @@ def send_account_deletion_notification_email(users_email):
     """
     
     mail.send(msg)
+
+def send_invite_email(users_email, event_name, event_id):
+    token = s.dumps(users_email, salt='invite-user')
+    link = url_for('accept_invite', token=token, _external=True)
+    msg = Message('Invitation to Manage Event', recipients=[users_email])
+    
+    # HTML email body
+    msg.html = f"""
+    <html>
+    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
+        <h1 style="color: #00578a;">Invitation to Manage Event</h1>
+        <p>You have been invited to help manage the event "{event_name}". Please click the button below to accept the invitation:</p>
+        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Accept Invitation</a>
+        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
+        <p>If you didn't expect this invitation, you can safely ignore this email.</p>
+        <p>Sincerely,<br>E-Council Team</p>
+    </body>
+    </html>
+    """
+    
+    # Plain text email body as a fallback
+    msg.body = f"""
+    You have been invited to help manage the event "{event_name}". Please click the link below to accept the invitation:
+    {link}
+
+    Or copy and paste this link into your browser:
+    {link}
+
+    If you didn't expect this invitation, you can safely ignore this email.
+
+    Sincerely,
+    E-Council Team
+    """
+    
+    mail.send(msg)
+
+    # Store the invitation details in the event_invitations table
+    event_invitation = EventInvitations(
+        event_invitations_events_id=event_id,
+        event_invitations_email=users_email,
+        event_invitations_token=token
+    )
+    db.session.add(event_invitation)
+    db.session.commit()
 
 # Routes
 @app.route("/")
@@ -1226,10 +1285,52 @@ def event_dashboard():
 def add_transaction():
     return render_template("add-transaction.html")
 
-@app.route("/invite-user")
+@app.route("/invite-user/<int:event_id>", methods=["POST"])
 @login_required
-def invite_user():
-    return render_template("invite-user.html")
+def invite_user(event_id):
+    # Get the event by ID
+    event = Events.query.get_or_404(event_id)
+
+    # Get form data
+    users_email = request.form.get("users-email")
+
+    # Send invite email
+    send_invite_email(users_email, event.events_name, event_id)
+
+    flash("Invitation email sent successfully.", "success")
+    return redirect(url_for("events_overview"))
+
+@app.route("/accept-invite/<token>")
+def accept_invite(token):
+    try:
+        # Decode the token
+        users_email = s.loads(token, salt='invite-user', max_age=3600)
+    except SignatureExpired:
+        flash("The invitation link has expired.", "error")
+        return redirect(url_for("login"))
+    except BadSignature:
+        flash("The invitation link is invalid.", "error")
+        return redirect(url_for("login"))
+
+    # Find the invitation by token
+    invitation = EventInvitations.query.filter_by(event_invitations_token=token).first_or_404()
+
+    # Find the user by email
+    user = Users.query.filter_by(users_email=users_email).first_or_404()
+
+    # Get the user's department ID
+    users_department_id = user.users_departments_id
+
+    # Get the event ID from the invitation
+    event_id = invitation.event_invitations_events_id
+
+    # Link the user's department to the event in the departments_events junction table
+    departments_event = DepartmentsEvents(departments_id=users_department_id, events_id=event_id)
+    db.session.add(departments_event)
+    db.session.commit()
+
+    flash("You have successfully accepted the invitation to manage the event.", "success")
+    return redirect(url_for("events_overview"))
 
 @app.route("/event-invite-rejected")
 @login_required
