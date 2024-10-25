@@ -654,7 +654,7 @@ textarea {
 
 .overview-content-container-group {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--gap-large);
     height: fit-content;
 }
@@ -670,6 +670,10 @@ textarea {
     gap: var(--gap-large);
     max-height: 700px;
     height: 100%;
+    justify-content: space-between;
+    /* Ensure equal height for all grid items */
+    display: grid;
+    grid-template-rows: auto 1fr auto;
 }
 
 /* Council Overview Table Styles */
