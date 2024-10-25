@@ -1301,15 +1301,19 @@ def invite_user(event_id):
     users_department_id = user.users_departments_id
 
     # Check if the departments_id and events_id pair already exists
-    existing_entry = DepartmentsEvents.query.filter_by(departments_id=users_department_id, events_id=event_id).first()
+    existing_entry = db.session.query(DepartmentsEvents).join(Events).filter(
+        DepartmentsEvents.departments_id == users_department_id,
+        DepartmentsEvents.events_id == event_id
+    ).first()
+
     if existing_entry:
-        flash("This department of this user is already managing the event.", "error")
+        flash(f"This department of this user is already managing the event '{event.events_name}'.", "error")
         return redirect(url_for("events_overview"))
 
     # Send invite email
     send_invite_email(users_email, event.events_name, event_id)
 
-    flash("Invitation email sent successfully.", "success")
+    flash(f"Invitation email for the event '{event.events_name}' sent successfully.", "success")
     return redirect(url_for("events_overview"))
 
 @app.route("/accept-invite/<token>")
