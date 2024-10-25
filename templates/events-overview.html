@@ -407,71 +407,78 @@
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
                 <script>
-                    const ctx1 = document.getElementById('budget-chart-1').getContext('2d');
-                    let budgetChart1 = new Chart(ctx1, {
-                        type: 'bar', // Use 'bar' type for horizontal bars
-                        data: {
-                            labels: ['Budget Overview'], // Label for the dataset
-                            datasets: [
-                                {
-                                    label: 'Remaining Budget',
-                                    data: [remainingBudget],
-                                    backgroundColor: getCssVariable('--remaining-budget-color'),
-                                    borderColor: getCssVariable('--remaining-budget-color'),
-                                    borderWidth: 1
-                                },
-                                {
-                                    label: 'Expenses (Within Budget)',
-                                    data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
-                                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                                    borderColor: getCssVariable('--expenses-within-budget-color'),
-                                    borderWidth: 1,
-                                    stack: 'expenses' // Stack this dataset with the 'expenses' group
-                                },
-                                {
-                                    label: 'Expenses (Over Budget)',
-                                    data: [overBudget], // Show over budget amount to the right of the expenses within budget
-                                    backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                                    borderColor: getCssVariable('--expenses-over-budget-color'),
-                                    borderWidth: 1,
-                                    stack: 'expenses', // Stack this dataset with the 'expenses' group
-                                }
-                            ]
-                        },
-                        options: {
-                            indexAxis: 'y', // Horizontal bars
-                            responsive: true, // Make the chart responsive
-                            maintainAspectRatio: false, // Allow the chart to resize based on its container
-                            scales: {
-                                y: {
-                                    display: false // Hide the y-axis
-                                },
-                                x: {
-                                    stacked: true, // Enable stacking for the x-axis
-                                    beginAtZero: true, // Start the x-axis at 0
-                                    ticks: {
-                                        color: getCssVariable('--primary-text-color') // X-axis ticks color
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
+                        canvasElements.forEach(canvasElement => {
+                            const ctx = canvasElement.getContext('2d');
+                            if (ctx) {
+                                let budgetChart = new Chart(ctx, {
+                                    type: 'bar', // Use 'bar' type for horizontal bars
+                                    data: {
+                                        labels: ['Budget Overview'], // Label for the dataset
+                                        datasets: [
+                                            {
+                                                label: 'Remaining Budget',
+                                                data: [remainingBudget],
+                                                backgroundColor: getCssVariable('--remaining-budget-color'),
+                                                borderColor: getCssVariable('--remaining-budget-color'),
+                                                borderWidth: 1
+                                            },
+                                            {
+                                                label: 'Expenses (Within Budget)',
+                                                data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
+                                                backgroundColor: getCssVariable('--expenses-within-budget-color'),
+                                                borderColor: getCssVariable('--expenses-within-budget-color'),
+                                                borderWidth: 1,
+                                                stack: 'expenses' // Stack this dataset with the 'expenses' group
+                                            },
+                                            {
+                                                label: 'Expenses (Over Budget)',
+                                                data: [overBudget], // Show over budget amount to the right of the expenses within budget
+                                                backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
+                                                borderColor: getCssVariable('--expenses-over-budget-color'),
+                                                borderWidth: 1,
+                                                stack: 'expenses', // Stack this dataset with the 'expenses' group
+                                            }
+                                        ]
                                     },
-                                    title: {
-                                        display: true, // Optionally add a title to the X-axis
-                                        color: getCssVariable('--primary-text-color') // X-axis title color
+                                    options: {
+                                        indexAxis: 'y', // Horizontal bars
+                                        responsive: true, // Make the chart responsive
+                                        maintainAspectRatio: false, // Allow the chart to resize based on its container
+                                        scales: {
+                                            y: {
+                                                display: false // Hide the y-axis
+                                            },
+                                            x: {
+                                                stacked: true, // Enable stacking for the x-axis
+                                                beginAtZero: true, // Start the x-axis at 0
+                                                ticks: {
+                                                    color: getCssVariable('--primary-text-color') // X-axis ticks color
+                                                },
+                                                title: {
+                                                    display: true, // Optionally add a title to the X-axis
+                                                    color: getCssVariable('--primary-text-color') // X-axis title color
+                                                }
+                                            }
+                                        },
+                                        plugins: {
+                                            legend: {
+                                                display: true, // Show the legend
+                                                labels: {
+                                                    color: getLabelColor(),
+                                                    font: {
+                                                        family: getFontFamily(),
+                                                        size: getFontSize(),
+                                                        weight: getFontWeight()
+                                                    }
+                                                }
+                                            },
+                                        },
                                     }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: true, // Show the legend
-                                    labels: {
-                                        color: getLabelColor(),
-                                        font: {
-                                            family: getFontFamily(),
-                                            size: getFontSize(),
-                                            weight: getFontWeight()
-                                        }
-                                    }
-                                },
-                            },
-                        }
+                                });
+                            }
+                        });
                     });
                 </script>
 
