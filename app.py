@@ -219,6 +219,14 @@ class EventInvitations(db.Model):
     def __repr__(self):
         return f"EventInvitations({self.event_invitations_id}, {self.event_invitations_events_id}, {self.event_invitations_email}, {self.event_invitations_token}, {self.event_invitations_created_at})"
 
+# Custom Jinja2 Filters
+def truncate_text(text, length=100):
+    if len(text) > length:
+        return text[:length] + '...'
+    return text
+
+app.jinja_env.filters['truncate'] = truncate_text
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()

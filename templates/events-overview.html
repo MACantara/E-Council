@@ -319,7 +319,7 @@
 
                 <h3>{{ event.events_name }}</h3>
 
-                <p class="events-description">{{ event.events_description }}</p>
+                <p class="events-description">{{ event.events_description | truncate(100) }}</p>
 
                 <div class="grid-item-details">
                     <div class="grid-item-details-pair">
