@@ -1301,13 +1301,14 @@ def invite_user(event_id):
     users_department_id = user.users_departments_id
 
     # Check if the departments_id and events_id pair already exists
-    existing_entry = db.session.query(DepartmentsEvents).join(Events).filter(
+    existing_entry = db.session.query(DepartmentsEvents).join(Departments).filter(
         DepartmentsEvents.departments_id == users_department_id,
         DepartmentsEvents.events_id == event_id
     ).first()
 
     if existing_entry:
-        flash(f"This department of this user is already managing the event '{event.events_name}'.", "error")
+        department_name = existing_entry.department.departments_name
+        flash(f"The department of this user ({department_name}) is already managing the event '{event.events_name}'.", "error")
         return redirect(url_for("events_overview"))
 
     # Send invite email
