@@ -1344,7 +1344,10 @@ def accept_invite(token):
         return redirect(url_for("login"))
 
     # Find the invitation by token
-    invitation = EventInvitations.query.filter_by(event_invitations_token=token).first_or_404()
+    invitation = EventInvitations.query.filter_by(event_invitations_token=token).first()
+    if not invitation:
+        flash("The invitation does not exist.", "error")
+        return redirect(url_for("events_overview"))
 
     # Check if the invitation email matches the current user's email
     if invitation.event_invitations_email != current_user.users_email:
@@ -1387,7 +1390,10 @@ def reject_invite(token):
         return redirect(url_for("login"))
 
     # Find the invitation by token
-    invitation = EventInvitations.query.filter_by(event_invitations_token=token).first_or_404()
+    invitation = EventInvitations.query.filter_by(event_invitations_token=token).first()
+    if not invitation:
+        flash("The invitation does not exist.", "error")
+        return redirect(url_for("events_overview"))
 
     # Check if the invitation email matches the current user's email
     if invitation.event_invitations_email != current_user.users_email:
