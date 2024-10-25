@@ -1346,7 +1346,7 @@ def accept_invite(token):
     # Find the invitation by token
     invitation = EventInvitations.query.filter_by(event_invitations_token=token).first()
     if not invitation:
-        flash("The invitation does not exist.", "error")
+        flash("The invitation link is invalid or has expired.", "error")
         return redirect(url_for("events_overview"))
 
     # Check if the invitation email matches the current user's email
@@ -1392,7 +1392,7 @@ def reject_invite(token):
     # Find the invitation by token
     invitation = EventInvitations.query.filter_by(event_invitations_token=token).first()
     if not invitation:
-        flash("The invitation does not exist.", "error")
+        flash("The invitation link is invalid or has expired.", "error")
         return redirect(url_for("events_overview"))
 
     # Check if the invitation email matches the current user's email
