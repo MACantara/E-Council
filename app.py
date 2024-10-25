@@ -1294,6 +1294,18 @@ def invite_user(event_id):
     # Get form data
     users_email = request.form.get("users-email")
 
+    # Find the user by email
+    user = Users.query.filter_by(users_email=users_email).first_or_404()
+
+    # Get the user's department ID
+    users_department_id = user.users_departments_id
+
+    # Check if the departments_id and events_id pair already exists
+    existing_entry = DepartmentsEvents.query.filter_by(departments_id=users_department_id, events_id=event_id).first()
+    if existing_entry:
+        flash("This department of this user is already managing the event.", "error")
+        return redirect(url_for("events_overview"))
+
     # Send invite email
     send_invite_email(users_email, event.events_name, event_id)
 
