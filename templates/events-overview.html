@@ -301,11 +301,11 @@
             </div>
         </form>
 
-        <div class="council-overview-content-container-group">
+        <div class="overview-content-container-group">
             {% if events %}
             {% for event in events %}
-            <div class="council-overview-content-grid-item">
-                <select name="event-status-select-button" id="event-status-select-button-{{ loop.index }}"
+            <div class="overview-content-grid-item">
+                <select class="fit-content-button" name="event-status-select-button" id="event-status-select-button-{{ loop.index }}"
                     aria-label="Select an Event Status" data-event-id="{{ event.events_id }}"
                     data-event-name="{{ event.events_name }}" required>
                     <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming

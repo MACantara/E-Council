@@ -652,6 +652,26 @@ textarea {
     grid-column: span 2;
 }
 
+.overview-content-container-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--gap-large);
+    height: fit-content;
+}
+
+.overview-content-grid-item {
+    padding: var(--padding-large);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    background-color: var(--form-background-color);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-large);
+    max-height: 700px;
+    height: 100%;
+}
+
 /* Council Overview Table Styles */
 
 .council-overview-content-table {
