@@ -1308,13 +1308,13 @@ def invite_user(event_id):
 
     if existing_entry:
         department_name = existing_entry.department.departments_name
-        flash(f"The department of this user ({department_name}) is already managing the event '{event.events_name}'.", "error")
+        flash(f"The department of the user {users_email} ({department_name}) is already managing the event '{event.events_name}'.", "error")
         return redirect(url_for("events_overview"))
 
     # Send invite email
     send_invite_email(users_email, event.events_name, event_id)
 
-    flash(f"Invitation email for the event '{event.events_name}' sent successfully.", "success")
+    flash(f"Invitation email for the event '{event.events_name}' to {users_email} has been sent successfully.", "success")
     return redirect(url_for("events_overview"))
 
 @app.route("/accept-invite/<token>")
