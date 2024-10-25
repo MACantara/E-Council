@@ -711,7 +711,7 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: var(--gap-large);
-    max-height: fit-content;
+    max-height: 700px;
     height: 100%;
 }
 
