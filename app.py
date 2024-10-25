@@ -1311,6 +1311,12 @@ def invite_user(event_id):
         flash(f"The department of the user {users_email} ({department_name}) is already managing the event '{event.events_name}'.", "error")
         return redirect(url_for("events_overview"))
 
+    # Check if there is an existing invitation
+    existing_invitation = EventInvitations.query.filter_by(event_invitations_events_id=event_id, event_invitations_email=users_email).first()
+    if existing_invitation:
+        flash(f"An invitation for the event '{event.events_name}' has already been sent to {users_email}.", "error")
+        return redirect(url_for("events_overview"))
+
     # Send invite email
     send_invite_email(users_email, event.events_name, event_id)
 
