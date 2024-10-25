@@ -1,10 +1,11 @@
 import os
 import re
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
+from flask_wtf import CSRFProtect
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -51,6 +52,8 @@ cloudinary.config(
     api_secret = os.getenv("CLOUDINARY_API_SECRET"),
     secure=True
 )
+
+csrf = CSRFProtect(app)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -1215,6 +1218,21 @@ def update_event(event_id):
 
     flash("Event updated successfully.", "success")
     return redirect(url_for("events_overview"))
+
+@app.route("/update-event-status/<int:event_id>", methods=["POST"])
+@login_required
+def update_event_status(event_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the event by ID
+    event = Events.query.get_or_404(event_id)
+
+    # Update the event status
+    event.events_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
 
 @app.route("/add-event", methods=["GET", "POST"])
 @login_required
