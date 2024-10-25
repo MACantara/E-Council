@@ -344,7 +344,7 @@
                     {% endif %}
                     {% endwith %}
             
-                    <form method="POST">
+                    <form method="POST" action="{{ url_for('update_event', event_id=event.events_id) }}">
                         <div class="input-pair">
                             <label for="events-name-{{ loop.index }}">Event Name</label>
                             <input type="text" name="events-name" id="events-name-{{ loop.index }}" placeholder="Event Name" value="{{ event.events_name }}" required>
@@ -354,8 +354,8 @@
                             <label for="events-semester-{{ loop.index }}">Semester</label>
                             <select name="events-semester" id="events-semester-{{ loop.index }}" required>
                                 <option value="" disabled>Select a Semester</option>
-                                <option value="1st-semester" {% if event.events_semester == '1st-semester' %}selected{% endif %}>1st Semester</option>
-                                <option value="2nd-semester" {% if event.events_semester == '2nd-semester' %}selected{% endif %}>2nd Semester</option>
+                                <option value="1st Semester" {% if event.events_semester == '1st Semester' %}selected{% endif %}>1st Semester</option>
+                                <option value="2nd Semester" {% if event.events_semester == '2nd Semester' %}selected{% endif %}>2nd Semester</option>
                             </select>
                         </div>
             
@@ -369,12 +369,12 @@
             
                         <div class="input-pair">
                             <label for="events-start-date-and-time-{{ loop.index }}">Start Date and Time</label>
-                            <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time-{{ loop.index }}" value="{{ event.events_start_date_and_time }}" required>
+                            <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time-{{ loop.index }}" value="{{ event.events_start_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
                         </div>
             
                         <div class="input-pair">
                             <label for="events-end-date-and-time-{{ loop.index }}">End Date and Time</label>
-                            <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time-{{ loop.index }}" value="{{ event.events_end_date_and_time }}" required>
+                            <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time-{{ loop.index }}" value="{{ event.events_end_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
                         </div>
             
                         <div class="input-pair">
