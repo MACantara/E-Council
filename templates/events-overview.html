@@ -317,7 +317,7 @@
                     </option>
                 </select>
 
-                <h3>{{ event.events_name }}</h3>
+                <h3>{{ event.events_name | truncate(41) }}</h3>
 
                 <p class="events-description">{{ event.events_description | truncate(100) }}</p>
 
