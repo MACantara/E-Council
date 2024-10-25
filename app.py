@@ -487,6 +487,12 @@ def send_account_deletion_notification_email(users_email):
     mail.send(msg)
 
 def send_invite_email(users_email, event_name, event_id):
+    # Get the current user's details
+    inviter = Users.query.get(current_user.users_id)
+    inviter_first_name = inviter.users_first_name
+    inviter_last_name = inviter.users_last_name
+    inviter_department = Departments.query.get(inviter.users_departments_id).departments_name
+
     token = s.dumps(users_email, salt='invite-user')
     accept_link = url_for('accept_invite', token=token, _external=True)
     reject_link = url_for('reject_invite', token=token, _external=True)
@@ -497,7 +503,7 @@ def send_invite_email(users_email, event_name, event_id):
     <html>
     <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
         <h1 style="color: #00578a;">Invitation to Manage Event</h1>
-        <p>You have been invited to help manage the event "{event_name}". Please click the button below to accept the invitation:</p>
+        <p>You have been invited by {inviter_first_name} {inviter_last_name} from the {inviter_department} department to help manage the event "{event_name}". Please click the button below to accept the invitation:</p>
         <a href="{accept_link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Accept Invitation</a>
         <p>If you do not wish to manage this event, you can reject the invitation by clicking the link below:</p>
         <a href="{reject_link}" style="background-color: #d9534f; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Reject Invitation</a>
@@ -510,7 +516,7 @@ def send_invite_email(users_email, event_name, event_id):
     
     # Plain text email body as a fallback
     msg.body = f"""
-    You have been invited to help manage the event "{event_name}". Please click the link below to accept the invitation:
+    You have been invited by {inviter_first_name} {inviter_last_name} from the {inviter_department} department to help manage the event "{event_name}". Please click the link below to accept the invitation:
     {accept_link}
 
     If you do not wish to manage this event, you can reject the invitation by clicking the link below:
