@@ -488,7 +488,8 @@ def send_account_deletion_notification_email(users_email):
 
 def send_invite_email(users_email, event_name, event_id):
     token = s.dumps(users_email, salt='invite-user')
-    link = url_for('accept_invite', token=token, _external=True)
+    accept_link = url_for('accept_invite', token=token, _external=True)
+    reject_link = url_for('reject_invite', token=token, _external=True)
     msg = Message('Invitation to Manage Event', recipients=[users_email])
     
     # HTML email body
@@ -497,8 +498,10 @@ def send_invite_email(users_email, event_name, event_id):
     <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
         <h1 style="color: #00578a;">Invitation to Manage Event</h1>
         <p>You have been invited to help manage the event "{event_name}". Please click the button below to accept the invitation:</p>
-        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Accept Invitation</a>
-        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
+        <a href="{accept_link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Accept Invitation</a>
+        <p>If you do not wish to manage this event, you can reject the invitation by clicking the link below:</p>
+        <a href="{reject_link}" style="background-color: #d9534f; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Reject Invitation</a>
+        <p style="font-size: 0.8em; color: gray;">Or copy and paste these links into your browser: <br>Accept: <a href="{accept_link}" style="color: #00578a;">{accept_link}</a><br>Reject: <a href="{reject_link}" style="color: #d9534f;">{reject_link}</a></p>
         <p>If you didn't expect this invitation, you can safely ignore this email.</p>
         <p>Sincerely,<br>E-Council Team</p>
     </body>
@@ -508,10 +511,14 @@ def send_invite_email(users_email, event_name, event_id):
     # Plain text email body as a fallback
     msg.body = f"""
     You have been invited to help manage the event "{event_name}". Please click the link below to accept the invitation:
-    {link}
+    {accept_link}
 
-    Or copy and paste this link into your browser:
-    {link}
+    If you do not wish to manage this event, you can reject the invitation by clicking the link below:
+    {reject_link}
+
+    Or copy and paste these links into your browser:
+    Accept: {accept_link}
+    Reject: {reject_link}
 
     If you didn't expect this invitation, you can safely ignore this email.
 
@@ -1358,6 +1365,28 @@ def accept_invite(token):
     db.session.commit()
 
     flash("You have successfully accepted the invitation to manage the event.", "success")
+    return redirect(url_for("events_overview"))
+
+@app.route("/reject-invite/<token>")
+def reject_invite(token):
+    try:
+        # Decode the token
+        users_email = s.loads(token, salt='invite-user', max_age=3600)
+    except SignatureExpired:
+        flash("The invitation link has expired.", "error")
+        return redirect(url_for("login"))
+    except BadSignature:
+        flash("The invitation link is invalid.", "error")
+        return redirect(url_for("login"))
+
+    # Find the invitation by token
+    invitation = EventInvitations.query.filter_by(event_invitations_token=token).first_or_404()
+
+    # Delete the invitation record from the event_invitations table
+    db.session.delete(invitation)
+    db.session.commit()
+
+    flash("You have successfully rejected the invitation to manage the event.", "success")
     return redirect(url_for("events_overview"))
 
 @app.route("/event-invite-rejected")
