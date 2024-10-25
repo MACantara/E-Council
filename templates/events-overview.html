@@ -248,18 +248,6 @@
                 updateChartColors();
             });
 
-            // Function to update chart colors dynamically
-            function updateChartColors() {
-                const labelColor = getLabelColor();
-                const rangeColor = getRangeColor();
-
-                // Update legend label colors
-                budgetChart1.options.plugins.legend.labels.color = labelColor;
-                budgetChart1.options.scales.x.title.color = rangeColor;
-                budgetChart1.options.scales.x.ticks.color = rangeColor;
-                budgetChart1.update();
-            }
-
             // Function to get CSS variable value
             function getCssVariable(variable) {
                 return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
@@ -409,10 +397,12 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
-                        canvasElements.forEach(canvasElement => {
+                        const charts = [];
+                
+                        canvasElements.forEach((canvasElement, index) => {
                             const ctx = canvasElement.getContext('2d');
                             if (ctx) {
-                                let budgetChart = new Chart(ctx, {
+                                const budgetChart = new Chart(ctx, {
                                     type: 'bar', // Use 'bar' type for horizontal bars
                                     data: {
                                         labels: ['Budget Overview'], // Label for the dataset
@@ -477,8 +467,28 @@
                                         },
                                     }
                                 });
+                                charts.push(budgetChart);
                             }
                         });
+                
+                        // Function to update the chart when color scheme changes
+                        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                            updateChartColors();
+                        });
+                
+                        // Function to update chart colors dynamically
+                        function updateChartColors() {
+                            const labelColor = getLabelColor();
+                            const rangeColor = getRangeColor();
+                
+                            charts.forEach(chart => {
+                                // Update legend label colors
+                                chart.options.plugins.legend.labels.color = labelColor;
+                                chart.options.scales.x.title.color = rangeColor;
+                                chart.options.scales.x.ticks.color = rangeColor;
+                                chart.update();
+                            });
+                        }
                     });
                 </script>
 
