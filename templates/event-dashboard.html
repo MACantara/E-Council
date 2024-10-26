@@ -72,7 +72,8 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="horizontal-input-pair">
-                        <a href="{{ url_for('event_dashboard') }}" class="secondary-button fit-content-button">Back</a>
+                        <button id="cancel-add-transaction-modal-button" class="secondary-button fit-content-button"
+                            type="button">Cancel</button>
                         <button class="primary-button" type="submit">Add Transaction</button>
                     </div>
                 </form>
@@ -437,13 +438,20 @@
         }
     });
 
-    // Delete User Account Modal
+    // Add Transaction Modal
     document.getElementById('open-add-transaction-modal-button').addEventListener('click', function () {
         document.getElementById('add-transaction-modal-content').style.display = 'block';
     });
 
     document.getElementById('close-add-transaction-modal-button').addEventListener('click', function () {
         document.getElementById('add-transaction-modal-content').style.display = 'none';
+    });
+
+    document.getElementById('cancel-add-transaction-modal-button').addEventListener('click', function () {
+        const modal = document.getElementById('add-transaction-modal-content');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     });
 
     window.addEventListener('click', function (event) {
@@ -458,7 +466,7 @@
         document.getElementById('file-name').textContent = fileName;
     });
 
-    // Delete User Account Modal
+    // Event Invite Modal
     document.getElementById('open-event-invite-modal-button').addEventListener('click', function () {
         document.getElementById('event-invite-modal-content').style.display = 'block';
     });
