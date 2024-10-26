@@ -46,6 +46,8 @@
                 <input type="password" name="users-current-password" id="users-current-password" placeholder="Current Password" required>
             </div>
 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <button class="primary-button" type="submit">Save Changes</button>
         </form>
     </div>

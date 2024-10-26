@@ -35,6 +35,8 @@
                     <span id="file-name" class="file-name">No file chosen</span>
                 </label>
             </div>
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         
             <div class="horizontal-button-pair-positioned-right">
                 <button class="primary-button fit-content-button" type="submit">
