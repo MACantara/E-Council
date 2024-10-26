@@ -206,6 +206,17 @@
                     });
                 });
 
+                // Cancel Delete Event Modal
+                document.querySelectorAll('[id^="cancel-delete-event-modal-button-"]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        const modal = document.getElementById(`delete-event-modal-content-${index}`);
+                        if (modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                });
+
                 window.addEventListener('click', function (event) {
                     document.querySelectorAll('[id^="delete-event-modal-content-"]').forEach(modal => {
                         if (event.target == modal) {
@@ -697,9 +708,11 @@
                     <h2>Delete Event</h2>
                     <p>Are you sure you want to delete this event? This action cannot be undone.</p>
                     <form method="POST" action="{{ url_for('delete_event', event_id=event.events_id) }}">
-                        <div class="input-pair">
+                        <div class="horizontal-button-pair-positioned-right">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button class="secondary-button fit-content-button type=" submit">Delete Event</button>
+                            <button class="secondary-button fit-content-button" data-index="{{ loop.index }}" type="submit">Delete Event</button>
+                            <button id="cancel-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
+                                class="primary-button fit-content-button" type="button">Cancel</button>
                         </div>
                     </form>
                 </div>
