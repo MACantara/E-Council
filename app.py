@@ -1158,7 +1158,11 @@ def events_overview():
     users_departments_id = current_user.users_departments_id
 
     # Query distinct academic years
-    academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+    if sort_by_date == "recent-to-old":
+        academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+    else:
+        academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.asc()).all()
+
 
     # Get filter and sort parameters from the request
     academic_year = request.args.get("events-overview-academic-year")
@@ -1194,7 +1198,7 @@ def events_overview():
     # Execute the query
     events = query.all()
 
-    return render_template("events-overview.html", events=events, academic_years=academic_years)
+    return render_template("events-overview.html", events=events, academic_years=academic_years, sort_by_date=sort_by_date)
 
 @app.route("/update-event/<int:event_id>", methods=["POST"])
 @login_required
