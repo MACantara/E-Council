@@ -1376,8 +1376,11 @@ def delete_event(event_id):
 def event_dashboard(event_id):
     # Fetch the event details based on the event_id
     event = Events.query.get_or_404(event_id)
+    
+    # Fetch the transaction history for the given event_id
+    transactions = TransactionHistory.query.filter_by(events_id=event_id).all()
 
-    return render_template("event-dashboard.html", event=event)
+    return render_template("event-dashboard.html", event=event, transactions=transactions)
 
 @app.route("/add-transaction/<int:event_id>", methods=["GET", "POST"])
 @login_required
