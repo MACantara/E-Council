@@ -142,39 +142,6 @@
                     window.location.href = "{{ url_for('events_overview') }}";
                 });
 
-                // Update Event Modal
-                document.querySelectorAll('[id^="open-update-event-modal-button-"]').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = this.getAttribute('data-index');
-                        document.getElementById(`update-event-modal-content-${index}`).style.display = 'block';
-                    });
-                });
-
-                document.querySelectorAll('[id^="close-update-event-modal-button-"]').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = this.getAttribute('data-index');
-                        document.getElementById(`update-event-modal-content-${index}`).style.display = 'none';
-                    });
-                });
-
-                document.querySelectorAll('[id^="cancel-update-event-modal-button-"]').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = this.getAttribute('data-index');
-                        const modal = document.getElementById(`update-event-modal-content-${index}`);
-                        if (modal) {
-                            modal.style.display = 'none';
-                        }
-                    });
-                });
-
-                window.addEventListener('click', function (event) {
-                    document.querySelectorAll('[id^="update-event-modal-content-"]').forEach(modal => {
-                        if (event.target == modal) {
-                            modal.style.display = 'none';
-                        }
-                    });
-                });
-
                 // Invite User Modal
                 document.querySelectorAll('[id^="open-invite-user-modal-button-"]').forEach(button => {
                     button.addEventListener('click', function () {
@@ -589,8 +556,8 @@
 
                 <div class="grid-item-button-group">
                     <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
-                    <button id="open-update-event-modal-button-{{ loop.index }}" class="secondary-button"
-                        data-index="{{ loop.index }}">Update</button>
+                    <a href="{{ url_for('update_event', event_id=event.events_id) }}" class="secondary-button"
+                        data-index="{{ loop.index }}">Update</a>
                     <button id="open-invite-user-modal-button-{{ loop.index }}" class="secondary-button"
                         data-index="{{ loop.index }}">Invite</button>
                     <button id="open-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
@@ -600,115 +567,7 @@
 
             <!-- Update Event Modal -->
             <div id="update-event-modal-content-{{ loop.index }}" class="modal">
-                <div class="container">
-                    <span id="close-update-event-modal-button-{{ loop.index }}" class="close-button"
-                        data-index="{{ loop.index }}">&times;</span>
-                    <h2>Update Event</h2>
-
-                    <!-- Flash messages section for the modal -->
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    <div class="flash-messages center no-top-margin bottom-margin">
-                        {% for category, message in messages %}
-                        {% if category == 'modal-error' %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    {% endwith %}
-
-                    <form method="POST" action="{{ url_for('update_event', event_id=event.events_id) }}">
-                        <div class="input-pair">
-                            <label for="events-name-{{ loop.index }}">Event Name</label>
-                            <input type="text" name="events-name" id="events-name-{{ loop.index }}"
-                                placeholder="Event Name" value="{{ event.events_name }}" required>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-semester-{{ loop.index }}">Semester</label>
-                            <select name="events-semester" id="events-semester-{{ loop.index }}" required>
-                                <option value="" disabled>Select a Semester</option>
-                                <option value="1st Semester" {% if event.events_semester=='1st Semester' %}selected{%
-                                    endif %}>1st Semester</option>
-                                <option value="2nd Semester" {% if event.events_semester=='2nd Semester' %}selected{%
-                                    endif %}>2nd Semester</option>
-                            </select>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-academic-year-{{ loop.index }}">Academic Year</label>
-                            <select name="events-academic-year" id="events-academic-year-{{ loop.index }}" required>
-                                <option value="" disabled>Select an Academic Year</option>
-                                {% for year in academic_years %}
-                                <option value="{{ year }}" {% if event.events_academic_year == year %}selected{% endif %}>A.Y {{ year }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-start-date-and-time-{{ loop.index }}">Start Date and Time</label>
-                            <input type="datetime-local" name="events-start-date-and-time"
-                                id="events-start-date-and-time-{{ loop.index }}"
-                                value="{{ event.events_start_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-end-date-and-time-{{ loop.index }}">End Date and Time</label>
-                            <input type="datetime-local" name="events-end-date-and-time"
-                                id="events-end-date-and-time-{{ loop.index }}"
-                                value="{{ event.events_end_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-venue-{{ loop.index }}">Venue</label>
-                            <input type="text" name="events-venue" id="events-venue-{{ loop.index }}"
-                                placeholder="Venue" value="{{ event.events_venue }}" required>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-budget-{{ loop.index }}">Budget</label>
-                            <input type="number" name="events-budget" id="events-budget-{{ loop.index }}"
-                                placeholder="Budget" value="{{ event.events_budget }}" required>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-status-{{ loop.index }}">Event Status</label>
-                            <select name="events-status" id="events-status-{{ loop.index }}" required>
-                                <option value="" disabled>Select an Event Status</option>
-                                <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>
-                                    Upcoming</option>
-                                <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>
-                                    Postponed</option>
-                                <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done
-                                </option>
-                                <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>
-                                    Cancelled</option>
-                            </select>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-description-{{ loop.index }}">Description</label>
-                            <textarea name="events-description" id="events-description-{{ loop.index }}"
-                                placeholder="Description" required>{{ event.events_description }}</textarea>
-                        </div>
-
-                        <div class="input-pair">
-                            <label for="events-remarks-{{ loop.index }}">Remarks</label>
-                            <input type="text" name="events-remarks" id="events-remarks-{{ loop.index }}"
-                                placeholder="Remarks (Optional)" value="{{ event.events_remarks }}">
-                        </div>
-
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                        <div class="horizontal-button-pair-positioned-right">
-                            <button id="cancel-update-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
-                                class="secondary-button fit-content-button" type="button">Cancel</button>
-                            <button class="primary-button" data-index="{{ loop.index }}" type="submit">Update
-                                Event</button>
-                        </div>
-                    </form>
-                </div>
+                
             </div>
 
             <!-- Invite User Modal -->
