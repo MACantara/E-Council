@@ -67,7 +67,7 @@
                         <select name="events-academic-year" id="events-academic-year" required>
                             <option value="" disabled selected>Select an Academic Year</option>
                             {% for year in academic_years %}
-                            <option value="{{ year.events_academic_year }}">{{ year.events_academic_year }}</option>
+                            <option value="{{ year.events_academic_year }}">A.Y. {{ year.events_academic_year }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -369,7 +369,7 @@
                     {% for year in academic_years %}
                     <option value="{{ year.events_academic_year }}" {% if
                         request.args.get('events-overview-academic-year')==year.events_academic_year or (not
-                        request.args.get('events-overview-academic-year') and loop.first) %}selected{% endif %}>S.Y {{
+                        request.args.get('events-overview-academic-year') and loop.first) %}selected{% endif %}>A.Y {{
                         year.events_academic_year }}</option>
                     {% endfor %}
                 </select>
