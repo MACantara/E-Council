@@ -116,8 +116,9 @@
 
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <div class="horizontal-input-pair">
-                        <a href="{{ url_for('events_overview') }}" class="secondary-button fit-content-button">Back</a>
+                    <div class="horizontal-button-pair-positioned-right">
+                        <button id="cancel-add-event-modal-button" class="secondary-button fit-content-button"
+                            type="button">Cancel</button>
                         <button class="primary-button" type="submit">Add Event</button>
                     </div>
                 </form>
@@ -252,6 +253,13 @@
 
             document.getElementById('close-add-event-modal-button').addEventListener('click', function () {
                 document.getElementById('add-event-modal-content').style.display = 'none';
+            });
+
+            document.getElementById('cancel-add-event-modal-button').addEventListener('click', function () {
+                const modal = document.getElementById('add-event-modal-content');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
             });
 
             window.addEventListener('click', function (event) {
