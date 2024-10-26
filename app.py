@@ -227,6 +227,11 @@ def truncate_text(text, length=100):
 
 app.jinja_env.filters['truncate'] = truncate_text
 
+def has_events(events, semester, academic_year):
+    return any(event.events_semester == semester and event.events_academic_year == academic_year for event in events)
+
+app.jinja_env.filters['has_events'] = has_events
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
