@@ -220,31 +220,25 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for transaction in transactions %}
                         <tr>
-                            <td>2024-06-05 6:47 PM</td>
-                            <td>Smart Sponsorship</td>
-                            <td>1</td>
-                            <td>₱ 10,000.00</td>
-                            <td>₱ 10,000.00</td>
-                            <td>Sponsorship</td>
-                            <td>Income</td>
+                            <td>{{ transaction.transaction_date.strftime('%Y-%m-%d %I:%M %p') }}</td>
+                            <td>{{ transaction.transaction_name }}</td>
+                            <td>{{ transaction.transaction_unit_amount }}</td>
+                            <td>₱ {{ "{:,.2f}".format(transaction.transaction_unit_price) }}</td>
+                            <td>₱ {{ "{:,.2f}".format(transaction.transaction_total) }}</td>
+                            <td>{{ transaction.transaction_category }}</td>
+                            <td>{{ transaction.transaction_type }}</td>
                             <td>
-                                <button class="primary-button fit-content-button">View Receipt</button>
+                                {% if transaction.transaction_receipt %}
+                                <a href="{{ url_for('static', filename='uploads/receipts/' ~ transaction.transaction_receipt) }}"
+                                    target="_blank" class="primary-button fit-content-button">View Receipt</a>
+                                {% else %}
+                                No Receipt
+                                {% endif %}
                             </td>
                         </tr>
-
-                        <tr>
-                            <td>2024-06-05 6:46 PM</td>
-                            <td>Food</td>
-                            <td>8</td>
-                            <td>₱ 80.00</td>
-                            <td>₱ 640.00</td>
-                            <td>Food</td>
-                            <td>Expense</td>
-                            <td>
-                                <button class="primary-button fit-content-button">View Receipt</button>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -483,9 +477,9 @@
 
     // File upload
     document.getElementById('transaction-receipt').addEventListener('change', function () {
-            const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-            document.getElementById('file-name').textContent = fileName;
-        });
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
+    });
 
     // Event Invite Modal
     document.getElementById('open-event-invite-modal-button').addEventListener('click', function () {
