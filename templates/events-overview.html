@@ -424,352 +424,354 @@
 
         <div class="overview-content-container-group">
             {% if events %}
-                {% set sorted_events = events | sort(attribute='events_academic_year', reverse=True) %}
-                {% set semesters = ['2nd Semester', '1st Semester'] %}
-                {% set academic_years = sorted_events | map(attribute='events_academic_year') | unique %}
-                
-                {% for academic_year in academic_years %}
-                    {% for semester in semesters %}
-                        {% if sorted_events | has_events(semester, academic_year) %}
-                            <div class="grid-header">
-                                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
-                            </div>
-                            
-                            {% for event in sorted_events %}
-                                {% if event.events_semester == semester and event.events_academic_year == academic_year %}
-                                    <div class="overview-content-grid-item">
-                                        <select class="fit-content-button" name="event-status-select-button"
-                                            id="event-status-select-button-{{ loop.index }}" aria-label="Select an Event Status"
-                                            data-event-id="{{ event.events_id }}" data-event-name="{{ event.events_name }}" required>
-                                            <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming
-                                            </option>
-                                            <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed
-                                            </option>
-                                            <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
-                                            <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled
-                                            </option>
-                                        </select>
-                        
-                                        <h3>{{ event.events_name | truncate(41) }}</h3>
-                        
-                                        <p class="events-description">{{ event.events_description | truncate(100) }}</p>
-                        
-                                        <div class="grid-item-details">
-                                            <div class="grid-item-details-pair">
-                                                <p>Date:</p>
-                                                <p>{{ event.events_start_date_and_time.strftime('%B %d, %Y') if event.events_start_date_and_time
-                                                    else 'N/A' }}</p>
-                                            </div>
-                                            <div class="grid-item-details-pair">
-                                                <p>Time:</p>
-                                                <p>{{ event.events_start_date_and_time.strftime('%I:%M %p') if event.events_start_date_and_time
-                                                    else 'N/A' }} - {{ event.events_end_date_and_time.strftime('%I:%M %p') if
-                                                    event.events_end_date_and_time else 'N/A' }}</p>
-                                            </div>
-                                            <div class="grid-item-details-pair">
-                                                <p>Venue:</p>
-                                                <p>{{ event.events_venue }}</p>
-                                            </div>
-                                            <div class="grid-item-details-pair">
-                                                <p>Budget:</p>
-                                                <p>₱ {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}</p>
-                                            </div>
-                                        </div>
-                        
-                                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                        
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function () {
-                                                const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
-                                                const charts = [];
-                        
-                                                canvasElements.forEach((canvasElement, index) => {
-                                                    const ctx = canvasElement.getContext('2d');
-                                                    if (ctx) {
-                                                        const budgetChart = new Chart(ctx, {
-                                                            type: 'bar', // Use 'bar' type for horizontal bars
-                                                            data: {
-                                                                labels: ['Budget Overview'], // Label for the dataset
-                                                                datasets: [
-                                                                    {
-                                                                        label: 'Remaining Budget',
-                                                                        data: [remainingBudget],
-                                                                        backgroundColor: getCssVariable('--remaining-budget-color'),
-                                                                        borderColor: getCssVariable('--remaining-budget-color'),
-                                                                        borderWidth: 1
-                                                                    },
-                                                                    {
-                                                                        label: 'Expenses (Within Budget)',
-                                                                        data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
-                                                                        backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                                                                        borderColor: getCssVariable('--expenses-within-budget-color'),
-                                                                        borderWidth: 1,
-                                                                        stack: 'expenses' // Stack this dataset with the 'expenses' group
-                                                                    },
-                                                                    {
-                                                                        label: 'Expenses (Over Budget)',
-                                                                        data: [overBudget], // Show over budget amount to the right of the expenses within budget
-                                                                        backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                                                                        borderColor: getCssVariable('--expenses-over-budget-color'),
-                                                                        borderWidth: 1,
-                                                                        stack: 'expenses', // Stack this dataset with the 'expenses' group
-                                                                    }
-                                                                ]
-                                                            },
-                                                            options: {
-                                                                indexAxis: 'y', // Horizontal bars
-                                                                responsive: true, // Make the chart responsive
-                                                                maintainAspectRatio: false, // Allow the chart to resize based on its container
-                                                                scales: {
-                                                                    y: {
-                                                                        display: false // Hide the y-axis
-                                                                    },
-                                                                    x: {
-                                                                        stacked: true, // Enable stacking for the x-axis
-                                                                        beginAtZero: true, // Start the x-axis at 0
-                                                                        ticks: {
-                                                                            color: getCssVariable('--primary-text-color') // X-axis ticks color
-                                                                        },
-                                                                        title: {
-                                                                            display: true, // Optionally add a title to the X-axis
-                                                                            color: getCssVariable('--primary-text-color') // X-axis title color
-                                                                        }
-                                                                    }
-                                                                },
-                                                                plugins: {
-                                                                    legend: {
-                                                                        display: true, // Show the legend
-                                                                        labels: {
-                                                                            color: getLabelColor(),
-                                                                            font: {
-                                                                                family: getFontFamily(),
-                                                                                size: getFontSize(),
-                                                                                weight: getFontWeight()
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                },
-                                                            }
-                                                        });
-                                                        charts.push(budgetChart);
-                                                    }
-                                                });
-                        
-                                                // Function to update the chart when color scheme changes
-                                                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                                                    updateChartColors();
-                                                });
-                        
-                                                // Function to update chart colors dynamically
-                                                function updateChartColors() {
-                                                    const labelColor = getLabelColor();
-                                                    const rangeColor = getRangeColor();
-                        
-                                                    charts.forEach(chart => {
-                                                        // Update legend label colors
-                                                        chart.options.plugins.legend.labels.color = labelColor;
-                                                        chart.options.scales.x.title.color = rangeColor;
-                                                        chart.options.scales.x.ticks.color = rangeColor;
-                                                        chart.update();
-                                                    });
+            {% set sorted_events = events | sort(attribute='events_academic_year', reverse=(sort_by_date ==
+            'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester']
+            %}
+            {% set academic_years = sorted_events | map(attribute='events_academic_year') | unique %}
+
+            {% for academic_year in academic_years %}
+            {% for semester in semesters %}
+            {% if sorted_events | has_events(semester, academic_year) %}
+            <div class="grid-header">
+                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            </div>
+
+            {% for event in sorted_events %}
+            {% if event.events_semester == semester and event.events_academic_year == academic_year %}
+            <div class="overview-content-grid-item">
+                <select class="fit-content-button" name="event-status-select-button"
+                    id="event-status-select-button-{{ loop.index }}" aria-label="Select an Event Status"
+                    data-event-id="{{ event.events_id }}" data-event-name="{{ event.events_name }}" required>
+                    <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming
+                    </option>
+                    <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed
+                    </option>
+                    <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
+                    <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled
+                    </option>
+                </select>
+
+                <h3>{{ event.events_name | truncate(41) }}</h3>
+
+                <p class="events-description">{{ event.events_description | truncate(100) }}</p>
+
+                <div class="grid-item-details">
+                    <div class="grid-item-details-pair">
+                        <p>Date:</p>
+                        <p>{{ event.events_start_date_and_time.strftime('%B %d, %Y') if event.events_start_date_and_time
+                            else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Time:</p>
+                        <p>{{ event.events_start_date_and_time.strftime('%I:%M %p') if event.events_start_date_and_time
+                            else 'N/A' }} - {{ event.events_end_date_and_time.strftime('%I:%M %p') if
+                            event.events_end_date_and_time else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Venue:</p>
+                        <p>{{ event.events_venue }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Budget:</p>
+                        <p>₱ {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}</p>
+                    </div>
+                </div>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
+                        const charts = [];
+
+                        canvasElements.forEach((canvasElement, index) => {
+                            const ctx = canvasElement.getContext('2d');
+                            if (ctx) {
+                                const budgetChart = new Chart(ctx, {
+                                    type: 'bar', // Use 'bar' type for horizontal bars
+                                    data: {
+                                        labels: ['Budget Overview'], // Label for the dataset
+                                        datasets: [
+                                            {
+                                                label: 'Remaining Budget',
+                                                data: [remainingBudget],
+                                                backgroundColor: getCssVariable('--remaining-budget-color'),
+                                                borderColor: getCssVariable('--remaining-budget-color'),
+                                                borderWidth: 1
+                                            },
+                                            {
+                                                label: 'Expenses (Within Budget)',
+                                                data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
+                                                backgroundColor: getCssVariable('--expenses-within-budget-color'),
+                                                borderColor: getCssVariable('--expenses-within-budget-color'),
+                                                borderWidth: 1,
+                                                stack: 'expenses' // Stack this dataset with the 'expenses' group
+                                            },
+                                            {
+                                                label: 'Expenses (Over Budget)',
+                                                data: [overBudget], // Show over budget amount to the right of the expenses within budget
+                                                backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
+                                                borderColor: getCssVariable('--expenses-over-budget-color'),
+                                                borderWidth: 1,
+                                                stack: 'expenses', // Stack this dataset with the 'expenses' group
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        indexAxis: 'y', // Horizontal bars
+                                        responsive: true, // Make the chart responsive
+                                        maintainAspectRatio: false, // Allow the chart to resize based on its container
+                                        scales: {
+                                            y: {
+                                                display: false // Hide the y-axis
+                                            },
+                                            x: {
+                                                stacked: true, // Enable stacking for the x-axis
+                                                beginAtZero: true, // Start the x-axis at 0
+                                                ticks: {
+                                                    color: getCssVariable('--primary-text-color') // X-axis ticks color
+                                                },
+                                                title: {
+                                                    display: true, // Optionally add a title to the X-axis
+                                                    color: getCssVariable('--primary-text-color') // X-axis title color
                                                 }
-                                            });
-                                        </script>
-                        
-                                        <div class="events-overview-chart-container">
-                                            <canvas id="budget-chart-{{ loop.index }}"></canvas>
-                                        </div>
-                        
-                                        <div class="grid-item-button-group">
-                                            <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
-                                            <button id="open-update-event-modal-button-{{ loop.index }}" class="secondary-button"
-                                                data-index="{{ loop.index }}">Update</button>
-                                            <button id="open-invite-user-modal-button-{{ loop.index }}" class="secondary-button"
-                                                data-index="{{ loop.index }}">Invite</button>
-                                            <button id="open-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
-                                                class="secondary-button">Delete</button>
-                                        </div>
-                                    </div>
-                        
-                                    <!-- Update Event Modal -->
-                                    <div id="update-event-modal-content-{{ loop.index }}" class="modal">
-                                        <div class="container">
-                                            <span id="close-update-event-modal-button-{{ loop.index }}" class="close-button"
-                                                data-index="{{ loop.index }}">&times;</span>
-                                            <h2>Update Event</h2>
-                        
-                                            <!-- Flash messages section for the modal -->
-                                            {% with messages = get_flashed_messages(with_categories=true) %}
-                                            {% if messages %}
-                                            <div class="flash-messages center no-top-margin bottom-margin">
-                                                {% for category, message in messages %}
-                                                {% if category == 'modal-error' %}
-                                                <div class="alert alert-{{ category }}">{{ message }}</div>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                            {% endwith %}
-                        
-                                            <form method="POST" action="{{ url_for('update_event', event_id=event.events_id) }}">
-                                                <div class="input-pair">
-                                                    <label for="events-name-{{ loop.index }}">Event Name</label>
-                                                    <input type="text" name="events-name" id="events-name-{{ loop.index }}"
-                                                        placeholder="Event Name" value="{{ event.events_name }}" required>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-semester-{{ loop.index }}">Semester</label>
-                                                    <select name="events-semester" id="events-semester-{{ loop.index }}" required>
-                                                        <option value="" disabled>Select a Semester</option>
-                                                        <option value="1st Semester" {% if event.events_semester=='1st Semester' %}selected{%
-                                                            endif %}>1st Semester</option>
-                                                        <option value="2nd Semester" {% if event.events_semester=='2nd Semester' %}selected{%
-                                                            endif %}>2nd Semester</option>
-                                                    </select>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-academic-year-{{ loop.index }}">Academic Year</label>
-                                                    <select name="events-academic-year" id="events-academic-year-{{ loop.index }}" required>
-                                                        <option value="" disabled>Select an Academic Year</option>
-                                                        <option value="2024-2025" {% if event.events_academic_year=='2024-2025' %}selected{%
-                                                            endif %}>2024-2025</option>
-                                                    </select>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-start-date-and-time-{{ loop.index }}">Start Date and Time</label>
-                                                    <input type="datetime-local" name="events-start-date-and-time"
-                                                        id="events-start-date-and-time-{{ loop.index }}"
-                                                        value="{{ event.events_start_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-end-date-and-time-{{ loop.index }}">End Date and Time</label>
-                                                    <input type="datetime-local" name="events-end-date-and-time"
-                                                        id="events-end-date-and-time-{{ loop.index }}"
-                                                        value="{{ event.events_end_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-venue-{{ loop.index }}">Venue</label>
-                                                    <input type="text" name="events-venue" id="events-venue-{{ loop.index }}"
-                                                        placeholder="Venue" value="{{ event.events_venue }}" required>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-budget-{{ loop.index }}">Budget</label>
-                                                    <input type="number" name="events-budget" id="events-budget-{{ loop.index }}"
-                                                        placeholder="Budget" value="{{ event.events_budget }}" required>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-status-{{ loop.index }}">Event Status</label>
-                                                    <select name="events-status" id="events-status-{{ loop.index }}" required>
-                                                        <option value="" disabled>Select an Event Status</option>
-                                                        <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>
-                                                            Upcoming</option>
-                                                        <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>
-                                                            Postponed</option>
-                                                        <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done
-                                                        </option>
-                                                        <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>
-                                                            Cancelled</option>
-                                                    </select>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-description-{{ loop.index }}">Description</label>
-                                                    <textarea name="events-description" id="events-description-{{ loop.index }}"
-                                                        placeholder="Description" required>{{ event.events_description }}</textarea>
-                                                </div>
-                        
-                                                <div class="input-pair">
-                                                    <label for="events-remarks-{{ loop.index }}">Remarks</label>
-                                                    <input type="text" name="events-remarks" id="events-remarks-{{ loop.index }}"
-                                                        placeholder="Remarks (Optional)" value="{{ event.events_remarks }}">
-                                                </div>
-                        
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        
-                                                <div class="horizontal-button-pair-positioned-right">
-                                                    <button id="cancel-update-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
-                                                        class="secondary-button fit-content-button" type="button">Cancel</button>
-                                                    <button class="primary-button" data-index="{{ loop.index }}" type="submit">Update
-                                                        Event</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                        
-                                    <!-- Invite User Modal -->
-                                    <div id="invite-user-modal-content-{{ loop.index }}" class="modal">
-                                        <div class="container">
-                                            <span id="close-invite-user-modal-button-{{ loop.index }}" class="close-button"
-                                                data-index="{{ loop.index }}">&times;</span>
-                                            <h2>Invite a User to Manage</h2>
-                        
-                                            <!-- Flash messages section for the modal -->
-                                            {% with messages = get_flashed_messages(with_categories=true) %}
-                                            {% if messages %}
-                                            <div class="flash-messages center no-top-margin bottom-margin">
-                                                {% for category, message in messages %}
-                                                {% if category == 'modal-error' %}
-                                                <div class="alert alert-{{ category }}">{{ message }}</div>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                            {% endwith %}
-                        
-                                            <p>Enter the email address of the user you would like to invite to help you manage "{{
-                                                event.events_name }}".</p>
-                        
-                                            <form method="POST" action="{{ url_for('invite_user', event_id=event.events_id) }}">
-                                                <div class="input-pair">
-                                                    <label for="users-email-{{ loop.index }}">User's Email</label>
-                                                    <input type="email" name="users-email" id="users-email-{{ loop.index }}"
-                                                        placeholder="User's Email" required>
-                                                </div>
-                        
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        
-                                                <div class="horizontal-button-pair-positioned-right">
-                                                    <button class="primary-button fit-content-button" data-index="{{ loop.index }}"
-                                                        type="submit">Send Email Invite</button>
-                                                    <button id="cancel-invite-user-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
-                                                        class="fit-content-button secondary-button" type="button">Cancel</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                        
-                                    <!-- Delete Event Modal -->
-                                    <div id="delete-event-modal-content-{{ loop.index }}" class="modal">
-                                        <div class="container">
-                                            <span id="close-delete-event-modal-button-{{ loop.index }}" class="close-button"
-                                                data-index="{{ loop.index }}">&times;</span>
-                                            <h2>Delete Event</h2>
-                                            <p>Are you sure you want to delete this event? This action cannot be undone.</p>
-                                            <form method="POST" action="{{ url_for('delete_event', event_id=event.events_id) }}">
-                                                <div class="horizontal-button-pair-positioned-right">
-                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                    <button class="secondary-button fit-content-button" data-index="{{ loop.index }}"
-                                                        type="submit">Delete Event</button>
-                                                    <button id="cancel-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
-                                                        class="primary-button fit-content-button" type="button">Cancel</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
+                                            }
+                                        },
+                                        plugins: {
+                                            legend: {
+                                                display: true, // Show the legend
+                                                labels: {
+                                                    color: getLabelColor(),
+                                                    font: {
+                                                        family: getFontFamily(),
+                                                        size: getFontSize(),
+                                                        weight: getFontWeight()
+                                                    }
+                                                }
+                                            },
+                                        },
+                                    }
+                                });
+                                charts.push(budgetChart);
+                            }
+                        });
+
+                        // Function to update the chart when color scheme changes
+                        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                            updateChartColors();
+                        });
+
+                        // Function to update chart colors dynamically
+                        function updateChartColors() {
+                            const labelColor = getLabelColor();
+                            const rangeColor = getRangeColor();
+
+                            charts.forEach(chart => {
+                                // Update legend label colors
+                                chart.options.plugins.legend.labels.color = labelColor;
+                                chart.options.scales.x.title.color = rangeColor;
+                                chart.options.scales.x.ticks.color = rangeColor;
+                                chart.update();
+                            });
+                        }
+                    });
+                </script>
+
+                <div class="events-overview-chart-container">
+                    <canvas id="budget-chart-{{ loop.index }}"></canvas>
+                </div>
+
+                <div class="grid-item-button-group">
+                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
+                    <button id="open-update-event-modal-button-{{ loop.index }}" class="secondary-button"
+                        data-index="{{ loop.index }}">Update</button>
+                    <button id="open-invite-user-modal-button-{{ loop.index }}" class="secondary-button"
+                        data-index="{{ loop.index }}">Invite</button>
+                    <button id="open-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
+                        class="secondary-button">Delete</button>
+                </div>
+            </div>
+
+            <!-- Update Event Modal -->
+            <div id="update-event-modal-content-{{ loop.index }}" class="modal">
+                <div class="container">
+                    <span id="close-update-event-modal-button-{{ loop.index }}" class="close-button"
+                        data-index="{{ loop.index }}">&times;</span>
+                    <h2>Update Event</h2>
+
+                    <!-- Flash messages section for the modal -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="flash-messages center no-top-margin bottom-margin">
+                        {% for category, message in messages %}
+                        {% if category == 'modal-error' %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
                         {% endif %}
-                    {% endfor %}
-                {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('update_event', event_id=event.events_id) }}">
+                        <div class="input-pair">
+                            <label for="events-name-{{ loop.index }}">Event Name</label>
+                            <input type="text" name="events-name" id="events-name-{{ loop.index }}"
+                                placeholder="Event Name" value="{{ event.events_name }}" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-semester-{{ loop.index }}">Semester</label>
+                            <select name="events-semester" id="events-semester-{{ loop.index }}" required>
+                                <option value="" disabled>Select a Semester</option>
+                                <option value="1st Semester" {% if event.events_semester=='1st Semester' %}selected{%
+                                    endif %}>1st Semester</option>
+                                <option value="2nd Semester" {% if event.events_semester=='2nd Semester' %}selected{%
+                                    endif %}>2nd Semester</option>
+                            </select>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-academic-year-{{ loop.index }}">Academic Year</label>
+                            <select name="events-academic-year" id="events-academic-year-{{ loop.index }}" required>
+                                <option value="" disabled>Select an Academic Year</option>
+                                <option value="2024-2025" {% if event.events_academic_year=='2024-2025' %}selected{%
+                                    endif %}>2024-2025</option>
+                            </select>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-start-date-and-time-{{ loop.index }}">Start Date and Time</label>
+                            <input type="datetime-local" name="events-start-date-and-time"
+                                id="events-start-date-and-time-{{ loop.index }}"
+                                value="{{ event.events_start_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-end-date-and-time-{{ loop.index }}">End Date and Time</label>
+                            <input type="datetime-local" name="events-end-date-and-time"
+                                id="events-end-date-and-time-{{ loop.index }}"
+                                value="{{ event.events_end_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-venue-{{ loop.index }}">Venue</label>
+                            <input type="text" name="events-venue" id="events-venue-{{ loop.index }}"
+                                placeholder="Venue" value="{{ event.events_venue }}" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-budget-{{ loop.index }}">Budget</label>
+                            <input type="number" name="events-budget" id="events-budget-{{ loop.index }}"
+                                placeholder="Budget" value="{{ event.events_budget }}" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-status-{{ loop.index }}">Event Status</label>
+                            <select name="events-status" id="events-status-{{ loop.index }}" required>
+                                <option value="" disabled>Select an Event Status</option>
+                                <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>
+                                    Upcoming</option>
+                                <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>
+                                    Postponed</option>
+                                <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done
+                                </option>
+                                <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>
+                                    Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-description-{{ loop.index }}">Description</label>
+                            <textarea name="events-description" id="events-description-{{ loop.index }}"
+                                placeholder="Description" required>{{ event.events_description }}</textarea>
+                        </div>
+
+                        <div class="input-pair">
+                            <label for="events-remarks-{{ loop.index }}">Remarks</label>
+                            <input type="text" name="events-remarks" id="events-remarks-{{ loop.index }}"
+                                placeholder="Remarks (Optional)" value="{{ event.events_remarks }}">
+                        </div>
+
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="horizontal-button-pair-positioned-right">
+                            <button id="cancel-update-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
+                                class="secondary-button fit-content-button" type="button">Cancel</button>
+                            <button class="primary-button" data-index="{{ loop.index }}" type="submit">Update
+                                Event</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Invite User Modal -->
+            <div id="invite-user-modal-content-{{ loop.index }}" class="modal">
+                <div class="container">
+                    <span id="close-invite-user-modal-button-{{ loop.index }}" class="close-button"
+                        data-index="{{ loop.index }}">&times;</span>
+                    <h2>Invite a User to Manage</h2>
+
+                    <!-- Flash messages section for the modal -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="flash-messages center no-top-margin bottom-margin">
+                        {% for category, message in messages %}
+                        {% if category == 'modal-error' %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+
+                    <p>Enter the email address of the user you would like to invite to help you manage "{{
+                        event.events_name }}".</p>
+
+                    <form method="POST" action="{{ url_for('invite_user', event_id=event.events_id) }}">
+                        <div class="input-pair">
+                            <label for="users-email-{{ loop.index }}">User's Email</label>
+                            <input type="email" name="users-email" id="users-email-{{ loop.index }}"
+                                placeholder="User's Email" required>
+                        </div>
+
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="horizontal-button-pair-positioned-right">
+                            <button class="primary-button fit-content-button" data-index="{{ loop.index }}"
+                                type="submit">Send Email Invite</button>
+                            <button id="cancel-invite-user-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
+                                class="fit-content-button secondary-button" type="button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Event Modal -->
+            <div id="delete-event-modal-content-{{ loop.index }}" class="modal">
+                <div class="container">
+                    <span id="close-delete-event-modal-button-{{ loop.index }}" class="close-button"
+                        data-index="{{ loop.index }}">&times;</span>
+                    <h2>Delete Event</h2>
+                    <p>Are you sure you want to delete this event? This action cannot be undone.</p>
+                    <form method="POST" action="{{ url_for('delete_event', event_id=event.events_id) }}">
+                        <div class="horizontal-button-pair-positioned-right">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="secondary-button fit-content-button" data-index="{{ loop.index }}"
+                                type="submit">Delete Event</button>
+                            <button id="cancel-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
+                                class="primary-button fit-content-button" type="button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
             {% else %}
-                <p>No events found for your department.</p>
+            <p>No events found for your department.</p>
             {% endif %}
         </div>
     </div>
