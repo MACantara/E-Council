@@ -1320,6 +1320,12 @@ def delete_event(event_id):
     # Find the event by ID
     event = Events.query.get_or_404(event_id)
 
+    # Delete related records in the departments_events table
+    DepartmentsEvents.query.filter_by(events_id=event_id).delete()
+
+    # Delete related records in the event_invitations table
+    EventInvitations.query.filter_by(event_invitations_events_id=event_id).delete()
+
     # Delete the event
     db.session.delete(event)
     db.session.commit()
