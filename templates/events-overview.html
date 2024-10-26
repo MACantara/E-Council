@@ -430,7 +430,9 @@
 
             {% for academic_year in academic_years %}
             {% for semester in semesters %}
-            <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            <div class="grid-header">
+                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            </div>
 
             {% for event in sorted_events %}
             {% if event.events_semester == semester and event.events_academic_year == academic_year %}
