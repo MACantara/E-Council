@@ -115,7 +115,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-button-pair-positioned-right">
-                    <a href="{{ url_for('events_overview', event_id=event.events_id) }}"
+                    <a href="{{ url_for('events_overview')}}"
                         class="secondary-button fit-content-button" type="button">Cancel</a>
                     <button class="primary-button"  type="submit">Update
                         Event</button>
