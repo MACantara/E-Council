@@ -1199,40 +1199,44 @@ def events_overview():
 
     return render_template("events-overview.html", events=events, academic_years=academic_years, sort_by_date=sort_by_date)
 
-@app.route("/update-event/<int:event_id>", methods=["POST"])
+@app.route("/update-event/<int:event_id>", methods=["POST", "GET"])
 @login_required
 def update_event(event_id):
-    # Get the event by ID
-    event = Events.query.get_or_404(event_id)
+    if request.method == "GET":
+        return render_template("update-event.html", event=Events.query.get_or_404(event_id))
+    elif request.method == "POST":
+        # Get the event by ID
+        event = Events.query.get_or_404(event_id)
 
-    # Get form data
-    event_name = request.form.get("events-name")
-    event_semester = request.form.get("events-semester")
-    event_academic_year = request.form.get("events-academic-year")
-    event_start_date_and_time = request.form.get("events-start-date-and-time")
-    event_end_date_and_time = request.form.get("events-end-date-and-time")
-    event_venue = request.form.get("events-venue")
-    event_budget = request.form.get("events-budget")
-    event_status = request.form.get("events-status")
-    event_description = request.form.get("events-description")
-    event_remarks = request.form.get("events-remarks")
+        # Get form data
+        event_name = request.form.get("events-name")
+        event_semester = request.form.get("events-semester")
+        event_academic_year = request.form.get("events-academic-year")
+        event_start_date_and_time = request.form.get("events-start-date-and-time")
+        event_end_date_and_time = request.form.get("events-end-date-and-time")
+        event_venue = request.form.get("events-venue")
+        event_budget = request.form.get("events-budget")
+        event_status = request.form.get("events-status")
+        event_description = request.form.get("events-description")
+        event_remarks = request.form.get("events-remarks")
 
-    # Update event details
-    event.events_name = event_name
-    event.events_semester = event_semester
-    event.events_academic_year = event_academic_year
-    event.events_start_date_and_time = datetime.strptime(event_start_date_and_time, '%Y-%m-%dT%H:%M')
-    event.events_end_date_and_time = datetime.strptime(event_end_date_and_time, '%Y-%m-%dT%H:%M')
-    event.events_venue = event_venue
-    event.events_budget = event_budget
-    event.events_status = event_status
-    event.events_description = event_description
-    event.events_remarks = event_remarks
+        # Update event details
+        event.events_name = event_name
+        event.events_semester = event_semester
+        event.events_academic_year = event_academic_year
+        event.events_start_date_and_time = datetime.strptime(event_start_date_and_time, '%Y-%m-%dT%H:%M')
+        event.events_end_date_and_time = datetime.strptime(event_end_date_and_time, '%Y-%m-%dT%H:%M')
+        event.events_venue = event_venue
+        event.events_budget = event_budget
+        event.events_status = event_status
+        event.events_description = event_description
+        event.events_remarks = event_remarks
 
-    # Commit changes to the database
-    db.session.commit()
+        # Commit changes to the database
+        db.session.commit()
 
-    flash("Event updated successfully.", "success")
+        flash("Event updated successfully.", "success")
+
     return redirect(url_for("events_overview"))
 
 @app.route("/update-event-status/<int:event_id>", methods=["POST"])
