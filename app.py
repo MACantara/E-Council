@@ -55,6 +55,10 @@ cloudinary.config(
 
 csrf = CSRFProtect(app)
 
+# Ensure the upload folder exists
+UPLOAD_FOLDER = 'uploads/receipts'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(Users, int(user_id))
@@ -218,6 +222,23 @@ class EventInvitations(db.Model):
 
     def __repr__(self):
         return f"EventInvitations({self.event_invitations_id}, {self.event_invitations_events_id}, {self.event_invitations_email}, {self.event_invitations_token}, {self.event_invitations_created_at})"
+
+class TransactionHistory(db.Model):
+    __tablename__ = 'transaction_history'
+
+    transaction_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), index=True, nullable=True)
+    transaction_name = db.Column(db.String(255), nullable=True)
+    transaction_date = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+    transaction_unit_amount = db.Column(db.Numeric(10, 2), nullable=True)
+    transaction_unit_price = db.Column(db.Numeric(10, 2), nullable=True)
+    transaction_total = db.column_property(transaction_unit_amount * transaction_unit_price)
+    transaction_category = db.Column(db.String(255), nullable=True)
+    transaction_type = db.Column(db.Enum('expense', 'income', name='transaction_type_enum'), nullable=True)
+    transaction_receipt = db.Column(db.String(255), nullable=True)
+
+    def __repr__(self):
+        return f'<TransactionHistory {self.transaction_name}>'
 
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
@@ -1358,10 +1379,47 @@ def event_dashboard(event_id):
 
     return render_template("event-dashboard.html", event=event)
 
-@app.route("/add-transaction")
+@app.route("/add-transaction/<int:event_id>", methods=["GET", "POST"])
 @login_required
-def add_transaction():
-    return render_template("add-transaction.html")
+def add_transaction(event_id):
+    if request.method == "POST":
+        # Get form data
+        transaction_name = request.form.get("transaction-name")
+        transaction_date = request.form.get("transaction-date")
+        unit_amount = request.form.get("unit-amount")
+        unit_price = request.form.get("transaction-unit-price")
+        transaction_total = request.form.get("transaction-total")
+        transaction_category = request.form.get("transaction-category")
+        transaction_type = request.form.get("transaction-type")
+        transaction_receipt = request.files.get("transaction-receipt")
+
+        # Handle file upload
+        receipt_filename = None
+        if transaction_receipt:
+            receipt_filename = secure_filename(transaction_receipt.filename)
+            transaction_receipt.save(os.path.join(UPLOAD_FOLDER, receipt_filename))
+
+        # Create a new transaction
+        new_transaction = TransactionHistory(
+            events_id=event_id,
+            transaction_name=transaction_name,
+            transaction_date=datetime.strptime(transaction_date, '%Y-%m-%dT%H:%M'),
+            transaction_unit_amount=unit_amount,
+            transaction_unit_price=unit_price,
+            transaction_total=transaction_total,
+            transaction_category=transaction_category,
+            transaction_type=transaction_type,
+            transaction_receipt=receipt_filename
+        )
+
+        # Add the transaction to the database
+        db.session.add(new_transaction)
+        db.session.commit()
+
+        flash("Transaction added successfully.", "success")
+        return redirect(url_for("event_dashboard", event_id=event_id))
+
+    return render_template("add-transaction.html", event_id=event_id)
 
 @app.route("/invite-user/<int:event_id>", methods=["POST"])
 @login_required
