@@ -114,6 +114,8 @@
                         <input type="text" name="events-remarks" id="events-remarks" placeholder="Remarks (Optional)">
                     </div>
 
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                     <div class="horizontal-input-pair">
                         <a href="{{ url_for('events_overview') }}" class="secondary-button fit-content-button">Back</a>
                         <button class="primary-button" type="submit">Add Event</button>
@@ -177,6 +179,35 @@
 
                 window.addEventListener('click', function (event) {
                     document.querySelectorAll('[id^="invite-user-modal-content-"]').forEach(modal => {
+                        if (event.target == modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                });
+
+                // Delete Event Modal
+                document.querySelectorAll('[id^="open-delete-event-modal-button-"]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        const modal = document.getElementById(`delete-event-modal-content-${index}`);
+                        if (modal) {
+                            modal.style.display = 'block';
+                        }
+                    });
+                });
+
+                document.querySelectorAll('[id^="close-delete-event-modal-button-"]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        const modal = document.getElementById(`delete-event-modal-content-${index}`);
+                        if (modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                });
+
+                window.addEventListener('click', function (event) {
+                    document.querySelectorAll('[id^="delete-event-modal-content-"]').forEach(modal => {
                         if (event.target == modal) {
                             modal.style.display = 'none';
                         }
@@ -344,6 +375,9 @@
                             request.args.get('events-overview-sort-by-date')=='old-to-recent' %}selected{% endif %}>Old
                             to Recent</option>
                     </select>
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                     <button type="button" id="reset-filters-button" class="secondary-button fit-content-button">Reset
                         Filters</button>
                 </div>
@@ -398,7 +432,7 @@
                     document.addEventListener('DOMContentLoaded', function () {
                         const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
                         const charts = [];
-                
+
                         canvasElements.forEach((canvasElement, index) => {
                             const ctx = canvasElement.getContext('2d');
                             if (ctx) {
@@ -470,17 +504,17 @@
                                 charts.push(budgetChart);
                             }
                         });
-                
+
                         // Function to update the chart when color scheme changes
                         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
                             updateChartColors();
                         });
-                
+
                         // Function to update chart colors dynamically
                         function updateChartColors() {
                             const labelColor = getLabelColor();
                             const rangeColor = getRangeColor();
-                
+
                             charts.forEach(chart => {
                                 // Update legend label colors
                                 chart.options.plugins.legend.labels.color = labelColor;
@@ -502,7 +536,8 @@
                         data-index="{{ loop.index }}">Update</button>
                     <button id="open-invite-user-modal-button-{{ loop.index }}" class="secondary-button"
                         data-index="{{ loop.index }}">Invite</button>
-                    <button class="secondary-button">Delete</button>
+                    <button id="open-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
+                        class="secondary-button">Delete</button>
                 </div>
             </div>
 
@@ -606,6 +641,8 @@
                                 placeholder="Remarks (Optional)" value="{{ event.events_remarks }}">
                         </div>
 
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                         <div class="horizontal-input-pair">
                             <a href="{{ url_for('events_overview') }}"
                                 class="secondary-button fit-content-button">Back</a>
@@ -645,7 +682,25 @@
                                 placeholder="User's Email" required>
                         </div>
 
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                         <button class="primary-button" type="submit">Send Email Invite</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Event Modal -->
+            <div id="delete-event-modal-content-{{ loop.index }}" class="modal">
+                <div class="container">
+                    <span id="close-delete-event-modal-button-{{ loop.index }}" class="close-button"
+                        data-index="{{ loop.index }}">&times;</span>
+                    <h2>Delete Event</h2>
+                    <p>Are you sure you want to delete this event? This action cannot be undone.</p>
+                    <form method="POST" action="{{ url_for('delete_event', event_id=event.events_id) }}">
+                        <div class="input-pair">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="secondary-button fit-content-button type=" submit">Delete Event</button>
+                        </div>
                     </form>
                 </div>
             </div>
