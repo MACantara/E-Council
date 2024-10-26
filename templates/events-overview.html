@@ -593,20 +593,18 @@
                     <p>Enter the email address of the user you would like to invite to help you manage "{{
                         event.events_name }}".</p>
 
-                    <form method="POST" action="{{ url_for('invite_user', event_id=event.events_id) }}">
+                                        <form method="POST" action="{{ url_for('invite_user', event_id=event.events_id) }}">
                         <div class="input-pair">
-                            <label for="users-email-{{ loop.index }}">User's Email</label>
-                            <input type="email" name="users-email" id="users-email-{{ loop.index }}"
-                                placeholder="User's Email" required>
+                            <label for="users-email">User's Email</label>
+                            <input type="email" name="users-email" id="users-email" placeholder="User's Email" required>
                         </div>
-
+                    
+                        <input type="hidden" name="source" value="events_overview">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
+                    
                         <div class="horizontal-button-pair-positioned-right">
-                            <button class="primary-button fit-content-button" data-index="{{ loop.index }}"
-                                type="submit">Send Email Invite</button>
-                            <button id="cancel-invite-user-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
-                                class="fit-content-button secondary-button" type="button">Cancel</button>
+                            <button class="primary-button" type="submit">Send Email Invite</button>
+                            <button id="cancel-event-invite-modal-button" class="secondary-button" type="button">Cancel</button>
                         </div>
                     </form>
                 </div>
