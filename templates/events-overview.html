@@ -424,7 +424,16 @@
 
         <div class="overview-content-container-group">
             {% if events %}
-            {% for event in events %}
+            {% set sorted_events = events | sort(attribute='events_academic_year', reverse=True) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] %}
+            {% set academic_years = sorted_events | map(attribute='events_academic_year') | unique %}
+
+            {% for academic_year in academic_years %}
+            {% for semester in semesters %}
+            <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+
+            {% for event in sorted_events %}
+            {% if event.events_semester == semester and event.events_academic_year == academic_year %}
             <div class="overview-content-grid-item">
                 <select class="fit-content-button" name="event-status-select-button"
                     id="event-status-select-button-{{ loop.index }}" aria-label="Select an Event Status"
@@ -751,6 +760,9 @@
                     </form>
                 </div>
             </div>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
             {% endfor %}
             {% else %}
             <p>No events found for your department.</p>
