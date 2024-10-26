@@ -28,16 +28,17 @@
                 <span id="close-add-transaction-modal-button" class="close-button">&times;</span>
                 <h2>Add Transaction</h2>
 
-                <form method="POST">
-                    <div class="input-pair">
-                        <label for="date">Date</label>
-                        <input type="datetime-local" name="date" id="date" required>
-                    </div>
-
+                <form method="POST" enctype="multipart/form-data"
+                    action="{{ url_for('add_transaction', event_id=event.events_id) }}">
                     <div class="input-pair">
                         <label for="transaction-name">Transaction Name</label>
                         <input type="text" name="transaction-name" id="transaction-name" placeholder="Transaction Name"
                             required>
+                    </div>
+
+                    <div class="input-pair">
+                        <label for="transaction-date">Date</label>
+                        <input type="datetime-local" name="transaction-date" id="transaction-date" required>
                     </div>
 
                     <div class="input-pair">
@@ -46,18 +47,20 @@
                     </div>
 
                     <div class="input-pair">
-                        <label for="unit-price">Unit Price</label>
-                        <input type="number" name="unit-price" id="unit-price" placeholder="Unit Price" required>
+                        <label for="transaction-unit-price">Unit Price</label>
+                        <input type="number" name="transaction-unit-price" id="transaction-unit-price"
+                            placeholder="Unit Price" required>
                     </div>
 
                     <div class="input-pair">
-                        <label for="total">Total</label>
-                        <input type="number" name="total" id="total" placeholder="Total" required>
+                        <label for="transaction-total">Total</label>
+                        <input type="number" name="transaction-total" id="transaction-total" placeholder="Total"
+                            required>
                     </div>
 
                     <div class="input-pair">
-                        <label for="category">Category</label>
-                        <select name="category" id="category" required>
+                        <label for="transaction-category">Category</label>
+                        <select name="transaction-category" id="transaction-category" required>
                             <option value="" disabled selected>Select a Category</option>
                             <option value="1">Category 1</option>
                             <option value="2">Category 2</option>
@@ -68,15 +71,15 @@
                     <div class="input-pair">
                         <label for="transaction-type">Transaction Type</label>
                         <select name="transaction-type" id="transaction-type" required>
-                            <option value="expense" selected>Expense</option>
-                            <option value="income">Income</option>
+                            <option value="Expense" selected>Expense</option>
+                            <option value="Income">Income</option>
                         </select>
                     </div>
 
                     <div class="input-pair">
-                        <label for="receipt">Receipt</label>
-                        <input type="file" name="receipt" id="receipt" hidden>
-                        <label for="receipt" class="custom-file-upload-input">
+                        <label for="transaction-receipt">Receipt</label>
+                        <input type="file" name="transaction-receipt" id="transaction-receipt" hidden>
+                        <label for="transaction-receipt" class="custom-file-upload-input">
                             <span class="choose-file-text">Choose File</span>
                             <span id="file-name" class="file-name">No file chosen</span>
                         </label>
@@ -479,10 +482,10 @@
     });
 
     // File upload
-    document.getElementById('receipt').addEventListener('change', function () {
-        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-        document.getElementById('file-name').textContent = fileName;
-    });
+    document.getElementById('transaction-receipt').addEventListener('change', function () {
+            const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+            document.getElementById('file-name').textContent = fileName;
+        });
 
     // Event Invite Modal
     document.getElementById('open-event-invite-modal-button').addEventListener('click', function () {
