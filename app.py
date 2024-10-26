@@ -1350,10 +1350,13 @@ def delete_event(event_id):
     flash("Event deleted successfully.", "success")
     return redirect(url_for("events_overview"))
 
-@app.route("/event-dashboard")
+@app.route("/event-dashboard/<int:event_id>", methods=["GET", "POST"])
 @login_required
-def event_dashboard():
-    return render_template("event-dashboard.html")
+def event_dashboard(event_id):
+    # Fetch the event details based on the event_id
+    event = Events.query.get_or_404(event_id)
+
+    return render_template("event-dashboard.html", event=event)
 
 @app.route("/add-transaction")
 @login_required
