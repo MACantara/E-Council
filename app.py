@@ -1371,6 +1371,7 @@ def invite_user(event_id):
 
     # Get form data
     users_email = request.form.get("users-email")
+    source = request.form.get("source")
 
     # Find the user by email
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -1387,19 +1388,19 @@ def invite_user(event_id):
     if existing_entry:
         department_name = existing_entry.department.departments_name
         flash(f"The department of the user {users_email} ({department_name}) is already managing the event '{event.events_name}'.", "error")
-        return redirect(url_for("events_overview"))
+        return redirect(url_for(source, event_id=event_id) if source == "event_dashboard" else url_for("events_overview"))
 
     # Check if there is an existing invitation
     existing_invitation = EventInvitations.query.filter_by(event_invitations_events_id=event_id, event_invitations_email=users_email).first()
     if existing_invitation:
         flash(f"An invitation for the event '{event.events_name}' has already been sent to {users_email}.", "error")
-        return redirect(url_for("events_overview"))
+        return redirect(url_for(source, event_id=event_id) if source == "event_dashboard" else url_for("events_overview"))
 
     # Send invite email
     send_invite_email(users_email, event.events_name, event_id)
 
     flash(f"Invitation email for the event '{event.events_name}' to {users_email} has been sent successfully.", "success")
-    return redirect(url_for("events_overview"))
+    return redirect(url_for(source, event_id=event_id) if source == "event_dashboard" else url_for("events_overview"))
 
 @app.route("/accept-invite/<token>")
 @login_required
