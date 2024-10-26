@@ -97,7 +97,11 @@
 
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <button class="primary-button" type="submit">Send Email Invite</button>
+                    <div class="horizontal-button-pair-positioned-right">
+                        <button id="cancel-event-invite-modal-button" class="secondary-button fit-content-button"
+                            type="button">Cancel</button>
+                        <button class="primary-button" type="submit">Send Email Invite</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -473,6 +477,13 @@
 
     document.getElementById('close-event-invite-modal-button').addEventListener('click', function () {
         document.getElementById('event-invite-modal-content').style.display = 'none';
+    });
+
+    document.getElementById('cancel-event-invite-modal-button').addEventListener('click', function () {
+        const modal = document.getElementById('event-invite-modal-content');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     });
 
     window.addEventListener('click', function (event) {
