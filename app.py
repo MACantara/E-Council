@@ -1203,7 +1203,12 @@ def events_overview():
 @login_required
 def update_event(event_id):
     if request.method == "GET":
-        return render_template("update-event.html", event=Events.query.get_or_404(event_id))
+        # Query distinct academic years
+        academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+        
+        # Render the template with the event and academic years
+        return render_template("update-event.html", event=Events.query.get_or_404(event_id), academic_years=academic_years)
+    
     elif request.method == "POST":
         # Get the event by ID
         event = Events.query.get_or_404(event_id)
@@ -1237,7 +1242,7 @@ def update_event(event_id):
 
         flash("Event updated successfully.", "success")
 
-    return redirect(url_for("events_overview"))
+        return redirect(url_for("events_overview"))
 
 @app.route("/update-event-status/<int:event_id>", methods=["POST"])
 @login_required
