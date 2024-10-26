@@ -66,7 +66,9 @@
                         <label for="events-academic-year">Academic Year</label>
                         <select name="events-academic-year" id="events-academic-year" required>
                             <option value="" disabled selected>Select an Academic Year</option>
-                            <option value="2024-2025">2024-2025</option>
+                            {% for year in academic_years %}
+                            <option value="{{ year.events_academic_year }}">{{ year.events_academic_year }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 
