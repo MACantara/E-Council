@@ -154,6 +154,16 @@
                     });
                 });
 
+                document.querySelectorAll('[id^="cancel-update-event-modal-button-"]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        const modal = document.getElementById(`update-event-modal-content-${index}`);
+                        if (modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                });
+
                 window.addEventListener('click', function (event) {
                     document.querySelectorAll('[id^="update-event-modal-content-"]').forEach(modal => {
                         if (event.target == modal) {
@@ -663,10 +673,11 @@
 
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                        <div class="horizontal-input-pair">
-                            <a href="{{ url_for('events_overview') }}"
-                                class="secondary-button fit-content-button">Back</a>
-                            <button class="primary-button" type="submit">Update Event</button>
+                        <div class="horizontal-button-pair-positioned-right">
+                            <button id="cancel-update-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
+                                class="secondary-button fit-content-button" type="button">Cancel</button>
+                            <button class="primary-button" data-index="{{ loop.index }}" type="submit">Update
+                                Event</button>
                         </div>
                     </form>
                 </div>
