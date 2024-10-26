@@ -1377,8 +1377,8 @@ def event_dashboard(event_id):
     # Fetch the event details based on the event_id
     event = Events.query.get_or_404(event_id)
     
-    # Fetch the transaction history for the given event_id
-    transactions = TransactionHistory.query.filter_by(events_id=event_id).all()
+    # Fetch the transaction history for the given event_id, sorted by most recent
+    transactions = TransactionHistory.query.filter_by(events_id=event_id).order_by(TransactionHistory.transaction_date.desc()).all()
 
     return render_template("event-dashboard.html", event=event, transactions=transactions)
 
