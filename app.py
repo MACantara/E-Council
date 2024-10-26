@@ -1314,6 +1314,19 @@ def add_event():
 
     return render_template("events-overview.html")
 
+@app.route("/delete-event/<int:event_id>", methods=["POST"])
+@login_required
+def delete_event(event_id):
+    # Find the event by ID
+    event = Events.query.get_or_404(event_id)
+
+    # Delete the event
+    db.session.delete(event)
+    db.session.commit()
+
+    flash("Event deleted successfully.", "success")
+    return redirect(url_for("events_overview"))
+
 @app.route("/event-dashboard")
 @login_required
 def event_dashboard():
