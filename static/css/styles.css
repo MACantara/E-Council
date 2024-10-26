@@ -676,6 +676,13 @@ textarea {
     grid-template-rows: auto 1fr auto;
 }
 
+.grid-header {
+    grid-column: 1 / -1; /* Make the header span the entire width of the grid */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
 /* Council Overview Table Styles */
 
 .council-overview-content-table {
