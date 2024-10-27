@@ -776,6 +776,10 @@ textarea {
     grid-column: span 3;
 }
 
+.grid-item-button-group a:nth-child(4) {
+    grid-column: span 3;
+}
+
 /* Events Overview Styles */
 
 .events-overview-chart-container {
