@@ -1412,8 +1412,13 @@ def add_transaction(event_id):
         unit_price = request.form.get("transaction-unit-price")
         transaction_total = request.form.get("transaction-total")
         transaction_category = request.form.get("transaction-category")
+        other_transaction_category = request.form.get("other-transaction-category")
         transaction_type = request.form.get("transaction-type")
         transaction_receipt = request.files.get("transaction-receipt")
+
+        # Use the value from the additional input field if "Other" is selected
+        if transaction_category == "Other":
+            transaction_category = other_transaction_category
 
         # Handle file upload
         receipt_filename = None
