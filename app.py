@@ -1278,13 +1278,13 @@ def add_event():
         # Validation
         if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time:
             flash("Please fill out all required fields.", "modal-error")
-            return render_template("events-overview.html", show_modal=True)
+            return render_template("add-event.html", academic_years=get_distinct_academic_years())
 
         # Check if event name already exists
         existing_event = Events.query.filter_by(events_name=events_name).first()
         if existing_event:
             flash("An event with this name already exists. Please choose a different name.", "modal-error")
-            return render_template("events-overview.html", show_modal=True)
+            return render_template("add-event.html", academic_years=get_distinct_academic_years())
 
         # Validate date format
         try:
@@ -1292,7 +1292,7 @@ def add_event():
             events_end_date_and_time = datetime.strptime(events_end_date_and_time, '%Y-%m-%dT%H:%M')
         except ValueError:
             flash("Invalid date format. Please use the format YYYY-MM-DDTHH:MM.", "modal-error")
-            return render_template("events-overview.html", show_modal=True)
+            return render_template("add-event.html", academic_years=get_distinct_academic_years())
 
         # Validate budget format
         if events_budget:
@@ -1300,7 +1300,7 @@ def add_event():
                 events_budget = float(events_budget)
             except ValueError:
                 flash("Invalid budget format. Please enter a valid number.", "modal-error")
-                return render_template("events-overview.html", show_modal=True)
+                return render_template("add-event.html", academic_years=get_distinct_academic_years())
 
         event = Events(
             events_name=events_name,
@@ -1330,7 +1330,12 @@ def add_event():
         flash("Event added successfully!", "success")
         return redirect(url_for("events_overview"))
 
-    return render_template("events-overview.html")
+    # Query distinct academic years
+    academic_years = get_distinct_academic_years()
+    return render_template("add-event.html", academic_years=academic_years)
+
+def get_distinct_academic_years():
+    return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
 @app.route("/delete-event/<int:event_id>", methods=["POST"])
 @login_required
