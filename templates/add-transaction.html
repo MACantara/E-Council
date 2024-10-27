@@ -9,7 +9,8 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button fit-content-button">Back to Events Dashboard</a>
+        <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}"
+            class="primary-button fit-content-button">Back to Events Dashboard</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -63,10 +64,11 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                
+
                 <div class="input-pair" id="other-transaction-category-container" style="display: none;">
                     <label for="other-transaction-category">Other Category</label>
-                    <input type="text" name="other-transaction-category" id="other-transaction-category" placeholder="Enter Category">
+                    <input type="text" name="other-transaction-category" id="other-transaction-category"
+                        placeholder="Enter Category">
                 </div>
 
                 <div class="input-pair">
@@ -89,7 +91,8 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
-                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="secondary-button fit-content-button">Cancel</a>
+                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}"
+                        class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Add Transaction</button>
                 </div>
             </form>
@@ -123,6 +126,12 @@
                 otherTransactionCategoryContainer.style.display = 'none';
             }
         });
+    });
+
+    // File upload
+    document.getElementById('transaction-receipt').addEventListener('change', function () {
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        document.getElementById('file-name').textContent = fileName;
     });
 </script>
 
