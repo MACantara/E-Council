@@ -1194,7 +1194,22 @@ def events_overview():
     # Execute the query
     events = query.all()
 
-    return render_template("events-overview.html", events=events, academic_years=academic_years, sort_by_date=sort_by_date)
+    # Fetch transaction history and calculate expenses, income, and remaining budget
+    event_data = []
+    for event in events:
+        transactions = TransactionHistory.query.filter_by(events_id=event.events_id).all()
+        total_income = sum(t.transaction_total for t in transactions if t.transaction_type == 'Income')
+        total_expense = sum(t.transaction_total for t in transactions if t.transaction_type == 'Expense')
+        remaining_budget = total_income - total_expense + (event.events_budget or 0)
+        event_data.append({
+            'event_id': event.events_id,
+            'total_income': total_income,
+            'total_expense': total_expense,
+            'remaining_budget': remaining_budget,
+            'events_budget': event.events_budget or 0
+        })
+
+    return render_template("events-overview.html", events=events, academic_years=academic_years, sort_by_date=sort_by_date, event_data=event_data)
 
 @app.route("/update-event/<int:event_id>", methods=["POST", "GET"])
 @login_required
