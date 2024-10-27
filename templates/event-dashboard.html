@@ -311,18 +311,6 @@
             }
         }
     });
-
-    // File upload
-    document.getElementById('transaction-receipt').addEventListener('change', function () {
-        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-        document.getElementById('file-name').textContent = fileName;
-    });
-
-    window.addEventListener('click', function (event) {
-        if (event.target == document.getElementById('event-invite-modal-content')) {
-            document.getElementById('event-invite-modal-content').style.display = 'none';
-        }
-    });
 </script>
 
 {% endblock %}
