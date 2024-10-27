@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 from markupsafe import Markup
 from datetime import datetime, timedelta
 from sqlalchemy import Enum
+from decimal import Decimal
 
 import cloudinary
 import cloudinary.uploader
@@ -1368,10 +1369,34 @@ def event_dashboard(event_id):
     # Fetch the transaction history for the given event_id, sorted by most recent
     transactions = TransactionHistory.query.filter_by(events_id=event_id).order_by(TransactionHistory.transaction_date.desc()).all()
 
-    # Query distinct transaction categories
-    transaction_categories = db.session.query(TransactionHistory.transaction_category).distinct().order_by(TransactionHistory.transaction_category).all()
+    # Query top 5 income transactions
+    top5_income = db.session.query(TransactionHistory).filter_by(events_id=event_id, transaction_type='Income').order_by(TransactionHistory.transaction_total.desc()).limit(5).all()
 
-    return render_template("event-dashboard.html", event=event, transactions=transactions, transaction_categories=transaction_categories)
+    # Query top 5 expense transactions
+    top5_expense = db.session.query(TransactionHistory).filter_by(events_id=event_id, transaction_type='Expense').order_by(TransactionHistory.transaction_total.desc()).limit(5).all()
+
+    # Convert TransactionHistory objects to dictionaries
+    def transaction_to_dict(transaction):
+        return {
+            'transaction_name': transaction.transaction_name,
+            'transaction_total': float(transaction.transaction_total),
+            'transaction_date': transaction.transaction_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'transaction_category': transaction.transaction_category,
+            'transaction_type': transaction.transaction_type
+        }
+
+    top5_income_dicts = [transaction_to_dict(transaction) for transaction in top5_income]
+    top5_expense_dicts = [transaction_to_dict(transaction) for transaction in top5_expense]
+
+    # Calculate total income and total expense
+    total_income = sum(transaction['transaction_total'] for transaction in top5_income_dicts) or 0
+    total_expense = sum(transaction['transaction_total'] for transaction in top5_expense_dicts) or 0
+
+    # Calculate remaining budget
+    events_budget = float(event.events_budget or 0)
+    remaining_budget = total_income - total_expense + events_budget
+
+    return render_template("event-dashboard.html", event=event, transactions=transactions, top5_income=top5_income_dicts, top5_expense=top5_expense_dicts, total_income=total_income, total_expense=total_expense, remaining_budget=remaining_budget)
 
 @app.route("/add-transaction/<int:event_id>", methods=["GET", "POST"])
 @login_required
