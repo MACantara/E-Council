@@ -1376,6 +1376,9 @@ def event_dashboard(event_id):
 @app.route("/add-transaction/<int:event_id>", methods=["GET", "POST"])
 @login_required
 def add_transaction(event_id):
+    # Fetch the event details based on the event_id
+    event = Events.query.get_or_404(event_id)
+
     if request.method == "POST":
         # Get form data
         transaction_name = request.form.get("transaction-name")
@@ -1413,7 +1416,10 @@ def add_transaction(event_id):
         flash("Transaction added successfully.", "success")
         return redirect(url_for("event_dashboard", event_id=event_id))
 
-    return render_template("add-transaction.html", event_id=event_id)
+    # Query distinct transaction categories
+    transaction_categories = db.session.query(TransactionHistory.transaction_category).distinct().order_by(TransactionHistory.transaction_category).all()
+
+    return render_template("add-transaction.html", event=event, transaction_categories=transaction_categories)
 
 @app.route("/invite-user/<int:event_id>", methods=["GET", "POST"])
 @login_required
