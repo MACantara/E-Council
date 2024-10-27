@@ -39,19 +39,18 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="unit-amount">Unit Amount</label>
-                    <input type="number" name="unit-amount" id="unit-amount" placeholder="Unit Amount" required>
+                    <label for="transaction-unit-amount">Unit Amount</label>
+                    <input type="number" name="transaction-unit-amount" id="transaction-unit-amount" placeholder="Unit Amount" required>
                 </div>
-
+                
                 <div class="input-pair">
                     <label for="transaction-unit-price">Unit Price</label>
-                    <input type="number" name="transaction-unit-price" id="transaction-unit-price"
-                        placeholder="Unit Price" required>
+                    <input type="number" name="transaction-unit-price" id="transaction-unit-price" placeholder="Unit Price" required>
                 </div>
-
+                
                 <div class="input-pair">
                     <label for="transaction-total">Total</label>
-                    <input type="number" name="transaction-total" id="transaction-total" placeholder="Total" required>
+                    <input type="number" name="transaction-total" id="transaction-total" placeholder="Total" readonly>
                 </div>
 
                 <div class="input-pair">
@@ -126,6 +125,20 @@
                 otherTransactionCategoryContainer.style.display = 'none';
             }
         });
+
+        const unitAmountInput = document.getElementById('transaction-unit-amount');
+        const unitPriceInput = document.getElementById('transaction-unit-price');
+        const totalInput = document.getElementById('transaction-total');
+
+        function calculateTotal() {
+            const unitAmount = parseFloat(unitAmountInput.value) || 0;
+            const unitPrice = parseFloat(unitPriceInput.value) || 0;
+            const total = unitAmount * unitPrice;
+            totalInput.value = total.toFixed(2);
+        }
+
+        unitAmountInput.addEventListener('input', calculateTotal);
+        unitPriceInput.addEventListener('input', calculateTotal);
     });
 
     // File upload
