@@ -27,39 +27,6 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Invite User Modal
-                document.querySelectorAll('[id^="open-invite-user-modal-button-"]').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = this.getAttribute('data-index');
-                        document.getElementById(`invite-user-modal-content-${index}`).style.display = 'block';
-                    });
-                });
-
-                document.querySelectorAll('[id^="close-invite-user-modal-button-"]').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = this.getAttribute('data-index');
-                        document.getElementById(`invite-user-modal-content-${index}`).style.display = 'none';
-                    });
-                });
-
-                document.querySelectorAll('[id^="cancel-invite-user-modal-button-"]').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = this.getAttribute('data-index');
-                        const modal = document.getElementById(`invite-user-modal-content-${index}`);
-                        if (modal) {
-                            modal.style.display = 'none';
-                        }
-                    });
-                });
-
-                window.addEventListener('click', function (event) {
-                    document.querySelectorAll('[id^="invite-user-modal-content-"]').forEach(modal => {
-                        if (event.target == modal) {
-                            modal.style.display = 'none';
-                        }
-                    });
-                });
-
                 // Delete Event Modal
                 document.querySelectorAll('[id^="open-delete-event-modal-button-"]').forEach(button => {
                     button.addEventListener('click', function () {
@@ -347,50 +314,9 @@
                     <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
                     <a href="{{ url_for('update_event', event_id=event.events_id) }}" class="secondary-button"
                         data-index="{{ loop.index }}">Update</a>
-                    <button id="open-invite-user-modal-button-{{ loop.index }}" class="secondary-button"
-                        data-index="{{ loop.index }}">Invite</button>
+                    <a href="{{ url_for('invite_user', event_id=event.events_id)}}" class="secondary-button">Invite</a>
                     <button id="open-delete-event-modal-button-{{ loop.index }}" data-index="{{ loop.index }}"
                         class="secondary-button">Delete</button>
-                </div>
-            </div>
-
-            <!-- Invite User Modal -->
-            <div id="invite-user-modal-content-{{ loop.index }}" class="modal">
-                <div class="container">
-                    <span id="close-invite-user-modal-button-{{ loop.index }}" class="close-button"
-                        data-index="{{ loop.index }}">&times;</span>
-                    <h2>Invite a User to Manage</h2>
-
-                    <!-- Flash messages section for the modal -->
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    <div class="flash-messages center no-top-margin bottom-margin">
-                        {% for category, message in messages %}
-                        {% if category == 'modal-error' %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    {% endwith %}
-
-                    <p>Enter the email address of the user you would like to invite to help you manage "{{
-                        event.events_name }}".</p>
-
-                                        <form method="POST" action="{{ url_for('invite_user', event_id=event.events_id) }}">
-                        <div class="input-pair">
-                            <label for="users-email">User's Email</label>
-                            <input type="email" name="users-email" id="users-email" placeholder="User's Email" required>
-                        </div>
-                    
-                        <input type="hidden" name="source" value="events_overview">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    
-                        <div class="horizontal-button-pair-positioned-right">
-                            <button class="primary-button" type="submit">Send Email Invite</button>
-                            <button id="cancel-event-invite-modal-button" class="secondary-button" type="button">Cancel</button>
-                        </div>
-                    </form>
                 </div>
             </div>
 
