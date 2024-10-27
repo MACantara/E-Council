@@ -1461,7 +1461,9 @@ def invite_user(event_id):
         flash(f"Invitation email for the event '{event.events_name}' to {users_email} has been sent successfully.", "success")
         return redirect(url_for(source, event_id=event_id) if source == "event_dashboard" else url_for("events_overview"))
 
-    return render_template("invite-user.html", event=event)
+    # Get the source from the query parameters
+    source = request.args.get("source", "events_overview")
+    return render_template("invite-user.html", event=event, source=source)
 
 @app.route("/accept-invite/<token>")
 @login_required
