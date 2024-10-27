@@ -1178,12 +1178,6 @@ def events_overview():
     # Get the current user's department ID
     users_departments_id = current_user.users_departments_id
 
-    # Get filter and sort parameters from the request
-    academic_year = request.args.get("events-overview-academic-year")
-    status = request.args.get("events-overview-filter-by-status")
-    semester = request.args.get("events-overview-filter-by-semester")
-    sort_by_date = request.args.get("events-overview-sort-by-date")
-
     # Set default sorting to recent-to-old if not provided
     if not sort_by_date:
         sort_by_date = "recent-to-old"
@@ -1194,26 +1188,12 @@ def events_overview():
     else:
         academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.asc()).all()
 
-    # Set default academic year to the most recent one if not provided and if "All" is not selected
-    if not academic_year and academic_years:
-        academic_year = academic_years[0].events_academic_year
+    # Set default academic year to "All" if not provided
+    if not academic_year:
+        academic_year = "All"
 
     # Base query for events associated with the user's department
     query = db.session.query(Events).join(DepartmentsEvents).filter(DepartmentsEvents.departments_id == users_departments_id)
-
-    # Apply filters
-    if academic_year and academic_year != "All":
-        query = query.filter(Events.events_academic_year == academic_year)
-    if status and status != "All":
-        query = query.filter(Events.events_status == status)
-    if semester and semester != "All":
-        query = query.filter(Events.events_semester == semester)
-
-    # Apply sorting
-    if sort_by_date == "recent-to-old":
-        query = query.order_by(Events.events_start_date_and_time.desc())
-    elif sort_by_date == "old-to-recent":
-        query = query.order_by(Events.events_start_date_and_time.asc())
 
     # Execute the query
     events = query.all()
