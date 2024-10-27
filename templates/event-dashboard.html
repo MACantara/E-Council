@@ -91,8 +91,7 @@
                             <td>{{ transaction.transaction_type }}</td>
                             <td>
                                 {% if transaction.transaction_receipt %}
-                                <a href="{{ url_for('static', filename='uploads/receipts/' ~ transaction.transaction_receipt) }}"
-                                    target="_blank" class="primary-button fit-content-button">View Receipt</a>
+                                <a href="{{ transaction.transaction_receipt }}" target="_blank" class="primary-button fit-content-button">View Receipt</a>
                                 {% else %}
                                 No Receipt
                                 {% endif %}
