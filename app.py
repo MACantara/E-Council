@@ -1337,24 +1337,27 @@ def add_event():
 def get_distinct_academic_years():
     return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
-@app.route("/delete-event/<int:event_id>", methods=["POST"])
+@app.route("/delete-event/<int:event_id>", methods=["GET", "POST"])
 @login_required
 def delete_event(event_id):
     # Find the event by ID
     event = Events.query.get_or_404(event_id)
 
-    # Delete related records in the departments_events table
-    DepartmentsEvents.query.filter_by(events_id=event_id).delete()
+    if request.method == "POST":
+        # Delete related records in the departments_events table
+        DepartmentsEvents.query.filter_by(events_id=event_id).delete()
 
-    # Delete related records in the event_invitations table
-    EventInvitations.query.filter_by(event_invitations_events_id=event_id).delete()
+        # Delete related records in the event_invitations table
+        EventInvitations.query.filter_by(event_invitations_events_id=event_id).delete()
 
-    # Delete the event
-    db.session.delete(event)
-    db.session.commit()
+        # Delete the event
+        db.session.delete(event)
+        db.session.commit()
 
-    flash("Event deleted successfully.", "success")
-    return redirect(url_for("events_overview"))
+        flash("Event deleted successfully.", "success")
+        return redirect(url_for("events_overview"))
+
+    return render_template("delete-event.html", event=event)
 
 @app.route("/event-dashboard/<int:event_id>", methods=["GET", "POST"])
 @login_required
