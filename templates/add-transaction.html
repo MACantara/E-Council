@@ -60,7 +60,13 @@
                         {% for category in transaction_categories %}
                         <option value="{{ category.transaction_category }}">{{ category.transaction_category }}</option>
                         {% endfor %}
+                        <option value="Other">Other</option>
                     </select>
+                </div>
+                
+                <div class="input-pair" id="other-transaction-category-container" style="display: none;">
+                    <label for="other-transaction-category">Other Category</label>
+                    <input type="text" name="other-transaction-category" id="other-transaction-category" placeholder="Enter Category">
                 </div>
 
                 <div class="input-pair">
@@ -106,6 +112,17 @@
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
         transactionDateInput.value = formattedDate;
+
+        const transactionCategorySelect = document.getElementById('transaction-category');
+        const otherTransactionCategoryContainer = document.getElementById('other-transaction-category-container');
+
+        transactionCategorySelect.addEventListener('change', function () {
+            if (transactionCategorySelect.value === 'Other') {
+                otherTransactionCategoryContainer.style.display = 'block';
+            } else {
+                otherTransactionCategoryContainer.style.display = 'none';
+            }
+        });
     });
 </script>
 
