@@ -1368,7 +1368,10 @@ def event_dashboard(event_id):
     # Fetch the transaction history for the given event_id, sorted by most recent
     transactions = TransactionHistory.query.filter_by(events_id=event_id).order_by(TransactionHistory.transaction_date.desc()).all()
 
-    return render_template("event-dashboard.html", event=event, transactions=transactions)
+    # Query distinct transaction categories
+    transaction_categories = db.session.query(TransactionHistory.transaction_category).distinct().order_by(TransactionHistory.transaction_category).all()
+
+    return render_template("event-dashboard.html", event=event, transactions=transactions, transaction_categories=transaction_categories)
 
 @app.route("/add-transaction/<int:event_id>", methods=["GET", "POST"])
 @login_required
