@@ -1179,18 +1179,13 @@ def events_overview():
     users_departments_id = current_user.users_departments_id
 
     # Set default sorting to recent-to-old if not provided
-    if not sort_by_date:
-        sort_by_date = "recent-to-old"
+    sort_by_date = "recent-to-old"
 
     # Query distinct academic years
-    if sort_by_date == "recent-to-old":
-        academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
-    else:
-        academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.asc()).all()
+    academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
     # Set default academic year to "All" if not provided
-    if not academic_year:
-        academic_year = "All"
+    academic_year = "All"
 
     # Base query for events associated with the user's department
     query = db.session.query(Events).join(DepartmentsEvents).filter(DepartmentsEvents.departments_id == users_departments_id)
@@ -1267,6 +1262,7 @@ def add_event():
         events_name = request.form.get("events-name")
         events_semester = request.form.get("events-semester")
         events_academic_year = request.form.get("events-academic-year")
+        other_academic_year = request.form.get("other-academic-year")
         events_start_date_and_time = request.form.get("events-start-date-and-time")
         events_end_date_and_time = request.form.get("events-end-date-and-time")
         events_venue = request.form.get("events-venue")
@@ -1274,6 +1270,10 @@ def add_event():
         events_status = request.form.get("events-status")
         events_description = request.form.get("events-description")
         events_remarks = request.form.get("events-remarks")
+
+        # Use the value from the additional input field if "Other A.Y." is selected
+        if events_academic_year == "Other":
+            events_academic_year = other_academic_year
 
         # Validation
         if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time:
