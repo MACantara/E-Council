@@ -24,8 +24,10 @@
 
         <div class="horizontal-button-group">
             <a href="{{ url_for('events_overview') }}" class="primary-button">Back to Events Overview</a>
-            <a href="{{ url_for('add_transaction', event_id=event.events_id) }}" class="secondary-button">Add Transaction</a>
-            <a href="{{ url_for('invite_user', event_id=event.events_id, source='event_dashboard') }}" class="secondary-button">Invite User</a>
+            <a href="{{ url_for('add_transaction', event_id=event.events_id) }}" class="secondary-button">Add
+                Transaction</a>
+            <a href="{{ url_for('invite_user', event_id=event.events_id, source='event_dashboard') }}"
+                class="secondary-button">Invite User</a>
             <a class="secondary-button">Generate Financial Report</a>
         </div>
         <h2>{{ event.events_name }}</h2>
@@ -33,31 +35,31 @@
         <div class="council-overview-content-container-group">
             <div class="council-overview-content-grid-item">
                 <h3>Top 5 Expenses</h3>
-        
+
                 <div class="event-dashboard-chart-container">
                     <canvas id="top-5-expenses-chart"></canvas>
                 </div>
-        
+
                 <p>Total expenses: ₱ {{ "{:,.2f}".format(total_expense) }}</p>
             </div>
-        
+
             <div class="council-overview-content-grid-item">
                 <h3>Top 5 Income</h3>
-        
+
                 <div class="event-dashboard-chart-container">
                     <canvas id="top-5-income-chart"></canvas>
                 </div>
-        
+
                 <p>Total Income: ₱ {{ "{:,.2f}".format(total_income) }}</p>
             </div>
-        
+
             <div class="council-overview-content-grid-item">
                 <h3>Remaining Budget</h3>
-        
+
                 <div class="event-dashboard-chart-container">
                     <canvas id="remaining-budget-chart"></canvas>
                 </div>
-        
+
                 <p>Remaining Budget: ₱ {{ "{:,.2f}".format(remaining_budget) }}</p>
             </div>
         </div>
@@ -91,7 +93,8 @@
                             <td>{{ transaction.transaction_type }}</td>
                             <td>
                                 {% if transaction.transaction_receipt %}
-                                <a href="{{ transaction.transaction_receipt }}" target="_blank" class="primary-button fit-content-button">View Receipt</a>
+                                <a href="{{ transaction.transaction_receipt }}" target="_blank"
+                                    class="primary-button fit-content-button">View Receipt</a>
                                 {% else %}
                                 No Receipt
                                 {% endif %}
@@ -116,6 +119,7 @@
     let top5Expenses = {{ top5_expense | tojson }};
     let top5Income = {{ top5_income | tojson }};
     let remainingBudget = {{ remaining_budget }};
+    let eventsBudget = {{ event.events_budget | default (0) }};
 
     // Extract data for charts
     let top5ExpensesData = top5Expenses.map(transaction => transaction.transaction_total);
@@ -273,6 +277,9 @@
         }
     });
 
+    // Determine the color based on the remaining budget
+    let remainingBudgetColor = remainingBudget > eventsBudget ? getCssVariable('--remaining-budget-color') : getCssVariable('--expense-color-1');
+
     // Initialize the remaining budget chart
     const ctx3 = document.getElementById('remaining-budget-chart').getContext('2d');
     let remainingBudgetChart = new Chart(ctx3, {
@@ -283,10 +290,10 @@
                 {
                     data: [remainingBudget], // Use the remainingBudget variable
                     backgroundColor: [
-                        getCssVariable('--remaining-budget-color')
+                        remainingBudgetColor
                     ],
                     borderColor: [
-                        getCssVariable('--remaining-budget-color')
+                        remainingBudgetColor
                     ],
                     borderWidth: 1
                 }
@@ -299,11 +306,11 @@
                 legend: {
                     display: true, // Show the legend
                     labels: {
-                        color: getLabelColor(),
+                        color: getCssVariable('--primary-text-color'),
                         font: {
-                            family: getFontFamily(),
-                            size: getFontSize(),
-                            weight: getFontWeight()
+                            family: getCssVariable('--chart-font-family'),
+                            size: parseInt(getCssVariable('--chart-font-size')),
+                            weight: getCssVariable('--chart-font-weight')
                         }
                     }
                 }
