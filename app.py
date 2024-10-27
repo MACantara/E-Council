@@ -1408,7 +1408,7 @@ def add_transaction(event_id):
         # Get form data
         transaction_name = request.form.get("transaction-name")
         transaction_date = request.form.get("transaction-date")
-        unit_amount = request.form.get("unit-amount")
+        unit_amount = request.form.get("transaction-unit-amount")
         unit_price = request.form.get("transaction-unit-price")
         transaction_total = request.form.get("transaction-total")
         transaction_category = request.form.get("transaction-category")
