@@ -33,32 +33,32 @@
         <div class="council-overview-content-container-group">
             <div class="council-overview-content-grid-item">
                 <h3>Top 5 Expenses</h3>
-
+        
                 <div class="event-dashboard-chart-container">
                     <canvas id="top-5-expenses-chart"></canvas>
                 </div>
-
-                <p>Total expenses: ₱ 20,000.00</p>
+        
+                <p>Total expenses: ₱ {{ "{:,.2f}".format(total_expense) }}</p>
             </div>
-
+        
             <div class="council-overview-content-grid-item">
                 <h3>Top 5 Income</h3>
-
+        
                 <div class="event-dashboard-chart-container">
                     <canvas id="top-5-income-chart"></canvas>
                 </div>
-
-                <p>Total Income: ₱ 15,000.00</p>
+        
+                <p>Total Income: ₱ {{ "{:,.2f}".format(total_income) }}</p>
             </div>
-
+        
             <div class="council-overview-content-grid-item">
                 <h3>Remaining Budget</h3>
-
+        
                 <div class="event-dashboard-chart-container">
                     <canvas id="remaining-budget-chart"></canvas>
                 </div>
-
-                <p>Remaining Budget: ₱ -5,000.00</p>
+        
+                <p>Remaining Budget: ₱ {{ "{:,.2f}".format(remaining_budget) }}</p>
             </div>
         </div>
 
@@ -114,14 +114,13 @@
 
 <script>
     // Data for top 5 expenses, top 5 income, and remaining budget
-    let top5Expenses = [4000, 5000, 3000, 6000, 2000]; // Adjusted array to total 20,000
-    let top5Income = [3000, 4000, 2000, 5000, 1000]; // Adjusted array to total 15,000
+    let top5Expenses = {{ top5_expense | tojson }};
+    let top5Income = {{ top5_income | tojson }};
+    let remainingBudget = {{ remaining_budget }};
 
-    // Calculate total expenses and total income
-    let totalExpenses = top5Expenses.reduce((amount, expense) => amount + expense, 0);
-    let totalIncome = top5Income.reduce((amount, income) => amount + income, 0);
-
-    let remainingBudget = totalIncome - totalExpenses;
+    // Extract data for charts
+    let top5ExpensesData = top5Expenses.map(transaction => transaction.transaction_total);
+    let top5IncomeData = top5Income.map(transaction => transaction.transaction_total);
 
     // Function to update the chart when color scheme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
@@ -188,10 +187,10 @@
     let top5ExpensesChart = new Chart(ctx1, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Expense 1', 'Expense 2', 'Expense 3', 'Expense 4', 'Expense 5'], // Labels for the datasets
+            labels: top5Expenses.map(transaction => transaction.transaction_name), // Labels for the datasets
             datasets: [
                 {
-                    data: top5Expenses, // Use the array of top 5 expenses
+                    data: top5ExpensesData, // Use the array of top 5 expenses
                     backgroundColor: [
                         getCssVariable('--expense-color-1'),
                         getCssVariable('--expense-color-2'),
@@ -234,10 +233,10 @@
     let top5IncomeChart = new Chart(ctx2, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Income 1', 'Income 2', 'Income 3', 'Income 4', 'Income 5'], // Labels for the datasets
+            labels: top5Income.map(transaction => transaction.transaction_name), // Labels for the datasets
             datasets: [
                 {
-                    data: top5Income, // Use the array of top 5 income
+                    data: top5IncomeData, // Use the array of top 5 income
                     backgroundColor: [
                         getCssVariable('--income-color-1'),
                         getCssVariable('--income-color-2'),
