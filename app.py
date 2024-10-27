@@ -1420,11 +1420,11 @@ def add_transaction(event_id):
         if transaction_category == "Other":
             transaction_category = other_transaction_category
 
-        # Handle file upload
-        receipt_filename = None
+        # Handle file upload to Cloudinary
+        receipt_url = None
         if transaction_receipt:
-            receipt_filename = secure_filename(transaction_receipt.filename)
-            transaction_receipt.save(os.path.join(UPLOAD_FOLDER, receipt_filename))
+            upload_result = cloudinary.uploader.upload(transaction_receipt)
+            receipt_url = upload_result.get('secure_url')
 
         # Create a new transaction
         new_transaction = TransactionHistory(
@@ -1436,7 +1436,7 @@ def add_transaction(event_id):
             transaction_total=transaction_total,
             transaction_category=transaction_category,
             transaction_type=transaction_type,
-            transaction_receipt=receipt_filename
+            transaction_receipt=receipt_url
         )
 
         # Add the transaction to the database
