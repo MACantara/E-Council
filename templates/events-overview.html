@@ -13,7 +13,7 @@
         {% if messages %}
         <div class="flash-messages center no-top-margin">
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
+            <div class="alert alert-{{ category }}">{{ message }}</div>
             {% endfor %}
         </div>
         {% endif %}
@@ -55,11 +55,6 @@
                     });
                 });
             });
-
-            // Data for remaining budget and expenses
-            const remainingBudget = 20000; // Example value
-            const expenses = 23000; // Example value
-            const overBudget = expenses > remainingBudget ? expenses - remainingBudget : 0; // Calculate over budget amount
 
             // Function to update the chart when color scheme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
@@ -164,107 +159,118 @@
                 </div>
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
-                        const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
-                        const charts = [];
+                        const eventData = {{ event_data | tojson
+                    }};
+                    const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
+                    const charts = [];
 
-                        canvasElements.forEach((canvasElement, index) => {
-                            const ctx = canvasElement.getContext('2d');
-                            if (ctx) {
-                                const budgetChart = new Chart(ctx, {
-                                    type: 'bar', // Use 'bar' type for horizontal bars
-                                    data: {
-                                        labels: ['Budget Overview'], // Label for the dataset
-                                        datasets: [
-                                            {
-                                                label: 'Remaining Budget',
-                                                data: [remainingBudget],
-                                                backgroundColor: getCssVariable('--remaining-budget-color'),
-                                                borderColor: getCssVariable('--remaining-budget-color'),
-                                                borderWidth: 1
-                                            },
-                                            {
-                                                label: 'Expenses (Within Budget)',
-                                                data: [expenses <= remainingBudget ? expenses : remainingBudget], // Ensure not to exceed the remaining budget
-                                                backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                                                borderColor: getCssVariable('--expenses-within-budget-color'),
-                                                borderWidth: 1,
-                                                stack: 'expenses' // Stack this dataset with the 'expenses' group
-                                            },
-                                            {
-                                                label: 'Expenses (Over Budget)',
-                                                data: [overBudget], // Show over budget amount to the right of the expenses within budget
-                                                backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                                                borderColor: getCssVariable('--expenses-over-budget-color'),
-                                                borderWidth: 1,
-                                                stack: 'expenses', // Stack this dataset with the 'expenses' group
-                                            }
-                                        ]
-                                    },
-                                    options: {
-                                        indexAxis: 'y', // Horizontal bars
-                                        responsive: true, // Make the chart responsive
-                                        maintainAspectRatio: false, // Allow the chart to resize based on its container
-                                        scales: {
-                                            y: {
-                                                display: false // Hide the y-axis
-                                            },
-                                            x: {
-                                                stacked: true, // Enable stacking for the x-axis
-                                                beginAtZero: true, // Start the x-axis at 0
-                                                ticks: {
-                                                    color: getCssVariable('--primary-text-color') // X-axis ticks color
-                                                },
-                                                title: {
-                                                    display: true, // Optionally add a title to the X-axis
-                                                    color: getCssVariable('--primary-text-color') // X-axis title color
-                                                }
-                                            }
-                                        },
-                                        plugins: {
-                                            legend: {
-                                                display: true, // Show the legend
-                                                labels: {
-                                                    color: getLabelColor(),
-                                                    font: {
-                                                        family: getFontFamily(),
-                                                        size: getFontSize(),
-                                                        weight: getFontWeight()
-                                                    }
-                                                }
-                                            },
-                                        },
-                                    }
-                                });
-                                charts.push(budgetChart);
+                    canvasElements.forEach((canvasElement, index) => {
+                        const ctx = canvasElement.getContext('2d');
+                        if (ctx) {
+                            const eventId = canvasElement.getAttribute('data-event-id');
+                            const event = eventData.find(e => e.event_id == eventId);
+
+                            if (!event) {
+                                console.error(`Event with ID ${eventId} not found in eventData`);
+                                return;
                             }
-                        });
 
-                        // Function to update the chart when color scheme changes
-                        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                            updateChartColors();
-                        });
+                            const remainingBudgetColor = event.remaining_budget > event.events_budget ? getCssVariable('--remaining-budget-color') : getCssVariable('--expense-color-1');
 
-                        // Function to update chart colors dynamically
-                        function updateChartColors() {
-                            const labelColor = getLabelColor();
-                            const rangeColor = getRangeColor();
-
-                            charts.forEach(chart => {
-                                // Update legend label colors
-                                chart.options.plugins.legend.labels.color = labelColor;
-                                chart.options.scales.x.title.color = rangeColor;
-                                chart.options.scales.x.ticks.color = rangeColor;
-                                chart.update();
+                            const budgetChart = new Chart(ctx, {
+                                type: 'bar', // Use 'bar' type for horizontal bars
+                                data: {
+                                    labels: ['Budget Overview'], // Label for the dataset
+                                    datasets: [
+                                        {
+                                            label: 'Remaining Budget',
+                                            data: [event.remaining_budget],
+                                            backgroundColor: remainingBudgetColor,
+                                            borderColor: remainingBudgetColor,
+                                            borderWidth: 1
+                                        },
+                                        {
+                                            label: 'Expenses (Within Budget)',
+                                            data: [event.total_expense <= event.remaining_budget ? event.total_expense : event.remaining_budget], // Ensure not to exceed the remaining budget
+                                            backgroundColor: getCssVariable('--expenses-within-budget-color'),
+                                            borderColor: getCssVariable('--expenses-within-budget-color'),
+                                            borderWidth: 1,
+                                            stack: 'expenses' // Stack this dataset with the 'expenses' group
+                                        },
+                                        {
+                                            label: 'Expenses (Over Budget)',
+                                            data: [event.total_expense > event.remaining_budget ? event.total_expense - event.remaining_budget : 0], // Show over budget amount to the right of the expenses within budget
+                                            backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
+                                            borderColor: getCssVariable('--expenses-over-budget-color'),
+                                            borderWidth: 1,
+                                            stack: 'expenses', // Stack this dataset with the 'expenses' group
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    indexAxis: 'y', // Horizontal bars
+                                    responsive: true, // Make the chart responsive
+                                    maintainAspectRatio: false, // Allow the chart to resize based on its container
+                                    scales: {
+                                        y: {
+                                            display: false // Hide the y-axis
+                                        },
+                                        x: {
+                                            stacked: true, // Enable stacking for the x-axis
+                                            beginAtZero: true, // Start the x-axis at 0
+                                            ticks: {
+                                                color: getCssVariable('--primary-text-color') // X-axis ticks color
+                                            },
+                                            title: {
+                                                display: true, // Optionally add a title to the X-axis
+                                                color: getCssVariable('--primary-text-color') // X-axis title color
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: true, // Show the legend
+                                            labels: {
+                                                color: getLabelColor(),
+                                                font: {
+                                                    family: getFontFamily(),
+                                                    size: getFontSize(),
+                                                    weight: getFontWeight()
+                                                }
+                                            }
+                                        },
+                                    },
+                                }
                             });
+                            charts.push(budgetChart);
                         }
                     });
+
+                    // Function to update the chart when color scheme changes
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                        updateChartColors();
+                    });
+
+                    // Function to update chart colors dynamically
+                    function updateChartColors() {
+                        const labelColor = getLabelColor();
+                        const rangeColor = getRangeColor();
+
+                        charts.forEach(chart => {
+                            // Update legend label colors
+                            chart.options.plugins.legend.labels.color = labelColor;
+                            chart.options.scales.x.title.color = rangeColor;
+                            chart.options.scales.x.ticks.color = rangeColor;
+                            chart.update();
+                        });
+                    }
+    });
                 </script>
 
                 <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-{{ loop.index }}"></canvas>
+                    <canvas id="budget-chart-{{ event.events_id }}" data-event-id="{{ event.events_id }}"></canvas>
                 </div>
 
                 <div class="grid-item-button-group">
