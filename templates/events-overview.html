@@ -13,9 +13,7 @@
         {% if messages %}
         <div class="flash-messages center no-top-margin">
             {% for category, message in messages %}
-            {% if category != 'modal-error' %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endif %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
             {% endfor %}
         </div>
         {% endif %}
