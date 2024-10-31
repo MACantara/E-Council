@@ -195,7 +195,7 @@
                                             },
                                             {
                                                 label: 'Expenses (Within Budget)',
-                                                data: [event.total_expense <= remainingBudget ? event.total_expense : remainingBudget], // Ensure not to exceed the remaining budget
+                                                data: [Math.abs(event.total_expense <= remainingBudget ? event.total_expense : remainingBudget)], // Ensure not to exceed the remaining budget
                                                 backgroundColor: getCssVariable('--expenses-within-budget-color'),
                                                 borderColor: getCssVariable('--expenses-within-budget-color'),
                                                 borderWidth: 1,
@@ -203,11 +203,11 @@
                                             },
                                             {
                                                 label: 'Expenses (Over Budget)',
-                                                data: [event.total_expense > remainingBudget ? event.total_expense - remainingBudget : 0], // Show over budget amount to the right of the expenses within budget
+                                                data: [Math.abs(event.total_expense > remainingBudget ? event.total_expense - remainingBudget : 0)], // Show over budget amount to the right of the expenses within budget
                                                 backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
                                                 borderColor: getCssVariable('--expenses-over-budget-color'),
                                                 borderWidth: 1,
-                                                stack: 'expenses', // Stack this dataset with the 'expenses' group
+                                                stack: 'expenses' // Stack this dataset with the 'expenses' group
                                             }
                                         ]
                                     },
