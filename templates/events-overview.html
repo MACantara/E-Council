@@ -153,7 +153,7 @@
                         <p>{{ event.events_venue }}</p>
                     </div>
                     <div class="grid-item-details-pair">
-                        <p>InitialBudget:</p>
+                        <p>Initial Budget:</p>
                         <p>₱ {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}</p>
                     </div>
                 </div>
@@ -181,35 +181,59 @@
                                 const remainingBudgetColor = getCssVariable('--remaining-budget-color');
                                 const remainingBudget = event.remaining_budget > 0 ? event.remaining_budget : 0;
                 
+                                // Datasets array
+                                const datasets = [
+                                    {
+                                        label: 'Remaining Budget',
+                                        data: [remainingBudget],
+                                        backgroundColor: remainingBudgetColor,
+                                        borderColor: remainingBudgetColor,
+                                        borderWidth: 1
+                                    }
+                                ];
+                
+                                // Calculate expenses within budget and over budget
+                                const expensesWithinBudget = Math.min(event.total_expense, remainingBudget);
+                                const expensesOverBudget = Math.max(event.total_expense - remainingBudget, 0);
+                
+                                // Debugging statements
+                                console.log(`Event ID: ${eventId}`);
+                                console.log(`Remaining Budget: ${remainingBudget}`);
+                                console.log(`Expenses Within Budget: ${expensesWithinBudget}`);
+                                console.log(`Expenses Over Budget: ${expensesOverBudget}`);
+                
+                                // Add "Expenses (Within Budget)" dataset
+                                datasets.push({
+                                    label: 'Expenses (Within Budget)',
+                                    data: [expensesWithinBudget],
+                                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
+                                    borderColor: getCssVariable('--expenses-within-budget-color'),
+                                    borderWidth: 1,
+                                    stack: 'expenses' // Stack this dataset with the 'expenses' group
+                                });
+                
+                                // Add "Expenses (Over Budget)" dataset if there are any over budget expenses
+                                if (expensesOverBudget > 0) {
+                                    datasets.push({
+                                        label: 'Expenses (Over Budget)',
+                                        data: [expensesOverBudget],
+                                        backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
+                                        borderColor: getCssVariable('--expenses-over-budget-color'),
+                                        borderWidth: 1,
+                                        stack: 'expenses' // Stack this dataset with the 'expenses' group
+                                    });
+                                }
+                
+                                // Destroy existing chart instance if it exists
+                                if (canvasElement.chartInstance) {
+                                    canvasElement.chartInstance.destroy();
+                                }
+                
                                 const budgetChart = new Chart(ctx, {
                                     type: 'bar', // Use 'bar' type for horizontal bars
                                     data: {
                                         labels: ['Budget Overview'], // Label for the dataset
-                                        datasets: [
-                                            {
-                                                label: 'Remaining Budget',
-                                                data: [remainingBudget],
-                                                backgroundColor: remainingBudgetColor,
-                                                borderColor: remainingBudgetColor,
-                                                borderWidth: 1
-                                            },
-                                            {
-                                                label: 'Expenses (Within Budget)',
-                                                data: [Math.abs(event.total_expense <= remainingBudget ? event.total_expense : remainingBudget)], // Ensure not to exceed the remaining budget
-                                                backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                                                borderColor: getCssVariable('--expenses-within-budget-color'),
-                                                borderWidth: 1,
-                                                stack: 'expenses' // Stack this dataset with the 'expenses' group
-                                            },
-                                            {
-                                                label: 'Expenses (Over Budget)',
-                                                data: [Math.abs(event.total_expense > remainingBudget ? event.total_expense - remainingBudget : 0)], // Show over budget amount to the right of the expenses within budget
-                                                backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                                                borderColor: getCssVariable('--expenses-over-budget-color'),
-                                                borderWidth: 1,
-                                                stack: 'expenses' // Stack this dataset with the 'expenses' group
-                                            }
-                                        ]
+                                        datasets: datasets
                                     },
                                     options: {
                                         indexAxis: 'y', // Horizontal bars
@@ -246,6 +270,9 @@
                                         },
                                     }
                                 });
+                
+                                // Store the chart instance on the canvas element
+                                canvasElement.chartInstance = budgetChart;
                                 charts.push(budgetChart);
                             }
                         });
@@ -270,7 +297,6 @@
                         }
                     });
                 </script>
-
                 <div class="events-overview-chart-container">
                     <canvas id="budget-chart-{{ event.events_id }}" data-event-id="{{ event.events_id }}"></canvas>
                 </div>
