@@ -251,6 +251,8 @@ class BoardResolutions(db.Model):
     board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=False)
     board_resolutions_description = db.Column(db.Text, nullable=True)
     board_resolutions_total_amount = db.Column(db.Numeric(20, 2), nullable=True)
+    board_resolutions_academic_year = db.Column(db.String(50), nullable=True)  # New column for academic year
+    board_resolutions_semester = db.Column(db.String(50), nullable=True)       # New column for semester
     board_resolutions_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationship to the Events model (if you have one)
