@@ -192,6 +192,9 @@ class Events(db.Model):
     events_description = db.Column(db.Text, nullable=True)
     events_remarks = db.Column(db.String(255), nullable=True)
 
+    # Relationship to the BoardResolutions model
+    board_resolutions = db.relationship('BoardResolutions', back_populates='events')
+
     def __repr__(self):
         return f"Events({self.events_id}, {self.events_name}, {self.events_semester}, {self.events_academic_year}, {self.events_start_date_and_time}, {self.events_end_date_and_time}, {self.events_venue}, {self.events_budget}, {self.events_status}, {self.events_description}, {self.events_remarks})"
 
@@ -240,6 +243,21 @@ class TransactionHistory(db.Model):
 
     def __repr__(self):
         return f'<TransactionHistory {self.transaction_name}>'
+
+class BoardResolutions(db.Model):
+    __tablename__ = 'board_resolutions'
+
+    board_resolutions_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=False)
+    board_resolutions_description = db.Column(db.Text, nullable=True)
+    board_resolutions_total_amount = db.Column(db.Numeric(20, 2), nullable=True)
+    board_resolutions_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship to the Events model (if you have one)
+    events = db.relationship('Events', back_populates='board_resolutions')
+
+    def __repr__(self):
+        return f'<BoardResolution {self.board_resolutions_id}: {self.board_resolutions_description}>'
 
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
@@ -1628,6 +1646,11 @@ def accreditation_requirements_overview():
 @login_required
 def board_resolutions_overview():
     return render_template("board-resolutions-overview.html")
+
+@app.route("/add-board-resolution")
+@login_required
+def add_board_resolution():
+    return render_template("add-board-resolution.html")
 
 @app.route("/notable-achievement-reports-overview")
 @login_required
