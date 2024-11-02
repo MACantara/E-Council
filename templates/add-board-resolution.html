@@ -68,6 +68,17 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="board-resolutions-status">Status</label>
+                    <select name="board-resolutions-status" id="board-resolutions-status" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Postponed">Postponed</option>
+                        <option value="Done">Done</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
                     <label for="board-resolutions-total-amount">Total Amount</label>
                     <input type="number" step="0.01" name="board-resolutions-total-amount" id="board-resolutions-total-amount" placeholder="Total Amount" required>
                 </div>
