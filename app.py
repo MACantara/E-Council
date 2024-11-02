@@ -1647,10 +1647,38 @@ def accreditation_requirements_overview():
 def board_resolutions_overview():
     return render_template("board-resolutions-overview.html")
 
-@app.route("/add-board-resolution")
+@app.route('/add-board-resolution', methods=['GET', 'POST'])
 @login_required
 def add_board_resolution():
-    return render_template("add-board-resolution.html")
+    if request.method == 'POST':
+        events_id = request.form.get('board-resolutions-events-id')
+        description = request.form.get('board-resolutions-description')
+        total_amount = request.form.get('board-resolutions-total-amount')
+        date = request.form.get('board-resolutions-date')
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+
+        # Create a new board resolution
+        new_resolution = BoardResolutions(
+            board_resolutions_events_id=events_id,
+            board_resolutions_description=description,
+            board_resolutions_total_amount=total_amount,
+            board_resolutions_date=date
+        )
+
+        # Add the new resolution to the database
+        db.session.add(new_resolution)
+        db.session.commit()
+
+        flash('Board resolution added successfully!', 'success')
+        return redirect(url_for('board_resolutions_overview'))
+
+    # Query for events that are not yet linked to any board resolutions
+    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
+                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
+
+    return render_template('add-board-resolution.html', events=events)
 
 @app.route("/notable-achievement-reports-overview")
 @login_required
