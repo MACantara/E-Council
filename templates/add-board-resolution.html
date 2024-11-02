@@ -45,12 +45,17 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-academic-year">Academic Year</label>
-                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required>
+                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required onchange="toggleOtherAcademicYear()">
                         <option value="" disabled selected>Select Academic Year</option>
                         {% for year in academic_years %}
                         <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
+                        <option value="Other">Other</option>
                     </select>
+                    <div class="input-pair">
+                        <label for="other-academic-year" id="other-academic-year-label" style="display: none; margin-top: 10px;">Other Academic Year</label>
+                        <input type="text" name="other-academic-year" id="other-academic-year-input" placeholder="Enter Academic Year" style="display: none;">
+                    </div>
                 </div>
 
                 <div class="input-pair">
@@ -83,5 +88,28 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    function toggleOtherAcademicYear() {
+        const academicYearSelect = document.getElementById('board-resolutions-academic-year');
+        const otherAcademicYearInput = document.getElementById('other-academic-year-input');
+        const otherAcademicYearLabel = document.getElementById('other-academic-year-label');
+        if (academicYearSelect.value === 'Other') {
+            otherAcademicYearInput.style.display = 'block';
+            otherAcademicYearInput.required = true;
+            otherAcademicYearLabel.style.display = 'block';
+            otherAcademicYearLabel.required = true;
+        } else {
+            otherAcademicYearInput.style.display = 'none';
+            otherAcademicYearInput.required = false;
+            otherAcademicYearLabel.style.display = 'none';
+            otherAcademicYearLabel.required = false;
+        }
+    }
+</script>
 
 {% endblock %}
