@@ -1657,14 +1657,19 @@ def add_board_resolution():
         description = request.form.get('board-resolutions-description')
         total_amount = request.form.get('board-resolutions-total-amount')
         academic_year = request.form.get('board-resolutions-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
         semester = request.form.get('board-resolutions-semester')
         date = request.form.get('board-resolutions-date')
+
+        # Use the value from the "Other" input field if "Other" is selected
+        if academic_year == 'Other':
+            academic_year = other_academic_year
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
 
         # Create a new board resolution
-        new_resolution = BoardResolution(
+        new_resolution = BoardResolutions(
             board_resolutions_events_id=events_id,
             board_resolutions_description=description,
             board_resolutions_total_amount=total_amount,
