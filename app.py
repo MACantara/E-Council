@@ -275,6 +275,13 @@ def has_events(events, semester, academic_year):
 
 app.jinja_env.filters['has_events'] = has_events
 
+# Custom Jinja2 filter to check if there are resolutions for a given semester and academic year
+@app.template_filter('has_resolutions')
+def has_resolutions(resolutions, semester, academic_year):
+    return any(resolution.board_resolutions_semester == semester and resolution.board_resolutions_academic_year == academic_year for resolution in resolutions)
+
+app.jinja_env.filters['has_resolutions'] = has_resolutions
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -1648,7 +1655,13 @@ def accreditation_requirements_overview():
 @app.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
-    return render_template("board-resolutions-overview.html")
+    # Query for all board resolutions
+    board_resolutions = BoardResolutions.query.all()
+
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    return render_template("board-resolutions-overview.html", board_resolutions=board_resolutions, sort_by_date=sort_by_date)
 
 @app.route('/add-board-resolution', methods=['GET', 'POST'])
 @login_required
