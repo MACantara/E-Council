@@ -163,6 +163,7 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const eventData = {{ event_data | tojson }};
+                        console.log("Event Data:", eventData); // Debugging statement to verify eventData
                         const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
                         const charts = [];
                 
@@ -179,6 +180,8 @@
                 
                                 // Always use green color for remaining budget
                                 const remainingBudgetColor = getCssVariable('--remaining-budget-color');
+                                const expensesWithinBudgetColor = getCssVariable('--expenses-within-budget-color');
+                                const expensesOverBudgetColor = getCssVariable('--expenses-over-budget-color');
                                 const remainingBudget = event.remaining_budget > 0 ? event.remaining_budget : 0;
                 
                                 // Datasets array
@@ -188,39 +191,47 @@
                                         data: [remainingBudget],
                                         backgroundColor: remainingBudgetColor,
                                         borderColor: remainingBudgetColor,
-                                        borderWidth: 1
+                                        borderWidth: 1,
+                                        stack: 'Stack 0'
                                     }
                                 ];
                 
                                 // Calculate expenses within budget and over budget
-                                const expensesWithinBudget = Math.min(event.total_expense, remainingBudget);
-                                const expensesOverBudget = Math.max(event.total_expense - remainingBudget, 0);
+                                const expensesWithinBudget = event.total_expense > event.events_budget ? event.events_budget : event.total_expense;
+                                const expensesOverBudget = event.total_expense > remainingBudget ? event.total_expense - event.events_budget : 0;
                 
                                 // Debugging statements
                                 console.log(`Event ID: ${eventId}`);
                                 console.log(`Remaining Budget: ${remainingBudget}`);
+                                console.log(`Total Expense: ${event.total_expense}`);
                                 console.log(`Expenses Within Budget: ${expensesWithinBudget}`);
                                 console.log(`Expenses Over Budget: ${expensesOverBudget}`);
                 
-                                // Add "Expenses (Within Budget)" dataset
-                                datasets.push({
-                                    label: 'Expenses (Within Budget)',
-                                    data: [expensesWithinBudget],
-                                    backgroundColor: getCssVariable('--expenses-within-budget-color'),
-                                    borderColor: getCssVariable('--expenses-within-budget-color'),
-                                    borderWidth: 1,
-                                    stack: 'expenses' // Stack this dataset with the 'expenses' group
-                                });
-                
-                                // Add "Expenses (Over Budget)" dataset if there are any over budget expenses
-                                if (expensesOverBudget > 0) {
+                                // If remaining budget is 0 or less, add the "Expenses (over budget)" dataset
+                                if (remainingBudget <= 0) {
                                     datasets.push({
+                                        label: 'Expenses (Within Budget)',
+                                        data: [expensesWithinBudget],
+                                        backgroundColor: expensesWithinBudgetColor,
+                                        borderColor: expensesWithinBudgetColor,
+                                        borderWidth: 1,
+                                        stack: 'Stack 1'
+                                    }, {
                                         label: 'Expenses (Over Budget)',
                                         data: [expensesOverBudget],
-                                        backgroundColor: getCssVariable('--expenses-over-budget-color'), // Dark red color for over budget
-                                        borderColor: getCssVariable('--expenses-over-budget-color'),
+                                        backgroundColor: expensesOverBudgetColor,
+                                        borderColor: expensesOverBudgetColor,
                                         borderWidth: 1,
-                                        stack: 'expenses' // Stack this dataset with the 'expenses' group
+                                        stack: 'Stack 1'
+                                    });
+                                } else {
+                                    datasets.push({
+                                        label: 'Expenses',
+                                        data: [event.total_expense],
+                                        backgroundColor: expensesWithinBudgetColor,
+                                        borderColor: expensesWithinBudgetColor,
+                                        borderWidth: 1,
+                                        stack: 'Stack 1'
                                     });
                                 }
                 
@@ -297,6 +308,7 @@
                         }
                     });
                 </script>
+
                 <div class="events-overview-chart-container">
                     <canvas id="budget-chart-{{ event.events_id }}" data-event-id="{{ event.events_id }}"></canvas>
                 </div>
