@@ -278,22 +278,38 @@
     });
 
     // Determine the color based on the remaining budget
-    let remainingBudgetColor = remainingBudget > eventsBudget ? getCssVariable('--remaining-budget-color') : getCssVariable('--expense-color-1');
+    let remainingBudgetColor = getCssVariable('--remaining-budget-color');
+    let expensesWithinBudgetColor = getCssVariable('--expenses-within-budget-color');
+    let expensesOverBudgetColor = getCssVariable('--expenses-over-budget-color');
 
+    // Data for expenses within and over budget
+    let totalExpense = {{ total_expense }};
+    let totalIncome = {{ total_income }};
+    let expensesWithinBudget = totalExpense <= eventsBudget;
+    let expensesOverBudget = totalExpense > eventsBudget;
+    
     // Initialize the remaining budget chart
     const ctx3 = document.getElementById('remaining-budget-chart').getContext('2d');
     let remainingBudgetChart = new Chart(ctx3, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: ['Remaining Budget'], // Labels for the datasets
+            labels: ['Remaining Budget', 'Expenses Within Budget', 'Expenses Over Budget'], // Labels for the datasets
             datasets: [
                 {
-                    data: [remainingBudget], // Use the remainingBudget variable
+                    data: [
+                        remainingBudget, 
+                        expensesWithinBudget ? totalExpense : 0, 
+                        expensesOverBudget ? totalExpense - eventsBudget : 0
+                    ], // Use the remainingBudget variable and expense data
                     backgroundColor: [
-                        remainingBudgetColor
+                        remainingBudgetColor,
+                        expensesWithinBudgetColor,
+                        expensesOverBudgetColor
                     ],
                     borderColor: [
-                        remainingBudgetColor
+                        remainingBudgetColor,
+                        expensesWithinBudgetColor,
+                        expensesOverBudgetColor
                     ],
                     borderWidth: 1
                 }
