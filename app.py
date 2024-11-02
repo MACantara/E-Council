@@ -248,12 +248,13 @@ class BoardResolutions(db.Model):
     __tablename__ = 'board_resolutions'
 
     board_resolutions_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=False)
-    board_resolutions_description = db.Column(db.Text, nullable=True)
-    board_resolutions_total_amount = db.Column(db.Numeric(20, 2), nullable=True)
-    board_resolutions_academic_year = db.Column(db.String(50), nullable=True)  # New column for academic year
-    board_resolutions_semester = db.Column(db.String(50), nullable=True)       # New column for semester
     board_resolutions_date = db.Column(db.DateTime, default=datetime.utcnow)
+    board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=False)
+    board_resolutions_academic_year = db.Column(db.String(50), nullable=True)
+    board_resolutions_semester = db.Column(db.String(50), nullable=True)
+    board_resolutions_status = db.Column(db.String(50), nullable=True)
+    board_resolutions_total_amount = db.Column(db.Numeric(20, 2), nullable=True)
+    board_resolutions_description = db.Column(db.Text, nullable=True)
 
     # Relationship to the Events model (if you have one)
     events = db.relationship('Events', back_populates='board_resolutions')
@@ -1659,6 +1660,7 @@ def add_board_resolution():
         academic_year = request.form.get('board-resolutions-academic-year')
         other_academic_year = request.form.get('other-academic-year')
         semester = request.form.get('board-resolutions-semester')
+        status = request.form.get('board-resolutions-status')
         date = request.form.get('board-resolutions-date')
 
         # Use the value from the "Other" input field if "Other" is selected
@@ -1675,6 +1677,7 @@ def add_board_resolution():
             board_resolutions_total_amount=total_amount,
             board_resolutions_academic_year=academic_year,
             board_resolutions_semester=semester,
+            board_resolutions_status=status,
             board_resolutions_date=date
         )
 
