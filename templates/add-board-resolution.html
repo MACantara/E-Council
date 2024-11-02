@@ -45,7 +45,12 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-academic-year">Academic Year</label>
-                    <input type="text" name="board-resolutions-academic-year" id="board-resolutions-academic-year" placeholder="Academic Year" required>
+                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required>
+                        <option value="" disabled selected>Select Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="input-pair">
