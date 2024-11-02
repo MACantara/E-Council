@@ -1664,7 +1664,7 @@ def add_board_resolution():
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
 
         # Create a new board resolution
-        new_resolution = BoardResolutions(
+        new_resolution = BoardResolution(
             board_resolutions_events_id=events_id,
             board_resolutions_description=description,
             board_resolutions_total_amount=total_amount,
@@ -1684,7 +1684,11 @@ def add_board_resolution():
     events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
                         .filter(BoardResolutions.board_resolutions_events_id == None).all()
 
-    return render_template('add-board-resolution.html', events=events)
+    # Query for distinct academic years
+    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('add-board-resolution.html', events=events, academic_years=academic_years)
 
 @app.route("/notable-achievement-reports-overview")
 @login_required
