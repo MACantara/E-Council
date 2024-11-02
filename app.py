@@ -250,6 +250,7 @@ class BoardResolutions(db.Model):
     board_resolutions_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     board_resolutions_date = db.Column(db.DateTime, default=datetime.utcnow)
     board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=False)
+    board_resolutions_title = db.Column(db.String(255), nullable=True)
     board_resolutions_academic_year = db.Column(db.String(50), nullable=True)
     board_resolutions_semester = db.Column(db.String(50), nullable=True)
     board_resolutions_status = db.Column(db.String(50), nullable=True)
@@ -1668,6 +1669,7 @@ def board_resolutions_overview():
 def add_board_resolution():
     if request.method == 'POST':
         events_id = request.form.get('board-resolutions-events-id')
+        title = request.form.get('board-resolutions-title')
         description = request.form.get('board-resolutions-description')
         total_amount = request.form.get('board-resolutions-total-amount')
         academic_year = request.form.get('board-resolutions-academic-year')
@@ -1686,6 +1688,7 @@ def add_board_resolution():
         # Create a new board resolution
         new_resolution = BoardResolutions(
             board_resolutions_events_id=events_id,
+            board_resolutions_title=title,
             board_resolutions_description=description,
             board_resolutions_total_amount=total_amount,
             board_resolutions_academic_year=academic_year,
