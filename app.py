@@ -1656,6 +1656,8 @@ def add_board_resolution():
         events_id = request.form.get('board-resolutions-events-id')
         description = request.form.get('board-resolutions-description')
         total_amount = request.form.get('board-resolutions-total-amount')
+        academic_year = request.form.get('board-resolutions-academic-year')
+        semester = request.form.get('board-resolutions-semester')
         date = request.form.get('board-resolutions-date')
 
         # Convert date to datetime object
@@ -1666,6 +1668,8 @@ def add_board_resolution():
             board_resolutions_events_id=events_id,
             board_resolutions_description=description,
             board_resolutions_total_amount=total_amount,
+            board_resolutions_academic_year=academic_year,
+            board_resolutions_semester=semester,
             board_resolutions_date=date
         )
 
