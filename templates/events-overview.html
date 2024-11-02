@@ -200,13 +200,6 @@
                                 const expensesWithinBudget = event.total_expense > event.events_budget ? event.events_budget : event.total_expense;
                                 const expensesOverBudget = event.total_expense > remainingBudget ? event.total_expense - event.events_budget : 0;
                 
-                                // Debugging statements
-                                console.log(`Event ID: ${eventId}`);
-                                console.log(`Remaining Budget: ${remainingBudget}`);
-                                console.log(`Total Expense: ${event.total_expense}`);
-                                console.log(`Expenses Within Budget: ${expensesWithinBudget}`);
-                                console.log(`Expenses Over Budget: ${expensesOverBudget}`);
-                
                                 // If remaining budget is 0 or less, add the "Expenses (over budget)" dataset
                                 if (remainingBudget <= 0) {
                                     datasets.push({
