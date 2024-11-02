@@ -35,12 +35,17 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-events-id">Event ID</label>
-                    <select name="board-resolutions-events-id" id="board-resolutions-events-id" required>
+                    <select name="board-resolutions-events-id" id="board-resolutions-events-id" required onchange="updateTitle()">
                         <option value="" disabled selected>Select Event</option>
                         {% for event in events %}
-                        <option value="{{ event.events_id }}">{{ event.events_name }}</option>
+                        <option value="{{ event.events_id }}" data-event-name="{{ event.events_name }}">{{ event.events_name }}</option>
                         {% endfor %}
                     </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="board-resolutions-title">Title</label>
+                    <input type="text" name="board-resolutions-title" id="board-resolutions-title" placeholder="Title" required>
                 </div>
 
                 <div class="input-pair">
@@ -119,6 +124,18 @@
             otherAcademicYearInput.required = false;
             otherAcademicYearLabel.style.display = 'none';
             otherAcademicYearLabel.required = false;
+        }
+    }
+
+    function updateTitle() {
+        const eventSelect = document.getElementById('board-resolutions-events-id');
+        const selectedOption = eventSelect.options[eventSelect.selectedIndex];
+        const eventName = selectedOption.getAttribute('data-event-name');
+        const titleInput = document.getElementById('board-resolutions-title');
+        if (eventName) {
+            titleInput.value = `${eventName} Board Resolution`;
+        } else {
+            titleInput.value = '';
         }
     }
 </script>
