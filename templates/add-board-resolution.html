@@ -29,6 +29,11 @@
             <form method="POST" enctype="multipart/form-data"
                 action="{{ url_for('add_board_resolution')}}">
                 <div class="input-pair">
+                    <label for="board-resolutions-date">Date</label>
+                    <input type="datetime-local" name="board-resolutions-date" id="board-resolutions-date" required>
+                </div>
+
+                <div class="input-pair">
                     <label for="board-resolutions-events-id">Event ID</label>
                     <select name="board-resolutions-events-id" id="board-resolutions-events-id" required>
                         <option value="" disabled selected>Select Event</option>
@@ -39,8 +44,17 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="board-resolutions-description">Description</label>
-                    <textarea name="board-resolutions-description" id="board-resolutions-description" placeholder="Description" required></textarea>
+                    <label for="board-resolutions-academic-year">Academic Year</label>
+                    <input type="text" name="board-resolutions-academic-year" id="board-resolutions-academic-year" placeholder="Academic Year" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="board-resolutions-semester">Semester</label>
+                    <select name="board-resolutions-semester" id="board-resolutions-semester" required>
+                        <option value="" disabled selected>Select Semester</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                    </select>
                 </div>
 
                 <div class="input-pair">
@@ -49,8 +63,8 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="board-resolutions-date">Date</label>
-                    <input type="datetime-local" name="board-resolutions-date" id="board-resolutions-date" required>
+                    <label for="board-resolutions-description">Description</label>
+                    <textarea name="board-resolutions-description" id="board-resolutions-description" placeholder="Description" required></textarea>
                 </div>
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
