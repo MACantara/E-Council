@@ -235,7 +235,7 @@ class TransactionHistory(db.Model):
     transaction_unit_price = db.Column(db.Numeric(10, 2), nullable=True)
     transaction_total = db.column_property(transaction_unit_amount * transaction_unit_price)
     transaction_category = db.Column(db.String(255), nullable=True)
-    transaction_type = db.Column(db.Enum('expense', 'income', name='transaction_type_enum'), nullable=True)
+    transaction_type = db.Column(db.Enum('Expense', 'Income', name='transaction_type_enum'), nullable=True)
     transaction_receipt = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):
@@ -1196,11 +1196,13 @@ def events_overview():
 
     # Fetch transaction history and calculate expenses, income, and remaining budget
     event_data = []
+
     for event in events:
         transactions = TransactionHistory.query.filter_by(events_id=event.events_id).all()
         total_income = sum(t.transaction_total for t in transactions if t.transaction_type == 'Income')
         total_expense = sum(t.transaction_total for t in transactions if t.transaction_type == 'Expense')
         remaining_budget = total_income - total_expense + (event.events_budget or 0)
+        
         event_data.append({
             'event_id': event.events_id,
             'total_income': total_income,
