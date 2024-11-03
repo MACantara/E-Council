@@ -302,7 +302,8 @@ class MinutesOfTheMeetingPhotoDocumentation(db.Model):
     minutes_of_the_meeting_photo_documentation_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     minutes_of_the_meeting_id = db.Column(db.Integer, db.ForeignKey('minutes_of_the_meeting.minutes_of_the_meeting_id'), nullable=False)
     minutes_of_the_meeting_photo_documentation_url = db.Column(db.String(255), nullable=False)
-    minutes_of_the_meeting_photo_documentation_description = db.Column(db.Text, nullable=True)
+    minutes_of_the_meeting_photo_documentation_cloudinary_url = db.Column(db.String(255), nullable=False)
+    minutes_of_the_meeting_photo_documentation_cloudinary_public_id = db.Column(db.String(255), nullable=False)
 
     minutes_of_the_meeting = db.relationship('MinutesOfTheMeeting', foreign_keys=[minutes_of_the_meeting_id])
 
