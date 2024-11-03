@@ -1669,6 +1669,7 @@ def board_resolutions_overview():
 def add_board_resolution():
     if request.method == 'POST':
         events_id = request.form.get('board-resolutions-events-id')
+        other_event_name = request.form.get('other-event-name')
         title = request.form.get('board-resolutions-title')
         description = request.form.get('board-resolutions-description')
         total_amount = request.form.get('board-resolutions-total-amount')
@@ -1678,9 +1679,17 @@ def add_board_resolution():
         status = request.form.get('board-resolutions-status')
         date = request.form.get('board-resolutions-date')
 
-        # Use the value from the "Other" input field if "Other" is selected
+        # Use the value from the "Other" input field if "Other" is selected for academic year
         if academic_year == 'Other':
             academic_year = other_academic_year
+
+        # Handle the "Other" option for event name
+        if events_id == 'Other':
+            # Create a new event with the provided name
+            new_event = Events(events_name=other_event_name)
+            db.session.add(new_event)
+            db.session.commit()
+            events_id = new_event.events_id
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
