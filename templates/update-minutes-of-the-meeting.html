@@ -116,6 +116,17 @@
                     <p>Supported file types: .jpeg, .jpg, .png</p>
                 </div>
 
+                <div class="input-pair">
+                    <label>Current Photo Documentation</label>
+                    <div class="current-photos">
+                        {% for photo in photo_documentations %}
+                        <div class="photo-item">
+                            <img src="{{ photo.minutes_of_the_meeting_photo_documentation_cloudinary_url }}" alt="Photo Documentation" class="photo-thumbnail">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-button-pair-positioned-right">
