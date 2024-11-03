@@ -263,6 +263,24 @@ class BoardResolutions(db.Model):
     def __repr__(self):
         return f'<BoardResolution {self.board_resolutions_id}: {self.board_resolutions_description}>'
 
+class MinutesOfTheMeeting(db.Model):
+    __tablename__ = 'minutes_of_the_meeting'
+
+    minutes_of_the_meeting_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    minutes_of_the_meeting_date = db.Column(db.DateTime, nullable=False)
+    minutes_of_the_meeting_semester = db.Column(db.String(50), nullable=False)
+    minutes_of_the_meeting_academic_year = db.Column(db.Integer, db.ForeignKey('academic_year.academic_year_id'), nullable=False)
+    minutes_of_the_meeting_presiding_officer = db.Column(db.String(100), nullable=False)
+    minutes_of_the_meeting_agenda = db.Column(db.Text, nullable=False)
+    minutes_of_the_meeting_notes = db.Column(db.Text, nullable=True)
+    minutes_of_the_meeting_adjourned = db.Column(db.DateTime, nullable=True)
+    minutes_of_the_meeting_approved_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    minutes_of_the_meeting_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    minutes_of_the_meeting_noted_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+
+    def __repr__(self):
+        return f'<MinutesOfTheMeeting {self.minutes_of_the_meeting_id}: {self.minutes_of_the_meeting_agenda}>'
+
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
     if len(text) > length:
@@ -282,6 +300,13 @@ def has_resolutions(resolutions, semester, academic_year):
     return any(resolution.board_resolutions_semester == semester and resolution.board_resolutions_academic_year == academic_year for resolution in resolutions)
 
 app.jinja_env.filters['has_resolutions'] = has_resolutions
+
+# Custom Jinja2 filter to check if there are meetings for a given semester and academic year
+@app.template_filter('has_meetings')
+def has_meetings(meetings, semester, academic_year):
+    return any(meeting.minutes_of_the_meeting_semester == semester and meeting.minutes_of_the_meeting_academic_year == academic_year for meeting in meetings)
+
+app.jinja_env.filters['has_meetings'] = has_meetings
 
 # Python functions
 def send_verification_email(users_email):
@@ -1855,7 +1880,134 @@ def society_accomplishment_and_compliance_reports_overview():
 @app.route("/minutes-of-the-meeting-overview")
 @login_required
 def minutes_of_the_meeting_overview():
-    return render_template("minutes-of-the-meeting-overview.html")
+    # Query for all minutes of the meeting sorted by date (most recent first)
+    minutes_of_the_meeting = MinutesOfTheMeeting.query.order_by(MinutesOfTheMeeting.minutes_of_the_meeting_date.desc()).all()
+
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    return render_template("minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date)
+
+@app.route('/add-minutes-of-the-meeting', methods=['GET', 'POST'])
+@login_required
+def add_minutes_of_the_meeting():
+    if request.method == 'POST':
+        date = request.form.get('minutes-of-the-meeting-date')
+        semester = request.form.get('minutes-of-the-meeting-semester')
+        academic_year = request.form.get('minutes-of-the-meeting-academic-year')
+        presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
+        agenda = request.form.get('minutes-of-the-meeting-agenda')
+        notes = request.form.get('minutes-of-the-meeting-notes')
+        adjourned = request.form.get('minutes-of-the-meeting-adjourned')
+        approved_by = request.form.get('minutes-of-the-meeting-approved-by')
+        prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
+        noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+        adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
+
+        # Create a new minutes of the meeting
+        new_meeting = MinutesOfTheMeeting(
+            minutes_of_the_meeting_date=date,
+            minutes_of_the_meeting_semester=semester,
+            minutes_of_the_meeting_academic_year=academic_year,
+            minutes_of_the_meeting_presiding_officer=presiding_officer,
+            minutes_of_the_meeting_agenda=agenda,
+            minutes_of_the_meeting_notes=notes,
+            minutes_of_the_meeting_adjourned=adjourned,
+            minutes_of_the_meeting_approved_by=approved_by,
+            minutes_of_the_meeting_prepared_by=prepared_by,
+            minutes_of_the_meeting_noted_by=noted_by
+        )
+
+        # Add the new meeting to the database
+        db.session.add(new_meeting)
+        db.session.commit()
+
+        flash('Minutes of the meeting added successfully!', 'success')
+        return redirect(url_for('minutes_of_the_meeting_overview'))
+
+    # Query for distinct academic years
+    academic_years = db.session.query(AcademicYear.academic_year_id).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years)
+
+@app.route("/delete-minutes-of-the-meeting/<int:meeting_id>", methods=["GET", "POST"])
+@login_required
+def delete_minutes_of_the_meeting(meeting_id):
+    # Find the minutes of the meeting by ID
+    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    if request.method == "POST":
+        # Delete the minutes of the meeting
+        db.session.delete(meeting)
+        db.session.commit()
+
+        flash("Minutes of the meeting deleted successfully.", "success")
+        return redirect(url_for("minutes_of_the_meeting_overview"))
+
+    return render_template("delete-minutes-of-the-meeting.html", meeting=meeting)
+
+@app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
+@login_required
+def update_minutes_of_the_meeting(meeting_id):
+    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    if request.method == 'POST':
+        date = request.form.get('minutes-of-the-meeting-date')
+        semester = request.form.get('minutes-of-the-meeting-semester')
+        academic_year = request.form.get('minutes-of-the-meeting-academic-year')
+        presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
+        agenda = request.form.get('minutes-of-the-meeting-agenda')
+        notes = request.form.get('minutes-of-the-meeting-notes')
+        adjourned = request.form.get('minutes-of-the-meeting-adjourned')
+        approved_by = request.form.get('minutes-of-the-meeting-approved-by')
+        prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
+        noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+        adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
+
+        # Update the minutes of the meeting
+        meeting.minutes_of_the_meeting_date = date
+        meeting.minutes_of_the_meeting_semester = semester
+        meeting.minutes_of_the_meeting_academic_year = academic_year
+        meeting.minutes_of_the_meeting_presiding_officer = presiding_officer
+        meeting.minutes_of_the_meeting_agenda = agenda
+        meeting.minutes_of_the_meeting_notes = notes
+        meeting.minutes_of_the_meeting_adjourned = adjourned
+        meeting.minutes_of_the_meeting_approved_by = approved_by
+        meeting.minutes_of_the_meeting_prepared_by = prepared_by
+        meeting.minutes_of_the_meeting_noted_by = noted_by
+
+        db.session.commit()
+
+        flash('Minutes of the meeting updated successfully!', 'success')
+        return redirect(url_for('minutes_of_the_meeting_overview'))
+
+    # Query for distinct academic years
+    academic_years = db.session.query(AcademicYear.academic_year_id).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years)
+
+@app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
+@login_required
+def update_minutes_of_the_meeting_status(meeting_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the minutes of the meeting by ID
+    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    # Update the minutes of the meeting status
+    meeting.minutes_of_the_meeting_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
 
 @app.route("/student-enrichment-activity-reports-overview")
 @login_required
