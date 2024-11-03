@@ -635,6 +635,9 @@ def send_invite_email(users_email, event_name, event_id):
     db.session.add(event_invitation)
     db.session.commit()
 
+def get_distinct_academic_years():
+    return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+
 # Routes
 @app.route("/")
 def index():
@@ -1405,9 +1408,6 @@ def add_event():
     # Query distinct academic years
     academic_years = get_distinct_academic_years()
     return render_template("add-event.html", academic_years=academic_years)
-
-def get_distinct_academic_years():
-    return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
 @app.route("/delete-event/<int:event_id>", methods=["GET", "POST"])
 @login_required
