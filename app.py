@@ -2009,10 +2009,5 @@ def end_of_semester_reports_overview():
 def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
-@app.route("/semestral-clearance-overview")
-@login_required
-def semestral_clearance_overview():
-    return render_template("semestral-clearance-overview.html")
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
