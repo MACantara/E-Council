@@ -1737,6 +1737,25 @@ def add_board_resolution():
 
     return render_template('add-board-resolution.html', events=events, academic_years=academic_years)
 
+@app.route("/delete-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
+@login_required
+def delete_board_resolution(resolution_id):
+    # Find the board resolution by ID
+    resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    if request.method == "POST":
+        # Delete related records in the departments_events table
+        DepartmentsEvents.query.filter_by(events_id=resolution.board_resolutions_events_id).delete()
+
+        # Delete the board resolution
+        db.session.delete(resolution)
+        db.session.commit()
+
+        flash("Board resolution deleted successfully.", "success")
+        return redirect(url_for("board_resolutions_overview"))
+
+    return render_template("delete-board-resolution.html", resolution=resolution)
+
 @app.route("/notable-achievement-reports-overview")
 @login_required
 def notable_achievement_reports_overview():
