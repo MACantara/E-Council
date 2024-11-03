@@ -922,7 +922,7 @@ def account():
 @login_required
 def upload_profile_picture():
     profile_picture = request.files.get("profile-picture")
-    if profile_picture:
+    if (profile_picture):
         # Server-side validation for image file types
         valid_image_types = ['image/jpeg', 'image/png', 'image/jpg']
         if profile_picture.mimetype not in valid_image_types:
@@ -1656,8 +1656,8 @@ def accreditation_requirements_overview():
 @app.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
-    # Query for all board resolutions
-    board_resolutions = BoardResolutions.query.all()
+    # Query for all board resolutions sorted by date (most recent first)
+    board_resolutions = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc()).all()
 
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
