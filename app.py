@@ -269,7 +269,7 @@ class MinutesOfTheMeeting(db.Model):
     minutes_of_the_meeting_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     minutes_of_the_meeting_date = db.Column(db.DateTime, nullable=False)
     minutes_of_the_meeting_semester = db.Column(db.String(50), nullable=False)
-    minutes_of_the_meeting_academic_year = db.Column(db.Integer, db.ForeignKey('academic_year.academic_year_id'), nullable=False)
+    minutes_of_the_meeting_academic_year = db.Column(db.String(50), nullable=False)
     minutes_of_the_meeting_presiding_officer = db.Column(db.String(100), nullable=False)
     minutes_of_the_meeting_agenda = db.Column(db.Text, nullable=False)
     minutes_of_the_meeting_notes = db.Column(db.Text, nullable=True)
@@ -1921,6 +1921,7 @@ def add_minutes_of_the_meeting():
         date = request.form.get('minutes-of-the-meeting-date')
         semester = request.form.get('minutes-of-the-meeting-semester')
         academic_year = request.form.get('minutes-of-the-meeting-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
         presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
         agenda = request.form.get('minutes-of-the-meeting-agenda')
         notes = request.form.get('minutes-of-the-meeting-notes')
@@ -1928,6 +1929,10 @@ def add_minutes_of_the_meeting():
         approved_by = request.form.get('minutes-of-the-meeting-approved-by')
         prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
         noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+
+        # Use the value from the additional input field if "Other A.Y." is selected
+        if academic_year == "Other":
+            academic_year = other_academic_year
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
@@ -1955,7 +1960,7 @@ def add_minutes_of_the_meeting():
         return redirect(url_for('minutes_of_the_meeting_overview'))
 
     # Query for distinct academic years
-    academic_years = db.session.query(AcademicYear.academic_year_id).distinct().all()
+    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years)
@@ -2015,7 +2020,7 @@ def update_minutes_of_the_meeting(meeting_id):
         return redirect(url_for('minutes_of_the_meeting_overview'))
 
     # Query for distinct academic years
-    academic_years = db.session.query(AcademicYear.academic_year_id).distinct().all()
+    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years)
@@ -2046,4 +2051,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
