@@ -1990,6 +1990,7 @@ def update_minutes_of_the_meeting(meeting_id):
         date = request.form.get('minutes-of-the-meeting-date')
         semester = request.form.get('minutes-of-the-meeting-semester')
         academic_year = request.form.get('minutes-of-the-meeting-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
         presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
         agenda = request.form.get('minutes-of-the-meeting-agenda')
         notes = request.form.get('minutes-of-the-meeting-notes')
@@ -1997,6 +1998,10 @@ def update_minutes_of_the_meeting(meeting_id):
         approved_by = request.form.get('minutes-of-the-meeting-approved-by')
         prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
         noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+
+        # Use the value from the additional input field if "Other A.Y." is selected
+        if academic_year == "Other":
+            academic_year = other_academic_year
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
@@ -2051,4 +2056,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
