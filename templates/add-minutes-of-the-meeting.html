@@ -93,16 +93,8 @@
 
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-prepared-by">Prepared By</label>
-                    <select name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by">
-                        <option value="" disabled selected>Select a User</option>
-                        {% for organization, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
-                        <optgroup label="{{ organization }}">
-                            {% for user in members %}
-                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
-                            {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                    </select>
+                    <input type="text" name="minutes-of-the-meeting-prepared-by-display" id="minutes-of-the-meeting-prepared-by-display" value="{{ current_user.users_first_name }} {{ current_user.users_last_name }} - {{ current_user.users_student_organization_position }} - {{ current_user.users_student_organization }}" readonly>
+                    <input type="hidden" name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by" value="{{ current_user.users_id }}">
                 </div>
 
                 <div class="input-pair">
