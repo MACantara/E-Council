@@ -89,8 +89,18 @@
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}</option>
                         {% endfor %}
+                        <option value="add-new-presiding-officer">Add new signatory</option>
                     </select>
                 </div>
+
+                <!-- New signatory fields for Presiding Officer -->
+                <input type="text" name="new-presiding-officer-title" id="new-presiding-officer-title" placeholder="Title" style="display: none;">
+                <input type="text" name="new-presiding-officer-first-name" id="new-presiding-officer-first-name" placeholder="First Name" style="display: none;">
+                <input type="text" name="new-presiding-officer-middle-name" id="new-presiding-officer-middle-name" placeholder="Middle Name" style="display: none;">
+                <input type="text" name="new-presiding-officer-last-name" id="new-presiding-officer-last-name" placeholder="Last Name" style="display: none;">
+                <input type="text" name="new-presiding-officer-suffix" id="new-presiding-officer-suffix" placeholder="Suffix" style="display: none;">
+                <input type="text" name="new-presiding-officer-position" id="new-presiding-officer-position" placeholder="Position" style="display: none;">
+                <input type="text" name="new-presiding-officer-department" id="new-presiding-officer-department" placeholder="Department" style="display: none;">
 
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-agenda">Agenda</label>
@@ -134,8 +144,18 @@
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}</option>
                         {% endfor %}
+                        <option value="add-new-noted-by">Add new signatory</option>
                     </select>
                 </div>
+
+                <!-- New signatory fields for Noted By -->
+                <input type="text" name="new-noted-by-title" id="new-noted-by-title" placeholder="Title" style="display: none;">
+                <input type="text" name="new-noted-by-first-name" id="new-noted-by-first-name" placeholder="First Name" style="display: none;">
+                <input type="text" name="new-noted-by-middle-name" id="new-noted-by-middle-name" placeholder="Middle Name" style="display: none;">
+                <input type="text" name="new-noted-by-last-name" id="new-noted-by-last-name" placeholder="Last Name" style="display: none;">
+                <input type="text" name="new-noted-by-suffix" id="new-noted-by-suffix" placeholder="Suffix" style="display: none;">
+                <input type="text" name="new-noted-by-position" id="new-noted-by-position" placeholder="Position" style="display: none;">
+                <input type="text" name="new-noted-by-department" id="new-noted-by-department" placeholder="Department" style="display: none;">
 
                 <div class="input-pair">
                     <label for="photo-documentation">Photo Documentation</label>
@@ -178,6 +198,26 @@
         document.getElementById('photo-documentation').addEventListener('change', function () {
             const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
             document.getElementById('file-name').textContent = fileNames;
+        });
+
+        const presidingOfficerSelect = document.getElementById('minutes-of-the-meeting-presiding-officer');
+        const notedBySelect = document.getElementById('minutes-of-the-meeting-noted-by');
+
+        function toggleNewSignatoryFields(selectElement, prefix) {
+            const fields = [
+                'title', 'first-name', 'middle-name', 'last-name', 'suffix', 'position', 'department'
+            ];
+            fields.forEach(field => {
+                document.getElementById(`new-${prefix}-${field}`).style.display = selectElement.value === `add-new-${prefix}` ? 'block' : 'none';
+            });
+        }
+
+        presidingOfficerSelect.addEventListener('change', function () {
+            toggleNewSignatoryFields(presidingOfficerSelect, 'presiding-officer');
+        });
+
+        notedBySelect.addEventListener('change', function () {
+            toggleNewSignatoryFields(notedBySelect, 'noted-by');
         });
     });
 </script>
