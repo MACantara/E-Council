@@ -301,7 +301,6 @@ class MinutesOfTheMeetingPhotoDocumentation(db.Model):
 
     minutes_of_the_meeting_photo_documentation_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     minutes_of_the_meeting_id = db.Column(db.Integer, db.ForeignKey('minutes_of_the_meeting.minutes_of_the_meeting_id'), nullable=False)
-    minutes_of_the_meeting_photo_documentation_url = db.Column(db.String(255), nullable=False)
     minutes_of_the_meeting_photo_documentation_cloudinary_url = db.Column(db.String(255), nullable=False)
     minutes_of_the_meeting_photo_documentation_cloudinary_public_id = db.Column(db.String(255), nullable=False)
 
@@ -1930,6 +1929,7 @@ def add_minutes_of_the_meeting():
         approved_by = request.form.get('minutes-of-the-meeting-approved-by')
         prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
         noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+        photo_documentations = request.files.getlist('photo-documentation')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if academic_year == "Other":
@@ -1957,6 +1957,24 @@ def add_minutes_of_the_meeting():
         db.session.add(new_meeting)
         db.session.commit()
 
+        # Handle multiple file uploads to Cloudinary
+        for photo_documentation in photo_documentations:
+            if photo_documentation:
+                upload_result = cloudinary.uploader.upload(photo_documentation)
+                photo_url = upload_result.get('secure_url')
+                photo_public_id = upload_result.get('public_id')
+
+                # Create a new photo documentation record
+                new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
+                    minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
+                    minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
+                    minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
+                )
+
+                # Add the new photo documentation to the database
+                db.session.add(new_photo_documentation)
+                db.session.commit()
+
         flash('Minutes of the meeting added successfully!', 'success')
         return redirect(url_for('minutes_of_the_meeting_overview'))
 
@@ -1965,22 +1983,6 @@ def add_minutes_of_the_meeting():
     academic_years = [year[0] for year in academic_years]
 
     return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years)
-
-@app.route("/delete-minutes-of-the-meeting/<int:meeting_id>", methods=["GET", "POST"])
-@login_required
-def delete_minutes_of_the_meeting(meeting_id):
-    # Find the minutes of the meeting by ID
-    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
-
-    if request.method == "POST":
-        # Delete the minutes of the meeting
-        db.session.delete(meeting)
-        db.session.commit()
-
-        flash("Minutes of the meeting deleted successfully.", "success")
-        return redirect(url_for("minutes_of_the_meeting_overview"))
-
-    return render_template("delete-minutes-of-the-meeting.html", meeting=meeting)
 
 @app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
 @login_required
@@ -1999,6 +2001,7 @@ def update_minutes_of_the_meeting(meeting_id):
         approved_by = request.form.get('minutes-of-the-meeting-approved-by')
         prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
         noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+        photo_documentations = request.files.getlist('photo-documentation')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if academic_year == "Other":
@@ -2021,6 +2024,24 @@ def update_minutes_of_the_meeting(meeting_id):
         meeting.minutes_of_the_meeting_noted_by = noted_by
 
         db.session.commit()
+
+        # Handle multiple file uploads to Cloudinary
+        for photo_documentation in photo_documentations:
+            if photo_documentation:
+                upload_result = cloudinary.uploader.upload(photo_documentation)
+                photo_url = upload_result.get('secure_url')
+                photo_public_id = upload_result.get('public_id')
+
+                # Create a new photo documentation record
+                new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
+                    minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id,
+                    minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
+                    minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
+                )
+
+                # Add the new photo documentation to the database
+                db.session.add(new_photo_documentation)
+                db.session.commit()
 
         flash('Minutes of the meeting updated successfully!', 'success')
         return redirect(url_for('minutes_of_the_meeting_overview'))
@@ -2045,6 +2066,28 @@ def update_minutes_of_the_meeting_status(meeting_id):
     db.session.commit()
 
     return jsonify(success=True)
+
+@app.route('/delete-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
+@login_required
+def delete_minutes_of_the_meeting(meeting_id):
+    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    if request.method == 'POST':
+        # Delete related photo documentation records
+        photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+        for photo_documentation in photo_documentations:
+            # Delete the photo from Cloudinary
+            cloudinary.uploader.destroy(photo_documentation.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
+            db.session.delete(photo_documentation)
+
+        # Delete the meeting
+        db.session.delete(meeting)
+        db.session.commit()
+
+        flash('Minutes of the meeting deleted successfully!', 'success')
+        return redirect(url_for('minutes_of_the_meeting_overview'))
+
+    return render_template('delete-minutes-of-the-meeting.html', meeting=meeting)
 
 @app.route("/end-of-semester-reports-overview")
 @login_required
