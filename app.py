@@ -1756,6 +1756,77 @@ def delete_board_resolution(resolution_id):
 
     return render_template("delete-board-resolution.html", resolution=resolution)
 
+@app.route('/update-board-resolution/<int:resolution_id>', methods=['GET', 'POST'])
+@login_required
+def update_board_resolution(resolution_id):
+    resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    if request.method == 'POST':
+        events_id = request.form.get('board-resolutions-events-id')
+        other_event_name = request.form.get('other-event-name')
+        title = request.form.get('board-resolutions-title')
+        description = request.form.get('board-resolutions-description')
+        total_amount = request.form.get('board-resolutions-total-amount')
+        academic_year = request.form.get('board-resolutions-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
+        semester = request.form.get('board-resolutions-semester')
+        status = request.form.get('board-resolutions-status')
+        date = request.form.get('board-resolutions-date')
+
+        # Use the value from the "Other" input field if "Other" is selected for academic year
+        if academic_year == 'Other':
+            academic_year = other_academic_year
+
+        # Handle the "Other" option for event name
+        if events_id == 'Other':
+            # Create a new event with the provided name
+            new_event = Events(
+                events_name=other_event_name, 
+                events_academic_year=academic_year,
+                events_semester=semester,
+                events_description=description)
+            db.session.add(new_event)
+            db.session.commit()
+            events_id = new_event.events_id
+            
+            # Link the event to the department of the current user
+            departments_events = DepartmentsEvents(
+                departments_id=current_user.users_departments_id,
+                events_id=events_id
+            )
+            db.session.add(departments_events)
+            db.session.commit()
+        elif events_id == 'None':
+            events_id = None
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+
+        # Update the board resolution
+        resolution.board_resolutions_events_id = events_id
+        resolution.board_resolutions_title = title
+        resolution.board_resolutions_description = description
+        resolution.board_resolutions_total_amount = total_amount
+        resolution.board_resolutions_academic_year = academic_year
+        resolution.board_resolutions_semester = semester
+        resolution.board_resolutions_status = status
+        resolution.board_resolutions_date = date
+
+        db.session.commit()
+
+        flash('Board resolution updated successfully!', 'success')
+        return redirect(url_for('board_resolutions_overview'))
+
+    # Query for events that are not yet linked to any board resolutions
+    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
+                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
+
+    # Query for distinct academic years
+    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years)
+
 @app.route("/notable-achievement-reports-overview")
 @login_required
 def notable_achievement_reports_overview():
