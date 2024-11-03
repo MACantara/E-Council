@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Add Minutes of the Meeting{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="primary-button fit-content-button">Back to Minutes of the Meeting Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div class="container">
+            <h2>Add Minutes of the Meeting</h2>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
+                    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+                    academicYearSelect.addEventListener('change', function () {
+                        if (academicYearSelect.value === 'Other') {
+                            otherAcademicYearContainer.style.display = 'block';
+                        } else {
+                            otherAcademicYearContainer.style.display = 'none';
+                        }
+                    });
+                });
+            </script>
+
+            <form method="POST" action="{{ url_for('add_minutes_of_the_meeting') }}" enctype="multipart/form-data">
+                <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-date">Date</label>
+                    <input type="datetime-local" name="minutes-of-the-meeting-date" id="minutes-of-the-meeting-date" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-semester">Semester</label>
+                    <select name="minutes-of-the-meeting-semester" id="minutes-of-the-meeting-semester" required>
+                        <option value="" disabled selected>Select a Semester</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-academic-year">Academic Year</label>
+                    <select name="minutes-of-the-meeting-academic-year" id="minutes-of-the-meeting-academic-year" required>
+                        <option value="" disabled selected>Select an Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other A.Y.</option>
+                    </select>
+                </div>
+
+                <div class="input-pair" id="other-academic-year-container" style="display: none;">
+                    <label for="other-academic-year">Other Academic Year</label>
+                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
+                    <input type="text" name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" placeholder="Presiding Officer" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-agenda">Agenda</label>
+                    <textarea name="minutes-of-the-meeting-agenda" id="minutes-of-the-meeting-agenda" placeholder="Agenda" required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-notes">Notes</label>
+                    <textarea name="minutes-of-the-meeting-notes" id="minutes-of-the-meeting-notes" placeholder="Notes"></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-adjourned">Adjourned</label>
+                    <input type="datetime-local" name="minutes-of-the-meeting-adjourned" id="minutes-of-the-meeting-adjourned">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-approved-by">Approved By</label>
+                    <input type="text" name="minutes-of-the-meeting-approved-by" id="minutes-of-the-meeting-approved-by" placeholder="Approved By">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-prepared-by">Prepared By</label>
+                    <input type="text" name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by" placeholder="Prepared By">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-noted-by">Noted By</label>
+                    <input type="text" name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" placeholder="Noted By">
+                </div>
+
+                <div class="input-pair">
+                    <label for="photo-documentation">Photo Documentation</label>
+                    <input type="file" name="photo-documentation" id="photo-documentation" accept="image/*">
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-button-pair-positioned-right">
+                    <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Add Minutes of the Meeting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
+        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+        academicYearSelect.addEventListener('change', function () {
+            if (academicYearSelect.value === 'Other') {
+                otherAcademicYearContainer.style.display = 'block';
+            } else {
+                otherAcademicYearContainer.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+{% endblock %}
