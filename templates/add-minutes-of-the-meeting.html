@@ -94,12 +94,19 @@
                 </div>
 
                 <!-- New signatory fields for Presiding Officer -->
+                <label for="new-presiding-officer-title" style="display: none;">Title</label>
                 <input type="text" name="new-presiding-officer-title" id="new-presiding-officer-title" placeholder="Title" style="display: none;">
+                <label for="new-presiding-officer-first-name" style="display: none;">First Name</label>
                 <input type="text" name="new-presiding-officer-first-name" id="new-presiding-officer-first-name" placeholder="First Name" style="display: none;">
+                <label for="new-presiding-officer-middle-name" style="display: none;">Middle Name</label>
                 <input type="text" name="new-presiding-officer-middle-name" id="new-presiding-officer-middle-name" placeholder="Middle Name" style="display: none;">
+                <label for="new-presiding-officer-last-name" style="display: none;">Last Name</label>
                 <input type="text" name="new-presiding-officer-last-name" id="new-presiding-officer-last-name" placeholder="Last Name" style="display: none;">
+                <label for="new-presiding-officer-suffix" style="display: none;">Suffix</label>
                 <input type="text" name="new-presiding-officer-suffix" id="new-presiding-officer-suffix" placeholder="Suffix" style="display: none;">
+                <label for="new-presiding-officer-position" style="display: none;">Position</label>
                 <input type="text" name="new-presiding-officer-position" id="new-presiding-officer-position" placeholder="Position" style="display: none;">
+                <label for="new-presiding-officer-department" style="display: none;">Department</label>
                 <input type="text" name="new-presiding-officer-department" id="new-presiding-officer-department" placeholder="Department" style="display: none;">
 
                 <div class="input-pair">
@@ -149,12 +156,19 @@
                 </div>
 
                 <!-- New signatory fields for Noted By -->
+                <label for="new-noted-by-title" style="display: none;">Title</label>
                 <input type="text" name="new-noted-by-title" id="new-noted-by-title" placeholder="Title" style="display: none;">
+                <label for="new-noted-by-first-name" style="display: none;">First Name</label>
                 <input type="text" name="new-noted-by-first-name" id="new-noted-by-first-name" placeholder="First Name" style="display: none;">
+                <label for="new-noted-by-middle-name" style="display: none;">Middle Name</label>
                 <input type="text" name="new-noted-by-middle-name" id="new-noted-by-middle-name" placeholder="Middle Name" style="display: none;">
+                <label for="new-noted-by-last-name" style="display: none;">Last Name</label>
                 <input type="text" name="new-noted-by-last-name" id="new-noted-by-last-name" placeholder="Last Name" style="display: none;">
+                <label for="new-noted-by-suffix" style="display: none;">Suffix</label>
                 <input type="text" name="new-noted-by-suffix" id="new-noted-by-suffix" placeholder="Suffix" style="display: none;">
+                <label for="new-noted-by-position" style="display: none;">Position</label>
                 <input type="text" name="new-noted-by-position" id="new-noted-by-position" placeholder="Position" style="display: none;">
+                <label for="new-noted-by-department" style="display: none;">Department</label>
                 <input type="text" name="new-noted-by-department" id="new-noted-by-department" placeholder="Department" style="display: none;">
 
                 <div class="input-pair">
@@ -209,6 +223,7 @@
             ];
             fields.forEach(field => {
                 document.getElementById(`new-${prefix}-${field}`).style.display = selectElement.value === `add-new-${prefix}` ? 'block' : 'none';
+                document.querySelector(`label[for="new-${prefix}-${field}"]`).style.display = selectElement.value === `add-new-${prefix}` ? 'block' : 'none';
             });
         }
 
