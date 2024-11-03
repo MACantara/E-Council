@@ -106,6 +106,16 @@
                     <input type="text" name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" placeholder="Noted By">
                 </div>
 
+                <div class="input-pair">
+                    <label for="photo-documentation">Photo Documentation</label>
+                    <input type="file" name="photo-documentation" id="photo-documentation" hidden accept="image/jpeg, image/jpg, image/png" multiple>
+                    <label for="photo-documentation" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="file-name" class="file-name">No files chosen</span>
+                    </label>
+                    <p>Supported file types: .jpeg, .jpg, .png</p>
+                </div>
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-button-pair-positioned-right">
@@ -132,6 +142,11 @@
             } else {
                 otherAcademicYearContainer.style.display = 'none';
             }
+        });
+
+        document.getElementById('photo-documentation').addEventListener('change', function () {
+            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
+            document.getElementById('file-name').textContent = fileNames;
         });
     });
 </script>
