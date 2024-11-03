@@ -1673,11 +1673,6 @@ def documentation_overview():
 def financial_reports_overview():
     return render_template("financial-reports-overview.html")
 
-@app.route("/accreditation-requirements-overview")
-@login_required
-def accreditation_requirements_overview():
-    return render_template("accreditation-requirements-overview.html")
-
 @app.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
@@ -1866,16 +1861,6 @@ def update_board_resolution_status(resolution_id):
     db.session.commit()
 
     return jsonify(success=True)
-
-@app.route("/notable-achievement-reports-overview")
-@login_required
-def notable_achievement_reports_overview():
-    return render_template("notable-achievement-reports-overview.html")
-
-@app.route("/society-achievement-and-compliance-reports-overview")
-@login_required
-def society_accomplishment_and_compliance_reports_overview():
-    return render_template("society-accomplishment-and-compliance-reports-overview.html")
 
 @app.route("/minutes-of-the-meeting-overview")
 @login_required
