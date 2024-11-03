@@ -1827,6 +1827,21 @@ def update_board_resolution(resolution_id):
 
     return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years)
 
+@app.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
+@login_required
+def update_board_resolution_status(resolution_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the board resolution by ID
+    resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    # Update the board resolution status
+    resolution.board_resolutions_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
+
 @app.route("/notable-achievement-reports-overview")
 @login_required
 def notable_achievement_reports_overview():
