@@ -1689,10 +1689,19 @@ def add_board_resolution():
             new_event = Events(
                 events_name=other_event_name, 
                 events_academic_year=academic_year,
-                events_semester=semester)
+                events_semester=semester,
+                events_description=description)
             db.session.add(new_event)
             db.session.commit()
             events_id = new_event.events_id
+            
+            # Link the event to the department of the current user
+            departments_events = DepartmentsEvents(
+                departments_id=current_user.users_departments_id,
+                events_id=events_id
+            )
+            db.session.add(departments_events)
+            db.session.commit()
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
