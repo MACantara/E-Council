@@ -92,20 +92,6 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="minutes-of-the-meeting-approved-by">Approved By</label>
-                    <select name="minutes-of-the-meeting-approved-by" id="minutes-of-the-meeting-approved-by">
-                        <option value="" disabled>Select a User</option>
-                        {% for organization, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
-                        <optgroup label="{{ organization }}">
-                            {% for user in members %}
-                            <option value="{{ user.users_id }}" {% if meeting.minutes_of_the_meeting_approved_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
-                            {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
                     <label for="minutes-of-the-meeting-prepared-by">Prepared By</label>
                     <select name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by">
                         <option value="" disabled>Select a User</option>
@@ -113,6 +99,20 @@
                         <optgroup label="{{ organization }}">
                             {% for user in members %}
                             <option value="{{ user.users_id }}" {% if meeting.minutes_of_the_meeting_prepared_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-approved-by">Approved By</label>
+                    <select name="minutes-of-the-meeting-approved-by" id="minutes-of-the-meeting-approved-by">
+                        <option value="" disabled>Select a User</option>
+                        {% for organization, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
+                        <optgroup label="{{ organization }}">
+                            {% for user in members %}
+                            <option value="{{ user.users_id }}" {% if meeting.minutes_of_the_meeting_approved_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
                             {% endfor %}
                         </optgroup>
                         {% endfor %}
