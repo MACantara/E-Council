@@ -1994,11 +1994,6 @@ def update_minutes_of_the_meeting_status(meeting_id):
 
     return jsonify(success=True)
 
-@app.route("/student-enrichment-activity-reports-overview")
-@login_required
-def student_enrichment_activity_reports_overview():
-    return render_template("student-enrichment-activity-reports-overview.html")
-
 @app.route("/end-of-semester-reports-overview")
 @login_required
 def end_of_semester_reports_overview():
