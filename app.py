@@ -1982,7 +1982,10 @@ def add_minutes_of_the_meeting():
     academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years)
+    # Query for users to populate the approved by and prepared by fields
+    users = Users.query.all()
+
+    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users)
 
 @app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
 @login_required
@@ -2062,7 +2065,10 @@ def update_minutes_of_the_meeting(meeting_id):
     # Query for existing photo documentations
     photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
 
-    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations)
+    # Query for users to populate the approved by and prepared by fields
+    users = Users.query.all()
+
+    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users)
 
 @app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
 @login_required
