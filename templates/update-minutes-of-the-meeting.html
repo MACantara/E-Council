@@ -72,6 +72,17 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="minutes-of-the-meeting-status">Status</label>
+                    <select name="minutes-of-the-meeting-status" id="minutes-of-the-meeting-status" required>
+                        <option value="" disabled>Select a Status</option>
+                        <option value="Upcoming" {% if meeting.minutes_of_the_meeting_status == 'Upcoming' %}selected{% endif %}>Upcoming</option>
+                        <option value="Postponed" {% if meeting.minutes_of_the_meeting_status == 'Postponed' %}selected{% endif %}>Postponed</option>
+                        <option value="Done" {% if meeting.minutes_of_the_meeting_status == 'Done' %}selected{% endif %}>Done</option>
+                        <option value="Cancelled" {% if meeting.minutes_of_the_meeting_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
                     <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
                     <input type="text" name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" value="{{ meeting.minutes_of_the_meeting_presiding_officer }}" placeholder="Presiding Officer" required>
                 </div>
@@ -171,4 +182,4 @@
     });
 </script>
 
-{% endblock %}
+{% endblock %} 

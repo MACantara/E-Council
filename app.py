@@ -1923,6 +1923,7 @@ def add_minutes_of_the_meeting():
         semester = request.form.get('minutes-of-the-meeting-semester')
         academic_year = request.form.get('minutes-of-the-meeting-academic-year')
         other_academic_year = request.form.get('other-academic-year')
+        status = request.form.get('minutes-of-the-meeting-status')
         presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
         agenda = request.form.get('minutes-of-the-meeting-agenda')
         notes = request.form.get('minutes-of-the-meeting-notes')
@@ -1945,6 +1946,7 @@ def add_minutes_of_the_meeting():
             minutes_of_the_meeting_date=date,
             minutes_of_the_meeting_semester=semester,
             minutes_of_the_meeting_academic_year=academic_year,
+            minutes_of_the_meeting_status=status,
             minutes_of_the_meeting_presiding_officer=presiding_officer,
             minutes_of_the_meeting_agenda=agenda,
             minutes_of_the_meeting_notes=notes,
@@ -1998,6 +2000,7 @@ def update_minutes_of_the_meeting(meeting_id):
         semester = request.form.get('minutes-of-the-meeting-semester')
         academic_year = request.form.get('minutes-of-the-meeting-academic-year')
         other_academic_year = request.form.get('other-academic-year')
+        status = request.form.get('minutes-of-the-meeting-status')
         presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
         agenda = request.form.get('minutes-of-the-meeting-agenda')
         notes = request.form.get('minutes-of-the-meeting-notes')
@@ -2019,6 +2022,7 @@ def update_minutes_of_the_meeting(meeting_id):
         meeting.minutes_of_the_meeting_date = date
         meeting.minutes_of_the_meeting_semester = semester
         meeting.minutes_of_the_meeting_academic_year = academic_year
+        meeting.minutes_of_the_meeting_status = status
         meeting.minutes_of_the_meeting_presiding_officer = presiding_officer
         meeting.minutes_of_the_meeting_agenda = agenda
         meeting.minutes_of_the_meeting_notes = notes
