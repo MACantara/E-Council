@@ -1988,7 +1988,10 @@ def add_minutes_of_the_meeting():
     # Query for users to populate the approved by and prepared by fields
     users = Users.query.all()
 
-    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users)
+    # Query for signatories to populate the presiding officer and noted by fields
+    signatories = Signatories.query.all()
+
+    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories)
 
 @app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
 @login_required
@@ -2073,7 +2076,10 @@ def update_minutes_of_the_meeting(meeting_id):
     # Query for users to populate the approved by and prepared by fields
     users = Users.query.all()
 
-    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users)
+    # Query for signatories to populate the presiding officer and noted by fields
+    signatories = Signatories.query.all()
+
+    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories)
 
 @app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
 @login_required
