@@ -84,7 +84,14 @@
 
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
-                    <input type="text" name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" value="{{ meeting.minutes_of_the_meeting_presiding_officer }}" placeholder="Presiding Officer" required>
+                    <select name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" required>
+                        <option value="" disabled>Select a Presiding Officer</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if meeting.minutes_of_the_meeting_presiding_officer == signatory.signatory_id %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="input-pair">
@@ -124,7 +131,14 @@
 
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-noted-by">Noted By</label>
-                    <input type="text" name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" value="{{ meeting.minutes_of_the_meeting_noted_by }}" placeholder="Noted By">
+                    <select name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" required>
+                        <option value="" disabled>Select a Signatory</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if meeting.minutes_of_the_meeting_noted_by == signatory.signatory_id %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="input-pair">
@@ -182,4 +196,4 @@
     });
 </script>
 
-{% endblock %} 
+{% endblock %}
