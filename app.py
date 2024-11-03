@@ -2026,22 +2026,31 @@ def update_minutes_of_the_meeting(meeting_id):
         db.session.commit()
 
         # Handle multiple file uploads to Cloudinary
-        for photo_documentation in photo_documentations:
-            if photo_documentation:
-                upload_result = cloudinary.uploader.upload(photo_documentation)
-                photo_url = upload_result.get('secure_url')
-                photo_public_id = upload_result.get('public_id')
+        if photo_documentations:
+            # Delete existing photo documentation records and photos from Cloudinary
+            existing_photos = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+            for photo in existing_photos:
+                cloudinary.uploader.destroy(photo.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
+                db.session.delete(photo)
+            db.session.commit()
 
-                # Create a new photo documentation record
-                new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
-                    minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id,
-                    minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
-                    minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
-                )
+            # Upload new photos to Cloudinary
+            for photo_documentation in photo_documentations:
+                if photo_documentation:
+                    upload_result = cloudinary.uploader.upload(photo_documentation)
+                    photo_url = upload_result.get('secure_url')
+                    photo_public_id = upload_result.get('public_id')
 
-                # Add the new photo documentation to the database
-                db.session.add(new_photo_documentation)
-                db.session.commit()
+                    # Create a new photo documentation record
+                    new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
+                        minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id,
+                        minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
+                        minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
+                    )
+
+                    # Add the new photo documentation to the database
+                    db.session.add(new_photo_documentation)
+                    db.session.commit()
 
         flash('Minutes of the meeting updated successfully!', 'success')
         return redirect(url_for('minutes_of_the_meeting_overview'))
@@ -2050,7 +2059,10 @@ def update_minutes_of_the_meeting(meeting_id):
     academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years)
+    # Query for existing photo documentations
+    photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+
+    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations)
 
 @app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
 @login_required
