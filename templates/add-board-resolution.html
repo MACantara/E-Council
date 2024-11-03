@@ -37,6 +37,7 @@
                     <label for="board-resolutions-events-id">Event Name</label>
                     <select name="board-resolutions-events-id" id="board-resolutions-events-id" required onchange="updateTitle()">
                         <option value="" disabled selected>Select Event</option>
+                        <option value="None">None</option>
                         {% for event in events %}
                         <option value="{{ event.events_id }}" data-event-name="{{ event.events_name }}">{{ event.events_name }}</option>
                         {% endfor %}

@@ -249,7 +249,7 @@ class BoardResolutions(db.Model):
 
     board_resolutions_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     board_resolutions_date = db.Column(db.DateTime, default=datetime.utcnow)
-    board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=False)
+    board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=True)
     board_resolutions_title = db.Column(db.String(255), nullable=True)
     board_resolutions_academic_year = db.Column(db.String(50), nullable=True)
     board_resolutions_semester = db.Column(db.String(50), nullable=True)
@@ -1702,6 +1702,8 @@ def add_board_resolution():
             )
             db.session.add(departments_events)
             db.session.commit()
+        elif events_id == 'None':
+            events_id = None
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
