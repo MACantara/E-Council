@@ -1937,6 +1937,25 @@ def add_minutes_of_the_meeting():
         if academic_year == "Other":
             academic_year = other_academic_year
 
+        # Handle new signatory addition
+        if presiding_officer == 'add-new' or noted_by == 'add-new':
+            new_signatory = Signatories(
+                signatory_title=request.form.get('new-signatory-title'),
+                signatory_first_name=request.form.get('new-signatory-first-name'),
+                signatory_middle_name=request.form.get('new-signatory-middle-name'),
+                signatory_last_name=request.form.get('new-signatory-last-name'),
+                signatory_suffix=request.form.get('new-signatory-suffix'),
+                signatory_position=request.form.get('new-signatory-position'),
+                signatory_department=request.form.get('new-signatory-department')
+            )
+            db.session.add(new_signatory)
+            db.session.commit()
+
+            if presiding_officer == 'add-new':
+                presiding_officer = new_signatory.signatory_id
+            if noted_by == 'add-new':
+                noted_by = new_signatory.signatory_id
+
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
         adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
@@ -2016,6 +2035,25 @@ def update_minutes_of_the_meeting(meeting_id):
         # Use the value from the additional input field if "Other A.Y." is selected
         if academic_year == "Other":
             academic_year = other_academic_year
+
+        # Handle new signatory addition
+        if presiding_officer == 'add-new' or noted_by == 'add-new':
+            new_signatory = Signatories(
+                signatory_title=request.form.get('new-signatory-title'),
+                signatory_first_name=request.form.get('new-signatory-first-name'),
+                signatory_middle_name=request.form.get('new-signatory-middle-name'),
+                signatory_last_name=request.form.get('new-signatory-last-name'),
+                signatory_suffix=request.form.get('new-signatory-suffix'),
+                signatory_position=request.form.get('new-signatory-position'),
+                signatory_department=request.form.get('new-signatory-department')
+            )
+            db.session.add(new_signatory)
+            db.session.commit()
+
+            if presiding_officer == 'add-new':
+                presiding_officer = new_signatory.signatory_id
+            if noted_by == 'add-new':
+                noted_by = new_signatory.signatory_id
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
