@@ -1686,7 +1686,10 @@ def add_board_resolution():
         # Handle the "Other" option for event name
         if events_id == 'Other':
             # Create a new event with the provided name
-            new_event = Events(events_name=other_event_name)
+            new_event = Events(
+                events_name=other_event_name, 
+                events_academic_year=academic_year,
+                events_semester=semester)
             db.session.add(new_event)
             db.session.commit()
             events_id = new_event.events_id
