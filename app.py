@@ -1810,7 +1810,11 @@ def documentation_overview():
 def financial_reports_overview():
     # Query for all financial reports
     financial_reports = FinancialReports.query.all()
-    return render_template("financial-reports-overview.html", financial_reports=financial_reports)
+
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    return render_template("financial-reports-overview.html", financial_reports=financial_reports, sort_by_date=sort_by_date)
 
 @app.route('/add-financial-report', methods=['GET', 'POST'])
 @login_required
