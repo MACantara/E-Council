@@ -100,17 +100,19 @@
 
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-attendees">Attendees</label>
-                    <select name="minutes-of-the-meeting-attendees" id="minutes-of-the-meeting-attendees" multiple required>
+                    <div id="minutes-of-the-meeting-attendees">
                         {% for organization, members in users|groupby('users_student_organization') %}
-                        <optgroup label="{{ organization }}">
+                        <fieldset>
+                            <legend>{{ organization }}</legend>
                             {% for user in members %}
-                            <option value="{{ user.users_id }}">
-                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
-                            </option>
+                            <div>
+                                <label><input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}">
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
+                            </div>
                             {% endfor %}
-                        </optgroup>
+                        </fieldset>
                         {% endfor %}
-                    </select>
+                    </div>
                 </div>
 
                 <div class="input-pair">
@@ -249,4 +251,4 @@
     });
 </script>
 
-{% endblock %} 
+{% endblock %}
