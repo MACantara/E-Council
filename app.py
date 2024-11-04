@@ -1940,6 +1940,21 @@ def update_financial_report_status(report_id):
 
     return jsonify(success=True)
 
+@app.route('/delete-financial-report/<int:report_id>', methods=['GET', 'POST'])
+@login_required
+def delete_financial_report(report_id):
+    report = FinancialReports.query.get_or_404(report_id)
+
+    if request.method == 'POST':
+        # Delete the financial report
+        db.session.delete(report)
+        db.session.commit()
+
+        flash('Financial report deleted successfully!', 'success')
+        return redirect(url_for('financial_reports_overview'))
+
+    return render_template('delete-financial-report.html', report=report)
+
 @app.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
