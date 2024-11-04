@@ -1816,7 +1816,11 @@ def financial_reports_overview():
 @login_required
 def add_financial_report():
     if request.method == 'POST':
+        financial_reports_date = request.form.get('financial-reports-date')
+        financial_reports_academic_year = request.form.get('financial-reports-academic-year')
+        financial_reports_semester = request.form.get('financial-reports-semester')
         financial_reports_events_id = request.form.get('financial-reports-events-id')
+        financial_reports_title = request.form.get('financial-reports-title')
         financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
         financial_reports_noted_by = request.form.get('financial-reports-noted-by')
         financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
@@ -1824,7 +1828,11 @@ def add_financial_report():
 
         # Create a new financial report
         new_financial_report = FinancialReports(
+            financial_reports_date=datetime.strptime(financial_reports_date, '%Y-%m-%dT%H:%M'),
+            financial_reports_academic_year=financial_reports_academic_year,
+            financial_reports_semester=financial_reports_semester,
             financial_reports_events_id=financial_reports_events_id,
+            financial_reports_title=financial_reports_title,
             financial_reports_audited_and_prepared_by=financial_reports_audited_and_prepared_by,
             financial_reports_noted_by=financial_reports_noted_by,
             financial_reports_recommending_approval_by=financial_reports_recommending_approval_by,
