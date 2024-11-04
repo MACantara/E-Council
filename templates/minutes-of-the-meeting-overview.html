@@ -59,7 +59,7 @@
 
         <div class="overview-content-container-group">
             {% if minutes_of_the_meeting %}
-            {% set sorted_meetings = minutes_of_the_meeting | sort(attribute='minutes_of_the_meeting_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
+            {% set sorted_meetings = meetings_only | sort(attribute='minutes_of_the_meeting_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
             {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
             {% set academic_years = sorted_meetings | map(attribute='minutes_of_the_meeting_academic_year') | unique | list %}
 
@@ -70,7 +70,7 @@
                 <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
             </div>
 
-            {% for meeting in sorted_meetings %}
+            {% for meeting, first_name, last_name in minutes_of_the_meeting %}
             {% if meeting.minutes_of_the_meeting_semester == semester and meeting.minutes_of_the_meeting_academic_year == academic_year %}
             <div class="overview-content-grid-item">
                 <select class="fit-content-button" name="meeting-status-select-button"
@@ -98,7 +98,7 @@
                     </div>
                     <div class="grid-item-details-pair">
                         <p>Presiding Officer:</p>
-                        <p>{{ meeting.minutes_of_the_meeting_presiding_officer }}</p>
+                        <p>{{ first_name }} {{ last_name }}</p>
                     </div>
                 </div>
 
