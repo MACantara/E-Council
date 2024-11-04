@@ -91,11 +91,7 @@ class Users(db.Model, UserMixin):
         name='role_enum'
     ), nullable=False)
 
-    users_student_organization = db.Column(db.Enum(
-        'College of Computer Studies - Student Council',
-        'Junior Philippine Computer Society',
-        name='organization_enum'
-    ), nullable=False)
+    users_student_organization = Column(Integer, ForeignKey('student_organizations.student_organizations_id'), nullable=False)
 
     users_student_organization_position = db.Column(db.Enum(
         'President',
@@ -125,6 +121,8 @@ class Users(db.Model, UserMixin):
 
     # Relationship to Departments
     department = db.relationship('Departments', backref='users')
+    
+    student_organization = relationship("StudentOrganizations", backref="users")
 
     def set_password(self, password):
         self.users_password = generate_password_hash(password)
@@ -322,6 +320,16 @@ class MinutesOfTheMeetingAttendees(db.Model):
 
     def __repr__(self):
         return f'<MinutesOfTheMeetingAttendees {self.minutes_of_the_meeting_attendees_id}: Meeting {self.minutes_of_the_meeting_id}, User {self.users_id}>'
+
+class StudentOrganizations(Base):
+    __tablename__ = 'student_organizations'
+    
+    student_organizations_id = Column(Integer, primary_key=True, autoincrement=True)
+    student_organizations_name = Column(String(255), nullable=False)
+    student_organizations_financial_bank_book_amount = Column(Numeric(20, 2), nullable=True)
+
+    def __repr__(self):
+        return f"<StudentOrganizations(id={self.student_organizations_id}, name={self.student_organizations_name})>"
 
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
