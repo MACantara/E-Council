@@ -67,10 +67,10 @@
                     </select>
                 </div>
 
-                <div class="input-pair" id="other-transaction-category-container" style="display: {% if transaction.transaction_category not in transaction_categories %}block{% else %}none{% endif %};">
+                <div class="input-pair" id="other-transaction-category-container" style="display: {% if transaction.transaction_category == 'Other' %}block{% else %}none{% endif %};">
                     <label for="other-transaction-category">Other Category</label>
                     <input type="text" name="other-transaction-category" id="other-transaction-category"
-                        placeholder="Enter Category" value="{% if transaction.transaction_category not in transaction_categories %}{{ transaction.transaction_category }}{% endif %}">
+                        placeholder="Enter Category" value="{% if transaction.transaction_category == 'Other' %}{{ transaction.transaction_category }}{% endif %}">
                 </div>
 
                 <div class="input-pair">
