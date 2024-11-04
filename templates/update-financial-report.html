@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Update Financial Report{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('financial_reports_overview') }}" class="primary-button fit-content-button">Back to Financial Reports Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div class="container">
+            <h2>Update Financial Report</h2>
+
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('update_financial_report', report_id=report.financial_reports_id) }}">
+                <div class="input-pair">
+                    <label for="financial-reports-date">Date</label>
+                    <input type="datetime-local" name="financial-reports-date" id="financial-reports-date" value="{{ report.financial_reports_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-academic-year">Academic Year</label>
+                    <select name="financial-reports-academic-year" id="financial-reports-academic-year" required>
+                        <option value="" disabled>Select an Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}" {% if report.financial_reports_academic_year == year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year" style="display:none;">
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-semester">Semester</label>
+                    <select name="financial-reports-semester" id="financial-reports-semester" required>
+                        <option value="" disabled>Select a Semester</option>
+                        <option value="1st Semester" {% if report.financial_reports_semester == '1st Semester' %}selected{% endif %}>1st Semester</option>
+                        <option value="2nd Semester" {% if report.financial_reports_semester == '2nd Semester' %}selected{% endif %}>2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-events-id">Event</label>
+                    <select name="financial-reports-events-id" id="financial-reports-events-id" required>
+                        <option value="" disabled>Select an Event</option>
+                        {% for event in events %}
+                        <option value="{{ event.events_id }}" {% if report.financial_reports_events_id == event.events_id %}selected{% endif %}>{{ event.events_name }}</option>
+                        {% endfor %}
+                        <option value="None" {% if report.financial_reports_events_id is none %}selected{% endif %}>None</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-title">Title</label>
+                    <input type="text" name="financial-reports-title" id="financial-reports-title" value="{{ report.financial_reports_title }}" placeholder="Title" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-status">Status</label>
+                    <select name="financial-reports-status" id="financial-reports-status" required>
+                        <option value="" disabled>Select a Status</option>
+                        <option value="Upcoming" {% if report.financial_reports_status == 'Upcoming' %}selected{% endif %}>Upcoming</option>
+                        <option value="Postponed" {% if report.financial_reports_status == 'Postponed' %}selected{% endif %}>Postponed</option>
+                        <option value="Done" {% if report.financial_reports_status == 'Done' %}selected{% endif %}>Done</option>
+                        <option value="Cancelled" {% if report.financial_reports_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-audited-and-prepared-by">Audited and Prepared By</label>
+                    <select name="financial-reports-audited-and-prepared-by" id="financial-reports-audited-and-prepared-by">
+                        <option value="" disabled>Select a User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if report.financial_reports_audited_and_prepared_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-noted-by">Noted By</label>
+                    <select name="financial-reports-noted-by" id="financial-reports-noted-by">
+                        <option value="" disabled>Select a User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if report.financial_reports_noted_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-recommending-approval-by">Recommending Approval By</label>
+                    <select name="financial-reports-recommending-approval-by" id="financial-reports-recommending-approval-by">
+                        <option value="" disabled>Select a User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if report.financial_reports_recommending_approval_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-approved-by">Approved By</label>
+                    <select name="financial-reports-approved-by" id="financial-reports-approved-by">
+                        <option value="" disabled>Select a Signatory</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if report.financial_reports_approved_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('financial_reports_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Update Financial Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const academicYearSelect = document.getElementById('financial-reports-academic-year');
+        const otherAcademicYearInput = document.getElementById('other-academic-year');
+
+        academicYearSelect.addEventListener('change', function () {
+            if (this.value === 'Other') {
+                otherAcademicYearInput.style.display = 'block';
+                otherAcademicYearInput.required = true;
+            } else {
+                otherAcademicYearInput.style.display = 'none';
+                otherAcademicYearInput.required = false;
+            }
+        });
+    });
+</script>
+
+{% endblock %}
