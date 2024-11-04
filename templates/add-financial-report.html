@@ -55,7 +55,7 @@
                     <label for="financial-reports-events-id">Event</label>
                     <select name="financial-reports-events-id" id="financial-reports-events-id">
                         <option value="" disabled selected>Select an Event</option>
-                        {% for event in events %}
+                        {% for event in events if event.financial_reports|length == 0 %}
                         <option value="{{ event.events_id }}">{{ event.events_name }}</option>
                         {% endfor %}
                         <option value="None">None</option>
