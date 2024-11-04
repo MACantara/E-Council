@@ -101,10 +101,14 @@
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-attendees">Attendees</label>
                     <select name="minutes-of-the-meeting-attendees" id="minutes-of-the-meeting-attendees" multiple required>
-                        {% for user in users %}
-                        <option value="{{ user.users_id }}" {% if user.users_id in meeting_attendees %}selected{% endif %}>
-                            {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
-                        </option>
+                        {% for organization, members in users|groupby('users_student_organization') %}
+                        <optgroup label="{{ organization }}">
+                            {% for user in members %}
+                            <option value="{{ user.users_id }}" {% if user.users_id in meeting_attendees %}selected{% endif %}>
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
+                            </option>
+                            {% endfor %}
+                        </optgroup>
                         {% endfor %}
                     </select>
                 </div>
@@ -119,7 +123,7 @@
                     <textarea name="minutes-of-the-meeting-notes" id="minutes-of-the-meeting-notes" placeholder="Notes">{{ meeting.minutes_of_the_meeting_notes }}</textarea>
                 </div>
 
-                <div class="input-pair">
+                <div class="input-pair"></div>
                     <label for="minutes-of-the-meeting-adjourned">Adjourned</label>
                     <input type="datetime-local" name="minutes-of-the-meeting-adjourned" id="minutes-of-the-meeting-adjourned" value="{{ meeting.minutes_of_the_meeting_adjourned.strftime('%Y-%m-%dT%H:%M') if meeting.minutes_of_the_meeting_adjourned else '' }}">
                 </div>
