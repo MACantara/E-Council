@@ -1833,7 +1833,7 @@ def add_financial_report():
         financial_reports_semester = request.form.get('financial-reports-semester')
         financial_reports_events_id = request.form.get('financial-reports-events-id')
         financial_reports_title = request.form.get('financial-reports-title')
-        financial_reports_status = request.form.get('financial-reports-status')  # New field
+        financial_reports_status = request.form.get('financial-reports-status')
         financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
         financial_reports_noted_by = request.form.get('financial-reports-noted-by')
         financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
@@ -1846,7 +1846,7 @@ def add_financial_report():
             financial_reports_semester=financial_reports_semester,
             financial_reports_events_id=financial_reports_events_id,
             financial_reports_title=financial_reports_title,
-            financial_reports_status=financial_reports_status,  # New field
+            financial_reports_status=financial_reports_status,
             financial_reports_audited_and_prepared_by=financial_reports_audited_and_prepared_by,
             financial_reports_noted_by=financial_reports_noted_by,
             financial_reports_recommending_approval_by=financial_reports_recommending_approval_by,
@@ -1869,7 +1869,11 @@ def add_financial_report():
     # Query for signatories
     signatories = Signatories.query.all()
 
-    return render_template('add-financial-report.html', events=events, users=users, signatories=signatories)
+    # Query for distinct academic years
+    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('add-financial-report.html', events=events, users=users, signatories=signatories, academic_years=academic_years)
 
 @app.route("/update-financial-report-status/<int:report_id>", methods=["POST"])
 @login_required
