@@ -32,7 +32,14 @@
 
                 <div class="input-pair">
                     <label for="financial-reports-academic-year">Academic Year</label>
-                    <input type="text" name="financial-reports-academic-year" id="financial-reports-academic-year" placeholder="Academic Year" required>
+                    <select name="financial-reports-academic-year" id="financial-reports-academic-year" required>
+                        <option value="" disabled selected>Select an Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year" style="display:none;">
                 </div>
 
                 <div class="input-pair">
@@ -121,5 +128,22 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const academicYearSelect = document.getElementById('financial-reports-academic-year');
+        const otherAcademicYearInput = document.getElementById('other-academic-year');
+
+        academicYearSelect.addEventListener('change', function () {
+            if (this.value === 'Other') {
+                otherAcademicYearInput.style.display = 'block';
+                otherAcademicYearInput.required = true;
+            } else {
+                otherAcademicYearInput.style.display = 'none';
+                otherAcademicYearInput.required = false;
+            }
+        });
+    });
+</script>
 
 {% endblock %}
