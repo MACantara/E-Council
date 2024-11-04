@@ -753,7 +753,7 @@ def signup():
         if users_role not in Users.users_role.type.enums:
             flash("Invalid role.", "error")
             return render_template("signup.html")
-        if users_student_organization and not StudentOrganizations.query.get(users_student_organization):
+        if users_student_organization and not db.session.get(StudentOrganizations, users_student_organization):
             flash("Invalid student organization.", "error")
             return render_template("signup.html")
         if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
@@ -1055,7 +1055,7 @@ def account_settings():
         if users_role not in Users.users_role.type.enums:
             flash("Invalid role.", "error")
             return redirect(url_for("account_settings"))
-        if users_student_organization and users_student_organization not in Users.users_student_organization.type.enums:
+        if users_student_organization and not db.session.get(StudentOrganizations, users_student_organization):
             flash("Invalid student organization.", "error")
             return redirect(url_for("account_settings"))
         if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
@@ -1114,9 +1114,10 @@ def account_settings():
         flash("Your account settings have been updated successfully.", "success")
         return redirect(url_for("account_settings"))
 
-    # Query all departments to pass to the template
+    # Query all departments and student organizations to pass to the template
     departments = Departments.query.all()
-    return render_template("account-settings.html", departments=departments)
+    student_organizations = StudentOrganizations.query.all()
+    return render_template("account-settings.html", departments=departments, student_organizations=student_organizations)
 
 @app.route("/delete-user-account", methods=["POST"])
 @login_required
