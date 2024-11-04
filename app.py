@@ -2037,7 +2037,7 @@ def update_minutes_of_the_meeting(meeting_id):
             academic_year = other_academic_year
 
         # Handle new signatory addition
-        if presiding_officer == 'add-new' or noted_by == 'add-new':
+        if noted_by == 'add-new':
             new_signatory = Signatories(
                 signatory_title=request.form.get('new-signatory-title'),
                 signatory_first_name=request.form.get('new-signatory-first-name'),
@@ -2050,8 +2050,6 @@ def update_minutes_of_the_meeting(meeting_id):
             db.session.add(new_signatory)
             db.session.commit()
 
-            if presiding_officer == 'add-new':
-                presiding_officer = new_signatory.signatory_id
             if noted_by == 'add-new':
                 noted_by = new_signatory.signatory_id
 
