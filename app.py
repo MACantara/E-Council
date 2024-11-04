@@ -382,6 +382,13 @@ def has_meetings(meetings, semester, academic_year):
 
 app.jinja_env.filters['has_meetings'] = has_meetings
 
+# Custom Jinja2 filter to check if there are financial reports for a given semester and academic year
+@app.template_filter('has_financial_reports')
+def has_financial_reports(reports, semester, academic_year):
+    return any(report.financial_reports_semester == semester and report.financial_reports_academic_year == academic_year for report in reports)
+
+app.jinja_env.filters['has_financial_reports'] = has_financial_reports
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
