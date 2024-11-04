@@ -91,7 +91,7 @@ class Users(db.Model, UserMixin):
         name='role_enum'
     ), nullable=False)
 
-    users_student_organization = Column(Integer, ForeignKey('student_organizations.student_organizations_id'), nullable=False)
+    users_student_organization = db.Column(db.Integer, db.ForeignKey('student_organizations.student_organizations_id'), nullable=False)
 
     users_student_organization_position = db.Column(db.Enum(
         'President',
@@ -122,7 +122,7 @@ class Users(db.Model, UserMixin):
     # Relationship to Departments
     department = db.relationship('Departments', backref='users')
     
-    student_organization = relationship("StudentOrganizations", backref="users")
+    student_organization = db.relationship("StudentOrganizations", backref="users")
 
     def set_password(self, password):
         self.users_password = generate_password_hash(password)
@@ -321,12 +321,12 @@ class MinutesOfTheMeetingAttendees(db.Model):
     def __repr__(self):
         return f'<MinutesOfTheMeetingAttendees {self.minutes_of_the_meeting_attendees_id}: Meeting {self.minutes_of_the_meeting_id}, User {self.users_id}>'
 
-class StudentOrganizations(Base):
+class StudentOrganizations(db.Model):
     __tablename__ = 'student_organizations'
     
-    student_organizations_id = Column(Integer, primary_key=True, autoincrement=True)
-    student_organizations_name = Column(String(255), nullable=False)
-    student_organizations_financial_bank_book_amount = Column(Numeric(20, 2), nullable=True)
+    student_organizations_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    student_organizations_name = db.Column(db.String(255), nullable=False)
+    student_organizations_financial_bank_book_amount = db.Column(db.Numeric(20, 2), nullable=True)
 
     def __repr__(self):
         return f"<StudentOrganizations(id={self.student_organizations_id}, name={self.student_organizations_name})>"
@@ -696,7 +696,8 @@ def index():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "GET":
-        return render_template("signup.html")
+        student_organizations = StudentOrganizations.query.all()
+        return render_template("signup.html", student_organizations=student_organizations)
     elif request.method == "POST":
         users_first_name = request.form.get("users-first-name")
         users_last_name = request.form.get("users-last-name")
@@ -708,8 +709,8 @@ def signup():
         users_repeat_password = request.form.get("users-repeat-password")
         users_email_verified = 0
         
-        users_student_organization = request.form.get("users-student-organization") if request.form.get("users-student-organization") else ""
-        users_student_organization_position = request.form.get("users-student-organization-position") if request.form.get("users-student-organization-position") else ""
+        users_student_organization = request.form.get("users-student-organization") if request.form.get("users-student-organization") else None
+        users_student_organization_position = request.form.get("users-student-organization-position") if request.form.get("users-student-organization-position") else None
 
         # Validation
         if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_password:
@@ -752,7 +753,7 @@ def signup():
         if users_role not in Users.users_role.type.enums:
             flash("Invalid role.", "error")
             return render_template("signup.html")
-        if users_student_organization and users_student_organization not in Users.users_student_organization.type.enums:
+        if users_student_organization and not StudentOrganizations.query.get(users_student_organization):
             flash("Invalid student organization.", "error")
             return render_template("signup.html")
         if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
