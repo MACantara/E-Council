@@ -23,103 +23,41 @@
 
         <a href="{{ url_for('add_financial_report') }}" class="primary-button create-button">Create New Financial Report</a>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select[name="event-status-select-button"]');
-                selects.forEach(select => {
-                    select.addEventListener('change', function () {
-                        const eventId = this.getAttribute('data-event-id');
-                        const newStatus = this.value;
-                        const eventName = this.getAttribute('data-event-name');
-
-                        fetch(`/update-event-status/${eventId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
-                            },
-                            body: JSON.stringify({ status: newStatus, name: eventName })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert(`Event status for "${eventName}" updated successfully.`);
-                                } else {
-                                    alert(`Failed to update event status for "${eventName}".`);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert(`An error occurred while updating the event status for "${eventName}".`);
-                            });
-                    });
-                });
-            });
-        </script>
-
         <div class="overview-content-container-group">
-            {% if events %}
-            {% set sorted_events = events | sort(attribute='events_academic_year', reverse=(sort_by_date ==
-            'recent-to-old')) %}
-            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester',
-            '2nd Semester']
-            %}
-            {% set academic_years = sorted_events | map(attribute='events_academic_year') | unique | list %}
+            {% if financial_reports %}
+            {% set sorted_reports = financial_reports | sort(attribute='financial_reports_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
+            {% set academic_years = sorted_reports | map(attribute='financial_reports_academic_year') | unique | list %}
 
             {% for academic_year in academic_years %}
             {% for semester in semesters %}
-            {% if sorted_events | has_events(semester, academic_year) %}
+            {% if sorted_reports | has_financial_reports(semester, academic_year) %}
             <div class="grid-header">
                 <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
             </div>
 
-            {% for event in sorted_events %}
-            {% if event.events_semester == semester and event.events_academic_year == academic_year %}
+            {% for report in sorted_reports %}
+            {% if report.financial_reports_semester == semester and report.financial_reports_academic_year == academic_year %}
             <div class="overview-content-grid-item">
-                <select class="fit-content-button" name="event-status-select-button"
-                    id="event-status-select-button-{{ loop.index }}" aria-label="Select an Event Status"
-                    data-event-id="{{ event.events_id }}" data-event-name="{{ event.events_name }}" required>
-                    <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming
-                    </option>
-                    <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed
-                    </option>
-                    <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
-                    <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled
-                    </option>
-                </select>
+                <h3>{{ report.financial_reports_title | truncate(41) }}</h3>
 
-                <h3>{{ event.events_name | truncate(41) }}</h3>
-
-                <p class="events-description">{{ event.events_description | truncate(100) }}</p>
+                <p class="events-description">{{ report.financial_reports_title | truncate(100) }}</p>
 
                 <div class="grid-item-details">
                     <div class="grid-item-details-pair">
                         <p>Date:</p>
-                        <p>{{ event.events_start_date_and_time.strftime('%B %d, %Y') if event.events_start_date_and_time
-                            else 'N/A' }}</p>
+                        <p>{{ report.financial_reports_date.strftime('%B %d, %Y') if report.financial_reports_date else 'N/A' }}</p>
                     </div>
                     <div class="grid-item-details-pair">
-                        <p>Time:</p>
-                        <p>{{ event.events_start_date_and_time.strftime('%I:%M %p') if event.events_start_date_and_time
-                            else 'N/A' }} - {{ event.events_end_date_and_time.strftime('%I:%M %p') if
-                            event.events_end_date_and_time else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Venue:</p>
-                        <p>{{ event.events_venue }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Budget:</p>
-                        <p>₱ {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}</p>
+                        <p>Event:</p>
+                        <p>{{ report.event.events_name if report.event else 'N/A' }}</p>
                     </div>
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
-                    <a href="{{ url_for('update_event', event_id=event.events_id) }}"
-                        class="secondary-button">Update</a>
-                    <a href="{{ url_for('delete_event', event_id=event.events_id) }}"
-                        class="secondary-button">Delete</a>
+                    <a href="" class="primary-button">View</a>
+                    <a href="" class="secondary-button">Update</a>
+                    <a href="" class="secondary-button">Delete</a>
                 </div>
             </div>
             {% endif %}
