@@ -86,10 +86,14 @@
                     <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
                     <select name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" required>
                         <option value="" disabled>Select a Presiding Officer</option>
-                        {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if meeting.minutes_of_the_meeting_presiding_officer == signatory.signatory_id %}selected{% endif %}>
-                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}
-                        </option>
+                        {% for organization, members in users|groupby('users_student_organization') %}
+                        <optgroup label="{{ organization }}">
+                            {% for user in members %}
+                            <option value="{{ user.users_id }}" {% if meeting.minutes_of_the_meeting_presiding_officer == user.users_id %}selected{% endif %}>
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
+                            </option>
+                            {% endfor %}
+                        </optgroup>
                         {% endfor %}
                         <option value="add-new-presiding-officer">Add new signatory</option>
                     </select>
@@ -278,4 +282,4 @@
 {% endblock %}  </div>
 </div>
 
-{% endblock %}
+{% endblock %}  
