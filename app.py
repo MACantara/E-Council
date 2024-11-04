@@ -1577,6 +1577,56 @@ def add_transaction(event_id):
 
     return render_template("add-transaction.html", event=event, transaction_categories=transaction_categories)
 
+@app.route("/update-transaction/<int:event_id>/<int:transaction_id>", methods=["GET", "POST"])
+@login_required
+def update_transaction(event_id, transaction_id):
+    # Fetch the event details based on the event_id
+    event = Events.query.get_or_404(event_id)
+    transaction = TransactionHistory.query.get_or_404(transaction_id)
+
+    if request.method == "POST":
+        # Get form data
+        transaction_name = request.form.get("transaction-name")
+        transaction_date = request.form.get("transaction-date")
+        unit_amount = request.form.get("transaction-unit-amount")
+        unit_price = request.form.get("transaction-unit-price")
+        transaction_total = request.form.get("transaction-total")
+        transaction_category = request.form.get("transaction-category")
+        other_transaction_category = request.form.get("other-transaction-category")
+        transaction_type = request.form.get("transaction-type")
+        transaction_receipt = request.files.get("transaction-receipt")
+
+        # Use the value from the additional input field if "Other" is selected
+        if transaction_category == "Other":
+            transaction_category = other_transaction_category
+
+        # Handle file upload to Cloudinary
+        receipt_url = transaction.transaction_receipt
+        if transaction_receipt:
+            upload_result = cloudinary.uploader.upload(transaction_receipt)
+            receipt_url = upload_result.get('secure_url')
+
+        # Update the transaction details
+        transaction.transaction_name = transaction_name
+        transaction.transaction_date = datetime.strptime(transaction_date, '%Y-%m-%dT%H:%M')
+        transaction.transaction_unit_amount = unit_amount
+        transaction.transaction_unit_price = unit_price
+        transaction.transaction_total = transaction_total
+        transaction.transaction_category = transaction_category
+        transaction.transaction_type = transaction_type
+        transaction.transaction_receipt = receipt_url
+
+        # Commit the changes to the database
+        db.session.commit()
+
+        flash("Transaction updated successfully.", "success")
+        return redirect(url_for("event_dashboard", event_id=event_id))
+
+    # Query distinct transaction categories
+    transaction_categories = db.session.query(TransactionHistory.transaction_category).distinct().order_by(TransactionHistory.transaction_category).all()
+
+    return render_template("update-transaction.html", event=event, transaction=transaction, transaction_categories=transaction_categories)
+
 @app.route("/invite-user/<int:event_id>", methods=["GET", "POST"])
 @login_required
 def invite_user(event_id):
