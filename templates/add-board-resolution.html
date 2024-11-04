@@ -101,8 +101,14 @@
                     <label for="board-resolutions-prepared-by">Prepared By</label>
                     <select name="board-resolutions-prepared-by" id="board-resolutions-prepared-by" required>
                         <option value="" disabled selected>Select Preparer</option>
-                        {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% for organization in student_organizations %}
+                        <optgroup label="{{ organization.student_organizations_name }}">
+                            {% for user in organization.users %}
+                            <option value="{{ user.users_id }}">
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
+                            </option>
+                            {% endfor %}
+                        </optgroup>
                         {% endfor %}
                     </select>
                 </div>
@@ -112,7 +118,9 @@
                     <select name="board-resolutions-approved-by" id="board-resolutions-approved-by" required>
                         <option value="" disabled selected>Select Approver</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}</option>
+                        <option value="{{ signatory.signatory_id }}"></option>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}{% if signatory.signatory_department %}, {{ signatory.signatory_department }}{% endif %}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
