@@ -79,6 +79,7 @@
                             <th>Category</th>
                             <th>Transaction Type</th>
                             <th>Receipt</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,6 +99,10 @@
                                 {% else %}
                                 No Receipt
                                 {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('update_transaction', event_id=event.events_id, transaction_id=transaction.transaction_id) }}"
+                                    class="secondary-button fit-content-button">Update</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -339,4 +344,4 @@
     });
 </script>
 
-{% endblock %} 
+{% endblock %}
