@@ -1036,7 +1036,7 @@ def upload_profile_picture():
     if (profile_picture):
         # Server-side validation for image file types
         valid_image_types = ['image/jpeg', 'image/png', 'image/jpg']
-        if profile_picture.mimetype not in valid_image_types:
+        if (profile_picture.mimetype not in valid_image_types):
             flash("Invalid file type. Please upload an image file.", "error")
             return redirect(url_for("account"))
 
@@ -1875,6 +1875,55 @@ def add_financial_report():
     academic_years = [year[0] for year in academic_years]
 
     return render_template('add-financial-report.html', events=events, users=users, signatories=signatories, academic_years=academic_years)
+
+@app.route('/update-financial-report/<int:report_id>', methods=['GET', 'POST'])
+@login_required
+def update_financial_report(report_id):
+    report = FinancialReports.query.get_or_404(report_id)
+
+    if request.method == 'POST':
+        financial_reports_date = request.form.get('financial-reports-date')
+        financial_reports_academic_year = request.form.get('financial-reports-academic-year')
+        financial_reports_semester = request.form.get('financial-reports-semester')
+        financial_reports_events_id = request.form.get('financial-reports-events-id')
+        financial_reports_title = request.form.get('financial-reports-title')
+        financial_reports_status = request.form.get('financial-reports-status')
+        financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
+        financial_reports_noted_by = request.form.get('financial-reports-noted-by')
+        financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
+        financial_reports_approved_by = request.form.get('financial-reports-approved-by')
+
+        # Update the financial report
+        report.financial_reports_date = datetime.strptime(financial_reports_date, '%Y-%m-%dT%H:%M')
+        report.financial_reports_academic_year = financial_reports_academic_year
+        report.financial_reports_semester = financial_reports_semester
+        report.financial_reports_events_id = financial_reports_events_id
+        report.financial_reports_title = financial_reports_title
+        report.financial_reports_status = financial_reports_status
+        report.financial_reports_audited_and_prepared_by = financial_reports_audited_and_prepared_by
+        report.financial_reports_noted_by = financial_reports_noted_by
+        report.financial_reports_recommending_approval_by = financial_reports_recommending_approval_by
+        report.financial_reports_approved_by = financial_reports_approved_by
+
+        db.session.commit()
+
+        flash('Financial report updated successfully!', 'success')
+        return redirect(url_for('financial_reports_overview'))
+
+    # Query for events
+    events = Events.query.all()
+
+    # Query for users
+    users = Users.query.all()
+
+    # Query for signatories
+    signatories = Signatories.query.all()
+
+    # Query for distinct academic years
+    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('update-financial-report.html', report=report, events=events, users=users, signatories=signatories, academic_years=academic_years)
 
 @app.route("/update-financial-report-status/<int:report_id>", methods=["POST"])
 @login_required
