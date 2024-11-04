@@ -2022,7 +2022,10 @@ def add_minutes_of_the_meeting():
     # Query for signatories to populate the presiding officer and noted by fields
     signatories = Signatories.query.all()
 
-    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories)
+    # Query for student organizations and their members
+    student_organizations = StudentOrganizations.query.all()
+
+    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories, student_organizations=student_organizations)
 
 @app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
 @login_required
@@ -2124,7 +2127,10 @@ def update_minutes_of_the_meeting(meeting_id):
     # Query for existing attendees
     meeting_attendees = [attendee.users_id for attendee in MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()]
 
-    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories, meeting_attendees=meeting_attendees)
+    # Query for student organizations and their members
+    student_organizations = StudentOrganizations.query.all()
+
+    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories, meeting_attendees=meeting_attendees, student_organizations=student_organizations)
 
 @app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
 @login_required
