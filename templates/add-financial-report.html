@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Add Financial Report{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('financial_reports_overview') }}" class="primary-button fit-content-button">Back to Financial Reports Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div class="container">
+            <h2>Add Financial Report</h2>
+
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_financial_report') }}">
+                <div class="input-pair">
+                    <label for="financial-reports-events-id">Event</label>
+                    <select name="financial-reports-events-id" id="financial-reports-events-id" required>
+                        <option value="" disabled selected>Select an Event</option>
+                        {% for event in events %}
+                        <option value="{{ event.events_id }}">{{ event.events_name }}</option>
+                        {% endfor %}
+                        <option value="None">None</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-audited-and-prepared-by">Audited and Prepared By</label>
+                    <select name="financial-reports-audited-and-prepared-by" id="financial-reports-audited-and-prepared-by" required>
+                        <option value="" disabled selected>Select a User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-noted-by">Noted By</label>
+                    <select name="financial-reports-noted-by" id="financial-reports-noted-by" required>
+                        <option value="" disabled selected>Select a User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-recommending-approval-by">Recommending Approval By</label>
+                    <select name="financial-reports-recommending-approval-by" id="financial-reports-recommending-approval-by" required>
+                        <option value="" disabled selected>Select a User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="financial-reports-approved-by">Approved By</label>
+                    <select name="financial-reports-approved-by" id="financial-reports-approved-by" required>
+                        <option value="" disabled selected>Select a Signatory</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('financial_reports_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Add Financial Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
