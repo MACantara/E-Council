@@ -92,8 +92,8 @@
                             <td>{{ transaction.transaction_category }}</td>
                             <td>{{ transaction.transaction_type }}</td>
                             <td>
-                                {% if transaction.transaction_receipt %}
-                                <a href="{{ transaction.transaction_receipt }}" target="_blank"
+                                {% if transaction.transaction_receipt_cloudinary_url %}
+                                <a href="{{ transaction.transaction_receipt_cloudinary_url }}" target="_blank"
                                     class="primary-button fit-content-button">View Receipt</a>
                                 {% else %}
                                 No Receipt
@@ -339,4 +339,4 @@
     });
 </script>
 
-{% endblock %}
+{% endblock %} 
