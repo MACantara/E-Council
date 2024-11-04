@@ -255,9 +255,13 @@ class BoardResolutions(db.Model):
     board_resolutions_status = db.Column(db.String(50), nullable=True)
     board_resolutions_total_amount = db.Column(db.Numeric(20, 2), nullable=True)
     board_resolutions_description = db.Column(db.Text, nullable=True)
+    board_resolutions_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    board_resolutions_approved_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
 
     # Relationship to the Events model (if you have one)
     events = db.relationship('Events', back_populates='board_resolutions')
+    prepared_by_user = db.relationship('Users', foreign_keys=[board_resolutions_prepared_by])
+    approved_by_signatory = db.relationship('Signatories', foreign_keys=[board_resolutions_approved_by])
 
     def __repr__(self):
         return f'<BoardResolution {self.board_resolutions_id}: {self.board_resolutions_description}>'
