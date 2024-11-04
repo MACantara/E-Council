@@ -1632,7 +1632,7 @@ def update_transaction(event_id, transaction_id):
         return redirect(url_for("event_dashboard", event_id=event_id))
 
     # Query distinct transaction categories
-    transaction_categories = db.session.query(TransactionHistory.transaction_category).distinct().order_by(TransactionHistory.transaction_category).all()
+    transaction_categories = [category[0] for category in db.session.query(TransactionHistory.transaction_category).distinct().all()]
 
     return render_template("update-transaction.html", event=event, transaction=transaction, transaction_categories=transaction_categories)
 
@@ -2242,4 +2242,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
