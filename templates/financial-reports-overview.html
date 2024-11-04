@@ -39,7 +39,17 @@
             {% for report in sorted_reports %}
             {% if report.financial_reports_semester == semester and report.financial_reports_academic_year == academic_year %}
             <div class="overview-content-grid-item">
-                <h3>{{ report.financial_reports_title | truncate(41) }}</h3>
+                <select class="fit-content-button" name="meeting-status-select-button"
+                    id="meeting-status-select-button-{{ loop.index }}" aria-label="Select a Meeting Status"
+                    data-meeting-id="{{ report.financial_reports_id }}"
+                    data-meeting-name="{{ report.financial_reports_title }}" required>
+                    <option value="Upcoming" {% if report.financial_reports_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                    <option value="Postponed" {% if report.financial_reports_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                    <option value="Done" {% if report.financial_reports_status=='Done' %}selected{% endif %}>Done</option>
+                    <option value="Cancelled" {% if report.financial_reports_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+
+                <h3>{{ report.financial_reports_title }}</h3>
 
                 <p class="events-description">{{ report.financial_reports_title | truncate(100) }}</p>
 
