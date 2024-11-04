@@ -95,38 +95,7 @@
                             {% endfor %}
                         </optgroup>
                         {% endfor %}
-                        <option value="add-new-presiding-officer">Add new signatory</option>
                     </select>
-                </div>
-
-                <!-- New signatory fields for Presiding Officer -->
-                <div class="input-pair" style="display: none;">
-                    <label for="new-presiding-officer-title">Title</label>
-                    <input type="text" name="new-presiding-officer-title" id="new-presiding-officer-title" placeholder="Title">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-presiding-officer-first-name">First Name</label>
-                    <input type="text" name="new-presiding-officer-first-name" id="new-presiding-officer-first-name" placeholder="First Name">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-presiding-officer-middle-name">Middle Name</label>
-                    <input type="text" name="new-presiding-officer-middle-name" id="new-presiding-officer-middle-name" placeholder="Middle Name">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-presiding-officer-last-name">Last Name</label>
-                    <input type="text" name="new-presiding-officer-last-name" id="new-presiding-officer-last-name" placeholder="Last Name">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-presiding-officer-suffix">Suffix</label>
-                    <input type="text" name="new-presiding-officer-suffix" id="new-presiding-officer-suffix" placeholder="Suffix">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-presiding-officer-position">Position</label>
-                    <input type="text" name="new-presiding-officer-position" id="new-presiding-officer-position" placeholder="Position">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-presiding-officer-department">Department</label>
-                    <input type="text" name="new-presiding-officer-department" id="new-presiding-officer-department" placeholder="Department">
                 </div>
 
                 <div class="input-pair">
@@ -248,7 +217,6 @@
             document.getElementById('file-name').textContent = fileNames;
         });
 
-        const presidingOfficerSelect = document.getElementById('minutes-of-the-meeting-presiding-officer');
         const notedBySelect = document.getElementById('minutes-of-the-meeting-noted-by');
 
         function toggleNewSignatoryFields(selectElement, prefix) {
@@ -259,10 +227,6 @@
                 document.getElementById(`new-${prefix}-${field}`).parentElement.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
             });
         }
-
-        presidingOfficerSelect.addEventListener('change', function () {
-            toggleNewSignatoryFields(presidingOfficerSelect, 'presiding-officer');
-        });
 
         notedBySelect.addEventListener('change', function () {
             toggleNewSignatoryFields(notedBySelect, 'noted-by');
