@@ -1804,7 +1804,9 @@ def documentation_overview():
 @app.route("/financial-reports-overview")
 @login_required
 def financial_reports_overview():
-    return render_template("financial-reports-overview.html")
+    # Query for all financial reports
+    financial_reports = FinancialReports.query.all()
+    return render_template("financial-reports-overview.html", financial_reports=financial_reports)
 
 @app.route('/add-financial-report', methods=['GET', 'POST'])
 @login_required
