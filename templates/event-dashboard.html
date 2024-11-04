@@ -190,7 +190,7 @@
     let top5ExpensesChart = new Chart(ctx1, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: top5Expenses.map(transaction => transaction.transaction_name), // Labels for the datasets
+            labels: top5Expenses.map(transaction => transaction.transaction_category), // Labels for the datasets
             datasets: [
                 {
                     data: top5ExpensesData, // Use the array of top 5 expenses
@@ -236,7 +236,7 @@
     let top5IncomeChart = new Chart(ctx2, {
         type: 'doughnut', // Use 'doughnut' type
         data: {
-            labels: top5Income.map(transaction => transaction.transaction_name), // Labels for the datasets
+            labels: top5Income.map(transaction => transaction.transaction_category), // Labels for the datasets
             datasets: [
                 {
                     data: top5IncomeData, // Use the array of top 5 income
