@@ -332,6 +332,25 @@ class StudentOrganizations(db.Model):
     def __repr__(self):
         return f"<StudentOrganizations(id={self.student_organizations_id}, name={self.student_organizations_name})>"
 
+class FinancialReports(db.Model):
+    __tablename__ = 'financial_reports'
+
+    financial_reports_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    financial_reports_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=True)
+    financial_reports_audited_and_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    financial_reports_noted_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    financial_reports_recommending_approval_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    financial_reports_approved_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+
+    event = db.relationship('Events', backref='financial_reports')
+    audited_and_prepared_by_user = db.relationship('Users', foreign_keys=[financial_reports_audited_and_prepared_by])
+    noted_by_user = db.relationship('Users', foreign_keys=[financial_reports_noted_by])
+    recommending_approval_by_user = db.relationship('Users', foreign_keys=[financial_reports_recommending_approval_by])
+    approved_by_signatory = db.relationship('Signatories', foreign_keys=[financial_reports_approved_by])
+
+    def __repr__(self):
+        return f'<FinancialReports {self.financial_reports_id}>'
+
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
     if len(text) > length:
