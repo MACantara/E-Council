@@ -101,15 +101,13 @@
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-attendees">Attendees</label>
                     <div id="minutes-of-the-meeting-attendees">
-                        {% for organization, members in users|groupby('users_student_organization') %}
+                        {% for organization in student_organizations %}
                         <fieldset>
-                            <legend>{{ organization }}</legend>
-                            {% for user in members %}
+                            <legend>{{ organization.student_organizations_name }}</legend>
+                            {% for user in organization.users %}
                             <div>
-                                <label>
-                                    <input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" {% if user.users_id in meeting_attendees %}checked{% endif %}>
-                                    {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
-                                </label>
+                                <label><input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" {% if user.users_id in meeting_attendees %}checked{% endif %}>
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
                             </div>
                             {% endfor %}
                         </fieldset>
