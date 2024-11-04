@@ -1860,8 +1860,9 @@ def add_financial_report():
         flash('Financial report added successfully!', 'success')
         return redirect(url_for('financial_reports_overview'))
 
-    # Query for events
-    events = Events.query.all()
+    # Query for events that do not have a financial report
+    events = Events.query.outerjoin(FinancialReports, Events.events_id == FinancialReports.financial_reports_events_id) \
+                         .filter(FinancialReports.financial_reports_events_id == None).all()
 
     # Query for users
     users = Users.query.all()
