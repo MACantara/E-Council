@@ -83,9 +83,17 @@
                     <input type="file" name="transaction-receipt" id="transaction-receipt" hidden>
                     <label for="transaction-receipt" class="custom-file-upload-input">
                         <span class="choose-file-text">Choose File</span>
-                        <span id="file-name" class="file-name">{{ transaction.transaction_receipt or 'No file chosen' }}</span>
+                        <span id="file-name" class="file-name">No file chosen</span>
                     </label>
                 </div>
+
+                <!-- Display receipt preview if available -->
+                {% if transaction.transaction_receipt_cloudinary_url %}
+                <div class="input-pair">
+                    <label>Receipt Preview</label>
+                    <img src="{{ transaction.transaction_receipt_cloudinary_url }}" alt="Receipt Preview" class="receipt-preview">
+                </div>
+                {% endif %}
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
