@@ -965,3 +965,12 @@ textarea {
     border-radius: var(--small-border-radius);
     border: 1px solid var(--secondary-color);
 }
+
+/* Receipt Preview Styles */
+.receipt-preview {
+    max-width: 100%;
+    max-height: 300px;
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--border-radius);
+    margin-top: var(--gap-small);
+}
