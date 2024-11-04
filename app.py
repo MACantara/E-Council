@@ -237,7 +237,8 @@ class TransactionHistory(db.Model):
     transaction_total = db.column_property(transaction_unit_amount * transaction_unit_price)
     transaction_category = db.Column(db.String(255), nullable=True)
     transaction_type = db.Column(db.Enum('Expense', 'Income', name='transaction_type_enum'), nullable=True)
-    transaction_receipt = db.Column(db.String(255), nullable=True)
+    transaction_receipt_cloudinary_url = db.Column(db.String(255), nullable=True)
+    transaction_receipt_cloudinary_public_id = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return f'<TransactionHistory {self.transaction_name}>'
@@ -1548,9 +1549,11 @@ def add_transaction(event_id):
 
         # Handle file upload to Cloudinary
         receipt_url = None
+        receipt_public_id = None
         if transaction_receipt:
             upload_result = cloudinary.uploader.upload(transaction_receipt)
             receipt_url = upload_result.get('secure_url')
+            receipt_public_id = upload_result.get('public_id')
 
         # Create a new transaction
         new_transaction = TransactionHistory(
@@ -1562,7 +1565,8 @@ def add_transaction(event_id):
             transaction_total=transaction_total,
             transaction_category=transaction_category,
             transaction_type=transaction_type,
-            transaction_receipt=receipt_url
+            transaction_receipt_cloudinary_url=receipt_url,
+            transaction_receipt_cloudinary_public_id=receipt_public_id
         )
 
         # Add the transaction to the database
@@ -1601,10 +1605,14 @@ def update_transaction(event_id, transaction_id):
             transaction_category = other_transaction_category
 
         # Handle file upload to Cloudinary
-        receipt_url = transaction.transaction_receipt
+        receipt_url = transaction.transaction_receipt_cloudinary_url
+        receipt_public_id = transaction.transaction_receipt_cloudinary_public_id
         if transaction_receipt:
+            if receipt_public_id:
+                cloudinary.uploader.destroy(receipt_public_id)
             upload_result = cloudinary.uploader.upload(transaction_receipt)
             receipt_url = upload_result.get('secure_url')
+            receipt_public_id = upload_result.get('public_id')
 
         # Update the transaction details
         transaction.transaction_name = transaction_name
@@ -1614,7 +1622,8 @@ def update_transaction(event_id, transaction_id):
         transaction.transaction_total = transaction_total
         transaction.transaction_category = transaction_category
         transaction.transaction_type = transaction_type
-        transaction.transaction_receipt = receipt_url
+        transaction.transaction_receipt_cloudinary_url = receipt_url
+        transaction.transaction_receipt_cloudinary_public_id = receipt_public_id
 
         # Commit the changes to the database
         db.session.commit()
@@ -2233,4 +2242,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
