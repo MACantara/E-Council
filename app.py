@@ -1029,9 +1029,9 @@ def upload_profile_picture():
             return redirect(url_for("account"))
 
         # Delete the previous profile picture from Cloudinary if it exists
-        if current_user.users_profile_picture:
+        if (current_user.users_profile_picture):
             public_id = current_user.users_profile_picture_cloudinary_public_id
-            if public_id:
+            if (public_id):
                 cloudinary.uploader.destroy(public_id)
 
         # Upload the new profile picture to Cloudinary
@@ -1805,6 +1805,43 @@ def documentation_overview():
 @login_required
 def financial_reports_overview():
     return render_template("financial-reports-overview.html")
+
+@app.route('/add-financial-report', methods=['GET', 'POST'])
+@login_required
+def add_financial_report():
+    if request.method == 'POST':
+        financial_reports_events_id = request.form.get('financial-reports-events-id')
+        financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
+        financial_reports_noted_by = request.form.get('financial-reports-noted-by')
+        financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
+        financial_reports_approved_by = request.form.get('financial-reports-approved-by')
+
+        # Create a new financial report
+        new_financial_report = FinancialReports(
+            financial_reports_events_id=financial_reports_events_id,
+            financial_reports_audited_and_prepared_by=financial_reports_audited_and_prepared_by,
+            financial_reports_noted_by=financial_reports_noted_by,
+            financial_reports_recommending_approval_by=financial_reports_recommending_approval_by,
+            financial_reports_approved_by=financial_reports_approved_by
+        )
+
+        # Add the new financial report to the database
+        db.session.add(new_financial_report)
+        db.session.commit()
+
+        flash('Financial report added successfully!', 'success')
+        return redirect(url_for('financial_reports_overview'))
+
+    # Query for events
+    events = Events.query.all()
+
+    # Query for users
+    users = Users.query.all()
+
+    # Query for signatories
+    signatories = Signatories.query.all()
+
+    return render_template('add-financial-report.html', events=events, users=users, signatories=signatories)
 
 @app.route("/board-resolutions-overview")
 @login_required
