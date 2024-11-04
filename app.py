@@ -336,7 +336,11 @@ class FinancialReports(db.Model):
     __tablename__ = 'financial_reports'
 
     financial_reports_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    financial_reports_date = db.Column(db.DateTime, nullable=False)
+    financial_reports_academic_year = db.Column(db.String(50), nullable=False)
+    financial_reports_semester = db.Column(db.String(50), nullable=False)
     financial_reports_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=True)
+    financial_reports_title = db.Column(db.String(255), nullable=False)
     financial_reports_audited_and_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     financial_reports_noted_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     financial_reports_recommending_approval_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
