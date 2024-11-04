@@ -1868,6 +1868,21 @@ def add_financial_report():
 
     return render_template('add-financial-report.html', events=events, users=users, signatories=signatories)
 
+@app.route("/update-financial-report-status/<int:report_id>", methods=["POST"])
+@login_required
+def update_financial_report_status(report_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the financial report by ID
+    report = FinancialReports.query.get_or_404(report_id)
+
+    # Update the financial report status
+    report.financial_reports_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
+
 @app.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
