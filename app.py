@@ -1864,8 +1864,8 @@ def add_financial_report():
     events = Events.query.outerjoin(FinancialReports, Events.events_id == FinancialReports.financial_reports_events_id) \
                          .filter(FinancialReports.financial_reports_events_id == None).all()
 
-    # Query for users
-    users = Users.query.all()
+    # Query for users grouped by student organization
+    student_organizations = StudentOrganizations.query.all()
 
     # Query for signatories
     signatories = Signatories.query.all()
@@ -1874,7 +1874,7 @@ def add_financial_report():
     academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('add-financial-report.html', events=events, users=users, signatories=signatories, academic_years=academic_years)
+    return render_template('add-financial-report.html', events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
 
 @app.route('/update-financial-report/<int:report_id>', methods=['GET', 'POST'])
 @login_required
@@ -1913,8 +1913,8 @@ def update_financial_report(report_id):
     # Query for events
     events = Events.query.all()
 
-    # Query for users
-    users = Users.query.all()
+    # Query for users grouped by student organization
+    student_organizations = StudentOrganizations.query.all()
 
     # Query for signatories
     signatories = Signatories.query.all()
@@ -1923,7 +1923,7 @@ def update_financial_report(report_id):
     academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('update-financial-report.html', report=report, events=events, users=users, signatories=signatories, academic_years=academic_years)
+    return render_template('update-financial-report.html', report=report, events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
 
 @app.route("/update-financial-report-status/<int:report_id>", methods=["POST"])
 @login_required
