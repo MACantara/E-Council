@@ -1931,30 +1931,12 @@ def add_minutes_of_the_meeting():
         approved_by = request.form.get('minutes-of-the-meeting-approved-by')
         prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
         noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+        attendees = request.form.getlist('minutes-of-the-meeting-attendees')
         photo_documentations = request.files.getlist('photo-documentation')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if academic_year == "Other":
             academic_year = other_academic_year
-
-        # Handle new signatory addition
-        if presiding_officer == 'add-new' or noted_by == 'add-new':
-            new_signatory = Signatories(
-                signatory_title=request.form.get('new-signatory-title'),
-                signatory_first_name=request.form.get('new-signatory-first-name'),
-                signatory_middle_name=request.form.get('new-signatory-middle-name'),
-                signatory_last_name=request.form.get('new-signatory-last-name'),
-                signatory_suffix=request.form.get('new-signatory-suffix'),
-                signatory_position=request.form.get('new-signatory-position'),
-                signatory_department=request.form.get('new-signatory-department')
-            )
-            db.session.add(new_signatory)
-            db.session.commit()
-
-            if presiding_officer == 'add-new':
-                presiding_officer = new_signatory.signatory_id
-            if noted_by == 'add-new':
-                noted_by = new_signatory.signatory_id
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
@@ -1977,6 +1959,15 @@ def add_minutes_of_the_meeting():
 
         # Add the new meeting to the database
         db.session.add(new_meeting)
+        db.session.commit()
+
+        # Add attendees to the minutes_of_the_meeting_attendees table
+        for attendee_id in attendees:
+            new_attendee = MinutesOfTheMeetingAttendees(
+                minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
+                users_id=attendee_id
+            )
+            db.session.add(new_attendee)
         db.session.commit()
 
         # Handle multiple file uploads to Cloudinary
@@ -2030,28 +2021,12 @@ def update_minutes_of_the_meeting(meeting_id):
         approved_by = request.form.get('minutes-of-the-meeting-approved-by')
         prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
         noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+        attendees = request.form.getlist('minutes-of-the-meeting-attendees')
         photo_documentations = request.files.getlist('photo-documentation')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if academic_year == "Other":
             academic_year = other_academic_year
-
-        # Handle new signatory addition
-        if noted_by == 'add-new':
-            new_signatory = Signatories(
-                signatory_title=request.form.get('new-signatory-title'),
-                signatory_first_name=request.form.get('new-signatory-first-name'),
-                signatory_middle_name=request.form.get('new-signatory-middle-name'),
-                signatory_last_name=request.form.get('new-signatory-last-name'),
-                signatory_suffix=request.form.get('new-signatory-suffix'),
-                signatory_position=request.form.get('new-signatory-position'),
-                signatory_department=request.form.get('new-signatory-department')
-            )
-            db.session.add(new_signatory)
-            db.session.commit()
-
-            if noted_by == 'add-new':
-                noted_by = new_signatory.signatory_id
 
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
@@ -2070,6 +2045,16 @@ def update_minutes_of_the_meeting(meeting_id):
         meeting.minutes_of_the_meeting_prepared_by = prepared_by
         meeting.minutes_of_the_meeting_noted_by = noted_by
 
+        db.session.commit()
+
+        # Update attendees in the minutes_of_the_meeting_attendees table
+        MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).delete()
+        for attendee_id in attendees:
+            new_attendee = MinutesOfTheMeetingAttendees(
+                minutes_of_the_meeting_id=meeting_id,
+                users_id=attendee_id
+            )
+            db.session.add(new_attendee)
         db.session.commit()
 
         # Handle multiple file uploads to Cloudinary
@@ -2115,7 +2100,10 @@ def update_minutes_of_the_meeting(meeting_id):
     # Query for signatories to populate the presiding officer and noted by fields
     signatories = Signatories.query.all()
 
-    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories)
+    # Query for existing attendees
+    meeting_attendees = [attendee.users_id for attendee in MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()]
+
+    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories, meeting_attendees=meeting_attendees)
 
 @app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
 @login_required
@@ -2165,4 +2153,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
