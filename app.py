@@ -1908,12 +1908,23 @@ def update_board_resolution_status(resolution_id):
 @login_required
 def minutes_of_the_meeting_overview():
     # Query for all minutes of the meeting sorted by date (most recent first)
-    minutes_of_the_meeting = MinutesOfTheMeeting.query.order_by(MinutesOfTheMeeting.minutes_of_the_meeting_date.desc()).all()
+    minutes_of_the_meeting = db.session.query(
+        MinutesOfTheMeeting,
+        Users.users_first_name,
+        Users.users_last_name
+    ).join(
+        Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id
+    ).order_by(
+        MinutesOfTheMeeting.minutes_of_the_meeting_date.desc()
+    ).all()
 
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
 
-    return render_template("minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date)
+    # Extract only the MinutesOfTheMeeting objects for filtering
+    meetings_only = [meeting for meeting, _, _ in minutes_of_the_meeting]
+
+    return render_template("minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date, meetings_only=meetings_only)
 
 @app.route('/add-minutes-of-the-meeting', methods=['GET', 'POST'])
 @login_required
@@ -2153,4 +2164,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
