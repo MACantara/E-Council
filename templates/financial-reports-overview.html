@@ -64,7 +64,7 @@
 
                 <div class="grid-item-button-group">
                     <a href="" class="primary-button">View</a>
-                    <a href="" class="secondary-button">Update</a>
+                    <a href="{{ url_for('update_financial_report', report_id=report.financial_reports_id) }}" class="secondary-button">Update</a>
                     <a href="" class="secondary-button">Delete</a>
                 </div>
             </div>
