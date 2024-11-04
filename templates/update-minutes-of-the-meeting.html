@@ -166,7 +166,7 @@
                         <option value="" disabled>Select a Signatory</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}" {% if meeting.minutes_of_the_meeting_noted_by == signatory.signatory_id %}selected{% endif %}>
-                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }} - {{ signatory.signatory_department }}
                         </option>
                         {% endfor %}
                         <option value="add-new-noted-by">Add new signatory</option>
