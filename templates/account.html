@@ -86,7 +86,7 @@
         {% if current_user.users_role == "Student Council Officer" %}
             <div class="horizontal-grid-input-pair">
                 <p>Student Organization:</p>
-                <p>{{ current_user.users_student_organization }}</p>
+                <p>{{ current_user.student_organization.student_organizations_name }}</p>
             </div>
 
             <div class="horizontal-grid-input-pair">
