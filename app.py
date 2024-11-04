@@ -1492,20 +1492,23 @@ def event_dashboard(event_id):
     # Fetch the transaction history for the given event_id, sorted by most recent
     transactions = TransactionHistory.query.filter_by(events_id=event_id).order_by(TransactionHistory.transaction_date.desc()).all()
 
-    # Query top 5 income transactions
-    top5_income = db.session.query(TransactionHistory).filter_by(events_id=event_id, transaction_type='Income').order_by(TransactionHistory.transaction_total.desc()).limit(5).all()
+    # Query top 5 income transactions grouped by category
+    top5_income = db.session.query(
+        TransactionHistory.transaction_category,
+        db.func.sum(TransactionHistory.transaction_total).label('transaction_total')
+    ).filter_by(events_id=event_id, transaction_type='Income').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
 
-    # Query top 5 expense transactions
-    top5_expense = db.session.query(TransactionHistory).filter_by(events_id=event_id, transaction_type='Expense').order_by(TransactionHistory.transaction_total.desc()).limit(5).all()
+    # Query top 5 expense transactions grouped by category
+    top5_expense = db.session.query(
+        TransactionHistory.transaction_category,
+        db.func.sum(TransactionHistory.transaction_total).label('transaction_total')
+    ).filter_by(events_id=event_id, transaction_type='Expense').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
 
     # Convert TransactionHistory objects to dictionaries
     def transaction_to_dict(transaction):
         return {
-            'transaction_name': transaction.transaction_name,
-            'transaction_total': float(transaction.transaction_total),
-            'transaction_date': transaction.transaction_date.strftime('%Y-%m-%d %H:%M:%S'),
             'transaction_category': transaction.transaction_category,
-            'transaction_type': transaction.transaction_type
+            'transaction_total': float(transaction.transaction_total)
         }
 
     top5_income_dicts = [transaction_to_dict(transaction) for transaction in top5_income]
