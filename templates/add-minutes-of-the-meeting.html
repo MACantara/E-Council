@@ -163,7 +163,7 @@
                     <select name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" required>
                         <option value="" disabled selected>Select a Signatory</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}</option>
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }} - {{ signatory.signatory_department }}</option>
                         {% endfor %}
                         <option value="add-new-noted-by">Add new signatory</option>
                     </select>
