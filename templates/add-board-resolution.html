@@ -97,6 +97,26 @@
                     <textarea name="board-resolutions-description" id="board-resolutions-description" placeholder="Description" required></textarea>
                 </div>
 
+                <div class="input-pair">
+                    <label for="board-resolutions-prepared-by">Prepared By</label>
+                    <select name="board-resolutions-prepared-by" id="board-resolutions-prepared-by" required>
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="board-resolutions-approved-by">Approved By</label>
+                    <select name="board-resolutions-approved-by" id="board-resolutions-approved-by" required>
+                        <option value="" disabled selected>Select Approver</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">

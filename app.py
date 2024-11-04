@@ -1984,6 +1984,8 @@ def add_board_resolution():
         semester = request.form.get('board-resolutions-semester')
         status = request.form.get('board-resolutions-status')
         date = request.form.get('board-resolutions-date')
+        prepared_by = request.form.get('board-resolutions-prepared-by')
+        approved_by = request.form.get('board-resolutions-approved-by')
 
         # Use the value from the "Other" input field if "Other" is selected for academic year
         if academic_year == 'Other':
@@ -2023,7 +2025,9 @@ def add_board_resolution():
             board_resolutions_academic_year=academic_year,
             board_resolutions_semester=semester,
             board_resolutions_status=status,
-            board_resolutions_date=date
+            board_resolutions_date=date,
+            board_resolutions_prepared_by=prepared_by,
+            board_resolutions_approved_by=approved_by
         )
 
         # Add the new resolution to the database
@@ -2041,7 +2045,10 @@ def add_board_resolution():
     academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('add-board-resolution.html', events=events, academic_years=academic_years)
+    users = Users.query.all()
+    signatories = Signatories.query.all()
+
+    return render_template('add-board-resolution.html', events=events, academic_years=academic_years, users=users, signatories=signatories)
 
 @app.route("/delete-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
 @login_required
@@ -2078,6 +2085,8 @@ def update_board_resolution(resolution_id):
         semester = request.form.get('board-resolutions-semester')
         status = request.form.get('board-resolutions-status')
         date = request.form.get('board-resolutions-date')
+        prepared_by = request.form.get('board-resolutions-prepared-by')
+        approved_by = request.form.get('board-resolutions-approved-by')
 
         # Use the value from the "Other" input field if "Other" is selected for academic year
         if academic_year == 'Other':
@@ -2117,6 +2126,8 @@ def update_board_resolution(resolution_id):
         resolution.board_resolutions_semester = semester
         resolution.board_resolutions_status = status
         resolution.board_resolutions_date = date
+        resolution.board_resolutions_prepared_by = prepared_by
+        resolution.board_resolutions_approved_by = approved_by
 
         db.session.commit()
 
@@ -2131,7 +2142,10 @@ def update_board_resolution(resolution_id):
     academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years)
+    users = Users.query.all()
+    signatories = Signatories.query.all()
+
+    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, users=users, signatories=signatories)
 
 @app.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
 @login_required
