@@ -77,9 +77,9 @@
             <label for="users-student-organization">Student Organization</label>
             <select name="users-student-organization" id="users-student-organization">
                 <option value="" disabled selected>Select a Student Organization</option>
-                <option value="College of Computer Studies - Student Council">College of Computer Studies - Student
-                    Council (CCS-SC)</option>
-                <option value="Junior Philippine Computer Society">Junior Philippine Computer Society (JPCS)</option>
+                {% for organization in student_organizations %}
+                <option value="{{ organization.student_organizations_id }}">{{ organization.student_organizations_name }}</option>
+                {% endfor %}
             </select>
         </div>
 
