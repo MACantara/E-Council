@@ -2045,10 +2045,10 @@ def add_board_resolution():
     academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    users = Users.query.all()
+    student_organizations = StudentOrganizations.query.all()
     signatories = Signatories.query.all()
 
-    return render_template('add-board-resolution.html', events=events, academic_years=academic_years, users=users, signatories=signatories)
+    return render_template('add-board-resolution.html', events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
 
 @app.route("/delete-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
 @login_required
@@ -2142,10 +2142,10 @@ def update_board_resolution(resolution_id):
     academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    users = Users.query.all()
+    student_organizations = StudentOrganizations.query.all()
     signatories = Signatories.query.all()
 
-    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, users=users, signatories=signatories)
+    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
 
 @app.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
 @login_required
