@@ -58,7 +58,7 @@
                     <select name="transaction-category" id="transaction-category" required>
                         <option value="" disabled>Select a Category</option>
                         {% for category in transaction_categories %}
-                        <option value="{{ category.transaction_category }}" {% if category.transaction_category == transaction.transaction_category %}selected{% endif %}>{{ category.transaction_category }}</option>
+                        <option value="{{ category }}" {% if category == transaction.transaction_category %}selected{% endif %}>{{ category }}</option>
                         {% endfor %}
                         {% if transaction.transaction_category not in transaction_categories %}
                         <option value="{{ transaction.transaction_category }}" selected>{{ transaction.transaction_category }}</option>
