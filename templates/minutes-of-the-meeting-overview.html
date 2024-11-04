@@ -97,6 +97,10 @@
                         <p>{{ meeting.minutes_of_the_meeting_date.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_date else 'N/A' }}</p>
                     </div>
                     <div class="grid-item-details-pair">
+                        <p>Adjourned:</p>
+                        <p>{{ meeting.minutes_of_the_meeting_adjourned.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_adjourned else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
                         <p>Presiding Officer:</p>
                         <p>{{ first_name }} {{ last_name }}</p>
                     </div>
