@@ -93,12 +93,11 @@
                 <label for="users-student-organization">Student Organization</label>
                 <select name="users-student-organization" id="users-student-organization">
                     <option value="" disabled>Select a Student Organization</option>
-                    <option value="College of Computer Studies - Student Council" {% if
-                        current_user.users_student_organization=="College of Computer Studies - Student Council"
-                        %}selected{% endif %}>College of Computer Studies - Student Council (CCS-SC)</option>
-                    <option value="Junior Philippine Computer Society" {% if
-                        current_user.users_student_organization=="Junior Philippine Computer Society" %}selected{% endif
-                        %}>Junior Philippine Computer Society (JPCS)</option>
+                    {% for organization in student_organizations %}
+                    <option value="{{ organization.student_organizations_id }}" {% if current_user.users_student_organization == organization.student_organizations_id %}selected{% endif %}>
+                        {{ organization.student_organizations_name }}
+                    </option>
+                    {% endfor %}
                 </select>
             </div>
 
