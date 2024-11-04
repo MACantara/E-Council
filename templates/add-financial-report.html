@@ -85,7 +85,7 @@
                         {% for org in student_organizations %}
                         <optgroup label="{{ org.student_organizations_name }}">
                             {% for user in org.users %}
-                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
                             {% endfor %}
                         </optgroup>
                         {% endfor %}
@@ -99,7 +99,7 @@
                         {% for org in student_organizations %}
                         <optgroup label="{{ org.student_organizations_name }}">
                             {% for user in org.users %}
-                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
                             {% endfor %}
                         </optgroup>
                         {% endfor %}
@@ -113,7 +113,7 @@
                         {% for org in student_organizations %}
                         <optgroup label="{{ org.student_organizations_name }}">
                             {% for user in org.users %}
-                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
                             {% endfor %}
                         </optgroup>
                         {% endfor %}
