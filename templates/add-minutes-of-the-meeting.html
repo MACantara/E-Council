@@ -99,6 +99,17 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="minutes-of-the-meeting-attendees">Attendees</label>
+                    <select name="minutes-of-the-meeting-attendees" id="minutes-of-the-meeting-attendees" multiple required>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">
+                            {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
                     <label for="minutes-of-the-meeting-agenda">Agenda</label>
                     <textarea name="minutes-of-the-meeting-agenda" id="minutes-of-the-meeting-agenda" placeholder="Agenda" required></textarea>
                 </div>
