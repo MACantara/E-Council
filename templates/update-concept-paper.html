@@ -145,10 +145,8 @@
                 <div class="input-pair">
                     <label for="concept-paper-objectives">Objectives of the Activity</label>
                     <div id="concept-paper-objectives">
-                        {% for objective in concept_paper.objectives_of_the_activity %}
-                        <input type="text" name="concept-paper-objectives"
-                            value="{{ objective.objectives_of_the_activity_content }}" placeholder="Enter Objective"
-                            required>
+                        {% for objective in objectives_of_the_activity %}
+                        <input type="text" name="concept-paper-objectives" value="{{ objective }}" required>
                         {% endfor %}
                     </div>
                     <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
@@ -157,14 +155,11 @@
                 <div class="input-pair">
                     <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
                     <div id="concept-paper-learning-outcomes">
-                        {% for outcome in concept_paper.learning_outcomes %}
-                        <input type="text" name="concept-paper-learning-outcomes"
-                            value="{{ outcome.learning_outcomes_content }}" placeholder="Enter Learning Outcome"
-                            required>
+                        {% for outcome in learning_outcomes %}
+                        <input type="text" name="concept-paper-learning-outcomes" value="{{ outcome }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning
-                        Outcome</button>
+                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning Outcome</button>
                 </div>
 
                 <div class="input-pair">
@@ -472,4 +467,4 @@
         container.appendChild(input);
     }
 </script>
-{% endblock %}
+{% endblock %} 
