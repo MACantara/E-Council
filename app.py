@@ -559,6 +559,18 @@ class PersonnelInChargeForms(db.Model):
     def __repr__(self):
         return f'<PersonnelInChargeForms {self.personnel_in_charge_forms_id}>'
 
+class SignatoriesPersonnelInChargeForms(db.Model):
+    __tablename__ = 'signatories_personnel_in_charge_forms'
+
+    signatory_id = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), primary_key=True, nullable=False)
+    personnel_in_charge_forms_id = db.Column(db.Integer, db.ForeignKey('personnel_in_charge_forms.personnel_in_charge_forms_id'), primary_key=True, nullable=False)
+
+    signatory = db.relationship('Signatories', backref='personnel_in_charge_forms')
+    personnel_in_charge_form = db.relationship('PersonnelInChargeForms', backref='signatories')
+
+    def __repr__(self):
+        return f'<SignatoriesPersonnelInChargeForms(signatory_id={self.signatory_id}, personnel_in_charge_forms_id={self.personnel_in_charge_forms_id})>'
+
 class LearningJournalForms(db.Model):
     __tablename__ = 'learning_journal_forms'
 
@@ -3337,4 +3349,4 @@ def update_concept_paper(paper_id):
     return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
