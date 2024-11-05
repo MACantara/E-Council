@@ -2458,10 +2458,5 @@ def delete_minutes_of_the_meeting(meeting_id):
 def end_of_semester_reports_overview():
     return render_template("end-of-semester-reports-overview.html")
 
-@app.route("/calendar-of-activities-overview")
-@login_required
-def calendar_of_activities_overview():
-    return render_template("calendar-of-activities-overview.html")
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
