@@ -2965,6 +2965,50 @@ def update_concept_paper(paper_id):
         concept_paper.concept_paper_forms_recommending_approval_by = concept_paper_recommending_approval_by
         concept_paper.concept_paper_forms_approved_by = concept_paper_approved_by
 
+        # Update objectives of the activity
+        # First delete existing objectives
+        for objective_link in concept_paper.objectives_of_the_activity:
+            db.session.delete(objective_link.objective_of_the_activity)
+            db.session.delete(objective_link)
+        
+        # Add new objectives
+        for objective_content in concept_paper_objectives:
+            new_objective = ObjectivesOfTheActivity(
+                objectives_of_the_activity_content=objective_content
+            )
+            db.session.add(new_objective)
+            db.session.commit()
+
+            # Link the objective to the concept paper
+            concept_paper_objective_link = ConceptPaperFormObjectivesOfTheActivity(
+                concept_paper_forms_id=paper_id,
+                objectives_of_the_activity_id=new_objective.objectives_of_the_activity_id
+            )
+            db.session.add(concept_paper_objective_link)
+            db.session.commit()
+
+        # Update learning outcomes
+        # First delete existing learning outcomes
+        for outcome_link in concept_paper.learning_outcomes:
+            db.session.delete(outcome_link.learning_outcome)
+            db.session.delete(outcome_link)
+        
+        # Add new learning outcomes
+        for outcome_content in concept_paper_learning_outcomes:
+            new_outcome = LearningOutcomes(
+                learning_outcomes_content=outcome_content
+            )
+            db.session.add(new_outcome)
+            db.session.commit()
+
+            # Link the learning outcome to the concept paper
+            concept_paper_outcome_link = ConceptPaperFormLearningOutcomes(
+                concept_paper_forms_id=paper_id,
+                learning_outcomes_id=new_outcome.learning_outcomes_id
+            )
+            db.session.add(concept_paper_outcome_link)
+            db.session.commit()
+
         # Update Excuse Letter Form
         if concept_paper.excuse_letter_forms:
             excuse_letter_form = concept_paper.excuse_letter_forms[0]
@@ -3099,4 +3143,4 @@ def update_concept_paper(paper_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
