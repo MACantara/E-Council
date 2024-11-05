@@ -525,6 +525,7 @@ input[type="password"],
 input[type="file"],
 input[type="number"],
 input[type="datetime-local"],
+input[type="date"],
 select,
 textarea {
     font-size: var(--font-size-medium);
