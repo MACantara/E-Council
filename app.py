@@ -479,6 +479,13 @@ def has_financial_reports(reports, semester, academic_year):
 
 app.jinja_env.filters['has_financial_reports'] = has_financial_reports
 
+# Custom Jinja2 filter to check if there are concept papers for a given semester and academic year
+@app.template_filter('has_papers')
+def has_papers(papers, semester, academic_year):
+    return any(paper.concept_paper_forms_semester == semester and paper.concept_paper_forms_academic_year == academic_year for paper in papers)
+
+app.jinja_env.filters['has_papers'] = has_papers
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -1895,7 +1902,13 @@ def event_invite_accepted():
 @app.route("/concept-papers-overview")
 @login_required
 def concept_papers_overview():
-    return render_template("concept-papers-overview.html")
+    # Query for all concept papers
+    concept_papers = ConceptPaperForms.query.all()
+
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    return render_template("concept-papers-overview.html", concept_papers=concept_papers, sort_by_date=sort_by_date)
 
 @app.route('/add-concept-paper', methods=['GET', 'POST'])
 @login_required
