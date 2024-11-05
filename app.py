@@ -266,6 +266,18 @@ class BoardResolutions(db.Model):
     def __repr__(self):
         return f'<BoardResolution {self.board_resolutions_id}: {self.board_resolutions_description}>'
 
+class BoardResolutionsStudentSignatories(db.Model):
+    __tablename__ = 'board_resolutions_student_signatories'
+
+    board_resolutions_id = db.Column(db.Integer, db.ForeignKey('board_resolutions.board_resolutions_id'), primary_key=True, nullable=False)
+    board_resolutions_users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), primary_key=True, nullable=False)
+
+    board_resolution = db.relationship('BoardResolutions', backref='student_signatories')
+    user = db.relationship('Users', backref='board_resolutions_signatories')
+
+    def __repr__(self):
+        return f'<BoardResolutionsStudentSignatories(board_resolutions_id={self.board_resolutions_id}, board_resolutions_users_id={self.board_resolutions_users_id})>'
+
 class MinutesOfTheMeeting(db.Model):
     __tablename__ = 'minutes_of_the_meeting'
 
