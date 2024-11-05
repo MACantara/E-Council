@@ -2019,6 +2019,21 @@ def add_concept_paper():
 
     return render_template('add-concept-paper.html', academic_years=academic_years, users=users, signatories=signatories)
 
+@app.route("/update-concept-paper-status/<int:paper_id>", methods=["POST"])
+@login_required
+def update_concept_paper_status(paper_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the concept paper by ID
+    concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
+
+    # Update the concept paper status
+    concept_paper.concept_paper_forms_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
+
 @app.route("/documentation-overview")
 @login_required
 def documentation_overview():
