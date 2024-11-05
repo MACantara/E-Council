@@ -285,21 +285,6 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="personnel-in-charge">Personnel In Charge</label>
-                    <select name="personnel-in-charge" id="personnel-in-charge">
-                        <option value="" disabled>Select Personnel In Charge</option>
-                        {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_forms and
-                            concept_paper.personnel_in_charge_forms[0].personnel_in_charge_forms_name_of_personnel_in_charge==signatory.signatory_id
-                            %}selected{% endif %}>
-                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
-                            signatory.signatory_position }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
                     <label for="activity-report-contact-numbers">Contact Numbers</label>
                     <input type="text" name="activity-report-contact-numbers" id="activity-report-contact-numbers"
                         value="{{ concept_paper.activity_report_forms[0].activity_report_forms_contact_numbers if concept_paper.activity_report_forms }}"
