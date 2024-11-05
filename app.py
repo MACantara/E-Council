@@ -2178,7 +2178,10 @@ def update_board_resolution(resolution_id):
     student_organizations = StudentOrganizations.query.all()
     signatories = Signatories.query.all()
 
-    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
+    # Query for existing student signatories
+    existing_signatories = [signatory.board_resolutions_users_id for signatory in resolution.student_signatories]
+
+    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories, existing_signatories=existing_signatories)
 
 @app.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
 @login_required
@@ -2461,4 +2464,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
