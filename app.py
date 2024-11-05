@@ -2789,6 +2789,65 @@ def add_concept_paper():
         db.session.add(new_excuse_letter_form)
         db.session.commit()
 
+        # Activity Report Form data
+        activity_report_date_submission = request.form.get('activity-report-date-submission')
+        activity_report_contact_numbers = request.form.get('activity-report-contact-numbers')
+        activity_report_prepared_by = request.form.get('activity-report-prepared-by')
+        activity_report_noted_by = request.form.get('activity-report-noted-by')
+        activity_strengths = request.form.getlist('activity-strengths')
+        activity_weaknesses = request.form.getlist('activity-weaknesses')
+        activity_recommendations = request.form.getlist('activity-recommendations')
+
+        # Add Activity Report Form
+        if activity_report_date_submission:
+            new_activity_report = ActivityReportForms(
+                activity_report_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+                activity_report_forms_contact_numbers=activity_report_contact_numbers,
+                activity_report_forms_prepared_by=activity_report_prepared_by,
+                activity_report_forms_noted_by=activity_report_noted_by,
+                activity_report_date_submission=datetime.strptime(activity_report_date_submission, '%Y-%m-%d')
+            )
+            db.session.add(new_activity_report)
+            db.session.commit()
+
+            # Add strengths
+            for strength in activity_strengths:
+                new_strength = ActivityStrengths(activity_strengths_content=strength)
+                db.session.add(new_strength)
+                db.session.commit()
+                
+                strength_link = ActivityReportFormsActivityStrengths(
+                    activity_report_forms_id=new_activity_report.activity_report_forms_id,
+                    activity_strengths_id=new_strength.activity_strengths_id
+                )
+                db.session.add(strength_link)
+
+            # Add weaknesses
+            for weakness in activity_weaknesses:
+                new_weakness = ActivityWeaknesses(activity_weaknesses_content=weakness)
+                db.session.add(new_weakness)
+                db.session.commit()
+                
+                weakness_link = ActivityReportFormsActivityWeaknesses(
+                    activity_report_forms_id=new_activity_report.activity_report_forms_id,
+                    activity_weaknesses_id=new_weakness.activity_weaknesses_id
+                )
+                db.session.add(weakness_link)
+
+            # Add recommendations
+            for recommendation in activity_recommendations:
+                new_recommendation = ActivityRecommendations(activity_recommendations_content=recommendation)
+                db.session.add(new_recommendation)
+                db.session.commit()
+                
+                recommendation_link = ActivityReportFormsActivityRecommendations(
+                    activity_report_forms_id=new_activity_report.activity_report_forms_id,
+                    activity_recommendations_id=new_recommendation.activity_recommendations_id
+                )
+                db.session.add(recommendation_link)
+
+            db.session.commit()
+
         flash('Concept paper added successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
@@ -2899,6 +2958,81 @@ def update_concept_paper(paper_id):
             )
             db.session.add(new_excuse_letter_form)
 
+        # Activity Report Form data
+        activity_report_date_submission = request.form.get('activity-report-date-submission')
+        activity_report_contact_numbers = request.form.get('activity-report-contact-numbers')
+        activity_report_prepared_by = request.form.get('activity-report-prepared-by')
+        activity_report_noted_by = request.form.get('activity-report-noted-by')
+        activity_strengths = request.form.getlist('activity-strengths')
+        activity_weaknesses = request.form.getlist('activity-weaknesses')
+        activity_recommendations = request.form.getlist('activity-recommendations')
+
+        # Update or create Activity Report Form
+        activity_report = ActivityReportForms.query.filter_by(
+            activity_report_forms_concept_paper_forms_id=paper_id
+        ).first()
+
+        if activity_report_date_submission:
+            if not activity_report:
+                activity_report = ActivityReportForms(
+                    activity_report_forms_concept_paper_forms_id=paper_id
+                )
+                db.session.add(activity_report)
+
+            activity_report.activity_report_date_submission = datetime.strptime(activity_report_date_submission, '%Y-%m-%d')
+            activity_report.activity_report_forms_contact_numbers = activity_report_contact_numbers
+            activity_report.activity_report_forms_prepared_by = activity_report_prepared_by
+            activity_report.activity_report_forms_noted_by = activity_report_noted_by
+            db.session.commit()
+
+            # Update strengths
+            ActivityReportFormsActivityStrengths.query.filter_by(
+                activity_report_forms_id=activity_report.activity_report_forms_id
+            ).delete()
+            
+            for strength in activity_strengths:
+                new_strength = ActivityStrengths(activity_strengths_content=strength)
+                db.session.add(new_strength)
+                db.session.commit()
+                
+                strength_link = ActivityReportFormsActivityStrengths(
+                    activity_report_forms_id=activity_report.activity_report_forms_id,
+                    activity_strengths_id=new_strength.activity_strengths_id
+                )
+                db.session.add(strength_link)
+
+            # Update weaknesses
+            ActivityReportFormsActivityWeaknesses.query.filter_by(
+                activity_report_forms_id=activity_report.activity_report_forms_id
+            ).delete()
+            
+            for weakness in activity_weaknesses:
+                new_weakness = ActivityWeaknesses(activity_weaknesses_content=weakness)
+                db.session.add(new_weakness)
+                db.session.commit()
+                
+                weakness_link = ActivityReportFormsActivityWeaknesses(
+                    activity_report_forms_id=activity_report.activity_report_forms_id,
+                    activity_weaknesses_id=new_weakness.activity_weaknesses_id
+                )
+                db.session.add(weakness_link)
+
+            # Update recommendations
+            ActivityReportFormsActivityRecommendations.query.filter_by(
+                activity_report_forms_id=activity_report.activity_report_forms_id
+            ).delete()
+            
+            for recommendation in activity_recommendations:
+                new_recommendation = ActivityRecommendations(activity_recommendations_content=recommendation)
+                db.session.add(new_recommendation)
+                db.session.commit()
+                
+                recommendation_link = ActivityReportFormsActivityRecommendations(
+                    activity_report_forms_id=activity_report.activity_report_forms_id,
+                    activity_recommendations_id=new_recommendation.activity_recommendations_id
+                )
+                db.session.add(recommendation_link)
+
         db.session.commit()
 
         flash('Concept paper updated successfully!', 'success')
@@ -2918,4 +3052,4 @@ def update_concept_paper(paper_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
