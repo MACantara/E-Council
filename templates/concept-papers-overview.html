@@ -59,12 +59,9 @@
 
         <div class="overview-content-container-group">
             {% if concept_papers %}
-            {% set sorted_papers = concept_papers | sort(attribute='concept_papers_academic_year',
-            reverse=(sort_by_date == 'recent-to-old')) %}
-            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester',
-            '2nd Semester'] %}
-            {% set academic_years = sorted_papers | map(attribute='concept_papers_academic_year') | unique |
-            list %}
+            {% set sorted_papers = concept_papers | sort(attribute='concept_paper_forms_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
+            {% set academic_years = sorted_papers | map(attribute='concept_paper_forms_academic_year') | unique | list %}
 
             {% for academic_year in academic_years %}
             {% for semester in semesters %}
@@ -74,52 +71,41 @@
             </div>
 
             {% for paper in sorted_papers %}
-            {% if paper.concept_papers_semester == semester and paper.concept_papers_academic_year ==
-            academic_year %}
+            {% if paper.concept_paper_forms_semester == semester and paper.concept_paper_forms_academic_year == academic_year %}
             <div class="overview-content-grid-item">
                 <select class="fit-content-button" name="concept-paper-status-select-button"
                     id="concept-paper-status-select-button-{{ loop.index }}" aria-label="Select a Concept Paper Status"
-                    data-paper-id="{{ paper.concept_papers_id }}"
-                    data-paper-name="{{ paper.concept_papers_description }}" required>
-                    <option value="Upcoming" {% if paper.concept_papers_status=='Upcoming' %}selected{% endif
-                        %}>Upcoming</option>
-                    <option value="Postponed" {% if paper.concept_papers_status=='Postponed' %}selected{% endif
-                        %}>Postponed</option>
-                    <option value="Done" {% if paper.concept_papers_status=='Done' %}selected{% endif %}>Done
-                    </option>
-                    <option value="Cancelled" {% if paper.concept_papers_status=='Cancelled' %}selected{% endif
-                        %}>Cancelled</option>
+                    data-paper-id="{{ paper.concept_paper_forms_id }}"
+                    data-paper-name="{{ paper.concept_paper_forms_subject }}" required>
+                    <option value="Upcoming" {% if paper.concept_paper_forms_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                    <option value="Postponed" {% if paper.concept_paper_forms_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                    <option value="Done" {% if paper.concept_paper_forms_status=='Done' %}selected{% endif %}>Done</option>
+                    <option value="Cancelled" {% if paper.concept_paper_forms_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
                 </select>
 
-                <h3>{{ paper.concept_papers_title }}</h3>
+                <h3>{{ paper.concept_paper_forms_subject }}</h3>
 
-                <p class="papers-description">{{ paper.concept_papers_description | truncate(100) }}</p>
+                <p class="papers-description">{{ paper.concept_paper_forms_descriptions | truncate(100) }}</p>
 
                 <div class="grid-item-details">
                     <div class="grid-item-details-pair">
                         <p>Date:</p>
-                        <p>{{ paper.concept_papers_date.strftime('%B %d, %Y') if
-                            paper.concept_papers_date else 'N/A' }}</p>
+                        <p>{{ paper.concept_paper_forms_date.strftime('%B %d, %Y') if paper.concept_paper_forms_date else 'N/A' }}</p>
                     </div>
                     <div class="grid-item-details-pair">
                         <p>Time:</p>
-                        <p>{{ paper.concept_papers_date.strftime('%I:%M %p') if
-                            paper.concept_papers_date else 'N/A' }}</p>
+                        <p>{{ paper.concept_paper_forms_date.strftime('%I:%M %p') if paper.concept_paper_forms_date else 'N/A' }}</p>
                     </div>
                     <div class="grid-item-details-pair">
-                        <p>Total Amount:</p>
-                        <p>₱ {{ "{:,.2f}".format(paper.concept_papers_total_amount) if
-                            paper.concept_papers_total_amount else '0.00' }}</p>
+                        <p>Budget:</p>
+                        <p>₱ {{ paper.concept_paper_forms_budget if paper.concept_paper_forms_budget else '0.00' }}</p>
                     </div>
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href=""
-                        class="primary-button">View</a>
-                    <a href=""
-                        class="secondary-button">Update</a>
-                    <a href=""
-                        class="secondary-button">Delete</a>
+                    <a href="" class="primary-button">View</a>
+                    <a href="" class="secondary-button">Update</a>
+                    <a href="" class="secondary-button">Delete</a>
                 </div>
             </div>
             {% endif %}
