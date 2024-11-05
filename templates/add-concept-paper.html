@@ -224,6 +224,16 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="personnel-in-charge">Personnel In Charge</label>
+                    <select name="personnel-in-charge" id="personnel-in-charge">
+                        <option value="" disabled selected>Select Personnel In Charge</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
                     <label for="activity-report-contact-numbers">Contact Numbers</label>
                     <input type="text" name="activity-report-contact-numbers" id="activity-report-contact-numbers" placeholder="Contact Numbers">
                 </div>
@@ -248,7 +258,7 @@
                     </select>
                 </div>
 
-                <div class="input-pair"></div>
+                <div class="input-pair">
                     <label>Strengths</label>
                     <div id="activity-strengths">
                         <input type="text" name="activity-strengths" placeholder="Enter Strength" required>
@@ -258,7 +268,7 @@
 
                 <div class="input-pair">
                     <label>Weaknesses</label>
-                    <div id="activity-weaknesses"></div>
+                    <div id="activity-weaknesses">
                         <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required>
                     </div>
                     <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
