@@ -1972,23 +1972,37 @@ def add_concept_paper():
         db.session.add(new_concept_paper)
         db.session.commit()
 
-        # Add objectives of the activity to the concept_paper_form_objectives_of_the_activity table
-        for objective_id in concept_paper_objectives:
-            new_objective = ConceptPaperFormObjectivesOfTheActivity(
-                concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                objectives_of_the_activity_id=objective_id
+        # Add objectives of the activity to the objectives_of_the_activity table
+        for objective_content in concept_paper_objectives:
+            new_objective = ObjectivesOfTheActivity(
+                objectives_of_the_activity_content=objective_content
             )
             db.session.add(new_objective)
-        db.session.commit()
+            db.session.commit()
 
-        # Add learning outcomes to the concept_paper_form_learning_outcomes table
-        for outcome_id in concept_paper_learning_outcomes:
-            new_outcome = ConceptPaperFormLearningOutcomes(
+            # Link the objective to the concept paper
+            concept_paper_objective_link = ConceptPaperFormObjectivesOfTheActivity(
                 concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                learning_outcomes_id=outcome_id
+                objectives_of_the_activity_id=new_objective.objectives_of_the_activity_id
+            )
+            db.session.add(concept_paper_objective_link)
+            db.session.commit()
+
+        # Add learning outcomes to the learning_outcomes table
+        for outcome_content in concept_paper_learning_outcomes:
+            new_outcome = LearningOutcomes(
+                learning_outcomes_content=outcome_content
             )
             db.session.add(new_outcome)
-        db.session.commit()
+            db.session.commit()
+
+            # Link the learning outcome to the concept paper
+            concept_paper_outcome_link = ConceptPaperFormLearningOutcomes(
+                concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+                learning_outcomes_id=new_outcome.learning_outcomes_id
+            )
+            db.session.add(concept_paper_outcome_link)
+            db.session.commit()
 
         flash('Concept paper added successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
@@ -1997,19 +2011,13 @@ def add_concept_paper():
     academic_years = db.session.query(ConceptPaperForms.concept_paper_forms_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    # Query for objectives of the activity
-    objectives = ObjectivesOfTheActivity.query.all()
-
-    # Query for learning outcomes
-    learning_outcomes = LearningOutcomes.query.all()
-
     # Query for users
     users = Users.query.all()
 
     # Query for signatories
     signatories = Signatories.query.all()
 
-    return render_template('add-concept-paper.html', academic_years=academic_years, objectives=objectives, learning_outcomes=learning_outcomes, users=users, signatories=signatories)
+    return render_template('add-concept-paper.html', academic_years=academic_years, users=users, signatories=signatories)
 
 @app.route("/documentation-overview")
 @login_required
