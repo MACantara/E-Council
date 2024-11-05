@@ -339,6 +339,22 @@
                     </select>
                 </div>
 
+                <div class="input-pair">
+                    <label for="learning-journal-observations">Observations</label>
+                    <div id="learning-journal-observations">
+                        <input type="text" name="learning-journal-observations" placeholder="Enter Observation" required>
+                    </div>
+                    <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-learnings">Learnings</label>
+                    <div id="learning-journal-learnings">
+                        <input type="text" name="learning-journal-learnings" placeholder="Enter Learning" required>
+                    </div>
+                    <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
+                </div>
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
@@ -418,6 +434,26 @@
         input.type = 'text';
         input.name = 'activity-recommendations';
         input.placeholder = 'Enter Recommendation';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addObservation() {
+        const container = document.getElementById('learning-journal-observations');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'learning-journal-observations';
+        input.placeholder = 'Enter Observation';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addLearning() {
+        const container = document.getElementById('learning-journal-learnings');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'learning-journal-learnings';
+        input.placeholder = 'Enter Learning';
         input.required = true;
         container.appendChild(input);
     }
