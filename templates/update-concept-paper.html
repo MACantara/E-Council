@@ -238,19 +238,6 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="excuse-letter-faculty-in-charge">Faculty In Charge</label>
-                    <select name="excuse-letter-faculty-in-charge" id="excuse-letter-faculty-in-charge">
-                        <option value="" disabled>Select Faculty In Charge</option>
-                        {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.excuse_letter_forms and
-                            concept_paper.excuse_letter_forms[0].excuse_letter_forms_faculty_in_charge==signatory.signatory_id
-                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
-                            }} - {{ signatory.signatory_position }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
                     <label for="excuse-letter-dean">Dean</label>
                     <select name="excuse-letter-dean" id="excuse-letter-dean">
                         <option value="" disabled>Select Dean</option>
@@ -446,6 +433,33 @@
                     </select>
                 </div>
 
+                <h3>Personnel In Charge Form</h3>
+
+                <div class="input-pair">
+                    <label for="personnel-in-charge">Personnel In Charge</label>
+                    <select name="personnel-in-charge" id="personnel-in-charge" required>
+                        <option value="" disabled selected>Select Personnel In Charge</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_forms and concept_paper.personnel_in_charge_forms[0].personnel_in_charge_forms_name_of_personnel_in_charge == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="personnel-in-charge-noted-by">Noted By</label>
+                    <div id="personnel-in-charge-noted-by-container">
+                        {% for noted_by in concept_paper.personnel_in_charge_forms[0].signatories %}
+                        <select name="personnel-in-charge-noted-by" required>
+                            <option value="" disabled>Select Noted By</option>
+                            {% for signatory in signatories %}
+                            <option value="{{ signatory.signatory_id }}" {% if noted_by.signatory_id == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endfor %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addNotedBy()">Add Another Noted By</button>
+                </div>
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
@@ -547,6 +561,20 @@
         input.placeholder = 'Enter Learning';
         input.required = true;
         container.appendChild(input);
+    }
+
+    function addNotedBy() {
+        const container = document.getElementById('personnel-in-charge-noted-by-container');
+        const select = document.createElement('select');
+        select.name = 'personnel-in-charge-noted-by';
+        select.required = true;
+        select.innerHTML = `
+            <option value="" disabled selected>Select Noted By</option>
+            {% for signatory in signatories %}
+            <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+            {% endfor %}
+        `;
+        container.appendChild(select);
     }
 </script>
 {% endblock %}
