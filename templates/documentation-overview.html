@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Events Overview{% endblock %}
+{% block title %}Documentation Overview{% endblock %}
 
 {% block content %}
 
@@ -8,155 +8,116 @@
     {% include "council-overview-sidebar.html" %}
 
     <div class="council-overview-content-container">
+        <!-- Flash messages section for the main page -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
         <h2>Documentation Overview</h2>
 
-        <button id="open-modal-button" class="primary-button create-button" type="submit">Create New Documentation</button>
+        <a href="{{ url_for('add_concept_paper') }}" class="primary-button create-button">Create New Documentation</a>
 
-        <div id="modal-content" class="modal">
-            <div class="container">
-                <span class="close-button">&times;</span>
-                <h2>Create Documentation</h2>
-                <form>
-                    <div class="input-pair">
-                        <label for="event">Event</label>
-                        <select name="event" id="event" required>
-                            <option value="" disabled selected>Select an Event for Documentation</option>
-                            <option value="techtutor-empowering-communities-with-ai-assisted-it-skills">"TechTutor: Empowering Communities with AI-Assisted IT Skills"</option>
-                        </select>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const selects = document.querySelectorAll('select[name="documentation-status-select-button"]');
+                selects.forEach(select => {
+                    select.addEventListener('change', function () {
+                        const documentationId = this.getAttribute('data-documentation-id');
+                        const newStatus = this.value;
+                        const documentationName = this.getAttribute('data-documentation-name');
+
+                        fetch(`/update-concept-paper-status/${documentationId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
+                            },
+                            body: JSON.stringify({ status: newStatus, name: documentationName })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert(`Documentation status for "${documentationName}" updated successfully.`);
+                                } else {
+                                    alert(`Failed to update documentation status for "${documentationName}".`);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert(`An error occurred while updating the documentation status for "${documentationName}".`);
+                            });
+                    });
+                });
+            });
+        </script>
+
+        <div class="overview-content-container-group">
+            {% if documentations %}
+            {% set sorted_papers = documentations | sort(attribute='concept_paper_forms_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
+            {% set academic_years = sorted_papers | map(attribute='concept_paper_forms_academic_year') | unique | list %}
+
+            {% for academic_year in academic_years %}
+            {% for semester in semesters %}
+            {% if sorted_papers | has_papers(semester, academic_year) %}
+            <div class="grid-header">
+                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            </div>
+
+            {% for paper in sorted_papers %}
+            {% if paper.concept_paper_forms_semester == semester and paper.concept_paper_forms_academic_year == academic_year %}
+            <div class="overview-content-grid-item">
+                <select class="fit-content-button" name="documentation-status-select-button"
+                    id="documentation-status-select-button-{{ loop.index }}" aria-label="Select a Documentation Status"
+                    data-documentation-id="{{ paper.concept_paper_forms_id }}"
+                    data-documentation-name="{{ paper.concept_paper_forms_subject }}" required>
+                    <option value="Upcoming" {% if paper.concept_paper_forms_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                    <option value="Postponed" {% if paper.concept_paper_forms_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                    <option value="Done" {% if paper.concept_paper_forms_status=='Done' %}selected{% endif %}>Done</option>
+                    <option value="Cancelled" {% if paper.concept_paper_forms_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+
+                <h3>{{ paper.concept_paper_forms_subject }}</h3>
+
+                <p class="papers-description">{{ paper.concept_paper_forms_descriptions | truncate(100) }}</p>
+
+                <div class="grid-item-details">
+                    <div class="grid-item-details-pair">
+                        <p>Date:</p>
+                        <p>{{ paper.concept_paper_forms_date.strftime('%B %d, %Y') if paper.concept_paper_forms_date else 'N/A' }}</p>
                     </div>
-
-                    <div class="input-pair">
-                        <label for="documentation-type">Documentation Type</label>
-                        <select name="documentation-type" id="documentation-type" required>
-                            <option value="" disabled selected>Select a Documentation Type</option>
-                            <option value="after-documentation">After Documentation</option>
-                            <option value="activity-report">Activity Report</option>
-                        </select>
+                    <div class="grid-item-details-pair">
+                        <p>Time:</p>
+                        <p>{{ paper.concept_paper_forms_date.strftime('%I:%M %p') if paper.concept_paper_forms_date else 'N/A' }}</p>
                     </div>
-
-                    <button type="submit" class="primary-button">Create New Documentation</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="horizontal-input-pair">
-            <select name="council-overview-school-year" id="council-overview-school-year"
-                aria-label="Select a School Year" required>
-                <option value="" disabled selected>Select a School Year</option>
-                <option value="2024-2025">S.Y 2024-2025</option>
-            </select>
-
-            <div class="council-overview-select-group">
-                <select name="council-overview-filter-by-status" id="council-overview-filter-by-status"
-                    aria-label="Filter by Status" required>
-                    <option value="" disabled selected>Filter by Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="postponed">Postponed</option>
-                    <option value="done">Done</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-                <select name="council-overview-filter-by-semester" id="council-overview-filter-by-semester"
-                    aria-label="Filter by Semester" required>
-                    <option value="" disabled selected>Filter by Semester</option>
-                    <option value="1st-semester">1st Semester</option>
-                    <option value="2nd-semester">2nd Semester</option>
-                </select>
-                <select name="council-overview-sort-by-date" id="council-overview-sort-by-date"
-                    aria-label="Sort by Date" required>
-                    <option value="" disabled selected>Sort by Date</option>
-                    <option value="recent-to-old">Recent to Old</option>
-                    <option value="old-to-recent">Old to Recent</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="council-overview-content-container-group">
-            <div class="council-overview-content-grid-item">
-                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
-                    required>
-                    <option value="" disabled selected>Select a Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="postponed">Postponed</option>
-                    <option value="done">Done</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-
-                <h3>Activity Report No. 1</h3>
-
-                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
-                    second semester...</p>
+                    <div class="grid-item-details-pair">
+                        <p>Budget:</p>
+                        <p>₱ {{ paper.concept_paper_forms_budget if paper.concept_paper_forms_budget else '0.00' }}</p>
+                    </div>
+                </div>
 
                 <div class="grid-item-button-group">
-                    <button class="primary-button">View</button>
-                    <button class="secondary-button">Update</button>
-                    <button class="secondary-button">Delete</button>
+                    <a href="" class="primary-button">View</a>
+                    <a href="" class="secondary-button">Update</a>
+                    <a href="" class="secondary-button">Delete</a>
                 </div>
             </div>
-            <div class="council-overview-content-grid-item">
-                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
-                    required>
-                    <option value="" disabled selected>Select a Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="postponed">Postponed</option>
-                    <option value="done">Done</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-
-                <h3>Activity Report No. 2</h3>
-
-                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
-                    second semester...</p>
-
-                <div class="grid-item-button-group">
-                    <button class="primary-button">View</button>
-                    <button class="secondary-button">Update</button>
-                    <button class="secondary-button">Delete</button>
-                </div>
-            </div>
-
-            <div class="council-overview-content-grid-item">
-                <select name="event-status-select-button" id="event-status-select-button" aria-label="Select a Status"
-                    required>
-                    <option value="" disabled selected>Select a Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="postponed">Postponed</option>
-                    <option value="done">Done</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-
-                <h3>After Docs No. 1</h3>
-
-                <p>The College of Computer Studies will be conducting two certification examinations during the upcoming
-                    second semester...</p>
-
-                <div class="grid-item-button-group">
-                    <button class="primary-button">View</button>
-                    <button class="secondary-button">Update</button>
-                    <button class="secondary-button">Delete</button>
-                </div>
-            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% else %}
+            <p>No documentation found for your department.</p>
+            {% endif %}
         </div>
     </div>
 </div>
-
-{% endblock %}
-
-{% block script %}
-
-<script>
-    document.getElementById('open-modal-button').addEventListener('click', function () {
-        document.getElementById('modal-content').style.display = 'block';
-    });
-
-    document.querySelector('.close-button').addEventListener('click', function () {
-        document.getElementById('modal-content').style.display = 'none';
-    });
-
-    window.addEventListener('click', function (event) {
-        if (event.target == document.getElementById('modal-content')) {
-            document.getElementById('modal-content').style.display = 'none';
-        }
-    });
-</script>
 
 {% endblock %}
