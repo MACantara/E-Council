@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Add Concept Paper{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('concept_papers_overview') }}" class="primary-button fit-content-button">Back to Concept Papers Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        
+        <div class="container">
+            <h2>Add Concept Paper</h2>
+
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_concept_paper') }}">
+                <div class="input-pair">
+                    <label for="concept-paper-date">Date</label>
+                    <input type="datetime-local" name="concept-paper-date" id="concept-paper-date" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-subject">Subject</label>
+                    <input type="text" name="concept-paper-subject" id="concept-paper-subject" placeholder="Subject" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-academic-year">Academic Year</label>
+                    <select name="concept-paper-academic-year" id="concept-paper-academic-year" required onchange="toggleOtherAcademicYear()">
+                        <option value="" disabled selected>Select Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="input-pair">
+                        <label for="other-academic-year" id="other-academic-year-label" style="display: none; margin-top: 10px;">Other Academic Year</label>
+                        <input type="text" name="other-academic-year" id="other-academic-year-input" placeholder="Enter Academic Year" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-semester">Semester</label>
+                    <select name="concept-paper-semester" id="concept-paper-semester" required>
+                        <option value="" disabled selected>Select Semester</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-event-start-date-and-time">Event Start Date and Time</label>
+                    <input type="datetime-local" name="concept-paper-event-start-date-and-time" id="concept-paper-event-start-date-and-time" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-event-end-date-and-time">Event End Date and Time</label>
+                    <input type="datetime-local" name="concept-paper-event-end-date-and-time" id="concept-paper-event-end-date-and-time" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-location">Location</label>
+                    <input type="text" name="concept-paper-location" id="concept-paper-location" placeholder="Location" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-participants">Participants</label>
+                    <input type="text" name="concept-paper-participants" id="concept-paper-participants" placeholder="Participants" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-budget">Budget</label>
+                    <input type="text" name="concept-paper-budget" id="concept-paper-budget" placeholder="Budget" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-descriptions">Descriptions</label>
+                    <textarea name="concept-paper-descriptions" id="concept-paper-descriptions" placeholder="Descriptions" required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-expected-number-of-participants">Expected Number of Participants</label>
+                    <textarea name="concept-paper-expected-number-of-participants" id="concept-paper-expected-number-of-participants" placeholder="Expected Number of Participants" required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-body">Body</label>
+                    <textarea name="concept-paper-body" id="concept-paper-body" placeholder="Body" required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-objectives">Objectives of the Activity</label>
+                    <div id="concept-paper-objectives">
+                        {% for objective in objectives %}
+                        <div>
+                            <input type="checkbox" name="concept-paper-objectives" value="{{ objective.objectives_of_the_activity_id }}" id="objective-{{ objective.objectives_of_the_activity_id }}">
+                            <label for="objective-{{ objective.objectives_of_the_activity_id }}">{{ objective.objectives_of_the_activity_content }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
+                    <div id="concept-paper-learning-outcomes">
+                        {% for outcome in learning_outcomes %}
+                        <div>
+                            <input type="checkbox" name="concept-paper-learning-outcomes" value="{{ outcome.learning_outcomes_id }}" id="outcome-{{ outcome.learning_outcomes_id }}">
+                            <label for="outcome-{{ outcome.learning_outcomes_id }}">{{ outcome.learning_outcomes_content }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-prepared-by">Prepared By</label>
+                    <select name="concept-paper-prepared-by" id="concept-paper-prepared-by" required>
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-signed-and-reviewed-by">Signed and Reviewed By</label>
+                    <select name="concept-paper-signed-and-reviewed-by" id="concept-paper-signed-and-reviewed-by" required>
+                        <option value="" disabled selected>Select Reviewer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-endorsed-by">Endorsed By</label>
+                    <select name="concept-paper-endorsed-by" id="concept-paper-endorsed-by" required>
+                        <option value="" disabled selected>Select Endorser</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-recommending-approval-by">Recommending Approval By</label>
+                    <select name="concept-paper-recommending-approval-by" id="concept-paper-recommending-approval-by" required>
+                        <option value="" disabled selected>Select Approver</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-approved-by">Approved By</label>
+                    <select name="concept-paper-approved-by" id="concept-paper-approved-by" required>
+                        <option value="" disabled selected>Select Approver</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('concept_papers_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Add Concept Paper</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    function toggleOtherAcademicYear() {
+        const academicYearSelect = document.getElementById('concept-paper-academic-year');
+        const otherAcademicYearInput = document.getElementById('other-academic-year-input');
+        const otherAcademicYearLabel = document.getElementById('other-academic-year-label');
+        if (academicYearSelect.value === 'Other') {
+            otherAcademicYearInput.style.display = 'block';
+            otherAcademicYearInput.required = true;
+            otherAcademicYearLabel.style.display = 'block';
+            otherAcademicYearLabel.required = true;
+        } else {
+            otherAcademicYearInput.style.display = 'none';
+            otherAcademicYearInput.required = false;
+            otherAcademicYearLabel.style.display = 'none';
+            otherAcademicYearLabel.required = false;
+        }
+    }
+
+    // Set the current date and time as the default value for the datetime-local input
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('concept-paper-date');
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+        dateInput.value = formattedDate;
+    });
+</script>
+
+{% endblock %}
