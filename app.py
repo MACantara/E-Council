@@ -1964,6 +1964,12 @@ def add_concept_paper():
         concept_paper_event_start_date_and_time = datetime.strptime(concept_paper_event_start_date_and_time, '%Y-%m-%dT%H:%M')
         concept_paper_event_end_date_and_time = datetime.strptime(concept_paper_event_end_date_and_time, '%Y-%m-%dT%H:%M')
 
+        # Excuse Letter Form data
+        excuse_letter_department_office_unit = request.form.get('excuse-letter-department-office-unit')
+        excuse_letter_faculty_in_charge = request.form.get('excuse-letter-faculty-in-charge')
+        excuse_letter_dean = request.form.get('excuse-letter-dean')
+        excuse_letter_noted_by = request.form.get('excuse-letter-noted-by')
+
         # Create a new concept paper
         new_concept_paper = ConceptPaperForms(
             concept_paper_forms_date=concept_paper_date,
@@ -2021,6 +2027,17 @@ def add_concept_paper():
             )
             db.session.add(concept_paper_outcome_link)
             db.session.commit()
+
+        # Add Excuse Letter Form to the excuse_letter_forms table
+        new_excuse_letter_form = ExcuseLetterForms(
+            excuse_letter_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+            excuse_letter_forms_department_office_unit=excuse_letter_department_office_unit,
+            excuse_letter_forms_faculty_in_charge=excuse_letter_faculty_in_charge,
+            excuse_letter_forms_dean=excuse_letter_dean,
+            excuse_letter_forms_noted_by=excuse_letter_noted_by
+        )
+        db.session.add(new_excuse_letter_form)
+        db.session.commit()
 
         flash('Concept paper added successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
@@ -2089,6 +2106,12 @@ def update_concept_paper(paper_id):
         concept_paper_event_start_date_and_time = datetime.strptime(concept_paper_event_start_date_and_time, '%Y-%m-%dT%H:%M')
         concept_paper_event_end_date_and_time = datetime.strptime(concept_paper_event_end_date_and_time, '%Y-%m-%dT%H:%M')
 
+        # Excuse Letter Form data
+        excuse_letter_department_office_unit = request.form.get('excuse-letter-department-office-unit')
+        excuse_letter_faculty_in_charge = request.form.get('excuse-letter-faculty-in-charge')
+        excuse_letter_dean = request.form.get('excuse-letter-dean')
+        excuse_letter_noted_by = request.form.get('excuse-letter-noted-by')
+
         # Update the concept paper
         concept_paper.concept_paper_forms_date = concept_paper_date
         concept_paper.concept_paper_forms_subject = concept_paper_subject
@@ -2108,6 +2131,23 @@ def update_concept_paper(paper_id):
         concept_paper.concept_paper_forms_endorsed_by = concept_paper_endorsed_by
         concept_paper.concept_paper_forms_recommending_approval_by = concept_paper_recommending_approval_by
         concept_paper.concept_paper_forms_approved_by = concept_paper_approved_by
+
+        # Update Excuse Letter Form
+        if concept_paper.excuse_letter_forms:
+            excuse_letter_form = concept_paper.excuse_letter_forms[0]
+            excuse_letter_form.excuse_letter_forms_department_office_unit = excuse_letter_department_office_unit
+            excuse_letter_form.excuse_letter_forms_faculty_in_charge = excuse_letter_faculty_in_charge
+            excuse_letter_form.excuse_letter_forms_dean = excuse_letter_dean
+            excuse_letter_form.excuse_letter_forms_noted_by = excuse_letter_noted_by
+        else:
+            new_excuse_letter_form = ExcuseLetterForms(
+                excuse_letter_forms_concept_paper_forms_id=concept_paper.concept_paper_forms_id,
+                excuse_letter_forms_department_office_unit=excuse_letter_department_office_unit,
+                excuse_letter_forms_faculty_in_charge=excuse_letter_faculty_in_charge,
+                excuse_letter_forms_dean=excuse_letter_dean,
+                excuse_letter_forms_noted_by=excuse_letter_noted_by
+            )
+            db.session.add(new_excuse_letter_form)
 
         db.session.commit()
 
@@ -2782,4 +2822,4 @@ def end_of_semester_reports_overview():
     return render_template("end-of-semester-reports-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
