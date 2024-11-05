@@ -1897,6 +1897,104 @@ def event_invite_accepted():
 def concept_papers_overview():
     return render_template("concept-papers-overview.html")
 
+@app.route('/add-concept-paper', methods=['GET', 'POST'])
+@login_required
+def add_concept_paper():
+    if request.method == 'POST':
+        concept_paper_date = request.form.get('concept-paper-date')
+        concept_paper_subject = request.form.get('concept-paper-subject')
+        concept_paper_academic_year = request.form.get('concept-paper-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
+        concept_paper_semester = request.form.get('concept-paper-semester')
+        concept_paper_event_start_date_and_time = request.form.get('concept-paper-event-start-date-and-time')
+        concept_paper_event_end_date_and_time = request.form.get('concept-paper-event-end-date-and-time')
+        concept_paper_location = request.form.get('concept-paper-location')
+        concept_paper_participants = request.form.get('concept-paper-participants')
+        concept_paper_budget = request.form.get('concept-paper-budget')
+        concept_paper_descriptions = request.form.get('concept-paper-descriptions')
+        concept_paper_expected_number_of_participants = request.form.get('concept-paper-expected-number-of-participants')
+        concept_paper_body = request.form.get('concept-paper-body')
+        concept_paper_objectives = request.form.getlist('concept-paper-objectives')
+        concept_paper_learning_outcomes = request.form.getlist('concept-paper-learning-outcomes')
+        concept_paper_prepared_by = request.form.get('concept-paper-prepared-by')
+        concept_paper_signed_and_reviewed_by = request.form.get('concept-paper-signed-and-reviewed-by')
+        concept_paper_endorsed_by = request.form.get('concept-paper-endorsed-by')
+        concept_paper_recommending_approval_by = request.form.get('concept-paper-recommending-approval-by')
+        concept_paper_approved_by = request.form.get('concept-paper-approved-by')
+
+        # Use the value from the additional input field if "Other A.Y." is selected
+        if concept_paper_academic_year == "Other":
+            concept_paper_academic_year = other_academic_year
+
+        # Convert date and time fields to datetime objects
+        concept_paper_date = datetime.strptime(concept_paper_date, '%Y-%m-%dT%H:%M')
+        concept_paper_event_start_date_and_time = datetime.strptime(concept_paper_event_start_date_and_time, '%Y-%m-%dT%H:%M')
+        concept_paper_event_end_date_and_time = datetime.strptime(concept_paper_event_end_date_and_time, '%Y-%m-%dT%H:%M')
+
+        # Create a new concept paper
+        new_concept_paper = ConceptPaperForms(
+            concept_paper_forms_date=concept_paper_date,
+            concept_paper_forms_subject=concept_paper_subject,
+            concept_paper_forms_academic_year=concept_paper_academic_year,
+            concept_paper_forms_semester=concept_paper_semester,
+            concept_paper_forms_event_start_date_and_time=concept_paper_event_start_date_and_time,
+            concept_paper_forms_event_end_date_and_time=concept_paper_event_end_date_and_time,
+            concept_paper_forms_location=concept_paper_location,
+            concept_paper_forms_participants=concept_paper_participants,
+            concept_paper_forms_budget=concept_paper_budget,
+            concept_paper_forms_descriptions=concept_paper_descriptions,
+            concept_paper_forms_expected_number_of_participants=concept_paper_expected_number_of_participants,
+            concept_paper_forms_body=concept_paper_body,
+            concept_paper_forms_prepared_by=concept_paper_prepared_by,
+            concept_paper_forms_signed_and_reviewed_by=concept_paper_signed_and_reviewed_by,
+            concept_paper_forms_endorsed_by=concept_paper_endorsed_by,
+            concept_paper_forms_recommending_approval_by=concept_paper_recommending_approval_by,
+            concept_paper_forms_approved_by=concept_paper_approved_by
+        )
+
+        # Add the new concept paper to the database
+        db.session.add(new_concept_paper)
+        db.session.commit()
+
+        # Add objectives of the activity to the concept_paper_form_objectives_of_the_activity table
+        for objective_id in concept_paper_objectives:
+            new_objective = ConceptPaperFormObjectivesOfTheActivity(
+                concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+                objectives_of_the_activity_id=objective_id
+            )
+            db.session.add(new_objective)
+        db.session.commit()
+
+        # Add learning outcomes to the concept_paper_form_learning_outcomes table
+        for outcome_id in concept_paper_learning_outcomes:
+            new_outcome = ConceptPaperFormLearningOutcomes(
+                concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+                learning_outcomes_id=outcome_id
+            )
+            db.session.add(new_outcome)
+        db.session.commit()
+
+        flash('Concept paper added successfully!', 'success')
+        return redirect(url_for('concept_papers_overview'))
+
+    # Query for distinct academic years
+    academic_years = db.session.query(ConceptPaperForms.concept_paper_forms_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    # Query for objectives of the activity
+    objectives = ObjectivesOfTheActivity.query.all()
+
+    # Query for learning outcomes
+    learning_outcomes = LearningOutcomes.query.all()
+
+    # Query for users
+    users = Users.query.all()
+
+    # Query for signatories
+    signatories = Signatories.query.all()
+
+    return render_template('add-concept-paper.html', academic_years=academic_years, objectives=objectives, learning_outcomes=learning_outcomes, users=users, signatories=signatories)
+
 @app.route("/documentation-overview")
 @login_required
 def documentation_overview():
