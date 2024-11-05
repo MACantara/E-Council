@@ -372,6 +372,79 @@ class FinancialReports(db.Model):
     def __repr__(self):
         return f'<FinancialReports {self.financial_reports_id}>'
 
+class ConceptPaperForms(db.Model):
+    __tablename__ = 'concept_paper_forms'
+
+    concept_paper_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    concept_paper_forms_semester = db.Column(db.String(50), nullable=True)
+    concept_paper_forms_academic_year = db.Column(db.String(50), nullable=True)
+    concept_paper_forms_endorsed_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    concept_paper_forms_recommending_approval_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    concept_paper_forms_approved_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    concept_paper_forms_subject = db.Column(db.String(255), nullable=True)
+    concept_paper_forms_date = db.Column(db.Date, nullable=True)
+    concept_paper_forms_body = db.Column(db.Text, nullable=True)
+    concept_paper_forms_event_start_date_and_time = db.Column(db.DateTime, nullable=True)
+    concept_paper_forms_event_end_date_and_time = db.Column(db.DateTime, nullable=True)
+    concept_paper_forms_location = db.Column(db.String(255), nullable=True)
+    concept_paper_forms_participants = db.Column(db.String(255), nullable=True)
+    concept_paper_forms_budget = db.Column(db.String(255), nullable=True)
+    concept_paper_forms_descriptions = db.Column(db.Text, nullable=True)
+    concept_paper_forms_expected_number_of_participants = db.Column(db.Text, nullable=True)
+    concept_paper_forms_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    concept_paper_forms_signed_and_reviewed_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+
+    endorsed_by_signatory = db.relationship('Signatories', foreign_keys=[concept_paper_forms_endorsed_by])
+    recommending_approval_by_signatory = db.relationship('Signatories', foreign_keys=[concept_paper_forms_recommending_approval_by])
+    approved_by_signatory = db.relationship('Signatories', foreign_keys=[concept_paper_forms_approved_by])
+    prepared_by_user = db.relationship('Users', foreign_keys=[concept_paper_forms_prepared_by])
+    signed_and_reviewed_by_user = db.relationship('Users', foreign_keys=[concept_paper_forms_signed_and_reviewed_by])
+
+    def __repr__(self):
+        return f'<ConceptPaperForms {self.concept_paper_forms_id}: {self.concept_paper_forms_subject}>'
+
+class ObjectivesOfTheActivity(db.Model):
+    __tablename__ = 'objectives_of_the_activity'
+
+    objectives_of_the_activity_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    objectives_of_the_activity_content = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<ObjectivesOfTheActivity {self.objectives_of_the_activity_id}: {self.objectives_of_the_activity_content}>'
+
+class ConceptPaperFormObjectivesOfTheActivity(db.Model):
+    __tablename__ = 'concept_paper_form_objectives_of_the_activity'
+
+    concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), primary_key=True, nullable=False)
+    objectives_of_the_activity_id = db.Column(db.Integer, db.ForeignKey('objectives_of_the_activity.objectives_of_the_activity_id'), primary_key=True, nullable=False)
+
+    concept_paper_form = db.relationship('ConceptPaperForms', backref='objectives_of_the_activity')
+    objective_of_the_activity = db.relationship('ObjectivesOfTheActivity', backref='concept_paper_forms')
+
+    def __repr__(self):
+        return f'<ConceptPaperFormObjectivesOfTheActivity(concept_paper_forms_id={self.concept_paper_forms_id}, objectives_of_the_activity_id={self.objectives_of_the_activity_id})>'
+
+class LearningOutcomes(db.Model):
+    __tablename__ = 'learning_outcomes'
+
+    learning_outcomes_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    learning_outcomes_content = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<LearningOutcomes {self.learning_outcomes_id}: {self.learning_outcomes_content}>'
+
+class ConceptPaperFormLearningOutcomes(db.Model):
+    __tablename__ = 'concept_paper_form_learning_outcomes'
+
+    concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), primary_key=True, nullable=False)
+    learning_outcomes_id = db.Column(db.Integer, db.ForeignKey('learning_outcomes.learning_outcomes_id'), primary_key=True, nullable=False)
+
+    concept_paper_form = db.relationship('ConceptPaperForms', backref='learning_outcomes')
+    learning_outcome = db.relationship('LearningOutcomes', backref='concept_paper_forms')
+
+    def __repr__(self):
+        return f'<ConceptPaperFormLearningOutcomes(concept_paper_forms_id={self.concept_paper_forms_id}, learning_outcomes_id={self.learning_outcomes_id})>'
+
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
     if len(text) > length:
