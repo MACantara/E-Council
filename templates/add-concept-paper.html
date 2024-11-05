@@ -114,24 +114,14 @@
                 <div class="input-pair">
                     <label for="concept-paper-objectives">Objectives of the Activity</label>
                     <div id="concept-paper-objectives">
-                        {% for objective in objectives %}
-                        <div>
-                            <input type="checkbox" name="concept-paper-objectives" value="{{ objective.objectives_of_the_activity_id }}" id="objective-{{ objective.objectives_of_the_activity_id }}">
-                            <label for="objective-{{ objective.objectives_of_the_activity_id }}">{{ objective.objectives_of_the_activity_content }}</label>
-                        </div>
-                        {% endfor %}
+                        <input type="text" name="concept-paper-objectives" id="concept-paper-objectives" placeholder="Enter Objective" required>
                     </div>
                 </div>
 
                 <div class="input-pair">
                     <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
                     <div id="concept-paper-learning-outcomes">
-                        {% for outcome in learning_outcomes %}
-                        <div>
-                            <input type="checkbox" name="concept-paper-learning-outcomes" value="{{ outcome.learning_outcomes_id }}" id="outcome-{{ outcome.learning_outcomes_id }}">
-                            <label for="outcome-{{ outcome.learning_outcomes_id }}">{{ outcome.learning_outcomes_content }}</label>
-                        </div>
-                        {% endfor %}
+                        <input type="text" name="concept-paper-learning-outcomes" id="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome" required>
                     </div>
                 </div>
 
