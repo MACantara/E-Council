@@ -634,6 +634,32 @@ class LearningJournalFormsLearnings(db.Model):
     def __repr__(self):
         return f'<LearningJournalFormsLearnings(learning_journal_forms_id={self.learning_journal_forms_id}, learnings_id={self.learnings_id})>'
 
+class ParentGuardianConsentForms(db.Model):
+    __tablename__ = 'parent_guardian_consent_forms'
+
+    parent_guardian_consent_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    parent_guardian_consent_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
+    parent_guardian_consent_forms_personnel_in_charge_forms_id = db.Column(db.Integer, db.ForeignKey('personnel_in_charge_forms.personnel_in_charge_forms_id'), nullable=True)
+    parent_guardian_consent_forms_name_of_student = db.Column(db.String(255), nullable=True)
+    parent_guardian_consent_forms_course_year_level = db.Column(db.String(255), nullable=True)
+    parent_guardian_consent_forms_id_number = db.Column(db.String(50), nullable=True)
+    parent_guardian_consent_forms_department_office_unit = db.Column(db.String(255), nullable=True)
+    parent_guardian_consent_forms_dean_immediate_supervisor = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    parent_guardian_consent_forms_checked_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    parent_guardian_consent_forms_content = db.Column(db.Text, nullable=True)
+    parent_guardian_consent_forms_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    parent_guardian_consent_forms_noted_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+
+    concept_paper_form = db.relationship('ConceptPaperForms', backref='parent_guardian_consent_forms')
+    personnel_in_charge_form = db.relationship('PersonnelInChargeForms', backref='parent_guardian_consent_forms')
+    dean_immediate_supervisor_signatory = db.relationship('Signatories', foreign_keys=[parent_guardian_consent_forms_dean_immediate_supervisor])
+    checked_by_signatory = db.relationship('Signatories', foreign_keys=[parent_guardian_consent_forms_checked_by])
+    prepared_by_user = db.relationship('Users', foreign_keys=[parent_guardian_consent_forms_prepared_by])
+    noted_by_signatory = db.relationship('Signatories', foreign_keys=[parent_guardian_consent_forms_noted_by])
+
+    def __repr__(self):
+        return f'<ParentGuardianConsentForms {self.parent_guardian_consent_forms_id}>'
+
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
     if len(text) > length:
