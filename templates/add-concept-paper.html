@@ -114,15 +114,17 @@
                 <div class="input-pair">
                     <label for="concept-paper-objectives">Objectives of the Activity</label>
                     <div id="concept-paper-objectives">
-                        <input type="text" name="concept-paper-objectives" id="concept-paper-objectives" placeholder="Enter Objective" required>
+                        <input type="text" name="concept-paper-objectives" placeholder="Enter Objective" required>
                     </div>
+                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
                 </div>
 
                 <div class="input-pair">
                     <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
                     <div id="concept-paper-learning-outcomes">
-                        <input type="text" name="concept-paper-learning-outcomes" id="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome" required>
+                        <input type="text" name="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome" required>
                     </div>
+                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning Outcome</button>
                 </div>
 
                 <div class="input-pair">
@@ -206,6 +208,26 @@
             otherAcademicYearLabel.style.display = 'none';
             otherAcademicYearLabel.required = false;
         }
+    }
+
+    function addObjective() {
+        const container = document.getElementById('concept-paper-objectives');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'concept-paper-objectives';
+        input.placeholder = 'Enter Objective';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addLearningOutcome() {
+        const container = document.getElementById('concept-paper-learning-outcomes');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'concept-paper-learning-outcomes';
+        input.placeholder = 'Enter Learning Outcome';
+        input.required = true;
+        container.appendChild(input);
     }
 
     // Set the current date and time as the default value for the datetime-local input
