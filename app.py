@@ -546,6 +546,19 @@ class ActivityReportFormsActivityRecommendations(db.Model):
     def __repr__(self):
         return f'<ActivityReportFormsActivityRecommendations(activity_report_forms_id={self.activity_report_forms_id}, activity_recommendations_id={self.activity_recommendations_id})>'
 
+class PersonnelInChargeForms(db.Model):
+    __tablename__ = 'personnel_in_charge_forms'
+
+    personnel_in_charge_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    personnel_in_charge_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
+    personnel_in_charge_forms_name_of_personnel_in_charge = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+
+    concept_paper_form = db.relationship('ConceptPaperForms', backref='personnel_in_charge_forms')
+    personnel_in_charge_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_forms_name_of_personnel_in_charge])
+
+    def __repr__(self):
+        return f'<PersonnelInChargeForms {self.personnel_in_charge_forms_id}>'
+
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
     if len(text) > length:
