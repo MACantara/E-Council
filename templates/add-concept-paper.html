@@ -216,6 +216,62 @@
                     </select>
                 </div>
 
+                <h3>Activity Report Form</h3>
+
+                <div class="input-pair">
+                    <label for="activity-report-date-submission">Date of Submission</label>
+                    <input type="date" name="activity-report-date-submission" id="activity-report-date-submission">
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-report-contact-numbers">Contact Numbers</label>
+                    <input type="text" name="activity-report-contact-numbers" id="activity-report-contact-numbers" placeholder="Contact Numbers">
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-report-prepared-by">Prepared By</label>
+                    <select name="activity-report-prepared-by" id="activity-report-prepared-by">
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-report-noted-by">Noted By</label>
+                    <select name="activity-report-noted-by" id="activity-report-noted-by">
+                        <option value="" disabled selected>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair"></div>
+                    <label>Strengths</label>
+                    <div id="activity-strengths">
+                        <input type="text" name="activity-strengths" placeholder="Enter Strength" required>
+                    </div>
+                    <button class="primary-button" type="button" onclick="addStrength()">Add Strength</button>
+                </div>
+
+                <div class="input-pair">
+                    <label>Weaknesses</label>
+                    <div id="activity-weaknesses"></div>
+                        <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required>
+                    </div>
+                    <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
+                </div>
+
+                <div class="input-pair">
+                    <label>Recommendations</label>
+                    <div id="activity-recommendations">
+                        <input type="text" name="activity-recommendations" placeholder="Enter Recommendation" required>
+                    </div>
+                    <button class="primary-button" type="button" onclick="addRecommendation()">Add Recommendation</button>
+                </div>
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
@@ -265,6 +321,36 @@
         input.type = 'text';
         input.name = 'concept-paper-learning-outcomes';
         input.placeholder = 'Enter Learning Outcome';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addStrength() {
+        const container = document.getElementById('activity-strengths');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'activity-strengths';
+        input.placeholder = 'Enter Strength';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addWeakness() {
+        const container = document.getElementById('activity-weaknesses');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'activity-weaknesses';
+        input.placeholder = 'Enter Weakness';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addRecommendation() {
+        const container = document.getElementById('activity-recommendations');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'activity-recommendations';
+        input.placeholder = 'Enter Recommendation';
         input.required = true;
         container.appendChild(input);
     }
