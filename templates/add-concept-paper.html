@@ -61,6 +61,17 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="concept-paper-status">Status</label> <!-- New field -->
+                    <select name="concept-paper-status" id="concept-paper-status" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Postponed">Postponed</option>
+                        <option value="Done">Done</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
                     <label for="concept-paper-event-start-date-and-time">Event Start Date and Time</label>
                     <input type="datetime-local" name="concept-paper-event-start-date-and-time" id="concept-paper-event-start-date-and-time" required>
                 </div>
