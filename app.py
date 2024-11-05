@@ -378,6 +378,7 @@ class ConceptPaperForms(db.Model):
     concept_paper_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     concept_paper_forms_semester = db.Column(db.String(50), nullable=True)
     concept_paper_forms_academic_year = db.Column(db.String(50), nullable=True)
+    concept_paper_forms_status = db.Column(db.String(50), nullable=True)
     concept_paper_forms_endorsed_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     concept_paper_forms_recommending_approval_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     concept_paper_forms_approved_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
@@ -1919,6 +1920,7 @@ def add_concept_paper():
         concept_paper_academic_year = request.form.get('concept-paper-academic-year')
         other_academic_year = request.form.get('other-academic-year')
         concept_paper_semester = request.form.get('concept-paper-semester')
+        concept_paper_status = request.form.get('concept-paper-status')
         concept_paper_event_start_date_and_time = request.form.get('concept-paper-event-start-date-and-time')
         concept_paper_event_end_date_and_time = request.form.get('concept-paper-event-end-date-and-time')
         concept_paper_location = request.form.get('concept-paper-location')
@@ -1950,6 +1952,7 @@ def add_concept_paper():
             concept_paper_forms_subject=concept_paper_subject,
             concept_paper_forms_academic_year=concept_paper_academic_year,
             concept_paper_forms_semester=concept_paper_semester,
+            concept_paper_forms_status=concept_paper_status,
             concept_paper_forms_event_start_date_and_time=concept_paper_event_start_date_and_time,
             concept_paper_forms_event_end_date_and_time=concept_paper_event_end_date_and_time,
             concept_paper_forms_location=concept_paper_location,
