@@ -2767,6 +2767,8 @@ def add_concept_paper():
         concept_paper_endorsed_by = request.form.get('concept-paper-endorsed-by')
         concept_paper_recommending_approval_by = request.form.get('concept-paper-recommending-approval-by')
         concept_paper_approved_by = request.form.get('concept-paper-approved-by')
+        concept_paper_observations = request.form.getlist('learning-journal-observations')
+        concept_paper_learnings = request.form.getlist('learning-journal-learnings')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if concept_paper_academic_year == "Other":
@@ -2809,6 +2811,14 @@ def add_concept_paper():
         db.session.add(new_concept_paper)
         db.session.commit()
 
+        # Create a new learning journal form
+        new_learning_journal_form = LearningJournalForms(
+            learning_journal_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+            # ...other fields...
+        )
+        db.session.add(new_learning_journal_form)
+        db.session.commit()
+
         # Add objectives of the activity to the objectives_of_the_activity table
         for objective_content in concept_paper_objectives:
             new_objective = ObjectivesOfTheActivity(
@@ -2840,6 +2850,36 @@ def add_concept_paper():
             )
             db.session.add(concept_paper_outcome_link)
             db.session.commit()
+
+        # Add observations to the observations table
+        for observation_content in concept_paper_observations:
+            observation = Observations(observations_content=observation_content)
+            db.session.add(observation)
+            db.session.commit()
+            learning_journal_observation = LearningJournalFormsObservations(
+                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
+                observations_id=observation.observations_id
+            )
+            db.session.add(learning_journal_observation)
+            db.session.commit()
+
+        # Add learnings to the learnings table
+        for learning_content in concept_paper_learnings:
+            learning = Learnings(learnings_content=learning_content)
+            db.session.add(learning)
+            db.session.commit()
+            learning_journal_learning = LearningJournalFormsLearnings(
+                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
+                learnings_id=learning.learnings_id
+            )
+            db.session.add(learning_journal_learning)
+            db.session.commit()
+
+        # Excuse Letter Form data
+        excuse_letter_department_office_unit = request.form.get('excuse-letter-department-office-unit')
+        excuse_letter_faculty_in_charge = request.form.get('excuse-letter-faculty-in-charge')
+        excuse_letter_dean = request.form.get('excuse-letter-dean')
+        excuse_letter_noted_by = request.form.get('excuse-letter-noted-by')
 
         # Add Excuse Letter Form to the excuse_letter_forms table
         new_excuse_letter_form = ExcuseLetterForms(
@@ -3023,6 +3063,8 @@ def update_concept_paper(paper_id):
         concept_paper_endorsed_by = request.form.get('concept-paper-endorsed-by')
         concept_paper_recommending_approval_by = request.form.get('concept-paper-recommending-approval-by')
         concept_paper_approved_by = request.form.get('concept-paper-approved-by')
+        concept_paper_observations = request.form.getlist('learning-journal-observations')
+        concept_paper_learnings = request.form.getlist('learning-journal-learnings')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if concept_paper_academic_year == "Other":
@@ -3101,6 +3143,32 @@ def update_concept_paper(paper_id):
                 learning_outcomes_id=new_outcome.learning_outcomes_id
             )
             db.session.add(concept_paper_outcome_link)
+            db.session.commit()
+
+        # Update observations in the observations table
+        LearningJournalFormsObservations.query.filter_by(learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
+        for observation_content in concept_paper_observations:
+            observation = Observations(observations_content=observation_content)
+            db.session.add(observation)
+            db.session.commit()
+            learning_journal_observation = LearningJournalFormsObservations(
+                learning_journal_forms_id=learning_journal.learning_journal_forms_id,
+                observations_id=observation.observations_id
+            )
+            db.session.add(learning_journal_observation)
+            db.session.commit()
+
+        # Update learnings in the learnings table
+        LearningJournalFormsLearnings.query.filter_by(learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
+        for learning_content in concept_paper_learnings:
+            learning = Learnings(learnings_content=learning_content)
+            db.session.add(learning)
+            db.session.commit()
+            learning_journal_learning = LearningJournalFormsLearnings(
+                learning_journal_forms_id=learning_journal.learning_journal_forms_id,
+                learnings_id=learning.learnings_id
+            )
+            db.session.add(learning_journal_learning)
             db.session.commit()
 
         # Update Excuse Letter Form
@@ -3269,4 +3337,4 @@ def update_concept_paper(paper_id):
     return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
