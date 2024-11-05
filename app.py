@@ -2934,7 +2934,36 @@ def add_concept_paper():
                 )
                 # ...rest of activity report creation code...
 
-        flash('Concept paper added successfully!', 'success')
+        # Learning Journal Form data
+        learning_journal_name_of_student = request.form.get('learning-journal-name-of-student')
+        learning_journal_course_year_level = request.form.get('learning-journal-course-year-level')
+        learning_journal_id_number = request.form.get('learning-journal-id-number')
+        learning_journal_date = request.form.get('learning-journal-date')
+        learning_journal_overall_reflection = request.form.get('learning-journal-overall-reflection')
+        learning_journal_prepared_by = request.form.get('learning-journal-prepared-by')
+        learning_journal_seen_and_read_by = request.form.get('learning-journal-seen-and-read-by')
+        learning_journal_checked_by = request.form.get('learning-journal-checked-by')
+
+        # Convert date fields to datetime objects
+        learning_journal_date = datetime.strptime(learning_journal_date, '%Y-%m-%d')
+
+        # Create a new learning journal form
+        new_learning_journal_form = LearningJournalForms(
+            learning_journal_forms_name_of_student=learning_journal_name_of_student,
+            learning_journal_forms_course_year_level=learning_journal_course_year_level,
+            learning_journal_forms_id_number=learning_journal_id_number,
+            learning_journal_forms_date=learning_journal_date,
+            learning_journal_forms_overall_reflection=learning_journal_overall_reflection,
+            learning_journal_forms_prepared_by=learning_journal_prepared_by,
+            learning_journal_forms_seen_and_read_by=learning_journal_seen_and_read_by,
+            learning_journal_forms_checked_by=learning_journal_checked_by
+        )
+
+        # Add the new learning journal form to the database
+        db.session.add(new_learning_journal_form)
+        db.session.commit()
+
+        flash('Concept paper and learning journal form added successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
     # Query for distinct academic years
@@ -2968,6 +2997,7 @@ def update_concept_paper_status(paper_id):
 @login_required
 def update_concept_paper(paper_id):
     concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
+    learning_journal = LearningJournalForms.query.filter_by(learning_journal_forms_id=concept_paper.learning_journal_forms_id).first()
 
     if request.method == 'POST':
         concept_paper_date = request.form.get('concept-paper-date')
@@ -3186,9 +3216,32 @@ def update_concept_paper(paper_id):
                 activity_report.activity_report_forms_personnel_in_charge_forms_id = personnel_in_charge_form.personnel_in_charge_forms_id
                 db.session.commit()
 
+        # Learning Journal Form data
+        learning_journal_name_of_student = request.form.get('learning-journal-name-of-student')
+        learning_journal_course_year_level = request.form.get('learning-journal-course-year-level')
+        learning_journal_id_number = request.form.get('learning-journal-id-number')
+        learning_journal_date = request.form.get('learning-journal-date')
+        learning_journal_overall_reflection = request.form.get('learning-journal-overall-reflection')
+        learning_journal_prepared_by = request.form.get('learning-journal-prepared-by')
+        learning_journal_seen_and_read_by = request.form.get('learning-journal-seen-and-read-by')
+        learning_journal_checked_by = request.form.get('learning-journal-checked-by')
+
+        # Convert date fields to datetime objects
+        learning_journal_date = datetime.strptime(learning_journal_date, '%Y-%m-%d')
+
+        # Update the learning journal form
+        learning_journal.learning_journal_forms_name_of_student = learning_journal_name_of_student
+        learning_journal.learning_journal_forms_course_year_level = learning_journal_course_year_level
+        learning_journal.learning_journal_forms_id_number = learning_journal_id_number
+        learning_journal.learning_journal_forms_date = learning_journal_date
+        learning_journal.learning_journal_forms_overall_reflection = learning_journal_overall_reflection
+        learning_journal.learning_journal_forms_prepared_by = learning_journal_prepared_by
+        learning_journal.learning_journal_forms_seen_and_read_by = learning_journal_seen_and_read_by
+        learning_journal.learning_journal_forms_checked_by = learning_journal_checked_by
+
         db.session.commit()
 
-        flash('Concept paper updated successfully!', 'success')
+        flash('Concept paper and learning journal form updated successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
     # Query for distinct academic years
