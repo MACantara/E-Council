@@ -26,6 +26,8 @@
             <h2>Update Concept Paper</h2>
 
             <form method="POST" enctype="multipart/form-data" action="{{ url_for('update_concept_paper', paper_id=concept_paper.concept_paper_forms_id) }}">
+                <h3>Concept Paper Form</h3>
+
                 <div class="input-pair">
                     <label for="concept-paper-date">Date</label>
                     <input type="datetime-local" name="concept-paper-date" id="concept-paper-date" value="{{ concept_paper.concept_paper_forms_date.strftime('%Y-%m-%dT%H:%M') }}" required>
@@ -177,6 +179,43 @@
                         <option value="" disabled>Select Approver</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}" {% if concept_paper.concept_paper_forms_approved_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h3>Excuse Letter Form</h3>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-department-office-unit">Department/Office/Unit</label>
+                    <input type="text" name="excuse-letter-department-office-unit" id="excuse-letter-department-office-unit" value="{{ concept_paper.excuse_letter_forms[0].excuse_letter_forms_department_office_unit if concept_paper.excuse_letter_forms else '' }}" placeholder="Department/Office/Unit">
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-faculty-in-charge">Faculty In Charge</label>
+                    <select name="excuse-letter-faculty-in-charge" id="excuse-letter-faculty-in-charge">
+                        <option value="" disabled>Select Faculty In Charge</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.excuse_letter_forms and concept_paper.excuse_letter_forms[0].excuse_letter_forms_faculty_in_charge == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-dean">Dean</label>
+                    <select name="excuse-letter-dean" id="excuse-letter-dean">
+                        <option value="" disabled>Select Dean</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.excuse_letter_forms and concept_paper.excuse_letter_forms[0].excuse_letter_forms_dean == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-noted-by">Noted By</label>
+                    <select name="excuse-letter-noted-by" id="excuse-letter-noted-by">
+                        <option value="" disabled>Select Noted By</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.excuse_letter_forms and concept_paper.excuse_letter_forms[0].excuse_letter_forms_noted_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>

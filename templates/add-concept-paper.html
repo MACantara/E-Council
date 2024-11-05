@@ -26,6 +26,8 @@
             <h2>Add Concept Paper</h2>
 
             <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_concept_paper') }}">
+                <h3>Concept Paper Form</h3>
+
                 <div class="input-pair">
                     <label for="concept-paper-date">Date</label>
                     <input type="datetime-local" name="concept-paper-date" id="concept-paper-date" required>
@@ -171,6 +173,43 @@
                     <label for="concept-paper-approved-by">Approved By</label>
                     <select name="concept-paper-approved-by" id="concept-paper-approved-by" required>
                         <option value="" disabled selected>Select Approver</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h3>Excuse Letter Form</h3>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-department-office-unit">Department/Office/Unit</label>
+                    <input type="text" name="excuse-letter-department-office-unit" id="excuse-letter-department-office-unit" placeholder="Department/Office/Unit">
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-faculty-in-charge">Faculty In Charge</label>
+                    <select name="excuse-letter-faculty-in-charge" id="excuse-letter-faculty-in-charge">
+                        <option value="" disabled selected>Select Faculty In Charge</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-dean">Dean</label>
+                    <select name="excuse-letter-dean" id="excuse-letter-dean">
+                        <option value="" disabled selected>Select Dean</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-noted-by">Noted By</label>
+                    <select name="excuse-letter-noted-by" id="excuse-letter-noted-by">
+                        <option value="" disabled selected>Select Noted By</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
