@@ -3062,7 +3062,35 @@ def add_concept_paper():
             db.session.add(new_noted_by_entry)
         db.session.commit()
 
-        flash('Concept paper and learning journal form added successfully!', 'success')
+        # Parent/Guardian Consent Form data
+        parent_guardian_consent_name_of_student = request.form.get('parent-guardian-consent-name-of-student')
+        parent_guardian_consent_course_year_level = request.form.get('parent-guardian-consent-course-year-level')
+        parent_guardian_consent_id_number = request.form.get('parent-guardian-consent-id-number')
+        parent_guardian_consent_department_office_unit = request.form.get('parent-guardian-consent-department-office-unit')
+        parent_guardian_consent_dean_immediate_supervisor = request.form.get('parent-guardian-consent-dean-immediate-supervisor')
+        parent_guardian_consent_checked_by = request.form.get('parent-guardian-consent-checked-by')
+        parent_guardian_consent_content = request.form.get('parent-guardian-consent-content')
+        parent_guardian_consent_prepared_by = request.form.get('parent-guardian-consent-prepared-by')
+        parent_guardian_consent_noted_by = request.form.get('parent-guardian-consent-noted-by')
+
+        # Create a new Parent/Guardian Consent Form
+        parent_guardian_consent_form = ParentGuardianConsentForms(
+            parent_guardian_consent_forms_personnel_in_charge_forms_id=new_personnel_in_charge_form.personnel_in_charge_forms_id,
+            parent_guardian_consent_forms_name_of_student=parent_guardian_consent_name_of_student,
+            parent_guardian_consent_forms_course_year_level=parent_guardian_consent_course_year_level,
+            parent_guardian_consent_forms_id_number=parent_guardian_consent_id_number,
+            parent_guardian_consent_forms_department_office_unit=parent_guardian_consent_department_office_unit,
+            parent_guardian_consent_forms_dean_immediate_supervisor=parent_guardian_consent_dean_immediate_supervisor,
+            parent_guardian_consent_forms_checked_by=parent_guardian_consent_checked_by,
+            parent_guardian_consent_forms_content=parent_guardian_consent_content,
+            parent_guardian_consent_forms_prepared_by=parent_guardian_consent_prepared_by,
+            parent_guardian_consent_forms_noted_by=parent_guardian_consent_noted_by
+        )
+
+        db.session.add(parent_guardian_consent_form)
+        db.session.commit()
+
+        flash('Concept paper added successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
     # Query for distinct academic years
@@ -3097,6 +3125,7 @@ def update_concept_paper_status(paper_id):
 def update_concept_paper(paper_id):
     concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
     learning_journal = LearningJournalForms.query.filter_by(learning_journal_forms_concept_paper_forms_id=paper_id).first()
+    parent_guardian_consent_form = ParentGuardianConsentForms.query.filter_by(parent_guardian_consent_forms_concept_paper_forms_id=paper_id).first()
 
     if request.method == 'POST':
         concept_paper_date = request.form.get('concept-paper-date')
@@ -3392,6 +3421,45 @@ def update_concept_paper(paper_id):
             db.session.add(new_noted_by_entry)
         db.session.commit()
 
+        # Parent/Guardian Consent Form data
+        parent_guardian_consent_name_of_student = request.form.get('parent-guardian-consent-name-of-student')
+        parent_guardian_consent_course_year_level = request.form.get('parent-guardian-consent-course-year-level')
+        parent_guardian_consent_id_number = request.form.get('parent-guardian-consent-id-number')
+        parent_guardian_consent_department_office_unit = request.form.get('parent-guardian-consent-department-office-unit')
+        parent_guardian_consent_dean_immediate_supervisor = request.form.get('parent-guardian-consent-dean-immediate-supervisor')
+        parent_guardian_consent_checked_by = request.form.get('parent-guardian-consent-checked-by')
+        parent_guardian_consent_content = request.form.get('parent-guardian-consent-content')
+        parent_guardian_consent_prepared_by = request.form.get('parent-guardian-consent-prepared-by')
+        parent_guardian_consent_noted_by = request.form.get('parent-guardian-consent-noted-by')
+
+        # Update Parent/Guardian Consent Form
+        if parent_guardian_consent_form:
+            parent_guardian_consent_form.parent_guardian_consent_forms_name_of_student = parent_guardian_consent_name_of_student
+            parent_guardian_consent_form.parent_guardian_consent_forms_course_year_level = parent_guardian_consent_course_year_level
+            parent_guardian_consent_form.parent_guardian_consent_forms_id_number = parent_guardian_consent_id_number
+            parent_guardian_consent_form.parent_guardian_consent_forms_department_office_unit = parent_guardian_consent_department_office_unit
+            parent_guardian_consent_form.parent_guardian_consent_forms_dean_immediate_supervisor = parent_guardian_consent_dean_immediate_supervisor
+            parent_guardian_consent_form.parent_guardian_consent_forms_checked_by = parent_guardian_consent_checked_by
+            parent_guardian_consent_form.parent_guardian_consent_forms_content = parent_guardian_consent_content
+            parent_guardian_consent_form.parent_guardian_consent_forms_prepared_by = parent_guardian_consent_prepared_by
+            parent_guardian_consent_form.parent_guardian_consent_forms_noted_by = parent_guardian_consent_noted_by
+        else:
+            parent_guardian_consent_form = ParentGuardianConsentForms(
+                parent_guardian_consent_forms_concept_paper_forms_id=paper_id,
+                parent_guardian_consent_forms_name_of_student=parent_guardian_consent_name_of_student,
+                parent_guardian_consent_forms_course_year_level=parent_guardian_consent_course_year_level,
+                parent_guardian_consent_forms_id_number=parent_guardian_consent_id_number,
+                parent_guardian_consent_forms_department_office_unit=parent_guardian_consent_department_office_unit,
+                parent_guardian_consent_forms_dean_immediate_supervisor=parent_guardian_consent_dean_immediate_supervisor,
+                parent_guardian_consent_forms_checked_by=parent_guardian_consent_checked_by,
+                parent_guardian_consent_forms_content=parent_guardian_consent_content,
+                parent_guardian_consent_forms_prepared_by=parent_guardian_consent_prepared_by,
+                parent_guardian_consent_forms_noted_by=parent_guardian_consent_noted_by
+            )
+            db.session.add(parent_guardian_consent_form)
+
+        db.session.commit()
+
         flash('Concept paper updated successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
@@ -3415,7 +3483,7 @@ def update_concept_paper(paper_id):
         for outcome in ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).all()
     ]
 
-    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal)
+    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
