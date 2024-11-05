@@ -571,6 +571,7 @@ class LearningJournalForms(db.Model):
     learning_journal_forms_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     learning_journal_forms_seen_and_read_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     learning_journal_forms_checked_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    learning_journal_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)  # New column
 
     prepared_by_user = db.relationship('Users', foreign_keys=[learning_journal_forms_prepared_by])
     seen_and_read_by_user = db.relationship('Users', foreign_keys=[learning_journal_forms_seen_and_read_by])
