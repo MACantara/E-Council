@@ -3139,8 +3139,17 @@ def update_concept_paper(paper_id):
     # Query for signatories
     signatories = Signatories.query.all()
 
-    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories)
+    # Fetch objectives of the activity and learning outcomes
+    objectives_of_the_activity = [
+        obj.objective_of_the_activity.objectives_of_the_activity_content
+        for obj in ConceptPaperFormObjectivesOfTheActivity.query.filter_by(concept_paper_forms_id=paper_id).all()
+    ]
+    learning_outcomes = [
+        outcome.learning_outcome.learning_outcomes_content
+        for outcome in ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).all()
+    ]
 
+    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
