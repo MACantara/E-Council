@@ -2781,6 +2781,8 @@ def add_concept_paper():
         concept_paper_approved_by = request.form.get('concept-paper-approved-by')
         concept_paper_observations = request.form.getlist('learning-journal-observations')
         concept_paper_learnings = request.form.getlist('learning-journal-learnings')
+        personnel_in_charge = request.form.get('personnel-in-charge')
+        personnel_in_charge_noted_by = request.form.getlist('personnel-in-charge-noted-by')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if concept_paper_academic_year == "Other":
@@ -3017,6 +3019,23 @@ def add_concept_paper():
         db.session.add(new_learning_journal_form)
         db.session.commit()
 
+        # Add Personnel In Charge Form
+        new_personnel_in_charge_form = PersonnelInChargeForms(
+            personnel_in_charge_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+            personnel_in_charge_forms_name_of_personnel_in_charge=personnel_in_charge
+        )
+        db.session.add(new_personnel_in_charge_form)
+        db.session.commit()
+
+        # Add multiple Noted By entries
+        for noted_by in personnel_in_charge_noted_by:
+            new_noted_by_entry = SignatoriesPersonnelInChargeForms(
+                signatory_id=noted_by,
+                personnel_in_charge_forms_id=new_personnel_in_charge_form.personnel_in_charge_forms_id
+            )
+            db.session.add(new_noted_by_entry)
+        db.session.commit()
+
         flash('Concept paper and learning journal form added successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
@@ -3077,6 +3096,8 @@ def update_concept_paper(paper_id):
         concept_paper_approved_by = request.form.get('concept-paper-approved-by')
         concept_paper_observations = request.form.getlist('learning-journal-observations')
         concept_paper_learnings = request.form.getlist('learning-journal-learnings')
+        personnel_in_charge = request.form.get('personnel-in-charge')
+        personnel_in_charge_noted_by = request.form.getlist('personnel-in-charge-noted-by')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if concept_paper_academic_year == "Other":
@@ -3321,6 +3342,28 @@ def update_concept_paper(paper_id):
         learning_journal.learning_journal_forms_seen_and_read_by = learning_journal_seen_and_read_by
         learning_journal.learning_journal_forms_checked_by = learning_journal_checked_by
 
+        db.session.commit()
+
+        # Update Personnel In Charge Form
+        personnel_in_charge_form = PersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_concept_paper_forms_id=paper_id).first()
+        if personnel_in_charge_form:
+            personnel_in_charge_form.personnel_in_charge_forms_name_of_personnel_in_charge = personnel_in_charge
+        else:
+            new_personnel_in_charge_form = PersonnelInChargeForms(
+                personnel_in_charge_forms_concept_paper_forms_id=paper_id,
+                personnel_in_charge_forms_name_of_personnel_in_charge=personnel_in_charge,
+            )
+            db.session.add(new_personnel_in_charge_form)
+        db.session.commit()
+
+        # Update multiple Noted By entries
+        SignatoriesPersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id).delete()
+        for noted_by in personnel_in_charge_noted_by:
+            new_noted_by_entry = SignatoriesPersonnelInChargeForms(
+                signatory_id=noted_by,
+                personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id
+            )
+            db.session.add(new_noted_by_entry)
         db.session.commit()
 
         flash('Concept paper updated successfully!', 'success')
