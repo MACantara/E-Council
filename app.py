@@ -464,6 +464,88 @@ class ExcuseLetterForms(db.Model):
     def __repr__(self):
         return f'<ExcuseLetterForms {self.excuse_letter_forms_id}>'
 
+class ActivityReportForms(db.Model):
+    __tablename__ = 'activity_report_forms'
+
+    activity_report_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    activity_report_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
+    activity_report_forms_personnel_in_charge_forms_id = db.Column(db.Integer, db.ForeignKey('personnel_in_charge_forms.personnel_in_charge_forms_id'), nullable=True)
+    activity_report_forms_contact_numbers = db.Column(db.String(255), nullable=True)
+    activity_report_forms_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    activity_report_forms_noted_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    activity_report_date_submission = db.Column(db.Date, nullable=True)
+
+    concept_paper_form = db.relationship('ConceptPaperForms', backref='activity_report_forms')
+    personnel_in_charge_form = db.relationship('PersonnelInChargeForms', backref='activity_report_forms')
+    prepared_by_user = db.relationship('Users', foreign_keys=[activity_report_forms_prepared_by])
+    noted_by_signatory = db.relationship('Signatories', foreign_keys=[activity_report_forms_noted_by])
+
+    def __repr__(self):
+        return f'<ActivityReportForms {self.activity_report_forms_id}>'
+
+class ActivityStrengths(db.Model):
+    __tablename__ = 'activity_strengths'
+
+    activity_strengths_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    activity_strengths_content = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<ActivityStrengths {self.activity_strengths_id}: {self.activity_strengths_content}>'
+
+class ActivityWeaknesses(db.Model):
+    __tablename__ = 'activity_weaknesses'
+
+    activity_weaknesses_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    activity_weaknesses_content = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<ActivityWeaknesses {self.activity_weaknesses_id}: {self.activity_weaknesses_content}>'
+
+class ActivityRecommendations(db.Model):
+    __tablename__ = 'activity_recommendations'
+
+    activity_recommendations_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    activity_recommendations_content = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<ActivityRecommendations {self.activity_recommendations_id}: {self.activity_recommendations_content}>'
+
+class ActivityReportFormsActivityStrengths(db.Model):
+    __tablename__ = 'activity_report_forms_activity_strengths'
+
+    activity_report_forms_id = db.Column(db.Integer, db.ForeignKey('activity_report_forms.activity_report_forms_id'), primary_key=True, nullable=False)
+    activity_strengths_id = db.Column(db.Integer, db.ForeignKey('activity_strengths.activity_strengths_id'), primary_key=True, nullable=False)
+
+    activity_report_form = db.relationship('ActivityReportForms', backref='activity_strengths')
+    activity_strength = db.relationship('ActivityStrengths', backref='activity_report_forms')
+
+    def __repr__(self):
+        return f'<ActivityReportFormsActivityStrengths(activity_report_forms_id={self.activity_report_forms_id}, activity_strengths_id={self.activity_strengths_id})>'
+
+class ActivityReportFormsActivityWeaknesses(db.Model):
+    __tablename__ = 'activity_report_forms_activity_weaknesses'
+
+    activity_report_forms_id = db.Column(db.Integer, db.ForeignKey('activity_report_forms.activity_report_forms_id'), primary_key=True, nullable=False)
+    activity_weaknesses_id = db.Column(db.Integer, db.ForeignKey('activity_weaknesses.activity_weaknesses_id'), primary_key=True, nullable=False)
+
+    activity_report_form = db.relationship('ActivityReportForms', backref='activity_weaknesses')
+    activity_weakness = db.relationship('ActivityWeaknesses', backref='activity_report_forms')
+
+    def __repr__(self):
+        return f'<ActivityReportFormsActivityWeaknesses(activity_report_forms_id={self.activity_report_forms_id}, activity_weaknesses_id={self.activity_weaknesses_id})>'
+
+class ActivityReportFormsActivityRecommendations(db.Model):
+    __tablename__ = 'activity_report_forms_activity_recommendations'
+
+    activity_report_forms_id = db.Column(db.Integer, db.ForeignKey('activity_report_forms.activity_report_forms_id'), primary_key=True, nullable=False)
+    activity_recommendations_id = db.Column(db.Integer, db.ForeignKey('activity_recommendations.activity_recommendations_id'), primary_key=True, nullable=False)
+
+    activity_report_form = db.relationship('ActivityReportForms', backref='activity_recommendations')
+    activity_recommendation = db.relationship('ActivityRecommendations', backref='activity_report_forms')
+
+    def __repr__(self):
+        return f'<ActivityReportFormsActivityRecommendations(activity_report_forms_id={self.activity_report_forms_id}, activity_recommendations_id={self.activity_recommendations_id})>'
+
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
     if len(text) > length:
@@ -2822,4 +2904,4 @@ def end_of_semester_reports_overview():
     return render_template("end-of-semester-reports-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
