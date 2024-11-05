@@ -98,6 +98,23 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="board-resolutions-student-signatories">Student Signatories</label>
+                    <div id="board-resolutions-student-signatories">
+                        {% for organization in student_organizations %}
+                        <fieldset>
+                            <legend>{{ organization.student_organizations_name }}</legend>
+                            {% for user in organization.users %}
+                            <div>
+                                <input type="checkbox" name="board-resolutions-student-signatories" value="{{ user.users_id }}" id="user-{{ user.users_id }}">
+                                <label for="user-{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
+                            </div>
+                            {% endfor %}
+                        </fieldset>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="input-pair">
                     <label for="board-resolutions-prepared-by">Prepared By</label>
                     <select name="board-resolutions-prepared-by" id="board-resolutions-prepared-by" required>
                         <option value="" disabled selected>Select Preparer</option>
