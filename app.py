@@ -559,6 +559,68 @@ class PersonnelInChargeForms(db.Model):
     def __repr__(self):
         return f'<PersonnelInChargeForms {self.personnel_in_charge_forms_id}>'
 
+class LearningJournalForms(db.Model):
+    __tablename__ = 'learning_journal_forms'
+
+    learning_journal_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    learning_journal_forms_name_of_student = db.Column(db.String(255), nullable=True)
+    learning_journal_forms_course_year_level = db.Column(db.String(255), nullable=True)
+    learning_journal_forms_id_number = db.Column(db.String(50), nullable=True)
+    learning_journal_forms_date = db.Column(db.Date, nullable=True)
+    learning_journal_forms_overall_reflection = db.Column(db.Text, nullable=True)
+    learning_journal_forms_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    learning_journal_forms_seen_and_read_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    learning_journal_forms_checked_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+
+    prepared_by_user = db.relationship('Users', foreign_keys=[learning_journal_forms_prepared_by])
+    seen_and_read_by_user = db.relationship('Users', foreign_keys=[learning_journal_forms_seen_and_read_by])
+    checked_by_signatory = db.relationship('Signatories', foreign_keys=[learning_journal_forms_checked_by])
+
+    def __repr__(self):
+        return f'<LearningJournalForms {self.learning_journal_forms_id}>'
+
+class Observations(db.Model):
+    __tablename__ = 'observations'
+
+    observations_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    observations_content = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<Observations {self.observations_id}: {self.observations_content}>'
+
+class LearningJournalFormsObservations(db.Model):
+    __tablename__ = 'learning_journal_forms_observations'
+
+    learning_journal_forms_id = db.Column(db.Integer, db.ForeignKey('learning_journal_forms.learning_journal_forms_id'), primary_key=True, nullable=False)
+    observations_id = db.Column(db.Integer, db.ForeignKey('observations.observations_id'), primary_key=True, nullable=False)
+
+    learning_journal_form = db.relationship('LearningJournalForms', backref='observations')
+    observation = db.relationship('Observations', backref='learning_journal_forms')
+
+    def __repr__(self):
+        return f'<LearningJournalFormsObservations(learning_journal_forms_id={self.learning_journal_forms_id}, observations_id={self.observations_id})>'
+
+class Learnings(db.Model):
+    __tablename__ = 'learnings'
+
+    learnings_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    learnings_content = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<Learnings {self.learnings_id}: {self.learnings_content}>'
+
+class LearningJournalFormsLearnings(db.Model):
+    __tablename__ = 'learning_journal_forms_learnings'
+
+    learning_journal_forms_id = db.Column(db.Integer, db.ForeignKey('learning_journal_forms.learning_journal_forms_id'), primary_key=True, nullable=False)
+    learnings_id = db.Column(db.Integer, db.ForeignKey('learnings.learnings_id'), primary_key=True, nullable=False)
+
+    learning_journal_form = db.relationship('LearningJournalForms', backref='learnings')
+    learning = db.relationship('Learnings', backref='learning_journal_forms')
+
+    def __repr__(self):
+        return f'<LearningJournalFormsLearnings(learning_journal_forms_id={self.learning_journal_forms_id}, learnings_id={self.learnings_id})>'
+
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
     if len(text) > length:
