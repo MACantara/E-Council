@@ -2848,6 +2848,30 @@ def add_concept_paper():
 
             db.session.commit()
 
+        # Personnel In Charge Form data
+        personnel_in_charge = request.form.get('personnel-in-charge')
+
+        # Create Personnel In Charge Form
+        if personnel_in_charge:
+            new_personnel_in_charge = PersonnelInChargeForms(
+                personnel_in_charge_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+                personnel_in_charge_forms_name_of_personnel_in_charge=personnel_in_charge
+            )
+            db.session.add(new_personnel_in_charge)
+            db.session.commit()
+
+            # Create Activity Report Form with personnel in charge reference
+            if activity_report_date_submission:
+                new_activity_report = ActivityReportForms(
+                    activity_report_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+                    activity_report_forms_personnel_in_charge_forms_id=new_personnel_in_charge.personnel_in_charge_forms_id,
+                    activity_report_forms_contact_numbers=activity_report_contact_numbers,
+                    activity_report_forms_prepared_by=activity_report_prepared_by,
+                    activity_report_forms_noted_by=activity_report_noted_by,
+                    activity_report_date_submission=datetime.strptime(activity_report_date_submission, '%Y-%m-%d')
+                )
+                # ...rest of activity report creation code...
+
         flash('Concept paper added successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
@@ -3033,6 +3057,29 @@ def update_concept_paper(paper_id):
                 )
                 db.session.add(recommendation_link)
 
+        # Personnel In Charge Form data
+        personnel_in_charge = request.form.get('personnel-in-charge')
+
+        # Update or create Personnel In Charge Form
+        personnel_in_charge_form = PersonnelInChargeForms.query.filter_by(
+            personnel_in_charge_forms_concept_paper_forms_id=paper_id
+        ).first()
+
+        if personnel_in_charge:
+            if not personnel_in_charge_form:
+                personnel_in_charge_form = PersonnelInChargeForms(
+                    personnel_in_charge_forms_concept_paper_forms_id=paper_id
+                )
+                db.session.add(personnel_in_charge_form)
+
+            personnel_in_charge_form.personnel_in_charge_forms_name_of_personnel_in_charge = personnel_in_charge
+            db.session.commit()
+
+            # Update Activity Report Form with personnel in charge reference
+            if activity_report:
+                activity_report.activity_report_forms_personnel_in_charge_forms_id = personnel_in_charge_form.personnel_in_charge_forms_id
+                db.session.commit()
+
         db.session.commit()
 
         flash('Concept paper updated successfully!', 'success')
@@ -3052,4 +3099,4 @@ def update_concept_paper(paper_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True) 
+    app.run(host="0.0.0.0", debug=True)
