@@ -1998,6 +1998,7 @@ def add_board_resolution():
         date = request.form.get('board-resolutions-date')
         prepared_by = request.form.get('board-resolutions-prepared-by')
         approved_by = request.form.get('board-resolutions-approved-by')
+        student_signatories = request.form.getlist('board-resolutions-student-signatories')
 
         # Use the value from the "Other" input field if "Other" is selected for academic year
         if academic_year == 'Other':
@@ -2044,6 +2045,15 @@ def add_board_resolution():
 
         # Add the new resolution to the database
         db.session.add(new_resolution)
+        db.session.commit()
+
+        # Add student signatories to the board_resolutions_student_signatories table
+        for signatory_id in student_signatories:
+            new_signatory = BoardResolutionsStudentSignatories(
+                board_resolutions_id=new_resolution.board_resolutions_id,
+                board_resolutions_users_id=signatory_id
+            )
+            db.session.add(new_signatory)
         db.session.commit()
 
         flash('Board resolution added successfully!', 'success')
@@ -2099,6 +2109,7 @@ def update_board_resolution(resolution_id):
         date = request.form.get('board-resolutions-date')
         prepared_by = request.form.get('board-resolutions-prepared-by')
         approved_by = request.form.get('board-resolutions-approved-by')
+        student_signatories = request.form.getlist('board-resolutions-student-signatories')
 
         # Use the value from the "Other" input field if "Other" is selected for academic year
         if academic_year == 'Other':
@@ -2141,6 +2152,16 @@ def update_board_resolution(resolution_id):
         resolution.board_resolutions_prepared_by = prepared_by
         resolution.board_resolutions_approved_by = approved_by
 
+        db.session.commit()
+
+        # Update student signatories in the board_resolutions_student_signatories table
+        BoardResolutionsStudentSignatories.query.filter_by(board_resolutions_id=resolution_id).delete()
+        for signatory_id in student_signatories:
+            new_signatory = BoardResolutionsStudentSignatories(
+                board_resolutions_id=resolution_id,
+                board_resolutions_users_id=signatory_id
+            )
+            db.session.add(new_signatory)
         db.session.commit()
 
         flash('Board resolution updated successfully!', 'success')
@@ -2440,4 +2461,4 @@ def calendar_of_activities_overview():
     return render_template("calendar-of-activities-overview.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True) 
