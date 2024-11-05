@@ -376,6 +376,72 @@
                     <button class="primary-button" type="button" onclick="addNotedBy()">Add Another Noted By</button>
                 </div>
 
+                <h3>Parent/Guardian Consent Form</h3>
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-name-of-student">Name of Student</label>
+                    <input type="text" name="parent-guardian-consent-name-of-student" id="parent-guardian-consent-name-of-student" placeholder="Name of Student">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-course-year-level">Course/Year Level</label>
+                    <input type="text" name="parent-guardian-consent-course-year-level" id="parent-guardian-consent-course-year-level" placeholder="Course/Year Level">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-id-number">ID Number</label>
+                    <input type="text" name="parent-guardian-consent-id-number" id="parent-guardian-consent-id-number" placeholder="ID Number">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-department-office-unit">Department/Office/Unit</label>
+                    <input type="text" name="parent-guardian-consent-department-office-unit" id="parent-guardian-consent-department-office-unit" placeholder="Department/Office/Unit">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-dean-immediate-supervisor">Dean/Immediate Supervisor</label>
+                    <select name="parent-guardian-consent-dean-immediate-supervisor" id="parent-guardian-consent-dean-immediate-supervisor">
+                        <option value="" disabled selected>Select Dean/Immediate Supervisor</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-checked-by">Checked By</label>
+                    <select name="parent-guardian-consent-checked-by" id="parent-guardian-consent-checked-by">
+                        <option value="" disabled selected>Select Checker</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-content">Content</label>
+                    <textarea name="parent-guardian-consent-content" id="parent-guardian-consent-content" placeholder="Content"></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-prepared-by">Prepared By</label>
+                    <select name="parent-guardian-consent-prepared-by" id="parent-guardian-consent-prepared-by">
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-noted-by">Noted By</label>
+                    <select name="parent-guardian-consent-noted-by" id="parent-guardian-consent-noted-by">
+                        <option value="" disabled selected>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
