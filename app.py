@@ -2775,11 +2775,6 @@ def delete_minutes_of_the_meeting(meeting_id):
 
     return render_template('delete-minutes-of-the-meeting.html', meeting=meeting)
 
-@app.route("/end-of-semester-reports-overview")
-@login_required
-def end_of_semester_reports_overview():
-    return render_template("end-of-semester-reports-overview.html")
-
 @app.route('/add-concept-paper', methods=['GET', 'POST'])
 @login_required
 def add_concept_paper():
