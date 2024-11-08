@@ -3052,11 +3052,11 @@ def add_documentation():
     # Query for signatories
     signatories = Signatories.query.all()
 
-    # Query for activity report forms
-    activity_reports = ActivityReportForms.query.all()
+    # Query for activity report forms and include related events
+    activity_reports = db.session.query(ActivityReportForms).join(Events, ActivityReportForms.activity_report_forms_concept_paper_forms_id == Events.events_concept_paper_forms_id).all()
 
-    # Query for learning journal forms
-    learning_journals = LearningJournalForms.query.all()
+    # Query for learning journal forms and include related events
+    learning_journals = db.session.query(LearningJournalForms).join(Events, LearningJournalForms.learning_journal_forms_concept_paper_forms_id == Events.events_concept_paper_forms_id).all()
 
     return render_template('add-documentation.html', events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
 
