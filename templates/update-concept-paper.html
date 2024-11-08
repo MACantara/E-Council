@@ -446,9 +446,9 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="personnel-in-charge-noted-by-dean">Noted By College Dean</label>
-                    <div id="personnel-in-charge-noted-by-dean-container">
-                        <select name="personnel-in-charge-noted-by-dean" id="personnel-in-charge-noted-by-dean" required>
+                    <label for="personnel-in-charge-noted-by-college-dean">Noted By College Dean</label>
+                    <div id="personnel-in-charge-noted-by-college-dean-container">
+                        <select name="personnel-in-charge-noted-by-college-dean" id="personnel-in-charge-noted-by-college-dean" required>
                             <option value="" disabled>Select Noted By College Dean</option>
                             {% for signatory in signatories %}
                             <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_noted_by_dean == signatory.signatory_id %}selected{% endif %}>
