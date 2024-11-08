@@ -70,9 +70,13 @@
                 <select name="users-department" id="users-department" required>
                     <option value="" disabled>Select a Department</option>
                     {% for department in departments %}
-                        <option value="{{ department.departments_id }}" {% if current_user.users_departments_id == department.departments_id %}selected{% endif %}>
-                            {{ department.departments_name }}
-                        </option>
+                        {% if current_user.users_departments_id == department.departments_id and department.departments_name == "Admin" %}
+                            <option value="{{ department.departments_id }}" selected>{{ department.departments_name }}</option>
+                        {% elif department.departments_name != "Admin" %}
+                            <option value="{{ department.departments_id }}" {% if current_user.users_departments_id == department.departments_id %}selected{% endif %}>
+                                {{ department.departments_name }}
+                            </option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
