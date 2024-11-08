@@ -2260,656 +2260,6 @@ def concept_papers_overview():
 
     return render_template("concept-papers-overview.html", concept_papers=concept_papers, sort_by_date=sort_by_date)
 
-@app.route('/delete-concept-paper/<int:paper_id>', methods=['GET', 'POST'])
-@login_required
-def delete_concept_paper(paper_id):
-    concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
-
-    if request.method == 'POST':
-        # Delete associated learning outcomes
-        ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).delete()
-        
-        # Delete associated objectives of the activity
-        ConceptPaperFormObjectivesOfTheActivity.query.filter_by(concept_paper_forms_id=paper_id).delete()
-        
-        # Delete the concept paper
-        db.session.delete(concept_paper)
-        db.session.commit()
-
-        flash('Concept paper deleted successfully!', 'success')
-        return redirect(url_for('concept_papers_overview'))
-
-    return render_template('delete-concept-paper.html', concept_paper=concept_paper)
-
-@app.route("/documentation-overview")
-@login_required
-def documentation_overview():
-    return render_template("documentation-overview.html")
-
-@app.route("/financial-reports-overview")
-@login_required
-def financial_reports_overview():
-    # Query for all financial reports
-    financial_reports = FinancialReports.query.all()
-
-    # Determine the sorting order
-    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
-
-    return render_template("financial-reports-overview.html", financial_reports=financial_reports, sort_by_date=sort_by_date)
-
-@app.route('/add-financial-report', methods=['GET', 'POST'])
-@login_required
-def add_financial_report():
-    if request.method == 'POST':
-        financial_reports_date = request.form.get('financial-reports-date')
-        financial_reports_academic_year = request.form.get('financial-reports-academic-year')
-        financial_reports_semester = request.form.get('financial-reports-semester')
-        financial_reports_events_id = request.form.get('financial-reports-events-id')
-        financial_reports_title = request.form.get('financial-reports-title')
-        financial_reports_status = request.form.get('financial-reports-status')
-        financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
-        financial_reports_noted_by = request.form.get('financial-reports-noted-by')
-        financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
-        financial_reports_approved_by = request.form.get('financial-reports-approved-by')
-
-        # Create a new financial report
-        new_financial_report = FinancialReports(
-            financial_reports_date=datetime.strptime(financial_reports_date, '%Y-%m-%dT%H:%M'),
-            financial_reports_academic_year=financial_reports_academic_year,
-            financial_reports_semester=financial_reports_semester,
-            financial_reports_events_id=financial_reports_events_id,
-            financial_reports_title=financial_reports_title,
-            financial_reports_status=financial_reports_status,
-            financial_reports_audited_and_prepared_by=financial_reports_audited_and_prepared_by,
-            financial_reports_noted_by=financial_reports_noted_by,
-            financial_reports_recommending_approval_by=financial_reports_recommending_approval_by,
-            financial_reports_approved_by=financial_reports_approved_by
-        )
-
-        # Add the new financial report to the database
-        db.session.add(new_financial_report)
-        db.session.commit()
-
-        flash('Financial report added successfully!', 'success')
-        return redirect(url_for('financial_reports_overview'))
-
-    # Query for events that do not have a financial report
-    events = Events.query.outerjoin(FinancialReports, Events.events_id == FinancialReports.financial_reports_events_id) \
-                         .filter(FinancialReports.financial_reports_events_id == None).all()
-
-    # Query for users grouped by student organization
-    student_organizations = StudentOrganizations.query.all()
-
-    # Query for signatories
-    signatories = Signatories.query.all()
-
-    # Query for distinct academic years
-    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
-    academic_years = [year[0] for year in academic_years]
-
-    return render_template('add-financial-report.html', events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
-
-@app.route('/update-financial-report/<int:report_id>', methods=['GET', 'POST'])
-@login_required
-def update_financial_report(report_id):
-    report = FinancialReports.query.get_or_404(report_id)
-
-    if request.method == 'POST':
-        financial_reports_date = request.form.get('financial-reports-date')
-        financial_reports_academic_year = request.form.get('financial-reports-academic-year')
-        financial_reports_semester = request.form.get('financial-reports-semester')
-        financial_reports_events_id = request.form.get('financial-reports-events-id')
-        financial_reports_title = request.form.get('financial-reports-title')
-        financial_reports_status = request.form.get('financial-reports-status')
-        financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
-        financial_reports_noted_by = request.form.get('financial-reports-noted-by')
-        financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
-        financial_reports_approved_by = request.form.get('financial-reports-approved-by')
-
-        # Update the financial report
-        report.financial_reports_date = datetime.strptime(financial_reports_date, '%Y-%m-%dT%H:%M')
-        report.financial_reports_academic_year = financial_reports_academic_year
-        report.financial_reports_semester = financial_reports_semester
-        report.financial_reports_events_id = financial_reports_events_id
-        report.financial_reports_title = financial_reports_title
-        report.financial_reports_status = financial_reports_status
-        report.financial_reports_audited_and_prepared_by = financial_reports_audited_and_prepared_by
-        report.financial_reports_noted_by = financial_reports_noted_by
-        report.financial_reports_recommending_approval_by = financial_reports_recommending_approval_by
-        report.financial_reports_approved_by = financial_reports_approved_by
-
-        db.session.commit()
-
-        flash('Financial report updated successfully!', 'success')
-        return redirect(url_for('financial_reports_overview'))
-
-    # Query for events
-    events = Events.query.all()
-
-    # Query for users grouped by student organization
-    student_organizations = StudentOrganizations.query.all()
-
-    # Query for signatories
-    signatories = Signatories.query.all()
-
-    # Query for distinct academic years
-    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
-    academic_years = [year[0] for year in academic_years]
-
-    return render_template('update-financial-report.html', report=report, events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
-
-@app.route("/update-financial-report-status/<int:report_id>", methods=["POST"])
-@login_required
-def update_financial_report_status(report_id):
-    data = request.get_json()
-    new_status = data.get('status')
-
-    # Find the financial report by ID
-    report = FinancialReports.query.get_or_404(report_id)
-
-    # Update the financial report status
-    report.financial_reports_status = new_status
-    db.session.commit()
-
-    return jsonify(success=True)
-
-@app.route('/delete-financial-report/<int:report_id>', methods=['GET', 'POST'])
-@login_required
-def delete_financial_report(report_id):
-    report = FinancialReports.query.get_or_404(report_id)
-
-    if request.method == 'POST':
-        # Delete the financial report
-        db.session.delete(report)
-        db.session.commit()
-
-        flash('Financial report deleted successfully!', 'success')
-        return redirect(url_for('financial_reports_overview'))
-
-    return render_template('delete-financial-report.html', report=report)
-
-@app.route("/board-resolutions-overview")
-@login_required
-def board_resolutions_overview():
-    # Query for all board resolutions sorted by date (most recent first)
-    board_resolutions = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc()).all()
-
-    # Determine the sorting order
-    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
-
-    return render_template("board-resolutions-overview.html", board_resolutions=board_resolutions, sort_by_date=sort_by_date)
-
-@app.route('/add-board-resolution', methods=['GET', 'POST'])
-@login_required
-def add_board_resolution():
-    if request.method == 'POST':
-        events_id = request.form.get('board-resolutions-events-id')
-        other_event_name = request.form.get('other-event-name')
-        title = request.form.get('board-resolutions-title')
-        description = request.form.get('board-resolutions-description')
-        total_amount = request.form.get('board-resolutions-total-amount')
-        academic_year = request.form.get('board-resolutions-academic-year')
-        other_academic_year = request.form.get('other-academic-year')
-        semester = request.form.get('board-resolutions-semester')
-        status = request.form.get('board-resolutions-status')
-        date = request.form.get('board-resolutions-date')
-        prepared_by = request.form.get('board-resolutions-prepared-by')
-        approved_by = request.form.get('board-resolutions-approved-by')
-        student_signatories = request.form.getlist('board-resolutions-student-signatories')
-
-        # Use the value from the "Other" input field if "Other" is selected for academic year
-        if academic_year == 'Other':
-            academic_year = other_academic_year
-
-        # Handle the "Other" option for event name
-        if events_id == 'Other':
-            # Create a new event with the provided name
-            new_event = Events(
-                events_name=other_event_name, 
-                events_academic_year=academic_year,
-                events_semester=semester,
-                events_description=description)
-            db.session.add(new_event)
-            db.session.commit()
-            events_id = new_event.events_id
-            
-            # Link the event to the department of the current user
-            departments_events = DepartmentsEvents(
-                departments_id=current_user.users_departments_id,
-                events_id=events_id
-            )
-            db.session.add(departments_events)
-            db.session.commit()
-        elif events_id == 'None':
-            events_id = None
-
-        # Convert date to datetime object
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
-
-        # Create a new board resolution
-        new_resolution = BoardResolutions(
-            board_resolutions_events_id=events_id,
-            board_resolutions_title=title,
-            board_resolutions_description=description,
-            board_resolutions_total_amount=total_amount,
-            board_resolutions_academic_year=academic_year,
-            board_resolutions_semester=semester,
-            board_resolutions_status=status,
-            board_resolutions_date=date,
-            board_resolutions_prepared_by=prepared_by,
-            board_resolutions_approved_by=approved_by
-        )
-
-        # Add the new resolution to the database
-        db.session.add(new_resolution)
-        db.session.commit()
-
-        # Add student signatories to the board_resolutions_student_signatories table
-        for signatory_id in student_signatories:
-            new_signatory = BoardResolutionsStudentSignatories(
-                board_resolutions_id=new_resolution.board_resolutions_id,
-                board_resolutions_users_id=signatory_id
-            )
-            db.session.add(new_signatory)
-        db.session.commit()
-
-        flash('Board resolution added successfully!', 'success')
-        return redirect(url_for('board_resolutions_overview'))
-
-    # Query for events that are not yet linked to any board resolutions
-    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
-                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
-
-    # Query for distinct academic years
-    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
-    academic_years = [year[0] for year in academic_years]
-
-    student_organizations = StudentOrganizations.query.all()
-    signatories = Signatories.query.all()
-
-    return render_template('add-board-resolution.html', events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
-
-@app.route("/delete-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
-@login_required
-def delete_board_resolution(resolution_id):
-    # Find the board resolution by ID
-    resolution = BoardResolutions.query.get_or_404(resolution_id)
-
-    if request.method == "POST":
-        # Delete related records in the departments_events table
-        DepartmentsEvents.query.filter_by(events_id=resolution.board_resolutions_events_id).delete()
-
-        # Delete the board resolution
-        db.session.delete(resolution)
-        db.session.commit()
-
-        flash("Board resolution deleted successfully.", "success")
-        return redirect(url_for("board_resolutions_overview"))
-
-    return render_template("delete-board-resolution.html", resolution=resolution)
-
-@app.route('/update-board-resolution/<int:resolution_id>', methods=['GET', 'POST'])
-@login_required
-def update_board_resolution(resolution_id):
-    resolution = BoardResolutions.query.get_or_404(resolution_id)
-
-    if request.method == 'POST':
-        events_id = request.form.get('board-resolutions-events-id')
-        other_event_name = request.form.get('other-event-name')
-        title = request.form.get('board-resolutions-title')
-        description = request.form.get('board-resolutions-description')
-        total_amount = request.form.get('board-resolutions-total-amount')
-        academic_year = request.form.get('board-resolutions-academic-year')
-        other_academic_year = request.form.get('other-academic-year')
-        semester = request.form.get('board-resolutions-semester')
-        status = request.form.get('board-resolutions-status')
-        date = request.form.get('board-resolutions-date')
-        prepared_by = request.form.get('board-resolutions-prepared-by')
-        approved_by = request.form.get('board-resolutions-approved-by')
-        student_signatories = request.form.getlist('board-resolutions-student-signatories')
-
-        # Use the value from the "Other" input field if "Other" is selected for academic year
-        if academic_year == 'Other':
-            academic_year = other_academic_year
-
-        # Handle the "Other" option for event name
-        if events_id == 'Other':
-            # Create a new event with the provided name
-            new_event = Events(
-                events_name=other_event_name, 
-                events_academic_year=academic_year,
-                events_semester=semester,
-                events_description=description)
-            db.session.add(new_event)
-            db.session.commit()
-            events_id = new_event.events_id
-            
-            # Link the event to the department of the current user
-            departments_events = DepartmentsEvents(
-                departments_id=current_user.users_departments_id,
-                events_id=events_id
-            )
-            db.session.add(departments_events)
-            db.session.commit()
-        elif events_id == 'None':
-            events_id = None
-
-        # Convert date to datetime object
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
-
-        # Update the board resolution
-        resolution.board_resolutions_events_id = events_id
-        resolution.board_resolutions_title = title
-        resolution.board_resolutions_description = description
-        resolution.board_resolutions_total_amount = total_amount
-        resolution.board_resolutions_academic_year = academic_year
-        resolution.board_resolutions_semester = semester
-        resolution.board_resolutions_status = status
-        resolution.board_resolutions_date = date
-        resolution.board_resolutions_prepared_by = prepared_by
-        resolution.board_resolutions_approved_by = approved_by
-
-        db.session.commit()
-
-        # Update student signatories in the board_resolutions_student_signatories table
-        BoardResolutionsStudentSignatories.query.filter_by(board_resolutions_id=resolution_id).delete()
-        for signatory_id in student_signatories:
-            new_signatory = BoardResolutionsStudentSignatories(
-                board_resolutions_id=resolution_id,
-                board_resolutions_users_id=signatory_id
-            )
-            db.session.add(new_signatory)
-        db.session.commit()
-
-        flash('Board resolution updated successfully!', 'success')
-        return redirect(url_for('board_resolutions_overview'))
-
-    # Query for events that are not yet linked to any board resolutions
-    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
-                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
-
-    # Query for distinct academic years
-    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
-    academic_years = [year[0] for year in academic_years]
-
-    student_organizations = StudentOrganizations.query.all()
-    signatories = Signatories.query.all()
-
-    # Query for existing student signatories
-    existing_signatories = [signatory.board_resolutions_users_id for signatory in resolution.student_signatories]
-
-    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories, existing_signatories=existing_signatories)
-
-@app.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
-@login_required
-def update_board_resolution_status(resolution_id):
-    data = request.get_json()
-    new_status = data.get('status')
-
-    # Find the board resolution by ID
-    resolution = BoardResolutions.query.get_or_404(resolution_id)
-
-    # Update the board resolution status
-    resolution.board_resolutions_status = new_status
-    db.session.commit()
-
-    return jsonify(success=True)
-
-@app.route("/minutes-of-the-meeting-overview")
-@login_required
-def minutes_of_the_meeting_overview():
-    # Query for all minutes of the meeting sorted by date (most recent first)
-    minutes_of_the_meeting = db.session.query(
-        MinutesOfTheMeeting,
-        Users.users_first_name,
-        Users.users_last_name
-    ).join(
-        Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id
-    ).order_by(
-        MinutesOfTheMeeting.minutes_of_the_meeting_date.desc()
-    ).all()
-
-    # Determine the sorting order
-    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
-
-    # Extract only the MinutesOfTheMeeting objects for filtering
-    meetings_only = [meeting for meeting, _, _ in minutes_of_the_meeting]
-
-    return render_template("minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date, meetings_only=meetings_only)
-
-@app.route('/add-minutes-of-the-meeting', methods=['GET', 'POST'])
-@login_required
-def add_minutes_of_the_meeting():
-    if request.method == 'POST':
-        date = request.form.get('minutes-of-the-meeting-date')
-        semester = request.form.get('minutes-of-the-meeting-semester')
-        academic_year = request.form.get('minutes-of-the-meeting-academic-year')
-        other_academic_year = request.form.get('other-academic-year')
-        status = request.form.get('minutes-of-the-meeting-status')
-        presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
-        agenda = request.form.get('minutes-of-the-meeting-agenda')
-        notes = request.form.get('minutes-of-the-meeting-notes')
-        adjourned = request.form.get('minutes-of-the-meeting-adjourned')
-        approved_by = request.form.get('minutes-of-the-meeting-approved-by')
-        prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
-        noted_by = request.form.get('minutes-of-the-meeting-noted-by')
-        attendees = request.form.getlist('minutes-of-the-meeting-attendees')
-        photo_documentations = request.files.getlist('photo-documentation')
-
-        # Use the value from the additional input field if "Other A.Y." is selected
-        if academic_year == "Other":
-            academic_year = other_academic_year
-
-        # Convert date to datetime object
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
-        adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
-
-        # Create a new minutes of the meeting
-        new_meeting = MinutesOfTheMeeting(
-            minutes_of_the_meeting_date=date,
-            minutes_of_the_meeting_semester=semester,
-            minutes_of_the_meeting_academic_year=academic_year,
-            minutes_of_the_meeting_status=status,
-            minutes_of_the_meeting_presiding_officer=presiding_officer,
-            minutes_of_the_meeting_agenda=agenda,
-            minutes_of_the_meeting_notes=notes,
-            minutes_of_the_meeting_adjourned=adjourned,
-            minutes_of_the_meeting_approved_by=approved_by,
-            minutes_of_the_meeting_prepared_by=prepared_by,
-            minutes_of_the_meeting_noted_by=noted_by
-        )
-
-        # Add the new meeting to the database
-        db.session.add(new_meeting)
-        db.session.commit()
-
-        # Add attendees to the minutes_of_the_meeting_attendees table
-        for attendee_id in attendees:
-            new_attendee = MinutesOfTheMeetingAttendees(
-                minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
-                users_id=attendee_id
-            )
-            db.session.add(new_attendee)
-        db.session.commit()
-
-        # Handle multiple file uploads to Cloudinary
-        for photo_documentation in photo_documentations:
-            if photo_documentation:
-                upload_result = cloudinary.uploader.upload(photo_documentation)
-                photo_url = upload_result.get('secure_url')
-                photo_public_id = upload_result.get('public_id')
-
-                # Create a new photo documentation record
-                new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
-                    minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
-                    minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
-                    minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
-                )
-
-                # Add the new photo documentation to the database
-                db.session.add(new_photo_documentation)
-                db.session.commit()
-
-        flash('Minutes of the meeting added successfully!', 'success')
-        return redirect(url_for('minutes_of_the_meeting_overview'))
-
-    # Query for distinct academic years
-    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
-    academic_years = [year[0] for year in academic_years]
-
-    # Query for users to populate the approved by and prepared by fields
-    users = Users.query.all()
-
-    # Query for signatories to populate the presiding officer and noted by fields
-    signatories = Signatories.query.all()
-
-    # Query for student organizations and their members
-    student_organizations = StudentOrganizations.query.all()
-
-    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories, student_organizations=student_organizations)
-
-@app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
-@login_required
-def update_minutes_of_the_meeting(meeting_id):
-    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
-
-    if request.method == 'POST':
-        date = request.form.get('minutes-of-the-meeting-date')
-        semester = request.form.get('minutes-of-the-meeting-semester')
-        academic_year = request.form.get('minutes-of-the-meeting-academic-year')
-        other_academic_year = request.form.get('other-academic-year')
-        status = request.form.get('minutes-of-the-meeting-status')
-        presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
-        agenda = request.form.get('minutes-of-the-meeting-agenda')
-        notes = request.form.get('minutes-of-the-meeting-notes')
-        adjourned = request.form.get('minutes-of-the-meeting-adjourned')
-        approved_by = request.form.get('minutes-of-the-meeting-approved-by')
-        prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
-        noted_by = request.form.get('minutes-of-the-meeting-noted-by')
-        attendees = request.form.getlist('minutes-of-the-meeting-attendees')
-        photo_documentations = request.files.getlist('photo-documentation')
-
-        # Use the value from the additional input field if "Other A.Y." is selected
-        if academic_year == "Other":
-            academic_year = other_academic_year
-
-        # Convert date to datetime object
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
-        adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
-
-        # Update the minutes of the meeting
-        meeting.minutes_of_the_meeting_date = date
-        meeting.minutes_of_the_meeting_semester = semester
-        meeting.minutes_of_the_meeting_academic_year = academic_year
-        meeting.minutes_of_the_meeting_status = status
-        meeting.minutes_of_the_meeting_presiding_officer = presiding_officer
-        meeting.minutes_of_the_meeting_agenda = agenda
-        meeting.minutes_of_the_meeting_notes = notes
-        meeting.minutes_of_the_meeting_adjourned = adjourned
-        meeting.minutes_of_the_meeting_approved_by = approved_by
-        meeting.minutes_of_the_meeting_prepared_by = prepared_by
-        meeting.minutes_of_the_meeting_noted_by = noted_by
-
-        db.session.commit()
-
-        # Update attendees in the minutes_of_the_meeting_attendees table
-        MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).delete()
-        for attendee_id in attendees:
-            new_attendee = MinutesOfTheMeetingAttendees(
-                minutes_of_the_meeting_id=meeting_id,
-                users_id=attendee_id
-            )
-            db.session.add(new_attendee)
-        db.session.commit()
-
-        # Handle multiple file uploads to Cloudinary
-        if photo_documentations:
-            # Delete existing photo documentation records and photos from Cloudinary
-            existing_photos = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
-            for photo in existing_photos:
-                cloudinary.uploader.destroy(photo.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
-                db.session.delete(photo)
-            db.session.commit()
-
-            # Upload new photos to Cloudinary
-            for photo_documentation in photo_documentations:
-                if photo_documentation:
-                    upload_result = cloudinary.uploader.upload(photo_documentation)
-                    photo_url = upload_result.get('secure_url')
-                    photo_public_id = upload_result.get('public_id')
-
-                    # Create a new photo documentation record
-                    new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
-                        minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id,
-                        minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
-                        minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
-                    )
-
-                    # Add the new photo documentation to the database
-                    db.session.add(new_photo_documentation)
-                    db.session.commit()
-
-        flash('Minutes of the meeting updated successfully!', 'success')
-        return redirect(url_for('minutes_of_the_meeting_overview'))
-
-    # Query for distinct academic years
-    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
-    academic_years = [year[0] for year in academic_years]
-
-    # Query for existing photo documentations
-    photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
-
-    # Query for users to populate the approved by and prepared by fields
-    users = Users.query.all()
-
-    # Query for signatories to populate the presiding officer and noted by fields
-    signatories = Signatories.query.all()
-
-    # Query for existing attendees
-    meeting_attendees = [attendee.users_id for attendee in MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()]
-
-    # Query for student organizations and their members
-    student_organizations = StudentOrganizations.query.all()
-
-    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories, meeting_attendees=meeting_attendees, student_organizations=student_organizations)
-
-@app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
-@login_required
-def update_minutes_of_the_meeting_status(meeting_id):
-    data = request.get_json()
-    new_status = data.get('status')
-
-    # Find the minutes of the meeting by ID
-    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
-
-    # Update the minutes of the meeting status
-    meeting.minutes_of_the_meeting_status = new_status
-    db.session.commit()
-
-    return jsonify(success=True)
-
-@app.route('/delete-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
-@login_required
-def delete_minutes_of_the_meeting(meeting_id):
-    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
-
-    if request.method == 'POST':
-        # Delete related photo documentation records
-        photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
-        for photo_documentation in photo_documentations:
-            # Delete the photo from Cloudinary
-            cloudinary.uploader.destroy(photo_documentation.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
-            db.session.delete(photo_documentation)
-
-        # Delete the meeting
-        db.session.delete(meeting)
-        db.session.commit()
-
-        flash('Minutes of the meeting deleted successfully!', 'success')
-        return redirect(url_for('minutes_of_the_meeting_overview'))
-
-    return render_template('delete-minutes-of-the-meeting.html', meeting=meeting)
-
 @app.route('/add-concept-paper', methods=['GET', 'POST'])
 @login_required
 def add_concept_paper():
@@ -3614,6 +2964,656 @@ def update_concept_paper(paper_id):
     ]
 
     return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form)
+
+@app.route('/delete-concept-paper/<int:paper_id>', methods=['GET', 'POST'])
+@login_required
+def delete_concept_paper(paper_id):
+    concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
+
+    if request.method == 'POST':
+        # Delete associated learning outcomes
+        ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).delete()
+        
+        # Delete associated objectives of the activity
+        ConceptPaperFormObjectivesOfTheActivity.query.filter_by(concept_paper_forms_id=paper_id).delete()
+        
+        # Delete the concept paper
+        db.session.delete(concept_paper)
+        db.session.commit()
+
+        flash('Concept paper deleted successfully!', 'success')
+        return redirect(url_for('concept_papers_overview'))
+
+    return render_template('delete-concept-paper.html', concept_paper=concept_paper)
+
+@app.route("/documentation-overview")
+@login_required
+def documentation_overview():
+    return render_template("documentation-overview.html")
+
+@app.route("/financial-reports-overview")
+@login_required
+def financial_reports_overview():
+    # Query for all financial reports
+    financial_reports = FinancialReports.query.all()
+
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    return render_template("financial-reports-overview.html", financial_reports=financial_reports, sort_by_date=sort_by_date)
+
+@app.route('/add-financial-report', methods=['GET', 'POST'])
+@login_required
+def add_financial_report():
+    if request.method == 'POST':
+        financial_reports_date = request.form.get('financial-reports-date')
+        financial_reports_academic_year = request.form.get('financial-reports-academic-year')
+        financial_reports_semester = request.form.get('financial-reports-semester')
+        financial_reports_events_id = request.form.get('financial-reports-events-id')
+        financial_reports_title = request.form.get('financial-reports-title')
+        financial_reports_status = request.form.get('financial-reports-status')
+        financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
+        financial_reports_noted_by = request.form.get('financial-reports-noted-by')
+        financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
+        financial_reports_approved_by = request.form.get('financial-reports-approved-by')
+
+        # Create a new financial report
+        new_financial_report = FinancialReports(
+            financial_reports_date=datetime.strptime(financial_reports_date, '%Y-%m-%dT%H:%M'),
+            financial_reports_academic_year=financial_reports_academic_year,
+            financial_reports_semester=financial_reports_semester,
+            financial_reports_events_id=financial_reports_events_id,
+            financial_reports_title=financial_reports_title,
+            financial_reports_status=financial_reports_status,
+            financial_reports_audited_and_prepared_by=financial_reports_audited_and_prepared_by,
+            financial_reports_noted_by=financial_reports_noted_by,
+            financial_reports_recommending_approval_by=financial_reports_recommending_approval_by,
+            financial_reports_approved_by=financial_reports_approved_by
+        )
+
+        # Add the new financial report to the database
+        db.session.add(new_financial_report)
+        db.session.commit()
+
+        flash('Financial report added successfully!', 'success')
+        return redirect(url_for('financial_reports_overview'))
+
+    # Query for events that do not have a financial report
+    events = Events.query.outerjoin(FinancialReports, Events.events_id == FinancialReports.financial_reports_events_id) \
+                         .filter(FinancialReports.financial_reports_events_id == None).all()
+
+    # Query for users grouped by student organization
+    student_organizations = StudentOrganizations.query.all()
+
+    # Query for signatories
+    signatories = Signatories.query.all()
+
+    # Query for distinct academic years
+    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('add-financial-report.html', events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
+
+@app.route('/update-financial-report/<int:report_id>', methods=['GET', 'POST'])
+@login_required
+def update_financial_report(report_id):
+    report = FinancialReports.query.get_or_404(report_id)
+
+    if request.method == 'POST':
+        financial_reports_date = request.form.get('financial-reports-date')
+        financial_reports_academic_year = request.form.get('financial-reports-academic-year')
+        financial_reports_semester = request.form.get('financial-reports-semester')
+        financial_reports_events_id = request.form.get('financial-reports-events-id')
+        financial_reports_title = request.form.get('financial-reports-title')
+        financial_reports_status = request.form.get('financial-reports-status')
+        financial_reports_audited_and_prepared_by = request.form.get('financial-reports-audited-and-prepared-by')
+        financial_reports_noted_by = request.form.get('financial-reports-noted-by')
+        financial_reports_recommending_approval_by = request.form.get('financial-reports-recommending-approval-by')
+        financial_reports_approved_by = request.form.get('financial-reports-approved-by')
+
+        # Update the financial report
+        report.financial_reports_date = datetime.strptime(financial_reports_date, '%Y-%m-%dT%H:%M')
+        report.financial_reports_academic_year = financial_reports_academic_year
+        report.financial_reports_semester = financial_reports_semester
+        report.financial_reports_events_id = financial_reports_events_id
+        report.financial_reports_title = financial_reports_title
+        report.financial_reports_status = financial_reports_status
+        report.financial_reports_audited_and_prepared_by = financial_reports_audited_and_prepared_by
+        report.financial_reports_noted_by = financial_reports_noted_by
+        report.financial_reports_recommending_approval_by = financial_reports_recommending_approval_by
+        report.financial_reports_approved_by = financial_reports_approved_by
+
+        db.session.commit()
+
+        flash('Financial report updated successfully!', 'success')
+        return redirect(url_for('financial_reports_overview'))
+
+    # Query for events
+    events = Events.query.all()
+
+    # Query for users grouped by student organization
+    student_organizations = StudentOrganizations.query.all()
+
+    # Query for signatories
+    signatories = Signatories.query.all()
+
+    # Query for distinct academic years
+    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    return render_template('update-financial-report.html', report=report, events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
+
+@app.route("/update-financial-report-status/<int:report_id>", methods=["POST"])
+@login_required
+def update_financial_report_status(report_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the financial report by ID
+    report = FinancialReports.query.get_or_404(report_id)
+
+    # Update the financial report status
+    report.financial_reports_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
+
+@app.route('/delete-financial-report/<int:report_id>', methods=['GET', 'POST'])
+@login_required
+def delete_financial_report(report_id):
+    report = FinancialReports.query.get_or_404(report_id)
+
+    if request.method == 'POST':
+        # Delete the financial report
+        db.session.delete(report)
+        db.session.commit()
+
+        flash('Financial report deleted successfully!', 'success')
+        return redirect(url_for('financial_reports_overview'))
+
+    return render_template('delete-financial-report.html', report=report)
+
+@app.route("/board-resolutions-overview")
+@login_required
+def board_resolutions_overview():
+    # Query for all board resolutions sorted by date (most recent first)
+    board_resolutions = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc()).all()
+
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    return render_template("board-resolutions-overview.html", board_resolutions=board_resolutions, sort_by_date=sort_by_date)
+
+@app.route('/add-board-resolution', methods=['GET', 'POST'])
+@login_required
+def add_board_resolution():
+    if request.method == 'POST':
+        events_id = request.form.get('board-resolutions-events-id')
+        other_event_name = request.form.get('other-event-name')
+        title = request.form.get('board-resolutions-title')
+        description = request.form.get('board-resolutions-description')
+        total_amount = request.form.get('board-resolutions-total-amount')
+        academic_year = request.form.get('board-resolutions-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
+        semester = request.form.get('board-resolutions-semester')
+        status = request.form.get('board-resolutions-status')
+        date = request.form.get('board-resolutions-date')
+        prepared_by = request.form.get('board-resolutions-prepared-by')
+        approved_by = request.form.get('board-resolutions-approved-by')
+        student_signatories = request.form.getlist('board-resolutions-student-signatories')
+
+        # Use the value from the "Other" input field if "Other" is selected for academic year
+        if academic_year == 'Other':
+            academic_year = other_academic_year
+
+        # Handle the "Other" option for event name
+        if events_id == 'Other':
+            # Create a new event with the provided name
+            new_event = Events(
+                events_name=other_event_name, 
+                events_academic_year=academic_year,
+                events_semester=semester,
+                events_description=description)
+            db.session.add(new_event)
+            db.session.commit()
+            events_id = new_event.events_id
+            
+            # Link the event to the department of the current user
+            departments_events = DepartmentsEvents(
+                departments_id=current_user.users_departments_id,
+                events_id=events_id
+            )
+            db.session.add(departments_events)
+            db.session.commit()
+        elif events_id == 'None':
+            events_id = None
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+
+        # Create a new board resolution
+        new_resolution = BoardResolutions(
+            board_resolutions_events_id=events_id,
+            board_resolutions_title=title,
+            board_resolutions_description=description,
+            board_resolutions_total_amount=total_amount,
+            board_resolutions_academic_year=academic_year,
+            board_resolutions_semester=semester,
+            board_resolutions_status=status,
+            board_resolutions_date=date,
+            board_resolutions_prepared_by=prepared_by,
+            board_resolutions_approved_by=approved_by
+        )
+
+        # Add the new resolution to the database
+        db.session.add(new_resolution)
+        db.session.commit()
+
+        # Add student signatories to the board_resolutions_student_signatories table
+        for signatory_id in student_signatories:
+            new_signatory = BoardResolutionsStudentSignatories(
+                board_resolutions_id=new_resolution.board_resolutions_id,
+                board_resolutions_users_id=signatory_id
+            )
+            db.session.add(new_signatory)
+        db.session.commit()
+
+        flash('Board resolution added successfully!', 'success')
+        return redirect(url_for('board_resolutions_overview'))
+
+    # Query for events that are not yet linked to any board resolutions
+    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
+                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
+
+    # Query for distinct academic years
+    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    student_organizations = StudentOrganizations.query.all()
+    signatories = Signatories.query.all()
+
+    return render_template('add-board-resolution.html', events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
+
+@app.route("/delete-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
+@login_required
+def delete_board_resolution(resolution_id):
+    # Find the board resolution by ID
+    resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    if request.method == "POST":
+        # Delete related records in the departments_events table
+        DepartmentsEvents.query.filter_by(events_id=resolution.board_resolutions_events_id).delete()
+
+        # Delete the board resolution
+        db.session.delete(resolution)
+        db.session.commit()
+
+        flash("Board resolution deleted successfully.", "success")
+        return redirect(url_for("board_resolutions_overview"))
+
+    return render_template("delete-board-resolution.html", resolution=resolution)
+
+@app.route('/update-board-resolution/<int:resolution_id>', methods=['GET', 'POST'])
+@login_required
+def update_board_resolution(resolution_id):
+    resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    if request.method == 'POST':
+        events_id = request.form.get('board-resolutions-events-id')
+        other_event_name = request.form.get('other-event-name')
+        title = request.form.get('board-resolutions-title')
+        description = request.form.get('board-resolutions-description')
+        total_amount = request.form.get('board-resolutions-total-amount')
+        academic_year = request.form.get('board-resolutions-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
+        semester = request.form.get('board-resolutions-semester')
+        status = request.form.get('board-resolutions-status')
+        date = request.form.get('board-resolutions-date')
+        prepared_by = request.form.get('board-resolutions-prepared-by')
+        approved_by = request.form.get('board-resolutions-approved-by')
+        student_signatories = request.form.getlist('board-resolutions-student-signatories')
+
+        # Use the value from the "Other" input field if "Other" is selected for academic year
+        if academic_year == 'Other':
+            academic_year = other_academic_year
+
+        # Handle the "Other" option for event name
+        if events_id == 'Other':
+            # Create a new event with the provided name
+            new_event = Events(
+                events_name=other_event_name, 
+                events_academic_year=academic_year,
+                events_semester=semester,
+                events_description=description)
+            db.session.add(new_event)
+            db.session.commit()
+            events_id = new_event.events_id
+            
+            # Link the event to the department of the current user
+            departments_events = DepartmentsEvents(
+                departments_id=current_user.users_departments_id,
+                events_id=events_id
+            )
+            db.session.add(departments_events)
+            db.session.commit()
+        elif events_id == 'None':
+            events_id = None
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+
+        # Update the board resolution
+        resolution.board_resolutions_events_id = events_id
+        resolution.board_resolutions_title = title
+        resolution.board_resolutions_description = description
+        resolution.board_resolutions_total_amount = total_amount
+        resolution.board_resolutions_academic_year = academic_year
+        resolution.board_resolutions_semester = semester
+        resolution.board_resolutions_status = status
+        resolution.board_resolutions_date = date
+        resolution.board_resolutions_prepared_by = prepared_by
+        resolution.board_resolutions_approved_by = approved_by
+
+        db.session.commit()
+
+        # Update student signatories in the board_resolutions_student_signatories table
+        BoardResolutionsStudentSignatories.query.filter_by(board_resolutions_id=resolution_id).delete()
+        for signatory_id in student_signatories:
+            new_signatory = BoardResolutionsStudentSignatories(
+                board_resolutions_id=resolution_id,
+                board_resolutions_users_id=signatory_id
+            )
+            db.session.add(new_signatory)
+        db.session.commit()
+
+        flash('Board resolution updated successfully!', 'success')
+        return redirect(url_for('board_resolutions_overview'))
+
+    # Query for events that are not yet linked to any board resolutions
+    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
+                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
+
+    # Query for distinct academic years
+    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    student_organizations = StudentOrganizations.query.all()
+    signatories = Signatories.query.all()
+
+    # Query for existing student signatories
+    existing_signatories = [signatory.board_resolutions_users_id for signatory in resolution.student_signatories]
+
+    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories, existing_signatories=existing_signatories)
+
+@app.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
+@login_required
+def update_board_resolution_status(resolution_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the board resolution by ID
+    resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    # Update the board resolution status
+    resolution.board_resolutions_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
+
+@app.route("/minutes-of-the-meeting-overview")
+@login_required
+def minutes_of_the_meeting_overview():
+    # Query for all minutes of the meeting sorted by date (most recent first)
+    minutes_of_the_meeting = db.session.query(
+        MinutesOfTheMeeting,
+        Users.users_first_name,
+        Users.users_last_name
+    ).join(
+        Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id
+    ).order_by(
+        MinutesOfTheMeeting.minutes_of_the_meeting_date.desc()
+    ).all()
+
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    # Extract only the MinutesOfTheMeeting objects for filtering
+    meetings_only = [meeting for meeting, _, _ in minutes_of_the_meeting]
+
+    return render_template("minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date, meetings_only=meetings_only)
+
+@app.route('/add-minutes-of-the-meeting', methods=['GET', 'POST'])
+@login_required
+def add_minutes_of_the_meeting():
+    if request.method == 'POST':
+        date = request.form.get('minutes-of-the-meeting-date')
+        semester = request.form.get('minutes-of-the-meeting-semester')
+        academic_year = request.form.get('minutes-of-the-meeting-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
+        status = request.form.get('minutes-of-the-meeting-status')
+        presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
+        agenda = request.form.get('minutes-of-the-meeting-agenda')
+        notes = request.form.get('minutes-of-the-meeting-notes')
+        adjourned = request.form.get('minutes-of-the-meeting-adjourned')
+        approved_by = request.form.get('minutes-of-the-meeting-approved-by')
+        prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
+        noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+        attendees = request.form.getlist('minutes-of-the-meeting-attendees')
+        photo_documentations = request.files.getlist('photo-documentation')
+
+        # Use the value from the additional input field if "Other A.Y." is selected
+        if academic_year == "Other":
+            academic_year = other_academic_year
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+        adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
+
+        # Create a new minutes of the meeting
+        new_meeting = MinutesOfTheMeeting(
+            minutes_of_the_meeting_date=date,
+            minutes_of_the_meeting_semester=semester,
+            minutes_of_the_meeting_academic_year=academic_year,
+            minutes_of_the_meeting_status=status,
+            minutes_of_the_meeting_presiding_officer=presiding_officer,
+            minutes_of_the_meeting_agenda=agenda,
+            minutes_of_the_meeting_notes=notes,
+            minutes_of_the_meeting_adjourned=adjourned,
+            minutes_of_the_meeting_approved_by=approved_by,
+            minutes_of_the_meeting_prepared_by=prepared_by,
+            minutes_of_the_meeting_noted_by=noted_by
+        )
+
+        # Add the new meeting to the database
+        db.session.add(new_meeting)
+        db.session.commit()
+
+        # Add attendees to the minutes_of_the_meeting_attendees table
+        for attendee_id in attendees:
+            new_attendee = MinutesOfTheMeetingAttendees(
+                minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
+                users_id=attendee_id
+            )
+            db.session.add(new_attendee)
+        db.session.commit()
+
+        # Handle multiple file uploads to Cloudinary
+        for photo_documentation in photo_documentations:
+            if photo_documentation:
+                upload_result = cloudinary.uploader.upload(photo_documentation)
+                photo_url = upload_result.get('secure_url')
+                photo_public_id = upload_result.get('public_id')
+
+                # Create a new photo documentation record
+                new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
+                    minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
+                    minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
+                    minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
+                )
+
+                # Add the new photo documentation to the database
+                db.session.add(new_photo_documentation)
+                db.session.commit()
+
+        flash('Minutes of the meeting added successfully!', 'success')
+        return redirect(url_for('minutes_of_the_meeting_overview'))
+
+    # Query for distinct academic years
+    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    # Query for users to populate the approved by and prepared by fields
+    users = Users.query.all()
+
+    # Query for signatories to populate the presiding officer and noted by fields
+    signatories = Signatories.query.all()
+
+    # Query for student organizations and their members
+    student_organizations = StudentOrganizations.query.all()
+
+    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories, student_organizations=student_organizations)
+
+@app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
+@login_required
+def update_minutes_of_the_meeting(meeting_id):
+    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    if request.method == 'POST':
+        date = request.form.get('minutes-of-the-meeting-date')
+        semester = request.form.get('minutes-of-the-meeting-semester')
+        academic_year = request.form.get('minutes-of-the-meeting-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
+        status = request.form.get('minutes-of-the-meeting-status')
+        presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
+        agenda = request.form.get('minutes-of-the-meeting-agenda')
+        notes = request.form.get('minutes-of-the-meeting-notes')
+        adjourned = request.form.get('minutes-of-the-meeting-adjourned')
+        approved_by = request.form.get('minutes-of-the-meeting-approved-by')
+        prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
+        noted_by = request.form.get('minutes-of-the-meeting-noted-by')
+        attendees = request.form.getlist('minutes-of-the-meeting-attendees')
+        photo_documentations = request.files.getlist('photo-documentation')
+
+        # Use the value from the additional input field if "Other A.Y." is selected
+        if academic_year == "Other":
+            academic_year = other_academic_year
+
+        # Convert date to datetime object
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+        adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
+
+        # Update the minutes of the meeting
+        meeting.minutes_of_the_meeting_date = date
+        meeting.minutes_of_the_meeting_semester = semester
+        meeting.minutes_of_the_meeting_academic_year = academic_year
+        meeting.minutes_of_the_meeting_status = status
+        meeting.minutes_of_the_meeting_presiding_officer = presiding_officer
+        meeting.minutes_of_the_meeting_agenda = agenda
+        meeting.minutes_of_the_meeting_notes = notes
+        meeting.minutes_of_the_meeting_adjourned = adjourned
+        meeting.minutes_of_the_meeting_approved_by = approved_by
+        meeting.minutes_of_the_meeting_prepared_by = prepared_by
+        meeting.minutes_of_the_meeting_noted_by = noted_by
+
+        db.session.commit()
+
+        # Update attendees in the minutes_of_the_meeting_attendees table
+        MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).delete()
+        for attendee_id in attendees:
+            new_attendee = MinutesOfTheMeetingAttendees(
+                minutes_of_the_meeting_id=meeting_id,
+                users_id=attendee_id
+            )
+            db.session.add(new_attendee)
+        db.session.commit()
+
+        # Handle multiple file uploads to Cloudinary
+        if photo_documentations:
+            # Delete existing photo documentation records and photos from Cloudinary
+            existing_photos = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+            for photo in existing_photos:
+                cloudinary.uploader.destroy(photo.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
+                db.session.delete(photo)
+            db.session.commit()
+
+            # Upload new photos to Cloudinary
+            for photo_documentation in photo_documentations:
+                if photo_documentation:
+                    upload_result = cloudinary.uploader.upload(photo_documentation)
+                    photo_url = upload_result.get('secure_url')
+                    photo_public_id = upload_result.get('public_id')
+
+                    # Create a new photo documentation record
+                    new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
+                        minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id,
+                        minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
+                        minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
+                    )
+
+                    # Add the new photo documentation to the database
+                    db.session.add(new_photo_documentation)
+                    db.session.commit()
+
+        flash('Minutes of the meeting updated successfully!', 'success')
+        return redirect(url_for('minutes_of_the_meeting_overview'))
+
+    # Query for distinct academic years
+    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    # Query for existing photo documentations
+    photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+
+    # Query for users to populate the approved by and prepared by fields
+    users = Users.query.all()
+
+    # Query for signatories to populate the presiding officer and noted by fields
+    signatories = Signatories.query.all()
+
+    # Query for existing attendees
+    meeting_attendees = [attendee.users_id for attendee in MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()]
+
+    # Query for student organizations and their members
+    student_organizations = StudentOrganizations.query.all()
+
+    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories, meeting_attendees=meeting_attendees, student_organizations=student_organizations)
+
+@app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
+@login_required
+def update_minutes_of_the_meeting_status(meeting_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the minutes of the meeting by ID
+    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    # Update the minutes of the meeting status
+    meeting.minutes_of_the_meeting_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
+
+@app.route('/delete-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
+@login_required
+def delete_minutes_of_the_meeting(meeting_id):
+    meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    if request.method == 'POST':
+        # Delete related photo documentation records
+        photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+        for photo_documentation in photo_documentations:
+            # Delete the photo from Cloudinary
+            cloudinary.uploader.destroy(photo_documentation.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
+            db.session.delete(photo_documentation)
+
+        # Delete the meeting
+        db.session.delete(meeting)
+        db.session.commit()
+
+        flash('Minutes of the meeting deleted successfully!', 'success')
+        return redirect(url_for('minutes_of_the_meeting_overview'))
+
+    return render_template('delete-minutes-of-the-meeting.html', meeting=meeting)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
