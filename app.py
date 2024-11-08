@@ -88,6 +88,7 @@ class Users(db.Model, UserMixin):
         'Student Council Officer',
         'Faculty',
         'Staff',
+        'Admin',
         name='role_enum'
     ), nullable=False)
 
