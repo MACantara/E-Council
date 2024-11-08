@@ -126,4 +126,39 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const eventsSelect = document.getElementById('documentation-events-id');
+        const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
+        const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
+
+        eventsSelect.addEventListener('change', function () {
+            const eventId = this.value;
+
+            fetch(`/get-related-forms/${eventId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update Activity Report Form options
+                    activityReportSelect.innerHTML = '<option value="" disabled selected>Select Activity Report Form</option>';
+                    data.activity_reports.forEach(report => {
+                        const option = document.createElement('option');
+                        option.value = report.activity_report_forms_id;
+                        option.textContent = report.events_name;
+                        activityReportSelect.appendChild(option);
+                    });
+
+                    // Update Learning Journal Form options
+                    learningJournalSelect.innerHTML = '<option value="" disabled selected>Select Learning Journal Form</option>';
+                    data.learning_journals.forEach(journal => {
+                        const option = document.createElement('option');
+                        option.value = journal.learning_journal_forms_id;
+                        option.textContent = journal.events_name;
+                        learningJournalSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching related forms:', error));
+        });
+    });
+</script>
+
 {% endblock %}
