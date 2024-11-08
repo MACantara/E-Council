@@ -1869,6 +1869,8 @@ def update_event_status(event_id):
 @login_required
 def add_event():
     if request.method == "POST":
+        creation_method = request.form.get("creation-method")
+        concept_paper_forms_id = request.form.get("concept-paper-forms-id")
         events_name = request.form.get("events-name")
         events_semester = request.form.get("events-semester")
         events_academic_year = request.form.get("events-academic-year")
@@ -1886,32 +1888,47 @@ def add_event():
             events_academic_year = other_academic_year
 
         # Validation
-        if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time:
-            flash("Please fill out all required fields.", "modal-error")
-            return render_template("add-event.html", academic_years=get_distinct_academic_years())
+        if creation_method == "scratch":
+            if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time:
+                flash("Please fill out all required fields.", "modal-error")
+                return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
 
-        # Check if event name already exists
-        existing_event = Events.query.filter_by(events_name=events_name).first()
-        if existing_event:
-            flash("An event with this name already exists. Please choose a different name.", "modal-error")
-            return render_template("add-event.html", academic_years=get_distinct_academic_years())
+            # Check if event name already exists
+            existing_event = Events.query.filter_by(events_name=events_name).first()
+            if existing_event:
+                flash("An event with this name already exists. Please choose a different name.", "modal-error")
+                return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
 
-        # Validate date format
-        try:
-            events_start_date_and_time = datetime.strptime(events_start_date_and_time, '%Y-%m-%dT%H:%M')
-            events_end_date_and_time = datetime.strptime(events_end_date_and_time, '%Y-%m-%dT%H:%M')
-        except ValueError:
-            flash("Invalid date format. Please use the format YYYY-MM-DDTHH:MM.", "modal-error")
-            return render_template("add-event.html", academic_years=get_distinct_academic_years())
-
-        # Validate budget format
-        if events_budget:
+            # Validate date format
             try:
-                events_budget = float(events_budget)
+                events_start_date_and_time = datetime.strptime(events_start_date_and_time, '%Y-%m-%dT%H:%M')
+                events_end_date_and_time = datetime.strptime(events_end_date_and_time, '%Y-%m-%dT%H:%M')
             except ValueError:
-                flash("Invalid budget format. Please enter a valid number.", "modal-error")
-                return render_template("add-event.html", academic_years=get_distinct_academic_years())
+                flash("Invalid date format. Please use the format YYYY-MM-DDTHH:MM.", "modal-error")
+                return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
 
+            # Validate budget format
+            if events_budget:
+                try:
+                    events_budget = float(events_budget)
+                except ValueError:
+                    flash("Invalid budget format. Please enter a valid number.", "modal-error")
+                    return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
+
+        # If creating from an existing concept paper, retrieve the concept paper details
+        if creation_method == "existing" and concept_paper_forms_id:
+            concept_paper = ConceptPaperForms.query.get(concept_paper_forms_id)
+            if concept_paper:
+                events_name = concept_paper.concept_paper_forms_subject
+                events_semester = concept_paper.concept_paper_forms_semester
+                events_academic_year = concept_paper.concept_paper_forms_academic_year
+                events_start_date_and_time = concept_paper.concept_paper_forms_event_start_date_and_time
+                events_end_date_and_time = concept_paper.concept_paper_forms_event_end_date_and_time
+                events_venue = concept_paper.concept_paper_forms_location
+                events_budget = concept_paper.concept_paper_forms_budget
+                events_description = concept_paper.concept_paper_forms_descriptions
+
+        # Create event
         event = Events(
             events_name=events_name,
             events_semester=events_semester,
@@ -1924,6 +1941,10 @@ def add_event():
             events_description=events_description,
             events_remarks=events_remarks
         )
+
+        # If creating from an existing concept paper, link the event to the concept paper
+        if creation_method == "existing" and concept_paper_forms_id:
+            event.concept_paper_forms_id = concept_paper_forms_id
 
         db.session.add(event)
         db.session.commit()
@@ -1940,9 +1961,10 @@ def add_event():
         flash("Event added successfully!", "success")
         return redirect(url_for("events_overview"))
 
-    # Query distinct academic years
+    # Query distinct academic years and concept papers
     academic_years = get_distinct_academic_years()
-    return render_template("add-event.html", academic_years=academic_years)
+    concept_papers = get_concept_papers()
+    return render_template("add-event.html", academic_years=academic_years, concept_papers=concept_papers)
 
 @app.route("/delete-event/<int:event_id>", methods=["GET", "POST"])
 @login_required
