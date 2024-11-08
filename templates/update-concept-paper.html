@@ -470,35 +470,31 @@
 
                 <div class="input-pair">
                     <label for="personnel-in-charge-noted-by-college-dean">Noted By College Dean</label>
-                    <div id="personnel-in-charge-noted-by-college-dean-container">
-                        <select name="personnel-in-charge-noted-by-college-dean"
-                            id="personnel-in-charge-noted-by-college-dean" required>
-                            <option value="" disabled>Select Noted By College Dean</option>
-                            {% for signatory in signatories %}
-                            <option value="{{ signatory.signatory_id }}" {% if
-                                noted_by_college_dean==signatory.signatory_id %}selected{% endif %}>
-                                {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
-                                signatory.signatory_position }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    <select name="personnel-in-charge-noted-by-college-dean"
+                        id="personnel-in-charge-noted-by-college-dean" required>
+                        <option value="" disabled>Select Noted By College Dean</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if noted_by_college_dean==signatory.signatory_id
+                            %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="input-pair">
                     <label for="personnel-in-charge-noted-by-sas">Noted By Head of Student Affairs Services</label>
-                    <div id="personnel-in-charge-noted-by-sas-container">
-                        <select name="personnel-in-charge-noted-by-sas" id="personnel-in-charge-noted-by-sas" required>
-                            <option value="" disabled>Select Noted By Head of Student Affairs Services</option>
-                            {% for signatory in signatories %}
-                            <option value="{{ signatory.signatory_id }}" {% if noted_by_sas==signatory.signatory_id
-                                %}selected{% endif %}>
-                                {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
-                                signatory.signatory_position }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    <select name="personnel-in-charge-noted-by-sas" id="personnel-in-charge-noted-by-sas" required>
+                        <option value="" disabled>Select Noted By Head of Student Affairs Services</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if noted_by_sas==signatory.signatory_id
+                            %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <h3>Parent/Guardian Consent Form</h3>
