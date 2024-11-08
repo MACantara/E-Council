@@ -74,6 +74,16 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="documentation-noted-by">Noted By</label>
+                    <select name="documentation-noted-by" id="documentation-noted-by" required>
+                        <option value="" disabled selected>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
                     <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
                     <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id">
                         <option value="" disabled selected>Select Learning Journal Form</option>
@@ -84,16 +94,6 @@
                     <label for="documentation-checked-by">Checked By</label>
                     <select name="documentation-checked-by" id="documentation-checked-by" required>
                         <option value="" disabled selected>Select Checker</option>
-                        {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="documentation-noted-by">Noted By</label>
-                    <select name="documentation-noted-by" id="documentation-noted-by" required>
-                        <option value="" disabled selected>Select Noter</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
