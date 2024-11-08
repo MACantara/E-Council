@@ -830,6 +830,11 @@ def has_papers(papers, semester, academic_year):
 
 app.jinja_env.filters['has_papers'] = has_papers
 
+# Define the has_documentations filter
+@app.template_filter('has_documentations')
+def has_documentations(documentations, semester, academic_year):
+    return any(doc.documentation_semester == semester and doc.documentation_academic_year == academic_year for doc in documentations)
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
