@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Add Documentation{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to Documentation Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="container">
+            <h2>Add Documentation</h2>
+
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
+                <div class="input-pair">
+                    <label for="documentation-events-id">Event</label>
+                    <select name="documentation-events-id" id="documentation-events-id" required>
+                        <option value="" disabled selected>Select Event</option>
+                        {% for event in events %}
+                        <option value="{{ event.events_id }}">{{ event.events_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-academic-year">Academic Year</label>
+                    <select name="documentation-academic-year" id="documentation-academic-year" required>
+                        <option value="" disabled selected>Select Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-semester">Semester</label>
+                    <select name="documentation-semester" id="documentation-semester" required>
+                        <option value="" disabled selected>Select Semester</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-status">Status</label>
+                    <select name="documentation-status" id="documentation-status" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Postponed">Postponed</option>
+                        <option value="Done">Done</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-type">Type</label>
+                    <input type="text" name="documentation-type" id="documentation-type" placeholder="Type" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-activity-report-forms-id">Activity Report Form</label>
+                    <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id">
+                        <option value="" disabled selected>Select Activity Report Form</option>
+                        {% for report in activity_reports %}
+                        <option value="{{ report.activity_report_forms_id }}">{{ report.activity_report_forms_title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-prepared-by">Prepared By</label>
+                    <select name="documentation-prepared-by" id="documentation-prepared-by" required>
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
+                    <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id">
+                        <option value="" disabled selected>Select Learning Journal Form</option>
+                        {% for journal in learning_journals %}
+                        <option value="{{ journal.learning_journal_forms_id }}">{{ journal.learning_journal_forms_title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-checked-by">Checked By</label>
+                    <select name="documentation-checked-by" id="documentation-checked-by" required>
+                        <option value="" disabled selected>Select Checker</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-noted-by">Noted By</label>
+                    <select name="documentation-noted-by" id="documentation-noted-by" required>
+                        <option value="" disabled selected>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-date-of-submission">Date of Submission</label>
+                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-rating">Rating</label>
+                    <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating" min="1" max="5">
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-comments-suggestions">Comments/Suggestions</label>
+                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions" placeholder="Comments/Suggestions"></textarea>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('documentation_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Add Documentation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
