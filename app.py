@@ -3076,6 +3076,75 @@ def update_documentation_status(documentation_id):
 
     return jsonify(success=True)
 
+@app.route('/update-documentation/<int:documentation_id>', methods=['GET', 'POST'])
+@login_required
+def update_documentation(documentation_id):
+    documentation = Documentation.query.get_or_404(documentation_id)
+
+    if request.method == 'POST':
+        documentation_events_id = request.form.get('documentation-events-id')
+        documentation_academic_year = request.form.get('documentation-academic-year')
+        other_academic_year = request.form.get('other-academic-year')
+        documentation_semester = request.form.get('documentation-semester')
+        documentation_status = request.form.get('documentation-status')
+        documentation_type = request.form.get('documentation-type')
+        documentation_activity_report_forms_id = request.form.get('documentation-activity-report-forms-id')
+        documentation_prepared_by = request.form.get('documentation-prepared-by')
+        documentation_learning_journal_forms_id = request.form.get('documentation-learning-journal-forms-id')
+        documentation_checked_by = request.form.get('documentation-checked-by')
+        documentation_noted_by = request.form.get('documentation-noted-by')
+        documentation_date_of_submission = request.form.get('documentation-date-of-submission')
+        documentation_rating = request.form.get('documentation-rating')
+        documentation_comments_suggestions = request.form.get('documentation-comments-suggestions')
+
+        # Use the value from the additional input field if "Other A.Y." is selected
+        if documentation_academic_year == "Other":
+            documentation_academic_year = other_academic_year
+
+        # Convert date fields to datetime objects
+        documentation_date_of_submission = datetime.strptime(documentation_date_of_submission, '%Y-%m-%d')
+
+        # Update the documentation entry
+        documentation.documentation_events_id = documentation_events_id
+        documentation.documentation_academic_year = documentation_academic_year
+        documentation.documentation_semester = documentation_semester
+        documentation.documentation_status = documentation_status
+        documentation.documentation_type = documentation_type
+        documentation.documentation_activity_report_forms_id = documentation_activity_report_forms_id
+        documentation.documentation_prepared_by = documentation_prepared_by
+        documentation.documentation_learning_journal_forms_id = documentation_learning_journal_forms_id
+        documentation.documentation_checked_by = documentation_checked_by
+        documentation.documentation_noted_by = documentation_noted_by
+        documentation.documentation_date_of_submission = documentation_date_of_submission
+        documentation.documentation_rating = documentation_rating
+        documentation.documentation_comments_suggestions = documentation_comments_suggestions
+
+        db.session.commit()
+
+        flash('Documentation updated successfully!', 'success')
+        return redirect(url_for('documentation_overview'))
+
+    # Query for events
+    events = Events.query.all()
+
+    # Query for distinct academic years
+    academic_years = db.session.query(Documentation.documentation_academic_year).distinct().all()
+    academic_years = [year[0] for year in academic_years]
+
+    # Query for users
+    users = Users.query.all()
+
+    # Query for signatories
+    signatories = Signatories.query.all()
+
+    # Query for activity report forms
+    activity_reports = ActivityReportForms.query.all()
+
+    # Query for learning journal forms
+    learning_journals = LearningJournalForms.query.all()
+
+    return render_template('update-documentation.html', documentation=documentation, events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
+
 @app.route("/financial-reports-overview")
 @login_required
 def financial_reports_overview():
