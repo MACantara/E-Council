@@ -81,11 +81,13 @@
                 <label for="users-role">Role</label>
                 <select name="users-role" id="users-role" required>
                     <option value="" disabled>Select a Role</option>
-                    <option value="Student Council Officer" {% if current_user.users_role=="Student Council Officer"
-                        %}selected{% endif %}>Student Council Officer</option>
-                    <option value="Faculty" {% if current_user.users_role=="Faculty" %}selected{% endif %}>Faculty
-                    </option>
-                    <option value="Staff" {% if current_user.users_role=="Staff" %}selected{% endif %}>Staff</option>
+                    {% if current_user.users_role == "Admin" %}
+                    <option value="Admin" {% if current_user.users_role == "Admin" %}selected{% endif %}>Admin</option>
+                    {% else %}
+                    <option value="Student Council Officer" {% if current_user.users_role == "Student Council Officer" %}selected{% endif %}>Student Council Officer</option>
+                    <option value="Faculty" {% if current_user.users_role == "Faculty" %}selected{% endif %}>Faculty</option>
+                    <option value="Staff" {% if current_user.users_role == "Staff" %}selected{% endif %}>Staff</option>
+                    {% endif %}
                 </select>
             </div>
 
