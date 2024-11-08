@@ -1942,11 +1942,7 @@ def add_event():
             events_description=events_description,
             events_remarks=events_remarks
         )
-
-        # If creating from an existing concept paper, link the event to the concept paper
-        if creation_method == "existing" and concept_paper_forms_id:
-            event.concept_paper_forms_id = concept_paper_forms_id
-
+        
         db.session.add(event)
         db.session.commit()
 
