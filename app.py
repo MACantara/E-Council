@@ -2493,7 +2493,6 @@ def add_concept_paper():
                     activity_report_forms_noted_by=activity_report_noted_by,
                     activity_report_date_submission=datetime.strptime(activity_report_date_submission, '%Y-%m-%d')
                 )
-                # ...rest of activity report creation code...
 
         # Learning Journal Form data
         learning_journal_name_of_student = request.form.get('learning-journal-name-of-student')
