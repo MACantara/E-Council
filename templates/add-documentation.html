@@ -25,21 +25,6 @@
         <div class="container">
             <h2>Add Documentation</h2>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const academicYearSelect = document.getElementById('documentation-academic-year');
-                    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-
-                    academicYearSelect.addEventListener('change', function () {
-                        if (academicYearSelect.value === 'Other') {
-                            otherAcademicYearContainer.style.display = 'flex';
-                        } else {
-                            otherAcademicYearContainer.style.display = 'none';
-                        }
-                    });
-                });
-            </script>
-
             <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
                 <div class="input-pair">
                     <label for="documentation-events-id">Event</label>
