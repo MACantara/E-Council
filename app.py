@@ -196,7 +196,7 @@ class Events(db.Model):
     board_resolutions = db.relationship('BoardResolutions', back_populates='events')
 
     def __repr__(self):
-        return f"Events({self.events_id}, {self.events_name}, {self.events_semester}, {self.events_academic_year}, {self.events_start_date_and_time}, {self.events_end_date_and_time}, {self.events_venue}, {self.events_budget}, {self.events_status}, {self.events_description}, {self.events_remarks})"
+        return f"Events({self.events_id}, {self.events_name}, {self.events_semester}, {self.events_academic_year}, {self.events_start_date_and_time}, {self.events_end_date_and_time}, {self.events_venue}, {self.events_budget}, {self.events_status}, {self.events_description}, {self.events_remarks}, {self.events_concept_paper_forms_id})"
 
 class DepartmentsEvents(db.Model):
     __tablename__ = "departments_events"
