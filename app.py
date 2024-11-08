@@ -1,6 +1,7 @@
 import os
 import re
 from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
+from jinja2 import Environment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from flask_migrate import Migrate
