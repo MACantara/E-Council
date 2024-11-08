@@ -30,8 +30,8 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-button-pair-positioned-right">
-                    <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="secondary-button fit-content-button">Cancel</a>
-                    <button class="primary-button" type="submit">Delete</button>
+                    <button class="secondary-button fit-content-button" type="submit">Delete Minutes of the Meeting</button>
+                    <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="primary-button fit-content-button">Cancel</a>
                 </div>
             </form>
         </div>
