@@ -143,7 +143,8 @@
                     data.activity_reports.forEach(report => {
                         const option = document.createElement('option');
                         option.value = report.activity_report_forms_id;
-                        option.textContent = report.events_name;
+                        option.textContent = report.events_name + " Activity Report";
+                        option.selected = true;
                         activityReportSelect.appendChild(option);
                     });
 
@@ -152,7 +153,8 @@
                     data.learning_journals.forEach(journal => {
                         const option = document.createElement('option');
                         option.value = journal.learning_journal_forms_id;
-                        option.textContent = journal.events_name;
+                        option.textContent = journal.events_name + " Learning Journal";
+                        option.selected = true;
                         learningJournalSelect.appendChild(option);
                     });
                 })
