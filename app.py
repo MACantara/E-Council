@@ -3145,6 +3145,21 @@ def update_documentation(documentation_id):
 
     return render_template('update-documentation.html', documentation=documentation, events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
 
+@app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
+@login_required
+def delete_documentation(documentation_id):
+    documentation = Documentation.query.get_or_404(documentation_id)
+
+    if request.method == 'POST':
+        # Delete the documentation
+        db.session.delete(documentation)
+        db.session.commit()
+
+        flash('Documentation deleted successfully!', 'success')
+        return redirect(url_for('documentation_overview'))
+
+    return render_template('delete-documentation.html', documentation=documentation)
+
 @app.route("/financial-reports-overview")
 @login_required
 def financial_reports_overview():
