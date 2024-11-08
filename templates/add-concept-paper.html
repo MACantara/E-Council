@@ -348,10 +348,22 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="personnel-in-charge-noted-by">Noted By</label>
-                    <div id="personnel-in-charge-noted-by-container">
-                        <select name="personnel-in-charge-noted-by" id="personnel-in-charge-noted-by" required>
-                            <option value="" disabled selected>Select Noted By</option>
+                    <label for="personnel-in-charge-noted-by-dean">Noted By College Dean</label>
+                    <div id="personnel-in-charge-noted-by-dean-container">
+                        <select name="personnel-in-charge-noted-by-dean" id="personnel-in-charge-noted-by-dean" required>
+                            <option value="" disabled selected>Select Noted By College Dean</option>
+                            {% for signatory in signatories %}
+                            <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-pair">
+                    <label for="personnel-in-charge-noted-by-sas">Noted By Head of Student Affairs Services</label>
+                    <div id="personnel-in-charge-noted-by-sas-container">
+                        <select name="personnel-in-charge-noted-by-sas" id="personnel-in-charge-noted-by-sas" required>
+                            <option value="" disabled selected>Select Noted By Head of Student Affairs Services</option>
                             {% for signatory in signatories %}
                             <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                             {% endfor %}
