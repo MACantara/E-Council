@@ -159,7 +159,8 @@
                         <input type="text" name="concept-paper-learning-outcomes" value="{{ outcome }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning Outcome</button>
+                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning
+                        Outcome</button>
                 </div>
 
                 <div class="input-pair">
@@ -360,29 +361,38 @@
 
                 <div class="input-pair">
                     <label for="learning-journal-name-of-student">Name of Student</label>
-                    <input type="text" name="learning-journal-name-of-student" id="learning-journal-name-of-student" value="{{ learning_journal.learning_journal_forms_name_of_student }}" placeholder="Name of Student" required>
+                    <input type="text" name="learning-journal-name-of-student" id="learning-journal-name-of-student"
+                        value="{{ learning_journal.learning_journal_forms_name_of_student }}"
+                        placeholder="Name of Student" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-course-year-level">Course/Year Level</label>
-                    <input type="text" name="learning-journal-course-year-level" id="learning-journal-course-year-level" value="{{ learning_journal.learning_journal_forms_course_year_level }}" placeholder="Course/Year Level" required>
+                    <input type="text" name="learning-journal-course-year-level" id="learning-journal-course-year-level"
+                        value="{{ learning_journal.learning_journal_forms_course_year_level }}"
+                        placeholder="Course/Year Level" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-id-number">ID Number</label>
-                    <input type="text" name="learning-journal-id-number" id="learning-journal-id-number" value="{{ learning_journal.learning_journal_forms_id_number }}" placeholder="ID Number" required>
+                    <input type="text" name="learning-journal-id-number" id="learning-journal-id-number"
+                        value="{{ learning_journal.learning_journal_forms_id_number }}" placeholder="ID Number"
+                        required>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-date">Date</label>
-                    <input type="date" name="learning-journal-date" id="learning-journal-date" value="{{ learning_journal.learning_journal_forms_date.strftime('%Y-%m-%d') if learning_journal.learning_journal_forms_date else '' }}" required>
+                    <input type="date" name="learning-journal-date" id="learning-journal-date"
+                        value="{{ learning_journal.learning_journal_forms_date.strftime('%Y-%m-%d') if learning_journal.learning_journal_forms_date else '' }}"
+                        required>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-observations">Observations</label>
                     <div id="learning-journal-observations">
                         {% for observation in learning_journal.observations %}
-                        <input type="text" name="learning-journal-observations" value="{{ observation.observation.observations_content }}" required>
+                        <input type="text" name="learning-journal-observations"
+                            value="{{ observation.observation.observations_content }}" required>
                         {% endfor %}
                     </div>
                     <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
@@ -392,7 +402,8 @@
                     <label for="learning-journal-learnings">Learnings</label>
                     <div id="learning-journal-learnings">
                         {% for learning in learning_journal.learnings %}
-                        <input type="text" name="learning-journal-learnings" value="{{ learning.learning.learnings_content }}" required>
+                        <input type="text" name="learning-journal-learnings"
+                            value="{{ learning.learning.learnings_content }}" required>
                         {% endfor %}
                     </div>
                     <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
@@ -400,7 +411,9 @@
 
                 <div class="input-pair">
                     <label for="learning-journal-overall-reflection">Overall Reflection</label>
-                    <textarea name="learning-journal-overall-reflection" id="learning-journal-overall-reflection" placeholder="Overall Reflection" required>{{ learning_journal.learning_journal_forms_overall_reflection }}</textarea>
+                    <textarea name="learning-journal-overall-reflection" id="learning-journal-overall-reflection"
+                        placeholder="Overall Reflection"
+                        required>{{ learning_journal.learning_journal_forms_overall_reflection }}</textarea>
                 </div>
 
                 <div class="input-pair">
@@ -408,7 +421,9 @@
                     <select name="learning-journal-prepared-by" id="learning-journal-prepared-by" required>
                         <option value="" disabled>Select Preparer</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}" {% if learning_journal.learning_journal_forms_prepared_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        <option value="{{ user.users_id }}" {% if
+                            learning_journal.learning_journal_forms_prepared_by==user.users_id %}selected{% endif %}>{{
+                            user.users_first_name }} {{ user.users_last_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -418,7 +433,9 @@
                     <select name="learning-journal-seen-and-read-by" id="learning-journal-seen-and-read-by" required>
                         <option value="" disabled>Select Reader</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}" {% if learning_journal.learning_journal_forms_seen_and_read_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        <option value="{{ user.users_id }}" {% if
+                            learning_journal.learning_journal_forms_seen_and_read_by==user.users_id %}selected{% endif
+                            %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -428,7 +445,10 @@
                     <select name="learning-journal-checked-by" id="learning-journal-checked-by" required>
                         <option value="" disabled>Select Checker</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if learning_journal.learning_journal_forms_checked_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            learning_journal.learning_journal_forms_checked_by==signatory.signatory_id %}selected{%
+                            endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -440,7 +460,10 @@
                     <select name="personnel-in-charge" id="personnel-in-charge" required>
                         <option value="" disabled selected>Select Personnel In Charge</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_forms and concept_paper.personnel_in_charge_forms[0].personnel_in_charge_forms_name_of_personnel_in_charge == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_forms and
+                            concept_paper.personnel_in_charge_forms[0].personnel_in_charge_forms_name_of_personnel_in_charge==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -448,25 +471,30 @@
                 <div class="input-pair">
                     <label for="personnel-in-charge-noted-by-college-dean">Noted By College Dean</label>
                     <div id="personnel-in-charge-noted-by-college-dean-container">
-                        <select name="personnel-in-charge-noted-by-college-dean" id="personnel-in-charge-noted-by-college-dean" required>
+                        <select name="personnel-in-charge-noted-by-college-dean"
+                            id="personnel-in-charge-noted-by-college-dean" required>
                             <option value="" disabled>Select Noted By College Dean</option>
                             {% for signatory in signatories %}
-                            <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_noted_by_dean == signatory.signatory_id %}selected{% endif %}>
-                                {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}
+                            <option value="{{ signatory.signatory_id }}" {% if
+                                noted_by_college_dean==signatory.signatory_id %}selected{% endif %}>
+                                {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                                signatory.signatory_position }}
                             </option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="input-pair">
                     <label for="personnel-in-charge-noted-by-sas">Noted By Head of Student Affairs Services</label>
                     <div id="personnel-in-charge-noted-by-sas-container">
                         <select name="personnel-in-charge-noted-by-sas" id="personnel-in-charge-noted-by-sas" required>
                             <option value="" disabled>Select Noted By Head of Student Affairs Services</option>
                             {% for signatory in signatories %}
-                            <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_noted_by_sas == signatory.signatory_id %}selected{% endif %}>
-                                {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}
+                            <option value="{{ signatory.signatory_id }}" {% if noted_by_sas==signatory.signatory_id
+                                %}selected{% endif %}>
+                                {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                                signatory.signatory_position }}
                             </option>
                             {% endfor %}
                         </select>
@@ -476,30 +504,41 @@
                 <h3>Parent/Guardian Consent Form</h3>
                 <div class="input-pair">
                     <label for="parent-guardian-consent-name-of-student">Name of Student</label>
-                    <input type="text" name="parent-guardian-consent-name-of-student" id="parent-guardian-consent-name-of-student" value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_name_of_student }}">
+                    <input type="text" name="parent-guardian-consent-name-of-student"
+                        id="parent-guardian-consent-name-of-student"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_name_of_student }}">
                 </div>
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-course-year-level">Course/Year Level</label>
-                    <input type="text" name="parent-guardian-consent-course-year-level" id="parent-guardian-consent-course-year-level" value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_course_year_level }}">
+                    <input type="text" name="parent-guardian-consent-course-year-level"
+                        id="parent-guardian-consent-course-year-level"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_course_year_level }}">
                 </div>
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-id-number">ID Number</label>
-                    <input type="text" name="parent-guardian-consent-id-number" id="parent-guardian-consent-id-number" value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_id_number }}">
+                    <input type="text" name="parent-guardian-consent-id-number" id="parent-guardian-consent-id-number"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_id_number }}">
                 </div>
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-department-office-unit">Department/Office/Unit</label>
-                    <input type="text" name="parent-guardian-consent-department-office-unit" id="parent-guardian-consent-department-office-unit" value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_department_office_unit }}">
+                    <input type="text" name="parent-guardian-consent-department-office-unit"
+                        id="parent-guardian-consent-department-office-unit"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_department_office_unit }}">
                 </div>
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-dean-immediate-supervisor">Dean/Immediate Supervisor</label>
-                    <select name="parent-guardian-consent-dean-immediate-supervisor" id="parent-guardian-consent-dean-immediate-supervisor">
+                    <select name="parent-guardian-consent-dean-immediate-supervisor"
+                        id="parent-guardian-consent-dean-immediate-supervisor">
                         <option value="" disabled>Select Dean/Immediate Supervisor</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if parent_guardian_consent_form.parent_guardian_consent_forms_dean_immediate_supervisor == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_dean_immediate_supervisor==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -509,14 +548,18 @@
                     <select name="parent-guardian-consent-checked-by" id="parent-guardian-consent-checked-by">
                         <option value="" disabled>Select Checker</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if parent_guardian_consent_form.parent_guardian_consent_forms_checked_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_checked_by==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-content">Content</label>
-                    <textarea name="parent-guardian-consent-content" id="parent-guardian-consent-content">{{ parent_guardian_consent_form.parent_guardian_consent_forms_content }}</textarea>
+                    <textarea name="parent-guardian-consent-content"
+                        id="parent-guardian-consent-content">{{ parent_guardian_consent_form.parent_guardian_consent_forms_content }}</textarea>
                 </div>
 
                 <div class="input-pair">
@@ -524,7 +567,9 @@
                     <select name="parent-guardian-consent-prepared-by" id="parent-guardian-consent-prepared-by">
                         <option value="" disabled>Select Preparer</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}" {% if parent_guardian_consent_form.parent_guardian_consent_forms_prepared_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        <option value="{{ user.users_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_prepared_by==user.users_id
+                            %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -534,7 +579,10 @@
                     <select name="parent-guardian-consent-noted-by" id="parent-guardian-consent-noted-by">
                         <option value="" disabled>Select Noter</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if parent_guardian_consent_form.parent_guardian_consent_forms_noted_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_noted_by==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
