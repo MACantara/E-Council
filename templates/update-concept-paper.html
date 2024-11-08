@@ -375,7 +375,7 @@
 
                 <div class="input-pair">
                     <label for="learning-journal-date">Date</label>
-                    <input type="date" name="learning-journal-date" id="learning-journal-date" value="{{ learning_journal.learning_journal_forms_date.strftime('%Y-%m-%d') }}" required>
+                    <input type="date" name="learning-journal-date" id="learning-journal-date" value="{{ learning_journal.learning_journal_forms_date.strftime('%Y-%m-%d') if learning_journal.learning_journal_forms_date else '' }}" required>
                 </div>
 
                 <div class="input-pair">
