@@ -3061,6 +3061,21 @@ def add_documentation():
 
     return render_template('add-documentation.html', events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
 
+@app.route("/update-documentation-status/<int:documentation_id>", methods=["POST"])
+@login_required
+def update_documentation_status(documentation_id):
+    data = request.get_json()
+    new_status = data.get('status')
+
+    # Find the documentation by ID
+    documentation = Documentation.query.get_or_404(documentation_id)
+
+    # Update the documentation status
+    documentation.documentation_status = new_status
+    db.session.commit()
+
+    return jsonify(success=True)
+
 @app.route("/financial-reports-overview")
 @login_required
 def financial_reports_overview():
