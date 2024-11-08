@@ -27,6 +27,15 @@
 
             <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
                 <div class="input-pair">
+                    <label for="documentation-type">Type</label>
+                    <select name="documentation-type" id="documentation-type" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="Activity Report">Activity Report</option>
+                        <option value="After Documentation">After Documentation</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
                     <label for="documentation-events-id">Event</label>
                     <select name="documentation-events-id" id="documentation-events-id" required>
                         <option value="" disabled selected>Select Event</option>
@@ -44,15 +53,6 @@
                         <option value="Postponed">Postponed</option>
                         <option value="Done">Done</option>
                         <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="documentation-type">Type</label>
-                    <select name="documentation-type" id="documentation-type" required>
-                        <option value="" disabled selected>Select Type</option>
-                        <option value="Activity Report">Activity Report</option>
-                        <option value="After Documentation">After Documentation</option>
                     </select>
                 </div>
 
