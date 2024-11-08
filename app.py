@@ -553,9 +553,13 @@ class PersonnelInChargeForms(db.Model):
     personnel_in_charge_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personnel_in_charge_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
     personnel_in_charge_forms_name_of_personnel_in_charge = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    personnel_in_charge_noted_by_dean = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    personnel_in_charge_noted_by_sas = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
 
     concept_paper_form = db.relationship('ConceptPaperForms', backref='personnel_in_charge_forms')
     personnel_in_charge_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_forms_name_of_personnel_in_charge])
+    noted_by_dean_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_noted_by_dean])
+    noted_by_sas_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_noted_by_sas])
 
     def __repr__(self):
         return f'<PersonnelInChargeForms {self.personnel_in_charge_forms_id}>'
