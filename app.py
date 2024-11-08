@@ -560,18 +560,6 @@ class PersonnelInChargeForms(db.Model):
     def __repr__(self):
         return f'<PersonnelInChargeForms {self.personnel_in_charge_forms_id}>'
 
-class SignatoriesPersonnelInChargeForms(db.Model):
-    __tablename__ = 'signatories_personnel_in_charge_forms'
-
-    signatory_id = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), primary_key=True, nullable=False)
-    personnel_in_charge_forms_id = db.Column(db.Integer, db.ForeignKey('personnel_in_charge_forms.personnel_in_charge_forms_id'), primary_key=True, nullable=False)
-
-    signatory = db.relationship('Signatories', backref='personnel_in_charge_forms')
-    personnel_in_charge_form = db.relationship('PersonnelInChargeForms', backref='signatories')
-
-    def __repr__(self):
-        return f'<SignatoriesPersonnelInChargeForms(signatory_id={self.signatory_id}, personnel_in_charge_forms_id={self.personnel_in_charge_forms_id})>'
-
 class LearningJournalForms(db.Model):
     __tablename__ = 'learning_journal_forms'
 
