@@ -25,6 +25,21 @@
         <div class="container">
             <h2>Add Documentation</h2>
 
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const academicYearSelect = document.getElementById('documentation-academic-year');
+                    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+                    academicYearSelect.addEventListener('change', function () {
+                        if (academicYearSelect.value === 'Other') {
+                            otherAcademicYearContainer.style.display = 'flex';
+                        } else {
+                            otherAcademicYearContainer.style.display = 'none';
+                        }
+                    });
+                });
+            </script>
+
             <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
                 <div class="input-pair">
                     <label for="documentation-events-id">Event</label>
@@ -43,7 +58,13 @@
                         {% for year in academic_years %}
                         <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
+                        <option value="Other">Other A.Y.</option>
                     </select>
+                </div>
+
+                <div class="input-pair" id="other-academic-year-container" style="display: none;">
+                    <label for="other-academic-year">Other Academic Year</label>
+                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
                 </div>
 
                 <div class="input-pair">
