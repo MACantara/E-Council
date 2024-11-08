@@ -3006,10 +3006,6 @@ def add_documentation():
         documentation_rating = request.form.get('documentation-rating')
         documentation_comments_suggestions = request.form.get('documentation-comments-suggestions')
 
-        # Use the value from the additional input field if "Other A.Y." is selected
-        if documentation_academic_year == "Other":
-            documentation_academic_year = other_academic_year
-
         # Retrieve event details using documentation_events_id
         event = Events.query.get(documentation_events_id)
         if event:
