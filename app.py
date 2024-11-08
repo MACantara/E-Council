@@ -186,7 +186,7 @@ class Events(db.Model):
     events_start_date_and_time = db.Column(db.DateTime, nullable=True)
     events_end_date_and_time = db.Column(db.DateTime, nullable=True)
     events_venue = db.Column(db.String(255), nullable=True)
-    events_budget = db.Column(db.Numeric(20, 2), nullable=True)
+    events_budget = db.Column(db.String(255), nullable=True)
     events_status = db.Column(db.String(50), nullable=True)
     events_description = db.Column(db.Text, nullable=True)
     events_remarks = db.Column(db.String(255), nullable=True)
