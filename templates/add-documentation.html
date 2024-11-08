@@ -60,11 +60,6 @@
                     <label for="documentation-activity-report-forms-id">Activity Report Form</label>
                     <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id">
                         <option value="" disabled selected>Select Activity Report Form</option>
-                        {% for report in activity_reports %}
-                        <option value="{{ report.activity_report_forms_id }}">
-                            {{ report.event.events_name if report.event else report.activity_report_forms_title }}
-                        </option>
-                        {% endfor %}
                     </select>
                 </div>
 
@@ -82,11 +77,6 @@
                     <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
                     <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id">
                         <option value="" disabled selected>Select Learning Journal Form</option>
-                        {% for journal in learning_journals %}
-                        <option value="{{ journal.learning_journal_forms_id }}">
-                            {{ journal.event.events_name if journal.event else journal.learning_journal_forms_title }}
-                        </option>
-                        {% endfor %}
                     </select>
                 </div>
 
