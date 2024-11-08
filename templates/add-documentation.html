@@ -65,17 +65,17 @@
 
                 <div class="input-pair">
                     <label for="activity-strengths">Activity Strengths</label>
-                    <ul id="activity-strengths"></ul>
+                    <div id="activity-strengths"></div>
                 </div>
                 
                 <div class="input-pair">
                     <label for="activity-weaknesses">Activity Weaknesses</label>
-                    <ul id="activity-weaknesses"></ul>
+                    <div id="activity-weaknesses"></div>
                 </div>
                 
                 <div class="input-pair">
                     <label for="activity-recommendations">Activity Recommendations</label>
-                    <ul id="activity-recommendations"></ul>
+                    <div id="activity-recommendations"></div>
                 </div>
 
                 <div class="input-pair">
@@ -162,7 +162,7 @@
                         const option = document.createElement('option');
                         option.value = report.activity_report_forms_id;
                         option.textContent = report.events_name;
-                        option.selected = true; // Make the newly created option selected
+                        option.selected = true;
                         activityReportSelect.appendChild(option);
                     });
 
@@ -172,7 +172,7 @@
                         const option = document.createElement('option');
                         option.value = journal.learning_journal_forms_id;
                         option.textContent = journal.events_name;
-                        option.selected = true; // Make the newly created option selected
+                        option.selected = true;
                         learningJournalSelect.appendChild(option);
                     });
                 })
@@ -192,25 +192,31 @@
                                 // Update Activity Strengths
                                 strengthsList.innerHTML = '';
                                 data.strengths.forEach(strength => {
-                                    const li = document.createElement('li');
-                                    li.textContent = strength.activity_strengths_content;
-                                    strengthsList.appendChild(li);
+                                    const input = document.createElement('input');
+                                    input.type = 'text';
+                                    input.name = 'activity-strengths';
+                                    input.value = strength.activity_strengths_content;
+                                    strengthsList.appendChild(input);
                                 });
 
                                 // Update Activity Weaknesses
                                 weaknessesList.innerHTML = '';
                                 data.weaknesses.forEach(weakness => {
-                                    const li = document.createElement('li');
-                                    li.textContent = weakness.activity_weaknesses_content;
-                                    weaknessesList.appendChild(li);
+                                    const input = document.createElement('input');
+                                    input.type = 'text';
+                                    input.name = 'activity-weaknesses';
+                                    input.value = weakness.activity_weaknesses_content;
+                                    weaknessesList.appendChild(input);
                                 });
 
                                 // Update Activity Recommendations
                                 recommendationsList.innerHTML = '';
                                 data.recommendations.forEach(recommendation => {
-                                    const li = document.createElement('li');
-                                    li.textContent = recommendation.activity_recommendations_content;
-                                    recommendationsList.appendChild(li);
+                                    const input = document.createElement('input');
+                                    input.type = 'text';
+                                    input.name = 'activity-recommendations';
+                                    input.value = recommendation.activity_recommendations_content;
+                                    recommendationsList.appendChild(input);
                                 });
                             })
                             .catch(error => console.error('Error fetching activity report details:', error));
