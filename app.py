@@ -2604,8 +2604,6 @@ def update_concept_paper(paper_id):
         concept_paper_approved_by = request.form.get('concept-paper-approved-by')
         concept_paper_observations = request.form.getlist('learning-journal-observations')
         concept_paper_learnings = request.form.getlist('learning-journal-learnings')
-        personnel_in_charge = request.form.get('personnel-in-charge')
-        personnel_in_charge_noted_by = request.form.getlist('personnel-in-charge-noted-by')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if concept_paper_academic_year == "Other":
