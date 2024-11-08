@@ -92,7 +92,7 @@ class Users(db.Model, UserMixin):
         name='role_enum'
     ), nullable=False)
 
-    users_student_organization = db.Column(db.Integer, db.ForeignKey('student_organizations.student_organizations_id'), nullable=False)
+    users_student_organization = db.Column(db.Integer, db.ForeignKey('student_organizations.student_organizations_id'), nullable=True)
 
     users_student_organization_position = db.Column(db.Enum(
         'President',
@@ -111,7 +111,7 @@ class Users(db.Model, UserMixin):
         '4th Year IT Representative',
         '4th Year CS Representative',
         name='position_enum'
-    ), nullable=False)
+    ), nullable=True)
 
     users_home_address = db.Column(db.String(255), nullable=True)
     users_contact_number = db.Column(db.String(20), nullable=True)
