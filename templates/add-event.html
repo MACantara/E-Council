@@ -28,12 +28,42 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     const academicYearSelect = document.getElementById('events-academic-year');
                     const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+                    const creationMethodSelect = document.getElementById('creation-method');
+                    const conceptPaperContainer = document.getElementById('concept-paper-container');
+                    const fieldsToToggle = [
+                        'events-name',
+                        'events-semester',
+                        'events-academic-year',
+                        'events-start-date-and-time',
+                        'events-end-date-and-time',
+                        'events-venue',
+                        'events-budget',
+                        'events-description'
+                    ];
 
                     academicYearSelect.addEventListener('change', function () {
                         if (academicYearSelect.value === 'Other') {
-                            otherAcademicYearContainer.style.display = 'block';
+                            otherAcademicYearContainer.style.display = 'flex';
                         } else {
                             otherAcademicYearContainer.style.display = 'none';
+                        }
+                    });
+
+                    creationMethodSelect.addEventListener('change', function () {
+                        if (creationMethodSelect.value === 'existing') {
+                            conceptPaperContainer.style.display = 'flex';
+                            fieldsToToggle.forEach(function (fieldId) {
+                                const field = document.getElementById(fieldId);
+                                field.closest('.input-pair').style.display = 'none';
+                                field.required = false;
+                            });
+                        } else {
+                            conceptPaperContainer.style.display = 'none';
+                            fieldsToToggle.forEach(function (fieldId) {
+                                const field = document.getElementById(fieldId);
+                                field.closest('.input-pair').style.display = 'flex';
+                                field.required = true;
+                            });
                         }
                     });
                 });
@@ -41,6 +71,26 @@
 
             <form method="POST" action="{{ url_for('add_event') }}">
                 <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
+
+                <div class="input-pair">
+                    <label for="creation-method">Creation Method</label>
+                    <select name="creation-method" id="creation-method" required>
+                        <option value="" disabled selected>Select Creation Method</option>
+                        <option value="scratch">Create from Scratch</option>
+                        <option value="existing">Create from Existing Concept Paper</option>
+                    </select>
+                </div>
+
+                <div class="input-pair" id="concept-paper-container" style="display: none;">
+                    <label for="concept-paper-forms-id">Concept Paper</label>
+                    <select name="concept-paper-forms-id" id="concept-paper-forms-id">
+                        <option value="" disabled selected>Select Concept Paper</option>
+                        {% for concept_paper in concept_papers %}
+                        <option value="{{ concept_paper.concept_paper_forms_id }}">{{ concept_paper.concept_paper_forms_subject }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <div class="input-pair">
                     <label for="events-name">Event Name</label>
                     <input type="text" name="events-name" id="events-name" placeholder="Event Name" required>
@@ -60,8 +110,7 @@
                     <select name="events-academic-year" id="events-academic-year" required>
                         <option value="" disabled selected>Select an Academic Year</option>
                         {% for year in academic_years %}
-                        <option value="{{ year.events_academic_year }}">A.Y. {{ year.events_academic_year }}
-                        </option>
+                        <option value="{{ year.events_academic_year }}">A.Y. {{ year.events_academic_year }}</option>
                         {% endfor %}
                         <option value="Other">Other A.Y.</option>
                     </select>
@@ -69,14 +118,12 @@
 
                 <div class="input-pair" id="other-academic-year-container" style="display: none;">
                     <label for="other-academic-year">Other Academic Year</label>
-                    <input type="text" name="other-academic-year" id="other-academic-year"
-                        placeholder="Enter Academic Year">
+                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
                 </div>
 
                 <div class="input-pair">
                     <label for="events-start-date-and-time">Start Date and Time</label>
-                    <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time"
-                        required>
+                    <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time" required>
                 </div>
 
                 <div class="input-pair">
@@ -107,8 +154,7 @@
 
                 <div class="input-pair">
                     <label for="events-description">Description</label>
-                    <textarea name="events-description" id="events-description" placeholder="Description"
-                        required></textarea>
+                    <textarea name="events-description" id="events-description" placeholder="Description" required></textarea>
                 </div>
 
                 <div class="input-pair">
@@ -126,24 +172,5 @@
         </div>
     </div>
 </div>
-
-{% endblock %}
-
-{% block script %}
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const academicYearSelect = document.getElementById('events-academic-year');
-        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-
-        academicYearSelect.addEventListener('change', function () {
-            if (academicYearSelect.value === 'Other') {
-                otherAcademicYearContainer.style.display = 'block';
-            } else {
-                otherAcademicYearContainer.style.display = 'none';
-            }
-        });
-    });
-</script>
 
 {% endblock %}
