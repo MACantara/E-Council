@@ -1158,6 +1158,9 @@ def send_invite_email(users_email, event_name, event_id):
 def get_distinct_academic_years():
     return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
+def get_concept_papers():
+    return ConceptPaperForms.query.all()
+
 # Routes
 @app.route("/")
 def index():
