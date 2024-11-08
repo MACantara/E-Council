@@ -2543,6 +2543,7 @@ def add_concept_paper():
         db.session.commit()
 
         # Parent/Guardian Consent Form data
+        concept_paper_forms_id = new_concept_paper.concept_paper_forms_id
         parent_guardian_consent_name_of_student = request.form.get('parent-guardian-consent-name-of-student')
         parent_guardian_consent_course_year_level = request.form.get('parent-guardian-consent-course-year-level')
         parent_guardian_consent_id_number = request.form.get('parent-guardian-consent-id-number')
@@ -2555,7 +2556,7 @@ def add_concept_paper():
 
         # Create a new Parent/Guardian Consent Form
         parent_guardian_consent_form = ParentGuardianConsentForms(
-            parent_guardian_consent_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+            parent_guardian_consent_forms_concept_paper_forms_id=concept_paper_forms_id,
             parent_guardian_consent_forms_personnel_in_charge_forms_id=new_personnel_in_charge_form.personnel_in_charge_forms_id,
             parent_guardian_consent_forms_name_of_student=parent_guardian_consent_name_of_student,
             parent_guardian_consent_forms_course_year_level=parent_guardian_consent_course_year_level,
