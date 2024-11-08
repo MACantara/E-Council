@@ -180,6 +180,7 @@ class Events(db.Model):
     __tablename__ = "events"
 
     events_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    events_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
     events_name = db.Column(db.String(255), nullable=True)
     events_semester = db.Column(db.String(50), nullable=False)
     events_academic_year = db.Column(db.String(50), nullable=False)
