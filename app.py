@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 from markupsafe import Markup
 from datetime import datetime, timedelta
 from sqlalchemy import Enum
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 import cloudinary
 import cloudinary.uploader
@@ -1752,6 +1752,12 @@ def password_security_settings():
 def council_overview():
     return render_template("council-overview.html")
 
+def safe_decimal_conversion(value):
+    try:
+        return Decimal(value)
+    except (ValueError, TypeError, InvalidOperation):
+        return str(value)
+
 @app.route("/events-overview", methods=["GET", "POST"])
 @login_required
 def events_overview():
@@ -1778,16 +1784,20 @@ def events_overview():
 
     for event in events:
         transactions = TransactionHistory.query.filter_by(events_id=event.events_id).all()
-        total_income = sum(t.transaction_total for t in transactions if t.transaction_type == 'Income')
-        total_expense = sum(t.transaction_total for t in transactions if t.transaction_type == 'Expense')
-        remaining_budget = total_income - total_expense + (event.events_budget or 0)
+        total_income = sum(safe_decimal_conversion(t.transaction_total) for t in transactions if t.transaction_type == 'Income')
+        total_expense = sum(safe_decimal_conversion(t.transaction_total) for t in transactions if t.transaction_type == 'Expense')
+        events_budget = safe_decimal_conversion(event.events_budget) if event.events_budget else Decimal('0.00')
+        if isinstance(events_budget, Decimal):
+            remaining_budget = total_income - total_expense + events_budget
+        else:
+            remaining_budget = "N/A"
         
         event_data.append({
             'event_id': event.events_id,
             'total_income': total_income,
             'total_expense': total_expense,
             'remaining_budget': remaining_budget,
-            'events_budget': event.events_budget or 0
+            'events_budget': events_budget
         })
 
     return render_template("events-overview.html", events=events, academic_years=academic_years, sort_by_date=sort_by_date, event_data=event_data)
