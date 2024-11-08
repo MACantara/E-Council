@@ -580,6 +580,7 @@ class LearningJournalForms(db.Model):
     learning_journal_forms_checked_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     learning_journal_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)  # New column
 
+    concept_paper_form = db.relationship('ConceptPaperForms', backref='learning_journal_forms')
     prepared_by_user = db.relationship('Users', foreign_keys=[learning_journal_forms_prepared_by])
     seen_and_read_by_user = db.relationship('Users', foreign_keys=[learning_journal_forms_seen_and_read_by])
     checked_by_signatory = db.relationship('Signatories', foreign_keys=[learning_journal_forms_checked_by])
@@ -3158,6 +3159,24 @@ def delete_documentation(documentation_id):
         return redirect(url_for('documentation_overview'))
 
     return render_template('delete-documentation.html', documentation=documentation)
+
+@app.route('/get-related-forms/<int:event_id>', methods=['GET'])
+@login_required
+def get_related_forms(event_id):
+    # Query for the concept paper form ID related to the event
+    concept_paper_form_id = db.session.query(Events.events_concept_paper_forms_id).filter(Events.events_id == event_id).scalar()
+
+    # Query for activity report forms related to the concept paper form
+    activity_reports = db.session.query(ActivityReportForms).filter(ActivityReportForms.activity_report_forms_concept_paper_forms_id == concept_paper_form_id).all()
+
+    # Query for learning journal forms related to the concept paper form
+    learning_journals = db.session.query(LearningJournalForms).filter(LearningJournalForms.learning_journal_forms_concept_paper_forms_id == concept_paper_form_id).all()
+
+    # Prepare the data to be sent as JSON
+    activity_reports_data = [{'activity_report_forms_id': report.activity_report_forms_id, 'events_name': report.concept_paper_form.concept_paper_forms_subject} for report in activity_reports]
+    learning_journals_data = [{'learning_journal_forms_id': journal.learning_journal_forms_id, 'events_name': journal.concept_paper_form.concept_paper_forms_subject} for journal in learning_journals]
+
+    return jsonify(activity_reports=activity_reports_data, learning_journals=learning_journals_data)
 
 @app.route("/financial-reports-overview")
 @login_required
