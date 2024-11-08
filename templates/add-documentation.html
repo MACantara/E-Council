@@ -179,38 +179,47 @@
                 .catch(error => console.error('Error fetching related forms:', error));
         });
 
-        activityReportSelect.addEventListener('change', function () {
-            const activityReportId = this.value;
+        const observer = new MutationObserver(function (mutationsList) {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    const addedNode = mutation.addedNodes[0];
+                    if (addedNode.tagName === 'OPTION' && addedNode.selected) {
+                        const activityReportId = addedNode.value;
 
-            fetch(`/get-activity-report-details/${activityReportId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Update Activity Strengths
-                    strengthsList.innerHTML = '';
-                    data.strengths.forEach(strength => {
-                        const li = document.createElement('li');
-                        li.textContent = strength.activity_strengths_content;
-                        strengthsList.appendChild(li);
-                    });
+                        fetch(`/get-activity-report-details/${activityReportId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Update Activity Strengths
+                                strengthsList.innerHTML = '';
+                                data.strengths.forEach(strength => {
+                                    const li = document.createElement('li');
+                                    li.textContent = strength.activity_strengths_content;
+                                    strengthsList.appendChild(li);
+                                });
 
-                    // Update Activity Weaknesses
-                    weaknessesList.innerHTML = '';
-                    data.weaknesses.forEach(weakness => {
-                        const li = document.createElement('li');
-                        li.textContent = weakness.activity_weaknesses_content;
-                        weaknessesList.appendChild(li);
-                    });
+                                // Update Activity Weaknesses
+                                weaknessesList.innerHTML = '';
+                                data.weaknesses.forEach(weakness => {
+                                    const li = document.createElement('li');
+                                    li.textContent = weakness.activity_weaknesses_content;
+                                    weaknessesList.appendChild(li);
+                                });
 
-                    // Update Activity Recommendations
-                    recommendationsList.innerHTML = '';
-                    data.recommendations.forEach(recommendation => {
-                        const li = document.createElement('li');
-                        li.textContent = recommendation.activity_recommendations_content;
-                        recommendationsList.appendChild(li);
-                    });
-                })
-                .catch(error => console.error('Error fetching activity report details:', error));
+                                // Update Activity Recommendations
+                                recommendationsList.innerHTML = '';
+                                data.recommendations.forEach(recommendation => {
+                                    const li = document.createElement('li');
+                                    li.textContent = recommendation.activity_recommendations_content;
+                                    recommendationsList.appendChild(li);
+                                });
+                            })
+                            .catch(error => console.error('Error fetching activity report details:', error));
+                    }
+                }
+            }
         });
+
+        observer.observe(activityReportSelect, { childList: true });
     });
 </script>
 
