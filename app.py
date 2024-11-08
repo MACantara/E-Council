@@ -3178,6 +3178,25 @@ def get_related_forms(event_id):
 
     return jsonify(activity_reports=activity_reports_data, learning_journals=learning_journals_data)
 
+@app.route('/get-activity-report-details/<int:activity_report_id>', methods=['GET'])
+@login_required
+def get_activity_report_details(activity_report_id):
+    # Query for activity strengths related to the activity report form
+    strengths = db.session.query(ActivityStrengths).join(ActivityReportFormsActivityStrengths).filter(ActivityReportFormsActivityStrengths.activity_report_forms_id == activity_report_id).all()
+
+    # Query for activity weaknesses related to the activity report form
+    weaknesses = db.session.query(ActivityWeaknesses).join(ActivityReportFormsActivityWeaknesses).filter(ActivityReportFormsActivityWeaknesses.activity_report_forms_id == activity_report_id).all()
+
+    # Query for activity recommendations related to the activity report form
+    recommendations = db.session.query(ActivityRecommendations).join(ActivityReportFormsActivityRecommendations).filter(ActivityReportFormsActivityRecommendations.activity_report_forms_id == activity_report_id).all()
+
+    # Prepare the data to be sent as JSON
+    strengths_data = [{'activity_strengths_content': strength.activity_strengths_content} for strength in strengths]
+    weaknesses_data = [{'activity_weaknesses_content': weakness.activity_weaknesses_content} for weakness in weaknesses]
+    recommendations_data = [{'activity_recommendations_content': recommendation.activity_recommendations_content} for recommendation in recommendations]
+
+    return jsonify(strengths=strengths_data, weaknesses=weaknesses_data, recommendations=recommendations_data)
+
 @app.route("/financial-reports-overview")
 @login_required
 def financial_reports_overview():
