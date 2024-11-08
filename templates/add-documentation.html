@@ -64,6 +64,21 @@
                 </div>
 
                 <div class="input-pair">
+                    <label for="activity-strengths">Activity Strengths</label>
+                    <ul id="activity-strengths"></ul>
+                </div>
+                
+                <div class="input-pair">
+                    <label for="activity-weaknesses">Activity Weaknesses</label>
+                    <ul id="activity-weaknesses"></ul>
+                </div>
+                
+                <div class="input-pair">
+                    <label for="activity-recommendations">Activity Recommendations</label>
+                    <ul id="activity-recommendations"></ul>
+                </div>
+
+                <div class="input-pair">
                     <label for="documentation-prepared-by">Prepared By</label>
                     <select name="documentation-prepared-by" id="documentation-prepared-by" required>
                         <option value="" disabled selected>Select Preparer</option>
@@ -131,6 +146,9 @@
         const eventsSelect = document.getElementById('documentation-events-id');
         const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
         const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
+        const strengthsList = document.getElementById('activity-strengths');
+        const weaknessesList = document.getElementById('activity-weaknesses');
+        const recommendationsList = document.getElementById('activity-recommendations');
 
         eventsSelect.addEventListener('change', function () {
             const eventId = this.value;
@@ -143,8 +161,8 @@
                     data.activity_reports.forEach(report => {
                         const option = document.createElement('option');
                         option.value = report.activity_report_forms_id;
-                        option.textContent = report.events_name + " Activity Report";
-                        option.selected = true;
+                        option.textContent = report.events_name;
+                        option.selected = true; // Make the newly created option selected
                         activityReportSelect.appendChild(option);
                     });
 
@@ -153,12 +171,45 @@
                     data.learning_journals.forEach(journal => {
                         const option = document.createElement('option');
                         option.value = journal.learning_journal_forms_id;
-                        option.textContent = journal.events_name + " Learning Journal";
-                        option.selected = true;
+                        option.textContent = journal.events_name;
+                        option.selected = true; // Make the newly created option selected
                         learningJournalSelect.appendChild(option);
                     });
                 })
                 .catch(error => console.error('Error fetching related forms:', error));
+        });
+
+        activityReportSelect.addEventListener('change', function () {
+            const activityReportId = this.value;
+
+            fetch(`/get-activity-report-details/${activityReportId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update Activity Strengths
+                    strengthsList.innerHTML = '';
+                    data.strengths.forEach(strength => {
+                        const li = document.createElement('li');
+                        li.textContent = strength.activity_strengths_content;
+                        strengthsList.appendChild(li);
+                    });
+
+                    // Update Activity Weaknesses
+                    weaknessesList.innerHTML = '';
+                    data.weaknesses.forEach(weakness => {
+                        const li = document.createElement('li');
+                        li.textContent = weakness.activity_weaknesses_content;
+                        weaknessesList.appendChild(li);
+                    });
+
+                    // Update Activity Recommendations
+                    recommendationsList.innerHTML = '';
+                    data.recommendations.forEach(recommendation => {
+                        const li = document.createElement('li');
+                        li.textContent = recommendation.activity_recommendations_content;
+                        recommendationsList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error fetching activity report details:', error));
         });
     });
 </script>
