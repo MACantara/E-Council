@@ -1168,6 +1168,12 @@ def get_distinct_academic_years():
 def get_concept_papers():
     return ConceptPaperForms.query.all()
 
+def safe_decimal_conversion(value):
+    try:
+        return Decimal(value)
+    except (ValueError, TypeError, InvalidOperation):
+        return str(value)
+
 # Routes
 @app.route("/")
 def index():
