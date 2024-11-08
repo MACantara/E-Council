@@ -2492,7 +2492,7 @@ def add_concept_paper():
         db.session.add(new_learning_journal_form)
         db.session.commit()
         
-                # Add observations to the observations table
+        # Add observations to the observations table
         for observation_content in concept_paper_observations:
             observation = Observations(observations_content=observation_content)
             db.session.add(observation)
