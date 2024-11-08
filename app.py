@@ -1931,6 +1931,7 @@ def add_event():
 
         # Create event
         event = Events(
+            events_concept_paper_forms_id=concept_paper_forms_id,
             events_name=events_name,
             events_semester=events_semester,
             events_academic_year=events_academic_year,
