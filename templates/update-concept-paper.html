@@ -448,11 +448,13 @@
                 <div class="input-pair">
                     <label for="personnel-in-charge-noted-by">Noted By</label>
                     <div id="personnel-in-charge-noted-by-container">
-                        {% for noted_by in concept_paper.personnel_in_charge_forms[0].signatories %}
+                        {% for noted_by in noted_by_signatories %}
                         <select name="personnel-in-charge-noted-by" required>
                             <option value="" disabled>Select Noted By</option>
                             {% for signatory in signatories %}
-                            <option value="{{ signatory.signatory_id }}" {% if noted_by.signatory_id == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                            <option value="{{ signatory.signatory_id }}" {% if noted_by == signatory.signatory_id %}selected{% endif %}>
+                                {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}
+                            </option>
                             {% endfor %}
                         </select>
                         {% endfor %}
