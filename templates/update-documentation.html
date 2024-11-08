@@ -82,9 +82,6 @@
                     <label for="documentation-activity-report-forms-id">Activity Report Form</label>
                     <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id">
                         <option value="" disabled>Select Activity Report Form</option>
-                        {% for report in activity_reports %}
-                        <option value="{{ report.activity_report_forms_id }}" {% if documentation.documentation_activity_report_forms_id == report.activity_report_forms_id %}selected{% endif %}>{{ report.activity_report_forms_title }}</option>
-                        {% endfor %}
                     </select>
                 </div>
 
@@ -102,9 +99,6 @@
                     <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
                     <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id">
                         <option value="" disabled>Select Learning Journal Form</option>
-                        {% for journal in learning_journals %}
-                        <option value="{{ journal.learning_journal_forms_id }}" {% if documentation.documentation_learning_journal_forms_id == journal.learning_journal_forms_id %}selected{% endif %}>{{ journal.learning_journal_forms_title }}</option>
-                        {% endfor %}
                     </select>
                 </div>
 
@@ -161,6 +155,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         const academicYearSelect = document.getElementById('documentation-academic-year');
         const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+        const eventsSelect = document.getElementById('documentation-events-id');
+        const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
+        const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
 
         academicYearSelect.addEventListener('change', function () {
             if (academicYearSelect.value === 'Other') {
@@ -168,6 +165,33 @@
             } else {
                 otherAcademicYearContainer.style.display = 'none';
             }
+        });
+
+        eventsSelect.addEventListener('change', function () {
+            const eventId = this.value;
+
+            fetch(`/get-related-forms/${eventId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update Activity Report Form options
+                    activityReportSelect.innerHTML = '<option value="" disabled selected>Select Activity Report Form</option>';
+                    data.activity_reports.forEach(report => {
+                        const option = document.createElement('option');
+                        option.value = report.activity_report_forms_id;
+                        option.textContent = report.events_name;
+                        activityReportSelect.appendChild(option);
+                    });
+
+                    // Update Learning Journal Form options
+                    learningJournalSelect.innerHTML = '<option value="" disabled selected>Select Learning Journal Form</option>';
+                    data.learning_journals.forEach(journal => {
+                        const option = document.createElement('option');
+                        option.value = journal.learning_journal_forms_id;
+                        option.textContent = journal.events_name;
+                        learningJournalSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching related forms:', error));
         });
     });
 </script>
