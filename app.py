@@ -553,13 +553,13 @@ class PersonnelInChargeForms(db.Model):
     personnel_in_charge_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personnel_in_charge_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
     personnel_in_charge_forms_name_of_personnel_in_charge = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
-    personnel_in_charge_noted_by_dean = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
-    personnel_in_charge_noted_by_sas = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    personnel_in_charge_forms_noted_by_college_dean = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    personnel_in_charge_forms_noted_by_sas = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
 
     concept_paper_form = db.relationship('ConceptPaperForms', backref='personnel_in_charge_forms')
     personnel_in_charge_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_forms_name_of_personnel_in_charge])
-    noted_by_dean_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_noted_by_dean])
-    noted_by_sas_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_noted_by_sas])
+    noted_by_dean_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_forms_noted_by_college_dean])
+    noted_by_sas_signatory = db.relationship('Signatories', foreign_keys=[personnel_in_charge_forms_noted_by_sas])
 
     def __repr__(self):
         return f'<PersonnelInChargeForms {self.personnel_in_charge_forms_id}>'
@@ -2279,8 +2279,6 @@ def add_concept_paper():
         concept_paper_approved_by = request.form.get('concept-paper-approved-by')
         concept_paper_observations = request.form.getlist('learning-journal-observations')
         concept_paper_learnings = request.form.getlist('learning-journal-learnings')
-        personnel_in_charge = request.form.get('personnel-in-charge')
-        personnel_in_charge_noted_by = request.form.getlist('personnel-in-charge-noted-by')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if concept_paper_academic_year == "Other":
@@ -2433,25 +2431,20 @@ def add_concept_paper():
 
         # Personnel In Charge Form data
         personnel_in_charge = request.form.get('personnel-in-charge')
-
+        personnel_in_charge_noted_by_college_dean = request.form.get('personnel-in-charge-noted-by-college-dean')
+        personnel_in_charge_noted_by_sas = request.form.get('personnel-in-charge-noted-by-sas')
+        
         # Create Personnel In Charge Form
         if personnel_in_charge:
             new_personnel_in_charge = PersonnelInChargeForms(
                 personnel_in_charge_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                personnel_in_charge_forms_name_of_personnel_in_charge=personnel_in_charge
+                personnel_in_charge_forms_name_of_personnel_in_charge=personnel_in_charge,
+                personnel_in_charge_forms_noted_by_college_dean=personnel_in_charge_noted_by_college_dean,
+                personnel_in_charge_forms_noted_by_sas=personnel_in_charge_noted_by_sas
             )
             db.session.add(new_personnel_in_charge)
             db.session.commit()
-
-            # Add multiple Noted By entries
-            for noted_by in personnel_in_charge_noted_by:
-                new_noted_by_entry = SignatoriesPersonnelInChargeForms(
-                    signatory_id=noted_by,
-                    personnel_in_charge_forms_id=new_personnel_in_charge.personnel_in_charge_forms_id
-                )
-                db.session.add(new_noted_by_entry)
-            db.session.commit()
-
+        
             # Create Activity Report Form with personnel in charge reference
             if activity_report_date_submission:
                 new_activity_report = ActivityReportForms(
@@ -2462,6 +2455,8 @@ def add_concept_paper():
                     activity_report_forms_noted_by=activity_report_noted_by,
                     activity_report_date_submission=datetime.strptime(activity_report_date_submission, '%Y-%m-%d')
                 )
+                db.session.add(new_activity_report)
+                db.session.commit()
 
         # Learning Journal Form data
         learning_journal_name_of_student = request.form.get('learning-journal-name-of-student')
@@ -2811,33 +2806,30 @@ def update_concept_paper(paper_id):
 
         # Personnel In Charge Form data
         personnel_in_charge = request.form.get('personnel-in-charge')
-
+        personnel_in_charge_noted_by_college_dean = request.form.get('personnel-in-charge-noted-by-college-dean')
+        personnel_in_charge_noted_by_sas = request.form.get('personnel-in-charge-noted-by-sas')
+        
         # Update or create Personnel In Charge Form
         if personnel_in_charge:
+            personnel_in_charge_form = PersonnelInChargeForms.query.filter_by(
+                personnel_in_charge_forms_concept_paper_forms_id=paper_id
+            ).first()
+        
             if not personnel_in_charge_form:
                 personnel_in_charge_form = PersonnelInChargeForms(
                     personnel_in_charge_forms_concept_paper_forms_id=paper_id
                 )
                 db.session.add(personnel_in_charge_form)
-
+        
             personnel_in_charge_form.personnel_in_charge_forms_name_of_personnel_in_charge = personnel_in_charge
+            personnel_in_charge_form.personnel_in_charge_noted_by_college_dean = personnel_in_charge_noted_by_college_dean
+            personnel_in_charge_form.personnel_in_charge_noted_by_sas = personnel_in_charge_noted_by_sas
             db.session.commit()
-
+        
             # Update Activity Report Form with personnel in charge reference
             if activity_report:
                 activity_report.activity_report_forms_personnel_in_charge_forms_id = personnel_in_charge_form.personnel_in_charge_forms_id
                 db.session.commit()
-
-        # Update multiple Noted By entries
-        if personnel_in_charge_form:
-            SignatoriesPersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id).delete()
-            for noted_by in personnel_in_charge_noted_by:
-                new_noted_by_entry = SignatoriesPersonnelInChargeForms(
-                    signatory_id=noted_by,
-                    personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id
-                )
-                db.session.add(new_noted_by_entry)
-            db.session.commit()
 
         # Learning Journal Form data
         learning_journal_name_of_student = request.form.get('learning-journal-name-of-student')
