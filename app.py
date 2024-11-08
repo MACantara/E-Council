@@ -2599,6 +2599,7 @@ def update_concept_paper(paper_id):
     concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
     learning_journal = LearningJournalForms.query.filter_by(learning_journal_forms_concept_paper_forms_id=paper_id).first()
     parent_guardian_consent_form = ParentGuardianConsentForms.query.filter_by(parent_guardian_consent_forms_concept_paper_forms_id=paper_id).first()
+    personnel_in_charge_form = PersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_concept_paper_forms_id=paper_id).first()
 
     if request.method == 'POST':
         concept_paper_date = request.form.get('concept-paper-date')
@@ -2828,10 +2829,6 @@ def update_concept_paper(paper_id):
         personnel_in_charge = request.form.get('personnel-in-charge')
 
         # Update or create Personnel In Charge Form
-        personnel_in_charge_form = PersonnelInChargeForms.query.filter_by(
-            personnel_in_charge_forms_concept_paper_forms_id=paper_id
-        ).first()
-
         if personnel_in_charge:
             if not personnel_in_charge_form:
                 personnel_in_charge_form = PersonnelInChargeForms(
@@ -2846,6 +2843,17 @@ def update_concept_paper(paper_id):
             if activity_report:
                 activity_report.activity_report_forms_personnel_in_charge_forms_id = personnel_in_charge_form.personnel_in_charge_forms_id
                 db.session.commit()
+
+        # Update multiple Noted By entries
+        if personnel_in_charge_form:
+            SignatoriesPersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id).delete()
+            for noted_by in personnel_in_charge_noted_by:
+                new_noted_by_entry = SignatoriesPersonnelInChargeForms(
+                    signatory_id=noted_by,
+                    personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id
+                )
+                db.session.add(new_noted_by_entry)
+            db.session.commit()
 
         # Learning Journal Form data
         learning_journal_name_of_student = request.form.get('learning-journal-name-of-student')
@@ -2870,28 +2878,6 @@ def update_concept_paper(paper_id):
         learning_journal.learning_journal_forms_seen_and_read_by = learning_journal_seen_and_read_by
         learning_journal.learning_journal_forms_checked_by = learning_journal_checked_by
 
-        db.session.commit()
-
-        # Update Personnel In Charge Form
-        personnel_in_charge_form = PersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_concept_paper_forms_id=paper_id).first()
-        if personnel_in_charge_form:
-            personnel_in_charge_form.personnel_in_charge_forms_name_of_personnel_in_charge = personnel_in_charge
-        else:
-            new_personnel_in_charge_form = PersonnelInChargeForms(
-                personnel_in_charge_forms_concept_paper_forms_id=paper_id,
-                personnel_in_charge_forms_name_of_personnel_in_charge=personnel_in_charge,
-            )
-            db.session.add(new_personnel_in_charge_form)
-        db.session.commit()
-
-        # Update multiple Noted By entries
-        SignatoriesPersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id).delete()
-        for noted_by in personnel_in_charge_noted_by:
-            new_noted_by_entry = SignatoriesPersonnelInChargeForms(
-                signatory_id=noted_by,
-                personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id
-            )
-            db.session.add(new_noted_by_entry)
         db.session.commit()
 
         # Parent/Guardian Consent Form data
@@ -2955,8 +2941,16 @@ def update_concept_paper(paper_id):
         outcome.learning_outcome.learning_outcomes_content
         for outcome in ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).all()
     ]
+    
+    # Fetch noted by signatories for the personnel in charge form
+    noted_by_signatories = []
+    if personnel_in_charge_form:
+        noted_by_signatories = [
+            entry.signatory_id
+            for entry in SignatoriesPersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id).all()
+        ]
 
-    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form)
+    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form, noted_by_signatories=noted_by_signatories)
 
 @app.route('/delete-concept-paper/<int:paper_id>', methods=['GET', 'POST'])
 @login_required
