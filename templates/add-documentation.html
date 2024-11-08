@@ -52,31 +52,6 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="documentation-academic-year">Academic Year</label>
-                    <select name="documentation-academic-year" id="documentation-academic-year" required>
-                        <option value="" disabled selected>Select Academic Year</option>
-                        {% for year in academic_years %}
-                        <option value="{{ year }}">{{ year }}</option>
-                        {% endfor %}
-                        <option value="Other">Other A.Y.</option>
-                    </select>
-                </div>
-
-                <div class="input-pair" id="other-academic-year-container" style="display: none;">
-                    <label for="other-academic-year">Other Academic Year</label>
-                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
-                </div>
-
-                <div class="input-pair">
-                    <label for="documentation-semester">Semester</label>
-                    <select name="documentation-semester" id="documentation-semester" required>
-                        <option value="" disabled selected>Select Semester</option>
-                        <option value="1st Semester">1st Semester</option>
-                        <option value="2nd Semester">2nd Semester</option>
-                    </select>
-                </div>
-
-                <div class="input-pair">
                     <label for="documentation-status">Status</label>
                     <select name="documentation-status" id="documentation-status" required>
                         <option value="" disabled selected>Select Status</option>
