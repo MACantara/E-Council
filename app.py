@@ -1768,12 +1768,6 @@ def password_security_settings():
 def council_overview():
     return render_template("council-overview.html")
 
-def safe_decimal_conversion(value):
-    try:
-        return Decimal(value)
-    except (ValueError, TypeError, InvalidOperation):
-        return str(value)
-
 @app.route("/events-overview", methods=["GET", "POST"])
 @login_required
 def events_overview():
