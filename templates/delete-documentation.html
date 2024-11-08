@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Documentation{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to Documentation Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="container">
+            <h2>Delete Documentation</h2>
+            <p>Are you sure you want to delete the documentation titled "{{ documentation.documentation_type }}"?</p>
+
+            <form method="POST" action="{{ url_for('delete_documentation', documentation_id=documentation.documentation_id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-button-pair-positioned-right">
+                    <button class="secondary-button fit-content-button" type="submit">Delete Documentation</button>
+                    <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button" type="button">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
