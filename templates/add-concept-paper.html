@@ -357,7 +357,6 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button class="primary-button" type="button" onclick="addNotedBy()">Add Another Noted By</button>
                 </div>
 
                 <h3>Parent/Guardian Consent Form</h3>
@@ -527,20 +526,6 @@
         input.placeholder = 'Enter Learning';
         input.required = true;
         container.appendChild(input);
-    }
-
-    function addNotedBy() {
-        const container = document.getElementById('personnel-in-charge-noted-by-container');
-        const select = document.createElement('select');
-        select.name = 'personnel-in-charge-noted-by';
-        select.required = true;
-        select.innerHTML = `
-            <option value="" disabled selected>Select Noted By</option>
-            {% for signatory in signatories %}
-            <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
-            {% endfor %}
-        `;
-        container.appendChild(select);
     }
 
     // Set the current date and time as the default value for the datetime-local input
