@@ -2995,9 +2995,6 @@ def documentation_overview():
 def add_documentation():
     if request.method == 'POST':
         documentation_events_id = request.form.get('documentation-events-id')
-        documentation_academic_year = request.form.get('documentation-academic-year')
-        other_academic_year = request.form.get('other-academic-year')
-        documentation_semester = request.form.get('documentation-semester')
         documentation_status = request.form.get('documentation-status')
         documentation_type = request.form.get('documentation-type')
         documentation_activity_report_forms_id = request.form.get('documentation-activity-report-forms-id')
@@ -3012,6 +3009,12 @@ def add_documentation():
         # Use the value from the additional input field if "Other A.Y." is selected
         if documentation_academic_year == "Other":
             documentation_academic_year = other_academic_year
+
+        # Retrieve event details using documentation_events_id
+        event = Events.query.get(documentation_events_id)
+        if event:
+            documentation_academic_year = event.events_academic_year
+            documentation_semester = event.events_semester
 
         # Convert date fields to datetime objects
         documentation_date_of_submission = datetime.strptime(documentation_date_of_submission, '%Y-%m-%d')
