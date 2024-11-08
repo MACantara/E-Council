@@ -2917,16 +2917,8 @@ def update_concept_paper(paper_id):
         outcome.learning_outcome.learning_outcomes_content
         for outcome in ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).all()
     ]
-    
-    # Fetch noted by signatories for the personnel in charge form
-    noted_by_signatories = []
-    if personnel_in_charge_form:
-        noted_by_signatories = [
-            entry.signatory_id
-            for entry in SignatoriesPersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_id=personnel_in_charge_form.personnel_in_charge_forms_id).all()
-        ]
 
-    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form, noted_by_signatories=noted_by_signatories)
+    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form)
 
 @app.route('/delete-concept-paper/<int:paper_id>', methods=['GET', 'POST'])
 @login_required
