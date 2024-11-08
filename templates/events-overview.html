@@ -154,7 +154,13 @@
                     </div>
                     <div class="grid-item-details-pair">
                         <p>Initial Budget:</p>
-                        <p>₱ {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}</p>
+                        <p>₱ 
+                            {% if event.events_budget is string %}
+                                {{ event.events_budget }}
+                            {% else %}
+                                {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
 
