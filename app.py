@@ -2331,14 +2331,6 @@ def add_concept_paper():
         db.session.add(new_concept_paper)
         db.session.commit()
 
-        # Create a new learning journal form
-        new_learning_journal_form = LearningJournalForms(
-            learning_journal_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-            # ...other fields...
-        )
-        db.session.add(new_learning_journal_form)
-        db.session.commit()
-
         # Add objectives of the activity to the objectives_of_the_activity table
         for objective_content in concept_paper_objectives:
             new_objective = ObjectivesOfTheActivity(
@@ -2369,30 +2361,6 @@ def add_concept_paper():
                 learning_outcomes_id=new_outcome.learning_outcomes_id
             )
             db.session.add(concept_paper_outcome_link)
-            db.session.commit()
-
-        # Add observations to the observations table
-        for observation_content in concept_paper_observations:
-            observation = Observations(observations_content=observation_content)
-            db.session.add(observation)
-            db.session.commit()
-            learning_journal_observation = LearningJournalFormsObservations(
-                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
-                observations_id=observation.observations_id
-            )
-            db.session.add(learning_journal_observation)
-            db.session.commit()
-
-        # Add learnings to the learnings table
-        for learning_content in concept_paper_learnings:
-            learning = Learnings(learnings_content=learning_content)
-            db.session.add(learning)
-            db.session.commit()
-            learning_journal_learning = LearningJournalFormsLearnings(
-                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
-                learnings_id=learning.learnings_id
-            )
-            db.session.add(learning_journal_learning)
             db.session.commit()
 
         # Excuse Letter Form data
@@ -2523,6 +2491,30 @@ def add_concept_paper():
         # Add the new learning journal form to the database
         db.session.add(new_learning_journal_form)
         db.session.commit()
+        
+                # Add observations to the observations table
+        for observation_content in concept_paper_observations:
+            observation = Observations(observations_content=observation_content)
+            db.session.add(observation)
+            db.session.commit()
+            learning_journal_observation = LearningJournalFormsObservations(
+                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
+                observations_id=observation.observations_id
+            )
+            db.session.add(learning_journal_observation)
+            db.session.commit()
+
+        # Add learnings to the learnings table
+        for learning_content in concept_paper_learnings:
+            learning = Learnings(learnings_content=learning_content)
+            db.session.add(learning)
+            db.session.commit()
+            learning_journal_learning = LearningJournalFormsLearnings(
+                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
+                learnings_id=learning.learnings_id
+            )
+            db.session.add(learning_journal_learning)
+            db.session.commit()
 
         # Add Personnel In Charge Form
         new_personnel_in_charge_form = PersonnelInChargeForms(
