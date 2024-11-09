@@ -251,31 +251,6 @@
                 </div>
 
                 <div class="input-pair">
-                    <label>Strengths</label>
-                    <div id="activity-strengths">
-                        <input type="text" name="activity-strengths" placeholder="Enter Strength">
-                    </div>
-                    <button class="primary-button" type="button" onclick="addStrength()">Add Strength</button>
-                </div>
-
-                <div class="input-pair">
-                    <label>Weaknesses</label>
-                    <div id="activity-weaknesses">
-                        <input type="text" name="activity-weaknesses" placeholder="Enter Weakness">
-                    </div>
-                    <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
-                </div>
-
-                <div class="input-pair">
-                    <label>Recommendations</label>
-                    <div id="activity-recommendations">
-                        <input type="text" name="activity-recommendations" placeholder="Enter Recommendation">
-                    </div>
-                    <button class="primary-button" type="button" onclick="addRecommendation()">Add
-                        Recommendation</button>
-                </div>
-
-                <div class="input-pair">
                     <label for="activity-report-prepared-by">Prepared By</label>
                     <select name="activity-report-prepared-by" id="activity-report-prepared-by">
                         <option value="" disabled selected>Select Preparer</option>
@@ -302,70 +277,8 @@
                 <h3>Learning Journal Form</h3>
 
                 <div class="input-pair">
-                    <label for="learning-journal-name-of-student">Name of Student</label>
-                    <input type="text" name="learning-journal-name-of-student" id="learning-journal-name-of-student"
-                        placeholder="Name of Student">
-                </div>
-
-                <div class="input-pair">
-                    <label for="learning-journal-course-year-level">Course/Year Level</label>
-                    <input type="text" name="learning-journal-course-year-level" id="learning-journal-course-year-level"
-                        placeholder="Course/Year Level">
-                </div>
-
-                <div class="input-pair">
-                    <label for="learning-journal-id-number">ID Number</label>
-                    <input type="text" name="learning-journal-id-number" id="learning-journal-id-number"
-                        placeholder="ID Number">
-                </div>
-
-                <div class="input-pair">
                     <label for="learning-journal-date">Date</label>
                     <input type="date" name="learning-journal-date" id="learning-journal-date">
-                </div>
-
-                <div class="input-pair">
-                    <label for="learning-journal-observations">Observations</label>
-                    <div id="learning-journal-observations">
-                        <input type="text" name="learning-journal-observations" placeholder="Enter Observation">
-                    </div>
-                    <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
-                </div>
-
-                <div class="input-pair">
-                    <label for="learning-journal-learnings">Learnings</label>
-                    <div id="learning-journal-learnings">
-                        <input type="text" name="learning-journal-learnings" placeholder="Enter Learning">
-                    </div>
-                    <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
-                </div>
-
-                <div class="input-pair">
-                    <label for="learning-journal-overall-reflection">Overall Reflection</label>
-                    <textarea name="learning-journal-overall-reflection" id="learning-journal-overall-reflection"
-                        placeholder="Overall Reflection"></textarea>
-                </div>
-
-                <div class="input-pair">
-                    <label for="learning-journal-prepared-by">Prepared By</label>
-                    <select name="learning-journal-prepared-by" id="learning-journal-prepared-by">
-                        <option value="" disabled selected>Select Preparer</option>
-                        {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="learning-journal-seen-and-read-by">Seen and Read By</label>
-                    <select name="learning-journal-seen-and-read-by" id="learning-journal-seen-and-read-by">
-                        <option value="" disabled selected>Select Reader</option>
-                        {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
                 </div>
 
                 <div class="input-pair">
@@ -420,24 +333,6 @@
 
             <div class="form-container">
                 <h3>Parent/Guardian Consent Form</h3>
-            
-                <div class="input-pair">
-                    <label for="parent-guardian-consent-name-of-student">Name of Student</label>
-                    <input type="text" name="parent-guardian-consent-name-of-student"
-                        id="parent-guardian-consent-name-of-student" placeholder="Name of Student">
-                </div>
-    
-                <div class="input-pair">
-                    <label for="parent-guardian-consent-course-year-level">Course/Year Level</label>
-                    <input type="text" name="parent-guardian-consent-course-year-level"
-                        id="parent-guardian-consent-course-year-level" placeholder="Course/Year Level">
-                </div>
-    
-                <div class="input-pair">
-                    <label for="parent-guardian-consent-id-number">ID Number</label>
-                    <input type="text" name="parent-guardian-consent-id-number" id="parent-guardian-consent-id-number"
-                        placeholder="ID Number">
-                </div>
     
                 <div class="input-pair">
                     <label for="parent-guardian-consent-department-office-unit">Department/Office/Unit</label>
@@ -547,56 +442,6 @@
         input.type = 'text';
         input.name = 'concept-paper-learning-outcomes';
         input.placeholder = 'Enter Learning Outcome';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addStrength() {
-        const container = document.getElementById('activity-strengths');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'activity-strengths';
-        input.placeholder = 'Enter Strength';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addWeakness() {
-        const container = document.getElementById('activity-weaknesses');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'activity-weaknesses';
-        input.placeholder = 'Enter Weakness';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addRecommendation() {
-        const container = document.getElementById('activity-recommendations');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'activity-recommendations';
-        input.placeholder = 'Enter Recommendation';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addObservation() {
-        const container = document.getElementById('learning-journal-observations');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'learning-journal-observations';
-        input.placeholder = 'Enter Observation';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addLearning() {
-        const container = document.getElementById('learning-journal-learnings');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'learning-journal-learnings';
-        input.placeholder = 'Enter Learning';
         input.required = true;
         container.appendChild(input);
     }
