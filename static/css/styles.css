@@ -45,7 +45,7 @@
 
     /* Layout Max Widths */
     --max-width-container: 600px;
-    --max-width-hero: 1250px;
+    --max-width-hero: 1400px;
 
     /* Chart Colors */
     --remaining-budget-color: green;
@@ -230,6 +230,7 @@ nav ul li a {
 
 .hero-column img {
     max-width: 100%;
+    border-radius: var(--border-radius);
 }
 
 /* Button Styles */
