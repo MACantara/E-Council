@@ -23,22 +23,9 @@
         {% endif %}
         {% endwith %}
 
-        <div class="container">
-            <h2>Add Concept Paper</h2>
-
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_concept_paper') }}">
-                <h3>Concept Paper Form</h3>
-
-                <div class="input-pair">
-                    <label for="concept-paper-date">Date</label>
-                    <input type="datetime-local" name="concept-paper-date" id="concept-paper-date" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-subject">Subject</label>
-                    <input type="text" name="concept-paper-subject" id="concept-paper-subject" placeholder="Subject"
-                        required>
-                </div>
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_concept_paper') }}">
+            <div class="form-container">
+                <h2>Add Concept Paper</h2>
 
                 <div class="input-pair">
                     <label for="concept-paper-academic-year">Academic Year</label>
@@ -68,7 +55,7 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="concept-paper-status">Status</label> <!-- New field -->
+                    <label for="concept-paper-status">Status</label>
                     <select name="concept-paper-status" id="concept-paper-status" required>
                         <option value="" disabled selected>Select Status</option>
                         <option value="Upcoming">Upcoming</option>
@@ -76,6 +63,26 @@
                         <option value="Done">Done</option>
                         <option value="Cancelled">Cancelled</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Concept Paper Form</h3>
+
+                <div class="input-pair">
+                    <label for="concept-paper-subject">Subject</label>
+                    <input type="text" name="concept-paper-subject" id="concept-paper-subject" placeholder="Subject"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-date">Date</label>
+                    <input type="datetime-local" name="concept-paper-date" id="concept-paper-date" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-body">Body</label>
+                    <textarea name="concept-paper-body" id="concept-paper-body" placeholder="Body" required></textarea>
                 </div>
 
                 <div class="input-pair">
@@ -106,65 +113,6 @@
                     <label for="concept-paper-budget">Budget</label>
                     <input type="text" name="concept-paper-budget" id="concept-paper-budget" placeholder="Budget"
                         required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-descriptions">Descriptions</label>
-                    <textarea name="concept-paper-descriptions" id="concept-paper-descriptions"
-                        placeholder="Descriptions" required></textarea>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-expected-number-of-participants">Expected Number of Participants</label>
-                    <textarea name="concept-paper-expected-number-of-participants"
-                        id="concept-paper-expected-number-of-participants" placeholder="Expected Number of Participants"
-                        required></textarea>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-body">Body</label>
-                    <textarea name="concept-paper-body" id="concept-paper-body" placeholder="Body" required></textarea>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-objectives">Objectives of the Activity</label>
-                    <div id="concept-paper-objectives">
-                        <input type="text" name="concept-paper-objectives" placeholder="Enter Objective" required>
-                    </div>
-                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
-                    <div id="concept-paper-learning-outcomes">
-                        <input type="text" name="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome"
-                            required>
-                    </div>
-                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning
-                        Outcome</button>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-prepared-by">Prepared By</label>
-                    <select name="concept-paper-prepared-by" id="concept-paper-prepared-by" required>
-                        <option value="" disabled selected>Select Preparer</option>
-                        {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="concept-paper-signed-and-reviewed-by">Signed and Reviewed By</label>
-                    <select name="concept-paper-signed-and-reviewed-by" id="concept-paper-signed-and-reviewed-by"
-                        required>
-                        <option value="" disabled selected>Select Reviewer</option>
-                        {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
                 </div>
 
                 <div class="input-pair">
@@ -201,6 +149,62 @@
                     </select>
                 </div>
 
+                <div class="input-pair">
+                    <label for="concept-paper-descriptions">Descriptions</label>
+                    <textarea name="concept-paper-descriptions" id="concept-paper-descriptions"
+                        placeholder="Descriptions" required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-objectives">Objectives of the Activity</label>
+                    <div id="concept-paper-objectives">
+                        <input type="text" name="concept-paper-objectives" placeholder="Enter Objective" required>
+                    </div>
+                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
+                    <div id="concept-paper-learning-outcomes">
+                        <input type="text" name="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome"
+                            required>
+                    </div>
+                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning
+                        Outcome</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-expected-number-of-participants">Expected Number of Participants</label>
+                    <textarea name="concept-paper-expected-number-of-participants"
+                        id="concept-paper-expected-number-of-participants" placeholder="Expected Number of Participants"
+                        required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-prepared-by">Prepared By</label>
+                    <select name="concept-paper-prepared-by" id="concept-paper-prepared-by" required>
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-signed-and-reviewed-by">Signed and Reviewed By</label>
+                    <select name="concept-paper-signed-and-reviewed-by" id="concept-paper-signed-and-reviewed-by"
+                        required>
+                        <option value="" disabled selected>Select Reviewer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-container">
                 <h3>Excuse Letter Form</h3>
 
                 <div class="input-pair">
@@ -230,7 +234,9 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
+            <div class="form-container">
                 <h3>Activity Report Form</h3>
 
                 <div class="input-pair">
@@ -242,28 +248,6 @@
                     <label for="activity-report-contact-numbers">Contact Numbers</label>
                     <input type="text" name="activity-report-contact-numbers" id="activity-report-contact-numbers"
                         placeholder="Contact Numbers">
-                </div>
-
-                <div class="input-pair">
-                    <label for="activity-report-prepared-by">Prepared By</label>
-                    <select name="activity-report-prepared-by" id="activity-report-prepared-by">
-                        <option value="" disabled selected>Select Preparer</option>
-                        {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="activity-report-noted-by">Noted By</label>
-                    <select name="activity-report-noted-by" id="activity-report-noted-by">
-                        <option value="" disabled selected>Select Noter</option>
-                        {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
-                            signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
-                        {% endfor %}
-                    </select>
                 </div>
 
                 <div class="input-pair">
@@ -291,6 +275,30 @@
                         Recommendation</button>
                 </div>
 
+                <div class="input-pair">
+                    <label for="activity-report-prepared-by">Prepared By</label>
+                    <select name="activity-report-prepared-by" id="activity-report-prepared-by">
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-report-noted-by">Noted By</label>
+                    <select name="activity-report-noted-by" id="activity-report-noted-by">
+                        <option value="" disabled selected>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
+                            signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-container">
                 <h3>Learning Journal Form</h3>
 
                 <div class="input-pair">
@@ -370,7 +378,9 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
+            <div class="form-container">
                 <h3>Personnel In Charge Form</h3>
 
                 <div class="input-pair">
@@ -406,32 +416,35 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
+            <div class="form-container">
                 <h3>Parent/Guardian Consent Form</h3>
+            
                 <div class="input-pair">
                     <label for="parent-guardian-consent-name-of-student">Name of Student</label>
                     <input type="text" name="parent-guardian-consent-name-of-student"
                         id="parent-guardian-consent-name-of-student" placeholder="Name of Student">
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-course-year-level">Course/Year Level</label>
                     <input type="text" name="parent-guardian-consent-course-year-level"
                         id="parent-guardian-consent-course-year-level" placeholder="Course/Year Level">
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-id-number">ID Number</label>
                     <input type="text" name="parent-guardian-consent-id-number" id="parent-guardian-consent-id-number"
                         placeholder="ID Number">
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-department-office-unit">Department/Office/Unit</label>
                     <input type="text" name="parent-guardian-consent-department-office-unit"
                         id="parent-guardian-consent-department-office-unit" placeholder="Department/Office/Unit" required>
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-dean-immediate-supervisor">Dean/Immediate Supervisor</label>
                     <select name="parent-guardian-consent-dean-immediate-supervisor"
@@ -443,7 +456,7 @@
                         {% endfor %}
                     </select>
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-checked-by">Checked By</label>
                     <select name="parent-guardian-consent-checked-by" id="parent-guardian-consent-checked-by" required>
@@ -454,13 +467,13 @@
                         {% endfor %}
                     </select>
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-content">Content</label>
                     <textarea name="parent-guardian-consent-content" id="parent-guardian-consent-content"
                         placeholder="Content" required></textarea>
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-prepared-by">Prepared By</label>
                     <select name="parent-guardian-consent-prepared-by" id="parent-guardian-consent-prepared-by" required>
@@ -471,7 +484,7 @@
                         {% endfor %}
                     </select>
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="parent-guardian-consent-noted-by">Noted By</label>
                     <select name="parent-guardian-consent-noted-by" id="parent-guardian-consent-noted-by" required>
@@ -482,17 +495,18 @@
                         {% endfor %}
                     </select>
                 </div>
-
+    
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
+    
                 <div class="horizontal-input-pair">
                     <a href="{{ url_for('concept_papers_overview') }}"
                         class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Add Concept Paper</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
+</div>
 </div>
 
 {% endblock %}
