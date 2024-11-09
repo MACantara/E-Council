@@ -56,6 +56,10 @@
                         <option value="Cancelled">Cancelled</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Activity Report Form</h3>
 
                 <div class="input-pair">
                     <label for="documentation-activity-report-forms-id">Activity Report Form</label>
@@ -68,12 +72,12 @@
                     <label for="activity-strengths">Activity Strengths</label>
                     <div id="activity-strengths"></div>
                 </div>
-                
+
                 <div class="input-pair">
                     <label for="activity-weaknesses">Activity Weaknesses</label>
                     <div id="activity-weaknesses"></div>
                 </div>
-                
+
                 <div class="input-pair">
                     <label for="activity-recommendations">Activity Recommendations</label>
                     <div id="activity-recommendations"></div>
@@ -84,7 +88,8 @@
                     <select name="documentation-prepared-by" id="documentation-prepared-by" required>
                         <option value="" disabled selected>Select Preparer</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -94,10 +99,15 @@
                     <select name="documentation-noted-by" id="documentation-noted-by" required>
                         <option value="" disabled selected>Select Noter</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
+                            signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Learning Journal Form</h3>
 
                 <div class="input-pair">
                     <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
@@ -105,40 +115,48 @@
                         <option value="" disabled selected>Select Learning Journal Form</option>
                     </select>
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="documentation-checked-by">Checked By</label>
                     <select name="documentation-checked-by" id="documentation-checked-by" required>
                         <option value="" disabled selected>Select Checker</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
+                            signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
 
                 <div class="input-pair">
                     <label for="documentation-date-of-submission">Date of Submission</label>
-                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission" required>
+                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission"
+                        required>
                 </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Tally</h3>
 
                 <div class="input-pair">
                     <label for="documentation-rating">Rating</label>
-                    <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating" min="1" max="5">
+                    <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating" min="1"
+                        max="5">
                 </div>
-
+    
                 <div class="input-pair">
                     <label for="documentation-comments-suggestions">Comments/Suggestions</label>
-                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions" placeholder="Comments/Suggestions"></textarea>
+                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
+                        placeholder="Comments/Suggestions"></textarea>
                 </div>
-
+    
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
+    
                 <div class="horizontal-input-pair">
                     <a href="{{ url_for('documentation_overview') }}" class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Add Documentation</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
