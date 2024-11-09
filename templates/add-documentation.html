@@ -9,7 +9,8 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to Documentation Overview</a>
+        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to
+            Documentation Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -22,10 +23,10 @@
         {% endif %}
         {% endwith %}
 
-        <div class="container">
-            <h2>Add Documentation</h2>
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
+            <div class="form-container">
+                <h2>Add Documentation</h2>
 
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
                 <div class="input-pair">
                     <label for="documentation-type">Type</label>
                     <select name="documentation-type" id="documentation-type" required>
