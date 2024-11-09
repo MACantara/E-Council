@@ -2317,8 +2317,6 @@ def add_concept_paper():
         concept_paper_endorsed_by = request.form.get('concept-paper-endorsed-by')
         concept_paper_recommending_approval_by = request.form.get('concept-paper-recommending-approval-by')
         concept_paper_approved_by = request.form.get('concept-paper-approved-by')
-        concept_paper_observations = request.form.getlist('learning-journal-observations')
-        concept_paper_learnings = request.form.getlist('learning-journal-learnings')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if concept_paper_academic_year == "Other":
@@ -2415,9 +2413,6 @@ def add_concept_paper():
         activity_report_contact_numbers = request.form.get('activity-report-contact-numbers')
         activity_report_prepared_by = request.form.get('activity-report-prepared-by')
         activity_report_noted_by = request.form.get('activity-report-noted-by')
-        activity_strengths = request.form.getlist('activity-strengths')
-        activity_weaknesses = request.form.getlist('activity-weaknesses')
-        activity_recommendations = request.form.getlist('activity-recommendations')
 
         # Add Activity Report Form
         if activity_report_date_submission:
@@ -2429,44 +2424,6 @@ def add_concept_paper():
                 activity_report_date_submission=datetime.strptime(activity_report_date_submission, '%Y-%m-%d')
             )
             db.session.add(new_activity_report)
-            db.session.commit()
-
-            # Add strengths
-            for strength in activity_strengths:
-                new_strength = ActivityStrengths(activity_strengths_content=strength)
-                db.session.add(new_strength)
-                db.session.commit()
-                
-                strength_link = ActivityReportFormsActivityStrengths(
-                    activity_report_forms_id=new_activity_report.activity_report_forms_id,
-                    activity_strengths_id=new_strength.activity_strengths_id
-                )
-                db.session.add(strength_link)
-
-            # Add weaknesses
-            for weakness in activity_weaknesses:
-                new_weakness = ActivityWeaknesses(activity_weaknesses_content=weakness)
-                db.session.add(new_weakness)
-                db.session.commit()
-                
-                weakness_link = ActivityReportFormsActivityWeaknesses(
-                    activity_report_forms_id=new_activity_report.activity_report_forms_id,
-                    activity_weaknesses_id=new_weakness.activity_weaknesses_id
-                )
-                db.session.add(weakness_link)
-
-            # Add recommendations
-            for recommendation in activity_recommendations:
-                new_recommendation = ActivityRecommendations(activity_recommendations_content=recommendation)
-                db.session.add(new_recommendation)
-                db.session.commit()
-                
-                recommendation_link = ActivityReportFormsActivityRecommendations(
-                    activity_report_forms_id=new_activity_report.activity_report_forms_id,
-                    activity_recommendations_id=new_recommendation.activity_recommendations_id
-                )
-                db.session.add(recommendation_link)
-
             db.session.commit()
 
         # Personnel In Charge Form data
@@ -2499,13 +2456,7 @@ def add_concept_paper():
                 db.session.commit()
 
         # Learning Journal Form data
-        learning_journal_name_of_student = request.form.get('learning-journal-name-of-student')
-        learning_journal_course_year_level = request.form.get('learning-journal-course-year-level')
-        learning_journal_id_number = request.form.get('learning-journal-id-number')
         learning_journal_date = request.form.get('learning-journal-date')
-        learning_journal_overall_reflection = request.form.get('learning-journal-overall-reflection')
-        learning_journal_prepared_by = request.form.get('learning-journal-prepared-by')
-        learning_journal_seen_and_read_by = request.form.get('learning-journal-seen-and-read-by')
         learning_journal_checked_by = request.form.get('learning-journal-checked-by')
 
         # Convert date fields to datetime objects
@@ -2514,49 +2465,16 @@ def add_concept_paper():
         # Create a new learning journal form
         new_learning_journal_form = LearningJournalForms(
             learning_journal_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-            learning_journal_forms_name_of_student=learning_journal_name_of_student,
-            learning_journal_forms_course_year_level=learning_journal_course_year_level,
-            learning_journal_forms_id_number=learning_journal_id_number,
             learning_journal_forms_date=learning_journal_date,
-            learning_journal_forms_overall_reflection=learning_journal_overall_reflection,
-            learning_journal_forms_prepared_by=learning_journal_prepared_by,
-            learning_journal_forms_seen_and_read_by=learning_journal_seen_and_read_by,
             learning_journal_forms_checked_by=learning_journal_checked_by
         )
 
         # Add the new learning journal form to the database
         db.session.add(new_learning_journal_form)
         db.session.commit()
-        
-        # Add observations to the observations table
-        for observation_content in concept_paper_observations:
-            observation = Observations(observations_content=observation_content)
-            db.session.add(observation)
-            db.session.commit()
-            learning_journal_observation = LearningJournalFormsObservations(
-                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
-                observations_id=observation.observations_id
-            )
-            db.session.add(learning_journal_observation)
-            db.session.commit()
-
-        # Add learnings to the learnings table
-        for learning_content in concept_paper_learnings:
-            learning = Learnings(learnings_content=learning_content)
-            db.session.add(learning)
-            db.session.commit()
-            learning_journal_learning = LearningJournalFormsLearnings(
-                learning_journal_forms_id=new_learning_journal_form.learning_journal_forms_id,
-                learnings_id=learning.learnings_id
-            )
-            db.session.add(learning_journal_learning)
-            db.session.commit()
 
         # Parent/Guardian Consent Form data
         concept_paper_forms_id = new_concept_paper.concept_paper_forms_id
-        parent_guardian_consent_name_of_student = request.form.get('parent-guardian-consent-name-of-student')
-        parent_guardian_consent_course_year_level = request.form.get('parent-guardian-consent-course-year-level')
-        parent_guardian_consent_id_number = request.form.get('parent-guardian-consent-id-number')
         parent_guardian_consent_department_office_unit = request.form.get('parent-guardian-consent-department-office-unit')
         parent_guardian_consent_dean_immediate_supervisor = request.form.get('parent-guardian-consent-dean-immediate-supervisor')
         parent_guardian_consent_checked_by = request.form.get('parent-guardian-consent-checked-by')
@@ -2568,9 +2486,6 @@ def add_concept_paper():
         parent_guardian_consent_form = ParentGuardianConsentForms(
             parent_guardian_consent_forms_concept_paper_forms_id=concept_paper_forms_id,
             parent_guardian_consent_forms_personnel_in_charge_forms_id=new_personnel_in_charge.personnel_in_charge_forms_id,
-            parent_guardian_consent_forms_name_of_student=parent_guardian_consent_name_of_student,
-            parent_guardian_consent_forms_course_year_level=parent_guardian_consent_course_year_level,
-            parent_guardian_consent_forms_id_number=parent_guardian_consent_id_number,
             parent_guardian_consent_forms_department_office_unit=parent_guardian_consent_department_office_unit,
             parent_guardian_consent_forms_dean_immediate_supervisor=parent_guardian_consent_dean_immediate_supervisor,
             parent_guardian_consent_forms_checked_by=parent_guardian_consent_checked_by,
