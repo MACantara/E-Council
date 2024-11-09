@@ -269,7 +269,7 @@
                 <div class="input-pair">
                     <label>Strengths</label>
                     <div id="activity-strengths">
-                        <input type="text" name="activity-strengths" placeholder="Enter Strength" required>
+                        <input type="text" name="activity-strengths" placeholder="Enter Strength">
                     </div>
                     <button class="primary-button" type="button" onclick="addStrength()">Add Strength</button>
                 </div>
@@ -277,7 +277,7 @@
                 <div class="input-pair">
                     <label>Weaknesses</label>
                     <div id="activity-weaknesses">
-                        <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required>
+                        <input type="text" name="activity-weaknesses" placeholder="Enter Weakness">
                     </div>
                     <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
                 </div>
@@ -285,7 +285,7 @@
                 <div class="input-pair">
                     <label>Recommendations</label>
                     <div id="activity-recommendations">
-                        <input type="text" name="activity-recommendations" placeholder="Enter Recommendation" required>
+                        <input type="text" name="activity-recommendations" placeholder="Enter Recommendation">
                     </div>
                     <button class="primary-button" type="button" onclick="addRecommendation()">Add
                         Recommendation</button>
@@ -296,31 +296,30 @@
                 <div class="input-pair">
                     <label for="learning-journal-name-of-student">Name of Student</label>
                     <input type="text" name="learning-journal-name-of-student" id="learning-journal-name-of-student"
-                        placeholder="Name of Student" required>
+                        placeholder="Name of Student">
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-course-year-level">Course/Year Level</label>
                     <input type="text" name="learning-journal-course-year-level" id="learning-journal-course-year-level"
-                        placeholder="Course/Year Level" required>
+                        placeholder="Course/Year Level">
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-id-number">ID Number</label>
                     <input type="text" name="learning-journal-id-number" id="learning-journal-id-number"
-                        placeholder="ID Number" required>
+                        placeholder="ID Number">
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-date">Date</label>
-                    <input type="date" name="learning-journal-date" id="learning-journal-date" required>
+                    <input type="date" name="learning-journal-date" id="learning-journal-date">
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-observations">Observations</label>
                     <div id="learning-journal-observations">
-                        <input type="text" name="learning-journal-observations" placeholder="Enter Observation"
-                            required>
+                        <input type="text" name="learning-journal-observations" placeholder="Enter Observation">
                     </div>
                     <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
                 </div>
@@ -328,7 +327,7 @@
                 <div class="input-pair">
                     <label for="learning-journal-learnings">Learnings</label>
                     <div id="learning-journal-learnings">
-                        <input type="text" name="learning-journal-learnings" placeholder="Enter Learning" required>
+                        <input type="text" name="learning-journal-learnings" placeholder="Enter Learning">
                     </div>
                     <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
                 </div>
@@ -336,12 +335,12 @@
                 <div class="input-pair">
                     <label for="learning-journal-overall-reflection">Overall Reflection</label>
                     <textarea name="learning-journal-overall-reflection" id="learning-journal-overall-reflection"
-                        placeholder="Overall Reflection" required></textarea>
+                        placeholder="Overall Reflection"></textarea>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-prepared-by">Prepared By</label>
-                    <select name="learning-journal-prepared-by" id="learning-journal-prepared-by" required>
+                    <select name="learning-journal-prepared-by" id="learning-journal-prepared-by">
                         <option value="" disabled selected>Select Preparer</option>
                         {% for user in users %}
                         <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
@@ -352,7 +351,7 @@
 
                 <div class="input-pair">
                     <label for="learning-journal-seen-and-read-by">Seen and Read By</label>
-                    <select name="learning-journal-seen-and-read-by" id="learning-journal-seen-and-read-by" required>
+                    <select name="learning-journal-seen-and-read-by" id="learning-journal-seen-and-read-by">
                         <option value="" disabled selected>Select Reader</option>
                         {% for user in users %}
                         <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
@@ -430,13 +429,13 @@
                 <div class="input-pair">
                     <label for="parent-guardian-consent-department-office-unit">Department/Office/Unit</label>
                     <input type="text" name="parent-guardian-consent-department-office-unit"
-                        id="parent-guardian-consent-department-office-unit" placeholder="Department/Office/Unit">
+                        id="parent-guardian-consent-department-office-unit" placeholder="Department/Office/Unit" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-dean-immediate-supervisor">Dean/Immediate Supervisor</label>
                     <select name="parent-guardian-consent-dean-immediate-supervisor"
-                        id="parent-guardian-consent-dean-immediate-supervisor">
+                        id="parent-guardian-consent-dean-immediate-supervisor" required>
                         <option value="" disabled selected>Select Dean/Immediate Supervisor</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
@@ -447,7 +446,7 @@
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-checked-by">Checked By</label>
-                    <select name="parent-guardian-consent-checked-by" id="parent-guardian-consent-checked-by">
+                    <select name="parent-guardian-consent-checked-by" id="parent-guardian-consent-checked-by" required>
                         <option value="" disabled selected>Select Checker</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
@@ -459,12 +458,12 @@
                 <div class="input-pair">
                     <label for="parent-guardian-consent-content">Content</label>
                     <textarea name="parent-guardian-consent-content" id="parent-guardian-consent-content"
-                        placeholder="Content"></textarea>
+                        placeholder="Content" required></textarea>
                 </div>
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-prepared-by">Prepared By</label>
-                    <select name="parent-guardian-consent-prepared-by" id="parent-guardian-consent-prepared-by">
+                    <select name="parent-guardian-consent-prepared-by" id="parent-guardian-consent-prepared-by" required>
                         <option value="" disabled selected>Select Preparer</option>
                         {% for user in users %}
                         <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
@@ -475,7 +474,7 @@
 
                 <div class="input-pair">
                     <label for="parent-guardian-consent-noted-by">Noted By</label>
-                    <select name="parent-guardian-consent-noted-by" id="parent-guardian-consent-noted-by">
+                    <select name="parent-guardian-consent-noted-by" id="parent-guardian-consent-noted-by" required>
                         <option value="" disabled selected>Select Noter</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
