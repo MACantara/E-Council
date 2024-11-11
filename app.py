@@ -366,22 +366,25 @@ class FinancialReports(db.Model):
     financial_reports_date = db.Column(db.DateTime, nullable=False)
     financial_reports_academic_year = db.Column(db.String(50), nullable=False)
     financial_reports_semester = db.Column(db.String(50), nullable=False)
-    financial_reports_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=True)
-    financial_reports_title = db.Column(db.String(255), nullable=False)
     financial_reports_status = db.Column(db.String(50), nullable=False)
+    financial_reports_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=True)
+    financial_reports_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=True)
+    financial_reports_title = db.Column(db.String(255), nullable=False)
     financial_reports_audited_and_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
-    financial_reports_noted_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
-    financial_reports_recommending_approval_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
+    financial_reports_noted_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    financial_reports_recommending_approval_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     financial_reports_approved_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
 
-    event = db.relationship('Events', backref='financial_reports')
-    audited_and_prepared_by_user = db.relationship('Users', foreign_keys=[financial_reports_audited_and_prepared_by])
-    noted_by_user = db.relationship('Users', foreign_keys=[financial_reports_noted_by])
-    recommending_approval_by_user = db.relationship('Users', foreign_keys=[financial_reports_recommending_approval_by])
+    # Relationships
+    events = db.relationship('Events', back_populates='financial_reports')
+    prepared_by_user = db.relationship('Users', foreign_keys=[financial_reports_audited_and_prepared_by])
+    noted_by_signatory = db.relationship('Signatories', foreign_keys=[financial_reports_noted_by])
+    recommending_signatory = db.relationship('Signatories', foreign_keys=[financial_reports_recommending_approval_by])
     approved_by_signatory = db.relationship('Signatories', foreign_keys=[financial_reports_approved_by])
+    department = db.relationship('Departments', foreign_keys=[financial_reports_departments_id])
 
     def __repr__(self):
-        return f'<FinancialReports {self.financial_reports_id}>'
+        return f'<FinancialReports {self.financial_reports_id}: {self.financial_reports_title}>'
 
 class ConceptPaperForms(db.Model):
     __tablename__ = 'concept_paper_forms'
@@ -390,6 +393,7 @@ class ConceptPaperForms(db.Model):
     concept_paper_forms_semester = db.Column(db.String(50), nullable=True)
     concept_paper_forms_academic_year = db.Column(db.String(50), nullable=True)
     concept_paper_forms_status = db.Column(db.String(50), nullable=True)
+    concept_paper_forms_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=True)
     concept_paper_forms_endorsed_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     concept_paper_forms_recommending_approval_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     concept_paper_forms_approved_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
@@ -406,11 +410,13 @@ class ConceptPaperForms(db.Model):
     concept_paper_forms_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     concept_paper_forms_signed_and_reviewed_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
 
+    # Relationships
     endorsed_by_signatory = db.relationship('Signatories', foreign_keys=[concept_paper_forms_endorsed_by])
     recommending_approval_by_signatory = db.relationship('Signatories', foreign_keys=[concept_paper_forms_recommending_approval_by])
     approved_by_signatory = db.relationship('Signatories', foreign_keys=[concept_paper_forms_approved_by])
     prepared_by_user = db.relationship('Users', foreign_keys=[concept_paper_forms_prepared_by])
     signed_and_reviewed_by_user = db.relationship('Users', foreign_keys=[concept_paper_forms_signed_and_reviewed_by])
+    department = db.relationship('Departments', foreign_keys=[concept_paper_forms_departments_id])
 
     def __repr__(self):
         return f'<ConceptPaperForms {self.concept_paper_forms_id}: {self.concept_paper_forms_subject}>'
@@ -419,6 +425,7 @@ class ObjectivesOfTheActivity(db.Model):
     __tablename__ = 'objectives_of_the_activity'
 
     objectives_of_the_activity_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    objectives_of_the_activity_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=False)
     objectives_of_the_activity_content = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -428,6 +435,7 @@ class LearningOutcomes(db.Model):
     __tablename__ = 'learning_outcomes'
 
     learning_outcomes_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    learning_outcomes_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=False)
     learning_outcomes_content = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -474,6 +482,7 @@ class ActivityStrengths(db.Model):
     __tablename__ = 'activity_strengths'
 
     activity_strengths_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    activity_strengths_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=False)
     activity_strengths_content = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -483,6 +492,7 @@ class ActivityWeaknesses(db.Model):
     __tablename__ = 'activity_weaknesses'
 
     activity_weaknesses_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    activity_weaknesses_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=False)
     activity_weaknesses_content = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -492,6 +502,7 @@ class ActivityRecommendations(db.Model):
     __tablename__ = 'activity_recommendations'
 
     activity_recommendations_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    activity_recommendations_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=False)
     activity_recommendations_content = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -540,6 +551,7 @@ class Observations(db.Model):
     __tablename__ = 'observations'
 
     observations_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    observations_learning_journal_forms_id = db.Column(db.Integer, db.ForeignKey('learning_journal_forms.learning_journal_forms_id'), nullable=False)
     observations_content = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -549,6 +561,7 @@ class Learnings(db.Model):
     __tablename__ = 'learnings'
 
     learnings_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    learnings_learning_journal_forms_id = db.Column(db.Integer, db.ForeignKey('learning_journal_forms.learning_journal_forms_id'), nullable=False)
     learnings_content = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
@@ -588,18 +601,26 @@ class Documentation(db.Model):
     documentation_academic_year = db.Column(db.String(50), nullable=True)
     documentation_semester = db.Column(db.String(50), nullable=True)
     documentation_status = db.Column(db.String(50), nullable=True)
+    documentation_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=True)
     documentation_type = db.Column(db.String(50), nullable=True)
     documentation_activity_report_forms_id = db.Column(db.Integer, db.ForeignKey('activity_report_forms.activity_report_forms_id'), nullable=True)
     documentation_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     documentation_learning_journal_forms_id = db.Column(db.Integer, db.ForeignKey('learning_journal_forms.learning_journal_forms_id'), nullable=True)
     documentation_checked_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     documentation_noted_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
-    documentation_date_of_submission = db.Column(db.Date, nullable=True)
-    documentation_rating = db.Column(db.Integer, nullable=True)
+    documentation_date_of_submission = db.Column(db.DateTime, nullable=True)
+    documentation_rating = db.Column(db.Float, nullable=True)
     documentation_comments_suggestions = db.Column(db.Text, nullable=True)
 
+    # Relationships
+    events = db.relationship('Events', foreign_keys=[documentation_events_id])
+    prepared_by_user = db.relationship('Users', foreign_keys=[documentation_prepared_by])
+    checked_by_signatory = db.relationship('Signatories', foreign_keys=[documentation_checked_by])
+    noted_by_signatory = db.relationship('Signatories', foreign_keys=[documentation_noted_by])
+    department = db.relationship('Departments', foreign_keys=[documentation_departments_id])
+
     def __repr__(self):
-        return f'<Documentation {self.documentation_id}>'
+        return f'<Documentation {self.documentation_id}: {self.documentation_type}>'
 
 class TallyItems(db.Model):
     __tablename__ = 'tally_items'
@@ -669,7 +690,6 @@ class EventPhotoDocumentationImages(db.Model):
 
     def __repr__(self):
         return f'<EventPhotoDocumentationImages {self.event_photo_documentation_images_id}>'
-
 
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
