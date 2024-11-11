@@ -415,18 +415,6 @@ class ObjectivesOfTheActivity(db.Model):
     def __repr__(self):
         return f'<ObjectivesOfTheActivity {self.objectives_of_the_activity_id}: {self.objectives_of_the_activity_content}>'
 
-class ConceptPaperFormObjectivesOfTheActivity(db.Model):
-    __tablename__ = 'concept_paper_form_objectives_of_the_activity'
-
-    concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), primary_key=True, nullable=False)
-    objectives_of_the_activity_id = db.Column(db.Integer, db.ForeignKey('objectives_of_the_activity.objectives_of_the_activity_id'), primary_key=True, nullable=False)
-
-    concept_paper_form = db.relationship('ConceptPaperForms', backref='objectives_of_the_activity')
-    objective_of_the_activity = db.relationship('ObjectivesOfTheActivity', backref='concept_paper_forms')
-
-    def __repr__(self):
-        return f'<ConceptPaperFormObjectivesOfTheActivity(concept_paper_forms_id={self.concept_paper_forms_id}, objectives_of_the_activity_id={self.objectives_of_the_activity_id})>'
-
 class LearningOutcomes(db.Model):
     __tablename__ = 'learning_outcomes'
 
@@ -435,18 +423,6 @@ class LearningOutcomes(db.Model):
 
     def __repr__(self):
         return f'<LearningOutcomes {self.learning_outcomes_id}: {self.learning_outcomes_content}>'
-
-class ConceptPaperFormLearningOutcomes(db.Model):
-    __tablename__ = 'concept_paper_form_learning_outcomes'
-
-    concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), primary_key=True, nullable=False)
-    learning_outcomes_id = db.Column(db.Integer, db.ForeignKey('learning_outcomes.learning_outcomes_id'), primary_key=True, nullable=False)
-
-    concept_paper_form = db.relationship('ConceptPaperForms', backref='learning_outcomes')
-    learning_outcome = db.relationship('LearningOutcomes', backref='concept_paper_forms')
-
-    def __repr__(self):
-        return f'<ConceptPaperFormLearningOutcomes(concept_paper_forms_id={self.concept_paper_forms_id}, learning_outcomes_id={self.learning_outcomes_id})>'
 
 class ExcuseLetterForms(db.Model):
     __tablename__ = 'excuse_letter_forms'
@@ -512,42 +488,6 @@ class ActivityRecommendations(db.Model):
     def __repr__(self):
         return f'<ActivityRecommendations {self.activity_recommendations_id}: {self.activity_recommendations_content}>'
 
-class ActivityReportFormsActivityStrengths(db.Model):
-    __tablename__ = 'activity_report_forms_activity_strengths'
-
-    activity_report_forms_id = db.Column(db.Integer, db.ForeignKey('activity_report_forms.activity_report_forms_id'), primary_key=True, nullable=False)
-    activity_strengths_id = db.Column(db.Integer, db.ForeignKey('activity_strengths.activity_strengths_id'), primary_key=True, nullable=False)
-
-    activity_report_form = db.relationship('ActivityReportForms', backref='activity_strengths')
-    activity_strength = db.relationship('ActivityStrengths', backref='activity_report_forms')
-
-    def __repr__(self):
-        return f'<ActivityReportFormsActivityStrengths(activity_report_forms_id={self.activity_report_forms_id}, activity_strengths_id={self.activity_strengths_id})>'
-
-class ActivityReportFormsActivityWeaknesses(db.Model):
-    __tablename__ = 'activity_report_forms_activity_weaknesses'
-
-    activity_report_forms_id = db.Column(db.Integer, db.ForeignKey('activity_report_forms.activity_report_forms_id'), primary_key=True, nullable=False)
-    activity_weaknesses_id = db.Column(db.Integer, db.ForeignKey('activity_weaknesses.activity_weaknesses_id'), primary_key=True, nullable=False)
-
-    activity_report_form = db.relationship('ActivityReportForms', backref='activity_weaknesses')
-    activity_weakness = db.relationship('ActivityWeaknesses', backref='activity_report_forms')
-
-    def __repr__(self):
-        return f'<ActivityReportFormsActivityWeaknesses(activity_report_forms_id={self.activity_report_forms_id}, activity_weaknesses_id={self.activity_weaknesses_id})>'
-
-class ActivityReportFormsActivityRecommendations(db.Model):
-    __tablename__ = 'activity_report_forms_activity_recommendations'
-
-    activity_report_forms_id = db.Column(db.Integer, db.ForeignKey('activity_report_forms.activity_report_forms_id'), primary_key=True, nullable=False)
-    activity_recommendations_id = db.Column(db.Integer, db.ForeignKey('activity_recommendations.activity_recommendations_id'), primary_key=True, nullable=False)
-
-    activity_report_form = db.relationship('ActivityReportForms', backref='activity_recommendations')
-    activity_recommendation = db.relationship('ActivityRecommendations', backref='activity_report_forms')
-
-    def __repr__(self):
-        return f'<ActivityReportFormsActivityRecommendations(activity_report_forms_id={self.activity_report_forms_id}, activity_recommendations_id={self.activity_recommendations_id})>'
-
 class PersonnelInChargeForms(db.Model):
     __tablename__ = 'personnel_in_charge_forms'
 
@@ -596,18 +536,6 @@ class Observations(db.Model):
     def __repr__(self):
         return f'<Observations {self.observations_id}: {self.observations_content}>'
 
-class LearningJournalFormsObservations(db.Model):
-    __tablename__ = 'learning_journal_forms_observations'
-
-    learning_journal_forms_id = db.Column(db.Integer, db.ForeignKey('learning_journal_forms.learning_journal_forms_id'), primary_key=True, nullable=False)
-    observations_id = db.Column(db.Integer, db.ForeignKey('observations.observations_id'), primary_key=True, nullable=False)
-
-    learning_journal_form = db.relationship('LearningJournalForms', backref='observations')
-    observation = db.relationship('Observations', backref='learning_journal_forms')
-
-    def __repr__(self):
-        return f'<LearningJournalFormsObservations(learning_journal_forms_id={self.learning_journal_forms_id}, observations_id={self.observations_id})>'
-
 class Learnings(db.Model):
     __tablename__ = 'learnings'
 
@@ -616,18 +544,6 @@ class Learnings(db.Model):
 
     def __repr__(self):
         return f'<Learnings {self.learnings_id}: {self.learnings_content}>'
-
-class LearningJournalFormsLearnings(db.Model):
-    __tablename__ = 'learning_journal_forms_learnings'
-
-    learning_journal_forms_id = db.Column(db.Integer, db.ForeignKey('learning_journal_forms.learning_journal_forms_id'), primary_key=True, nullable=False)
-    learnings_id = db.Column(db.Integer, db.ForeignKey('learnings.learnings_id'), primary_key=True, nullable=False)
-
-    learning_journal_form = db.relationship('LearningJournalForms', backref='learnings')
-    learning = db.relationship('Learnings', backref='learning_journal_forms')
-
-    def __repr__(self):
-        return f'<LearningJournalFormsLearnings(learning_journal_forms_id={self.learning_journal_forms_id}, learnings_id={self.learnings_id})>'
 
 class ParentGuardianConsentForms(db.Model):
     __tablename__ = 'parent_guardian_consent_forms'
