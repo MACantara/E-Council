@@ -300,6 +300,12 @@ class MinutesOfTheMeeting(db.Model):
     minutes_of_the_meeting_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     minutes_of_the_meeting_noted_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
 
+    # Relationships
+    approved_by_user = db.relationship('Users', foreign_keys=[minutes_of_the_meeting_approved_by])
+    prepared_by_user = db.relationship('Users', foreign_keys=[minutes_of_the_meeting_prepared_by])
+    noted_by_signatory = db.relationship('Signatories', foreign_keys=[minutes_of_the_meeting_noted_by])
+    department = db.relationship('Departments', foreign_keys=[minutes_of_the_meeting_departments_id])
+
     def __repr__(self):
         return f'<MinutesOfTheMeeting {self.minutes_of_the_meeting_id}: {self.minutes_of_the_meeting_agenda}>'
 
