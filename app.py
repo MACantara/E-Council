@@ -252,6 +252,7 @@ class BoardResolutions(db.Model):
     board_resolutions_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     board_resolutions_date = db.Column(db.DateTime, default=datetime.utcnow)
     board_resolutions_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), nullable=True)
+    board_resolutions_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=True)
     board_resolutions_title = db.Column(db.String(255), nullable=True)
     board_resolutions_academic_year = db.Column(db.String(50), nullable=True)
     board_resolutions_semester = db.Column(db.String(50), nullable=True)
