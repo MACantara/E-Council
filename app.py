@@ -334,11 +334,11 @@ class MinutesOfTheMeetingAttendees(db.Model):
     minutes_of_the_meeting_id = db.Column(db.Integer, db.ForeignKey('minutes_of_the_meeting.minutes_of_the_meeting_id'), primary_key=True, nullable=False)
     users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), primary_key=True, nullable=False)
 
-    minutes_of_the_meeting = db.relationship('MinutesOfTheMeeting', foreign_keys=[minutes_of_the_meeting_id])
-    user = db.relationship('Users', foreign_keys=[users_id])
+    minutes_of_the_meeting = db.relationship('MinutesOfTheMeeting', backref='attendees')
+    user = db.relationship('Users', backref='minutes_of_the_meeting_attendees')
 
     def __repr__(self):
-        return f'<MinutesOfTheMeetingAttendees {self.minutes_of_the_meeting_attendees_id}: Meeting {self.minutes_of_the_meeting_id}, User {self.users_id}>'
+        return f'<MinutesOfTheMeetingAttendees(minutes_of_the_meeting_id={self.minutes_of_the_meeting_id}, users_id={self.users_id})>'
 
 class StudentOrganizations(db.Model):
     __tablename__ = 'student_organizations'
@@ -3804,6 +3804,11 @@ def delete_minutes_of_the_meeting(meeting_id):
     meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
 
     if request.method == 'POST':
+        # First, delete related attendees records (many-to-many relation)
+        attendees = MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+        for attendee in attendees:
+            db.session.delete(attendee)
+
         # Delete related photo documentation records
         photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
         for photo_documentation in photo_documentations:
@@ -3811,7 +3816,7 @@ def delete_minutes_of_the_meeting(meeting_id):
             cloudinary.uploader.destroy(photo_documentation.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
             db.session.delete(photo_documentation)
 
-        # Delete the meeting
+        # Finally, delete the meeting
         db.session.delete(meeting)
         db.session.commit()
 
