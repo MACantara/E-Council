@@ -291,6 +291,7 @@ class MinutesOfTheMeeting(db.Model):
     minutes_of_the_meeting_semester = db.Column(db.String(50), nullable=False)
     minutes_of_the_meeting_academic_year = db.Column(db.String(50), nullable=False)
     minutes_of_the_meeting_status = db.Column(db.String(50), nullable=False)
+    minutes_of_the_meeting_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=True)
     minutes_of_the_meeting_presiding_officer = db.Column(db.String(100), nullable=False)
     minutes_of_the_meeting_agenda = db.Column(db.Text, nullable=False)
     minutes_of_the_meeting_notes = db.Column(db.Text, nullable=True)
