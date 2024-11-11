@@ -232,7 +232,7 @@ class TransactionHistory(db.Model):
     __tablename__ = 'transaction_history'
 
     transaction_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), index=True, nullable=True)
+    transaction_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), index=True, nullable=True)
     transaction_name = db.Column(db.String(255), nullable=True)
     transaction_date = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
     transaction_unit_amount = db.Column(db.Numeric(10, 2), nullable=True)
