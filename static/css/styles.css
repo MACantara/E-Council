@@ -45,7 +45,7 @@
 
     /* Layout Max Widths */
     --max-width-container: 600px;
-    --max-width-hero: 1250px;
+    --max-width-hero: 1400px;
 
     /* Chart Colors */
     --remaining-budget-color: green;
@@ -230,6 +230,7 @@ nav ul li a {
 
 .hero-column img {
     max-width: 100%;
+    border-radius: var(--border-radius);
 }
 
 /* Button Styles */
@@ -362,8 +363,6 @@ nav ul li a {
 .container > p {
     margin-bottom: var(--gap-large);
 }
-
-
 
 /* Account Settings Styles */
 
@@ -974,4 +973,23 @@ textarea {
     border: 1px solid var(--secondary-color);
     border-radius: var(--border-radius);
     margin-top: var(--gap-small);
+}
+
+/* Form Container Styles */
+.form-container {
+    padding: var(--padding-large);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    max-width: var(--max-width-container);
+    margin: var(--padding-large) auto;
+    background-color: var(--form-background-color);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-large);
+}
+
+.form-container > h2,
+.form-container > h3 {
+    text-align: center;
 }
