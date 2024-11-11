@@ -266,6 +266,7 @@ class BoardResolutions(db.Model):
     events = db.relationship('Events', back_populates='board_resolutions')
     prepared_by_user = db.relationship('Users', foreign_keys=[board_resolutions_prepared_by])
     approved_by_signatory = db.relationship('Signatories', foreign_keys=[board_resolutions_approved_by])
+    department = db.relationship('Departments', foreign_keys=[board_resolutions_departments_id])
 
     def __repr__(self):
         return f'<BoardResolution {self.board_resolutions_id}: {self.board_resolutions_description}>'
