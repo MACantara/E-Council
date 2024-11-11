@@ -680,114 +680,71 @@ class TallyItems(db.Model):
     __tablename__ = 'tally_items'
 
     tally_items_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tally_items_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=True)
     tally_items_name = db.Column(db.String(255), nullable=True)
     tally_items_extremely_satisfied_rating = db.Column(db.Integer, nullable=True)
     tally_items_satisfied_rating = db.Column(db.Integer, nullable=True)
     tally_items_neutral_rating = db.Column(db.Integer, nullable=True)
     tally_items_dissatisfied_rating = db.Column(db.Integer, nullable=True)
     tally_items_extremely_dissatisfied_rating = db.Column(db.Integer, nullable=True)
+    
+    documentation = db.relationship('Documentation', backref='tally_items', lazy=True)
 
     def __repr__(self):
         return f'<TallyItems {self.tally_items_id}>'
-
-class DocumentationTallyItems(db.Model):
-    __tablename__ = 'documentation_tally_items'
-
-    documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), primary_key=True, nullable=False)
-    tally_items_id = db.Column(db.Integer, db.ForeignKey('tally_items.tally_items_id'), primary_key=True, nullable=False)
-
-    documentation = db.relationship('Documentation', backref='tally_items')
-    tally_item = db.relationship('TallyItems', backref='documentation')
-
-    def __repr__(self):
-        return f'<DocumentationTallyItems(documentation_id={self.documentation_id}, tally_items_id={self.tally_items_id})>'
 
 class ResultsOfTheEvaluationImages(db.Model):
     __tablename__ = 'results_of_the_evaluation_images'
 
     results_of_the_evaluation_images_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    results_of_the_evaluation_images_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=True)
     results_of_the_evaluation_images_cloudinary_url = db.Column(db.String(255), nullable=True)
     results_of_the_evaluation_images_cloudinary_public_id = db.Column(db.String(255), nullable=True)
+    
+
+    documentation = db.relationship('Documentation', backref='results_of_the_evaluation_images', lazy=True)
 
     def __repr__(self):
         return f'<ResultsOfTheEvaluationImages {self.results_of_the_evaluation_images_id}>'
-
-class DocumentationResultsOfTheEvaluationImages(db.Model):
-    __tablename__ = 'documentation_results_of_the_evaluation_images'
-
-    documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), primary_key=True, nullable=False)
-    results_of_the_evaluation_images_id = db.Column(db.Integer, db.ForeignKey('results_of_the_evaluation_images.results_of_the_evaluation_images_id'), primary_key=True, nullable=False)
-
-    documentation = db.relationship('Documentation', backref='results_of_the_evaluation_images')
-    results_of_the_evaluation_image = db.relationship('ResultsOfTheEvaluationImages', backref='documentation')
-
-    def __repr__(self):
-        return f'<DocumentationResultsOfTheEvaluationImages(documentation_id={self.documentation_id}, results_of_the_evaluation_images_id={self.results_of_the_evaluation_images_id})>'
 
 class SummaryOfAttendanceImages(db.Model):
     __tablename__ = 'summary_of_attendance_images'
 
     summary_of_attendance_images_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    summary_of_attendance_images_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=True)
     summary_of_attendance_images_cloudinary_url = db.Column(db.String(255), nullable=True)
     summary_of_attendance_images_cloudinary_public_id = db.Column(db.String(255), nullable=True)
+    
+    documentation = db.relationship('Documentation', backref='summary_of_attendance_images', lazy=True)
 
     def __repr__(self):
         return f'<SummaryOfAttendanceImages {self.summary_of_attendance_images_id}>'
-
-class DocumentationSummaryOfAttendanceImages(db.Model):
-    __tablename__ = 'documentation_summary_of_attendance_images'
-
-    documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), primary_key=True, nullable=False)
-    summary_of_attendance_images_id = db.Column(db.Integer, db.ForeignKey('summary_of_attendance_images.summary_of_attendance_images_id'), primary_key=True, nullable=False)
-
-    documentation = db.relationship('Documentation', backref='summary_of_attendance_images')
-    summary_of_attendance_image = db.relationship('SummaryOfAttendanceImages', backref='documentation')
-
-    def __repr__(self):
-        return f'<DocumentationSummaryOfAttendanceImages(documentation_id={self.documentation_id}, summary_of_attendance_images_id={self.summary_of_attendance_images_id})>'
 
 class EvaluationListOfStudentNames(db.Model):
     __tablename__ = 'evaluation_list_of_student_names'
 
     evaluation_list_of_student_names_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    evaluation_list_of_student_names_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=True)
     evaluation_list_of_student_names_student = db.Column(db.String(255), nullable=True)
+    
+    documentation = db.relationship('Documentation', backref='evaluation_list_of_student_names', lazy=True)
 
     def __repr__(self):
         return f'<EvaluationListOfStudentNames {self.evaluation_list_of_student_names_id}>'
-
-class DocumentationEvaluationStudentList(db.Model):
-    __tablename__ = 'documentation_evaluation_student_list'
-
-    documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), primary_key=True, nullable=False)
-    evaluation_list_of_student_names_id = db.Column(db.Integer, db.ForeignKey('evaluation_list_of_student_names.evaluation_list_of_student_names_id'), primary_key=True, nullable=False)
-
-    documentation = db.relationship('Documentation', backref='evaluation_student_list')
-    evaluation_list_of_student_name = db.relationship('EvaluationListOfStudentNames', backref='documentation')
-
-    def __repr__(self):
-        return f'<DocumentationEvaluationStudentList(documentation_id={self.documentation_id}, evaluation_list_of_student_names_id={self.evaluation_list_of_student_names_id})>'
 
 class EventPhotoDocumentationImages(db.Model):
     __tablename__ = 'event_photo_documentation_images'
 
     event_photo_documentation_images_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    event_photo_documentation_images_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=True)
     event_photo_documentation_images_cloudinary_url = db.Column(db.String(255), nullable=True)
     event_photo_documentation_images_cloudinary_public_id = db.Column(db.String(255), nullable=True)
+    
+    documentation = db.relationship('Documentation', backref='event_photo_documentation_images', lazy=True)
 
     def __repr__(self):
         return f'<EventPhotoDocumentationImages {self.event_photo_documentation_images_id}>'
 
-class DocumentationEventPhotoDocumentationImages(db.Model):
-    __tablename__ = 'documentation_event_photo_documentation_images'
-
-    documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), primary_key=True, nullable=False)
-    event_photo_documentation_images_id = db.Column(db.Integer, db.ForeignKey('event_photo_documentation_images.event_photo_documentation_images_id'), primary_key=True, nullable=False)
-
-    documentation = db.relationship('Documentation', backref='event_photo_documentation_images')
-    event_photo_documentation_image = db.relationship('EventPhotoDocumentationImages', backref='documentation')
-
-    def __repr__(self):
-        return f'<DocumentationEventPhotoDocumentationImages(documentation_id={self.documentation_id}, event_photo_documentation_images_id={self.event_photo_documentation_images_id})>'
 
 # Custom Jinja2 Filters
 def truncate_text(text, length=100):
