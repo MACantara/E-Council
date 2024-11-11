@@ -317,7 +317,7 @@ class Signatories(db.Model):
     signatory_first_name = db.Column(db.String(50), nullable=False)
     signatory_middle_name = db.Column(db.String(50), nullable=True)
     signatory_last_name = db.Column(db.String(50), nullable=False)
-    signatory_suffix = db.Column(db.String(10), nullable=True)
+    signatory_suffix = db.Column(db.String(50), nullable=True)
     signatory_position = db.Column(db.String(100), nullable=False)
     signatory_department = db.Column(db.String(100), nullable=False)
 
