@@ -628,11 +628,11 @@ class TallyItems(db.Model):
     tally_items_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tally_items_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=True)
     tally_items_name = db.Column(db.String(255), nullable=True)
-    tally_items_extremely_satisfied_rating = db.Column(db.Integer, nullable=True)
-    tally_items_satisfied_rating = db.Column(db.Integer, nullable=True)
-    tally_items_neutral_rating = db.Column(db.Integer, nullable=True)
-    tally_items_dissatisfied_rating = db.Column(db.Integer, nullable=True)
-    tally_items_extremely_dissatisfied_rating = db.Column(db.Integer, nullable=True)
+    tally_items_extremely_satisfied_rating_total = db.Column(db.Integer, nullable=True)
+    tally_items_satisfied_rating_total = db.Column(db.Integer, nullable=True)
+    tally_items_neutral_rating_total = db.Column(db.Integer, nullable=True)
+    tally_items_dissatisfied_rating_total = db.Column(db.Integer, nullable=True)
+    tally_items_extremely_dissatisfied_rating_total = db.Column(db.Integer, nullable=True)
     
     documentation = db.relationship('Documentation', backref='tally_items', lazy=True)
 
