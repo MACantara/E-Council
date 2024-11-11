@@ -77,8 +77,11 @@ class Users(db.Model, UserMixin):
     users_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     users_profile_picture_cloudinary_url = db.Column(db.String(255), nullable=True)
     users_profile_picture_cloudinary_public_id = db.Column(db.String(255), nullable=True)
+    users_title = db.Column(db.String(50), nullable=True)
     users_first_name = db.Column(db.String(50), nullable=False)
+    users_middle_name = db.Column(db.String(50), nullable=True)
     users_last_name = db.Column(db.String(50), nullable=False)
+    users_suffix = db.Column(db.String(50), nullable=True)
     users_username = db.Column(db.String(50), unique=True, nullable=False)
     users_email = db.Column(db.String(100), unique=True, nullable=False)
     
