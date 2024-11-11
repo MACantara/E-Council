@@ -331,9 +331,8 @@ class MinutesOfTheMeetingPhotoDocumentation(db.Model):
 class MinutesOfTheMeetingAttendees(db.Model):
     __tablename__ = 'minutes_of_the_meeting_attendees'
 
-    minutes_of_the_meeting_attendees_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    minutes_of_the_meeting_id = db.Column(db.Integer, db.ForeignKey('minutes_of_the_meeting.minutes_of_the_meeting_id'), nullable=False)
-    users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=False)
+    minutes_of_the_meeting_id = db.Column(db.Integer, db.ForeignKey('minutes_of_the_meeting.minutes_of_the_meeting_id'), primary_key=True, nullable=False)
+    users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), primary_key=True, nullable=False)
 
     minutes_of_the_meeting = db.relationship('MinutesOfTheMeeting', foreign_keys=[minutes_of_the_meeting_id])
     user = db.relationship('Users', foreign_keys=[users_id])
