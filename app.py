@@ -75,7 +75,7 @@ class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
     users_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    users_profile_picture = db.Column(db.String(255), nullable=True)
+    users_profile_picture_cloudinary_url = db.Column(db.String(255), nullable=True)
     users_profile_picture_cloudinary_public_id = db.Column(db.String(255), nullable=True)
     users_first_name = db.Column(db.String(50), nullable=False)
     users_last_name = db.Column(db.String(50), nullable=False)
@@ -116,7 +116,7 @@ class Users(db.Model, UserMixin):
 
     users_home_address = db.Column(db.String(255), nullable=True)
     users_contact_number = db.Column(db.String(20), nullable=True)
-    users_signature = db.Column(db.String(255), nullable=True)
+    users_signature_cloudinary_url = db.Column(db.String(255), nullable=True)
     users_signature_cloudinary_public_id = db.Column(db.String(255), nullable=True)
     users_password = db.Column(db.String(255), nullable=False)
     users_email_verified = db.Column(db.Integer, nullable=False)
