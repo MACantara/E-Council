@@ -450,12 +450,12 @@ class ExcuseLetterForms(db.Model):
     excuse_letter_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     excuse_letter_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
     excuse_letter_forms_department_office_unit = db.Column(db.String(255), nullable=True)
-    excuse_letter_forms_faculty_in_charge = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    excuse_letter_forms_personnel_in_charge_forms_id = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     excuse_letter_forms_dean = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
     excuse_letter_forms_noted_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
 
     concept_paper_form = db.relationship('ConceptPaperForms', backref='excuse_letter_forms')
-    faculty_in_charge_signatory = db.relationship('Signatories', foreign_keys=[excuse_letter_forms_faculty_in_charge])
+    personnel_in_charge_signatory = db.relationship('Signatories', foreign_keys=[excuse_letter_forms_personnel_in_charge_forms_id])
     dean_signatory = db.relationship('Signatories', foreign_keys=[excuse_letter_forms_dean])
     noted_by_signatory = db.relationship('Signatories', foreign_keys=[excuse_letter_forms_noted_by])
 
