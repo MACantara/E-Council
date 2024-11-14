@@ -2266,33 +2266,19 @@ def add_concept_paper():
         # Add objectives of the activity to the objectives_of_the_activity table
         for objective_content in concept_paper_objectives:
             new_objective = ObjectivesOfTheActivity(
-                objectives_of_the_activity_content=objective_content
+                objectives_of_the_activity_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id
+                objectives_of_the_activity_content=objective_content,
             )
             db.session.add(new_objective)
-            db.session.commit()
-
-            # Link the objective to the concept paper
-            concept_paper_objective_link = ConceptPaperFormObjectivesOfTheActivity(
-                concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                objectives_of_the_activity_id=new_objective.objectives_of_the_activity_id
-            )
-            db.session.add(concept_paper_objective_link)
             db.session.commit()
 
         # Add learning outcomes to the learning_outcomes table
         for outcome_content in concept_paper_learning_outcomes:
             new_outcome = LearningOutcomes(
+                learning_outcomes_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
                 learning_outcomes_content=outcome_content
             )
             db.session.add(new_outcome)
-            db.session.commit()
-
-            # Link the learning outcome to the concept paper
-            concept_paper_outcome_link = ConceptPaperFormLearningOutcomes(
-                concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                learning_outcomes_id=new_outcome.learning_outcomes_id
-            )
-            db.session.add(concept_paper_outcome_link)
             db.session.commit()
 
         # Excuse Letter Form data
@@ -2508,17 +2494,10 @@ def update_concept_paper(paper_id):
         # Add new objectives
         for objective_content in concept_paper_objectives:
             new_objective = ObjectivesOfTheActivity(
-                objectives_of_the_activity_content=objective_content
+                objectives_of_the_activity_content=objective_content,
+                objectives_of_the_activity_concept_paper_forms_id=paper_id
             )
             db.session.add(new_objective)
-            db.session.commit()
-
-            # Link the objective to the concept paper
-            concept_paper_objective_link = ConceptPaperFormObjectivesOfTheActivity(
-                concept_paper_forms_id=paper_id,
-                objectives_of_the_activity_id=new_objective.objectives_of_the_activity_id
-            )
-            db.session.add(concept_paper_objective_link)
             db.session.commit()
 
         # Update learning outcomes
@@ -2530,17 +2509,10 @@ def update_concept_paper(paper_id):
         # Add new learning outcomes
         for outcome_content in concept_paper_learning_outcomes:
             new_outcome = LearningOutcomes(
-                learning_outcomes_content=outcome_content
+                learning_outcomes_content=outcome_content,
+                learning_outcomes_concept_paper_forms_id=paper_id
             )
             db.session.add(new_outcome)
-            db.session.commit()
-
-            # Link the learning outcome to the concept paper
-            concept_paper_outcome_link = ConceptPaperFormLearningOutcomes(
-                concept_paper_forms_id=paper_id,
-                learning_outcomes_id=new_outcome.learning_outcomes_id
-            )
-            db.session.add(concept_paper_outcome_link)
             db.session.commit()
 
         # Update observations in the observations table
