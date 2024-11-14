@@ -2266,7 +2266,7 @@ def add_concept_paper():
         # Add objectives of the activity to the objectives_of_the_activity table
         for objective_content in concept_paper_objectives:
             new_objective = ObjectivesOfTheActivity(
-                objectives_of_the_activity_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id
+                objectives_of_the_activity_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
                 objectives_of_the_activity_content=objective_content,
             )
             db.session.add(new_objective)
