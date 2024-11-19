@@ -3549,6 +3549,36 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         match = re.search(pattern, text, re.DOTALL)
         return match.group(1).strip() if match else ""
     
+    # Helper function to split numbered points
+    def format_numbered_points(text):
+        # Split text into lines and process each line
+        lines = text.split('\n')
+        formatted_lines = []
+        
+        current_point = ""
+        for line in lines:
+            line = line.strip()
+            if line:
+                # Check for numbered format (e.g., "2.1", "3.2", etc.)
+                if re.match(r'^\d+\.\d+\s', line):
+                    # If we have a previous point, add it
+                    if current_point:
+                        formatted_lines.append(Paragraph(current_point, section_style))
+                    current_point = line
+                else:
+                    # If it's a continuation of the current point
+                    if current_point:
+                        current_point += " " + line
+                    else:
+                        current_point = line
+        
+        # Add the last point if exists
+        if current_point:
+            formatted_lines.append(Paragraph(current_point, section_style))
+            formatted_lines.append(Spacer(1, 6))
+        
+        return formatted_lines
+    
     # Extract each section
     summary = extract_section(notes, "Summary")
     key_points = extract_section(notes, "Key Discussion Points")
@@ -3558,25 +3588,25 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     # Add Summary
     if summary:
         elements.append(Paragraph("Summary", heading_style))
-        elements.append(Paragraph(summary, section_style))
+        elements.extend(format_numbered_points(summary))
         elements.append(Spacer(1, 12))
     
     # Add Key Discussion Points
     if key_points:
         elements.append(Paragraph("Key Discussion Points", heading_style))
-        elements.append(Paragraph(key_points, section_style))
+        elements.extend(format_numbered_points(key_points))
         elements.append(Spacer(1, 12))
     
     # Add Action Items
     if action_items:
         elements.append(Paragraph("Action Items", heading_style))
-        elements.append(Paragraph(action_items, section_style))
+        elements.extend(format_numbered_points(action_items))
         elements.append(Spacer(1, 12))
     
     # Add Next Steps
     if next_steps:
         elements.append(Paragraph("Next Steps", heading_style))
-        elements.append(Paragraph(next_steps, section_style))
+        elements.extend(format_numbered_points(next_steps))
         elements.append(Spacer(1, 12))
     
     if meeting_data.minutes_of_the_meeting_adjourned:
