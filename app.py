@@ -3495,14 +3495,12 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     section_style = ParagraphStyle(
         'SectionStyle',
         parent=styles['Normal'],
-        spaceBefore=12,
         spaceAfter=6,
         leftIndent=0,
         fontSize=12,
         textColor=colors.black,
     )
 
-    
     
     # Add meeting details
     meeting_data = meeting[0]
@@ -3514,7 +3512,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     elements.append(Paragraph(
         f'Date & Time: {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y, %I:%M %p")}' + 
         (f' - {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}' if meeting_data.minutes_of_the_meeting_adjourned else ''),
-        normal_style
+        section_style
     ))
 
     # Presiding Officer
