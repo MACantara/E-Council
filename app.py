@@ -1,5 +1,6 @@
 import os
 import re
+import requests
 from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify, send_file
 from jinja2 import Environment
 from flask_sqlalchemy import SQLAlchemy
@@ -21,7 +22,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 
 import cloudinary
 import cloudinary.uploader
@@ -3452,6 +3453,22 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         .filter(MinutesOfTheMeeting.minutes_of_the_meeting_id == minutes_of_the_meeting_id)\
         .first_or_404()
     
+    # Get attendees
+    attendees = db.session.query(MinutesOfTheMeetingAttendees, Users)\
+        .join(Users, MinutesOfTheMeetingAttendees.users_id == Users.users_id)\
+        .filter(MinutesOfTheMeetingAttendees.minutes_of_the_meeting_id == minutes_of_the_meeting_id)\
+        .all()
+    
+    # Get photo documentation
+    photos = MinutesOfTheMeetingPhotoDocumentation.query\
+        .filter_by(minutes_of_the_meeting_id=minutes_of_the_meeting_id)\
+        .all()
+    
+    # Get prepared by, approved by, and noted by users
+    prepared_by = Users.query.get(meeting[0].minutes_of_the_meeting_prepared_by)
+    approved_by = Users.query.get(meeting[0].minutes_of_the_meeting_approved_by)
+    noted_by = Users.query.get(meeting[0].minutes_of_the_meeting_noted_by)
+    
     # Create BytesIO buffer to receive PDF data
     buffer = BytesIO()
     
@@ -3494,6 +3511,17 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     elements.append(Paragraph(f'Date: {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y")}', normal_style))
     elements.append(Paragraph(f'Time: {meeting_data.minutes_of_the_meeting_date.strftime("%I:%M %p")}', normal_style))
     elements.append(Paragraph(f'Agenda: {meeting_data.minutes_of_the_meeting_agenda}', normal_style))
+    if meeting_data.minutes_of_the_meeting_adjourned:
+        elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', normal_style))
+    elements.append(Spacer(1, 12))
+    
+    # Add Attendees section
+    elements.append(Paragraph('Attendees', heading_style))
+    for attendee in attendees:
+        elements.append(Paragraph(
+            f'• {attendee[1].users_first_name} {attendee[1].users_last_name} - {attendee[1].users_student_organization_position}',
+            section_style
+        ))
     elements.append(Spacer(1, 12))
     
     # Add Notes section
@@ -3501,11 +3529,59 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     elements.append(Paragraph(meeting_data.minutes_of_the_meeting_notes, section_style))
     elements.append(Spacer(1, 12))
     
-    # Add Presiding Officer
+    # Add Photo Documentation section if there are photos
+    if photos:
+        elements.append(Paragraph('Photo Documentation', heading_style))
+        elements.append(Spacer(1, 12))
+        
+        for photo in photos:
+            try:
+                # Download image from Cloudinary URL
+                response = requests.get(photo.minutes_of_the_meeting_photo_documentation_cloudinary_url)
+                if response.status_code == 200:
+                    # Use BytesIO instead of temporary file
+                    image_data = BytesIO(response.content)
+                    img = Image(image_data, width=400, height=300, kind='proportional')
+                    elements.append(img)
+                    elements.append(Spacer(1, 12))
+                    
+            except Exception as e:
+                # If image fails to load, fall back to URL
+                elements.append(Paragraph(
+                    f'• {photo.minutes_of_the_meeting_photo_documentation_cloudinary_url}',
+                    section_style
+                ))
+        elements.append(Spacer(1, 12))
+    
+    # Add Signatures section
+    elements.append(Paragraph('Signatures', heading_style))
+    
+    # Presiding Officer
     elements.append(Paragraph(
-        f'Presiding Officer: {meeting[1]} {meeting[2]}',
-        normal_style
+        f'Presiding Officer: {meeting[1]} {meeting[2]} - {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y")}',
+        section_style
     ))
+    
+    # Prepared By
+    if prepared_by:
+        elements.append(Paragraph(
+            f'Prepared By: {prepared_by.users_first_name} {prepared_by.users_last_name} - {prepared_by.users_student_organization_position}',
+            section_style
+        ))
+    
+    # Approved By
+    if approved_by:
+        elements.append(Paragraph(
+            f'Approved By: {approved_by.users_first_name} {approved_by.users_last_name} - {approved_by.users_student_organization_position}',
+            section_style
+        ))
+    
+    # Noted By
+    if noted_by:
+        elements.append(Paragraph(
+            f'Noted By: {noted_by.users_first_name} {noted_by.users_last_name} - {noted_by.users_student_organization_position}',
+            section_style
+        ))
     
     # Build PDF
     doc.build(elements)
