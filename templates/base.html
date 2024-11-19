@@ -24,7 +24,7 @@
                     </li>
                     <li>
                         <a class="text-button account-image-container" href="{{ url_for('account') }}">
-                            <img class="small-account-picture" src="{{ current_user.users_profile_picture or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
+                            <img class="small-account-picture" src="{{ current_user.users_profile_picture_cloudinary_url or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
                             Account
                         </a>
                     </li>
