@@ -3444,7 +3444,6 @@ def add_minutes_of_the_meeting():
         status = request.form.get('minutes-of-the-meeting-status')
         presiding_officer = request.form.get('minutes-of-the-meeting-presiding-officer')
         agenda = request.form.get('minutes-of-the-meeting-agenda')
-        notes = request.form.get('minutes-of-the-meeting-notes')
         adjourned = request.form.get('minutes-of-the-meeting-adjourned')
         approved_by = request.form.get('minutes-of-the-meeting-approved-by')
         prepared_by = request.form.get('minutes-of-the-meeting-prepared-by')
@@ -3459,6 +3458,49 @@ def add_minutes_of_the_meeting():
         # Convert date to datetime object
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
         adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
+
+        # Process meeting recording with Gemini Pro if provided
+        meeting_recording = request.files.get('meeting-recording')
+        if meeting_recording:
+            filename = meeting_recording.filename.lower()
+            if not (filename.endswith(('.mp4', '.avi', '.mov', '.mp3', '.wav', '.m4a'))):
+                flash('Invalid file format. Please upload a video or audio file.', 'error')
+                return redirect(request.url)
+
+            try:
+                notes = ''
+                # Save file temporarily
+                temp_path = os.path.join(tempfile.gettempdir(), secure_filename(filename))
+                meeting_recording.save(temp_path)
+
+                # Use Gemini's File API to upload
+                uploaded_file = genai.upload_file(temp_path)
+
+                # Wait for file to be ready (add a small delay)
+                import time
+                time.sleep(2)  # Wait 2 seconds for file processing
+
+                # Create prompt for Gemini
+                prompt = f"""Please analyze this meeting transcript and provide a structured response with:
+                1. Summary
+                2. Key Discussion Points
+                3. Action Items
+                4. Next Steps
+                """
+
+                # Process with Gemini Flash
+                response = model_gemini_flash.generate_content([
+                    uploaded_file,
+                    prompt
+                ])
+                
+                # Combine AI-generated notes with user input
+                ai_generated_notes = response.text
+                notes = f"{notes}\n\nAI-Generated Summary:\n{ai_generated_notes}" if notes else ai_generated_notes
+
+            except Exception as e:
+                flash(f'Error processing recording with AI: {str(e)}', 'error')
+                return redirect(request.url)
 
         # Create a new minutes of the meeting
         new_meeting = MinutesOfTheMeeting(
