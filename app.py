@@ -61,7 +61,7 @@ cloudinary.config(
 
 # Gemini AI Configuration
 genai.configure(api_key=os.getenv("GOOGLE_GEMINI_AI_API_KEY"))
-model_gemini_pro = genai.GenerativeModel('gemini-1.5-pro')
+model_gemini_flash = genai.GenerativeModel('gemini-1.5-flash')
 
 csrf = CSRFProtect(app)
 
