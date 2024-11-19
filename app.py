@@ -3622,33 +3622,47 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     if approved_by:
         approved_by_org = StudentOrganizations.query.get(approved_by.users_student_organization)
 
-    # Prepared By
-    if prepared_by:
-        elements.append(Paragraph('Prepared By:', heading_style))
-        elements.append(Spacer(1, 20))  # Add space after label
-        elements.append(Paragraph(
-            f'{prepared_by.users_first_name} {prepared_by.users_last_name}',
-            section_style
-        ))
-        elements.append(Paragraph(
-            f'{prepared_by.users_student_organization_position}, {prepared_by_org.student_organizations_name if prepared_by_org else ""}',
-            section_style
-        ))
-        elements.append(Spacer(1, 30))  # Add space between signatures
+    # Create data for the signatures table
+    signature_data = []
     
-    # Approved By
+    # Prepare the signature blocks
+    if prepared_by:
+        prepared_block = [
+            Paragraph('Prepared By:', heading_style),
+            Spacer(1, 20),
+            Paragraph(f'{prepared_by.users_first_name} {prepared_by.users_last_name}', section_style),
+            Paragraph(f'{prepared_by.users_student_organization_position}, {prepared_by_org.student_organizations_name if prepared_by_org else ""}', section_style)
+        ]
+    else:
+        prepared_block = []
+
     if approved_by:
-        elements.append(Paragraph('Approved By:', heading_style))
-        elements.append(Spacer(1, 20))  # Add space after label
-        elements.append(Paragraph(
-            f'{approved_by.users_first_name} {approved_by.users_last_name}',
-            section_style
-        ))
-        elements.append(Paragraph(
-            f'{approved_by.users_student_organization_position}, {approved_by_org.student_organizations_name if approved_by_org else ""}',
-            section_style
-        ))
-        elements.append(Spacer(1, 30))  # Add space between signatures
+        approved_block = [
+            Paragraph('Approved By:', heading_style),
+            Spacer(1, 20),
+            Paragraph(f'{approved_by.users_first_name} {approved_by.users_last_name}', section_style),
+            Paragraph(f'{approved_by.users_student_organization_position}, {approved_by_org.student_organizations_name if approved_by_org else ""}', section_style)
+        ]
+    else:
+        approved_block = []
+
+    # Create table with signatures side by side
+    if prepared_by or approved_by:
+        signature_table = Table(
+            [[prepared_block, approved_block]],
+            colWidths=[doc.width/2]*2,  # Equal width columns without padding
+            spaceAfter=30
+        )
+        
+        # Add table style
+        signature_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0)
+        ]))
+        
+        elements.append(signature_table)
     
     # Noted By
     if noted_by:
