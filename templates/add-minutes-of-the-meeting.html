@@ -86,9 +86,9 @@
                     <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
                     <select name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" required>
                         <option value="" disabled selected>Select a Presiding Officer</option>
-                        {% for organization, members in users|groupby('users_student_organization') %}
-                        <optgroup label="{{ organization }}">
-                            {% for user in members %}
+                        {% for organization in student_organizations %}
+                        <optgroup label="{{ organization.student_organizations_name }}">
+                            {% for user in organization.users %}
                             <option value="{{ user.users_id }}">
                                 {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
                             </option>
