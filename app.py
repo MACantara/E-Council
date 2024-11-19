@@ -3511,6 +3511,16 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         text_x = iso_x + (50 - text_width)/2
         canvas.drawString(text_x, doc.height + doc.topMargin, text)
         
+        # Add red line after text
+        canvas.setStrokeColorRGB(0x8c/255, 0x04/255, 0x04/255)  # #8c0404
+        canvas.setLineWidth(2)
+        line_y = doc.height + doc.topMargin - 10
+        line_length = 510  # Adjust this value to control line length
+        # Calculate start and end points to center the line
+        line_start_x = (doc.width - line_length) / 2 + doc.leftMargin
+        line_end_x = line_start_x + line_length
+        canvas.line(line_start_x - 5, line_y, line_end_x, line_y)
+        
         canvas.restoreState()
     
     # Create custom page template
