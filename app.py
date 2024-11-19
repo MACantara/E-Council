@@ -139,7 +139,7 @@ class Users(db.Model, UserMixin):
         return str(self.users_id)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.users_profile_picture}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_departments_id}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
+        return f"Users({self.users_id}, {self.users_profile_picture_cloudinary_url}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_departments_id}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
 
 class Departments(db.Model):
     __tablename__ = "departments"
@@ -1406,7 +1406,7 @@ def upload_profile_picture():
             return redirect(url_for("account"))
 
         # Delete the previous profile picture from Cloudinary if it exists
-        if (current_user.users_profile_picture):
+        if (current_user.users_profile_picture_cloudinary_url):
             public_id = current_user.users_profile_picture_cloudinary_public_id
             if (public_id):
                 cloudinary.uploader.destroy(public_id)
@@ -1417,7 +1417,7 @@ def upload_profile_picture():
         profile_picture_public_id = upload_result["public_id"]
 
         # Update the user's profile picture URL and public ID
-        current_user.users_profile_picture = profile_picture_url
+        current_user.users_profile_picture_cloudinary_url = profile_picture_url
         current_user.users_profile_picture_cloudinary_public_id = profile_picture_public_id
 
         db.session.commit()
@@ -1536,7 +1536,7 @@ def delete_user_account():
             cloudinary.uploader.destroy(public_id)
 
     # Delete the user's profile picture from Cloudinary if it exists
-    if current_user.users_profile_picture:
+    if current_user.users_profile_picture_cloudinary_url:
         profile_picture_public_id = current_user.users_profile_picture_cloudinary_public_id
         if profile_picture_public_id:
             cloudinary.uploader.destroy(profile_picture_public_id)
