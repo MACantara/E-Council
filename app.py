@@ -3624,24 +3624,45 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
 
     # Prepared By
     if prepared_by:
+        elements.append(Paragraph('Prepared By:', heading_style))
+        elements.append(Spacer(1, 20))  # Add space after label
         elements.append(Paragraph(
-            f'Prepared By: {prepared_by.users_first_name} {prepared_by.users_last_name} - {prepared_by.users_student_organization_position}, {prepared_by_org.student_organizations_name if prepared_by_org else ""}',
+            f'{prepared_by.users_first_name} {prepared_by.users_last_name}',
             section_style
         ))
+        elements.append(Paragraph(
+            f'{prepared_by.users_student_organization_position}, {prepared_by_org.student_organizations_name if prepared_by_org else ""}',
+            section_style
+        ))
+        elements.append(Spacer(1, 30))  # Add space between signatures
     
     # Approved By
     if approved_by:
+        elements.append(Paragraph('Approved By:', heading_style))
+        elements.append(Spacer(1, 20))  # Add space after label
         elements.append(Paragraph(
-            f'Approved By: {approved_by.users_first_name} {approved_by.users_last_name} - {approved_by.users_student_organization_position}, {approved_by_org.student_organizations_name if approved_by_org else ""}',
+            f'{approved_by.users_first_name} {approved_by.users_last_name}',
             section_style
         ))
+        elements.append(Paragraph(
+            f'{approved_by.users_student_organization_position}, {approved_by_org.student_organizations_name if approved_by_org else ""}',
+            section_style
+        ))
+        elements.append(Spacer(1, 30))  # Add space between signatures
     
     # Noted By
     if noted_by:
+        elements.append(Paragraph('Noted By:', heading_style))
+        elements.append(Spacer(1, 20))  # Add space after label
         elements.append(Paragraph(
-            f'Noted By: {noted_by.signatory_first_name} {noted_by.signatory_last_name} - {noted_by.signatory_position}, {noted_by.signatory_department}',
+            f'{noted_by.signatory_first_name} {noted_by.signatory_last_name}',
             section_style
         ))
+        elements.append(Paragraph(
+            f'{noted_by.signatory_position}, {noted_by.signatory_department}',
+            section_style
+        ))
+        elements.append(Spacer(1, 30))  # Add space between signatures
     
     # Add Photo Documentation section if there are photos
     if photos:
