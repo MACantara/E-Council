@@ -3610,7 +3610,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         elements.append(Spacer(1, 12))
     
     if meeting_data.minutes_of_the_meeting_adjourned:
-        elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', normal_style))
+        elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', section_style))
     elements.append(Spacer(1, 12))
 
     # Add Signatures section
