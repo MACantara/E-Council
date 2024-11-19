@@ -3666,17 +3666,28 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     
     # Noted By
     if noted_by:
-        elements.append(Paragraph('Noted By:', heading_style))
-        elements.append(Spacer(1, 20))  # Add space after label
-        elements.append(Paragraph(
-            f'{noted_by.signatory_first_name} {noted_by.signatory_last_name}',
-            section_style
-        ))
-        elements.append(Paragraph(
-            f'{noted_by.signatory_position}, {noted_by.signatory_department}',
-            section_style
-        ))
-        elements.append(Spacer(1, 30))  # Add space between signatures
+        noted_block = [
+            Paragraph('Noted By:', heading_style),
+            Spacer(1, 20),
+            Paragraph(f'{noted_by.signatory_first_name} {noted_by.signatory_last_name}', section_style),
+            Paragraph(f'{noted_by.signatory_position}, {noted_by.signatory_department}', section_style)
+        ]
+        
+        noted_table = Table(
+            [[noted_block]],
+            colWidths=[doc.width/2],  # Use half width for consistent sizing
+            spaceAfter=30
+        )
+        
+        # Add table style for centering
+        noted_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0)
+        ]))
+        
+        elements.append(noted_table)
     
     # Add Photo Documentation section if there are photos
     if photos:
