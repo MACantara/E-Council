@@ -22,7 +22,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame
 
 import cloudinary
 import cloudinary.uploader
@@ -3481,6 +3481,45 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         topMargin=72,
         bottomMargin=72
     )
+
+    # Create a custom header function
+    def header(canvas, doc):
+        canvas.saveState()
+        
+        # Add header images with manual positioning
+        # PERPS header - left side
+        header_perps = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/HEADER-PERPS.png', width=200, height=50)
+        header_perps.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin - 50)
+        
+        # CCS Logo - center
+        header_ccs = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/CCS-LOGO.png', width=50, height=50)
+        # Calculate center position: leftMargin + (pageWidth - imageWidth)/2
+        ccs_x = doc.leftMargin + (doc.width - 50)/2
+        header_ccs.drawOn(canvas, ccs_x, doc.height + doc.topMargin - 50)
+        
+        # ISO Logo - right side
+        header_iso = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/ISO.png', width=50, height=50)
+        # Calculate right position: leftMargin + pageWidth - imageWidth
+        iso_x = doc.leftMargin + doc.width - 50
+        header_iso.drawOn(canvas, iso_x, doc.height + doc.topMargin - 50)
+        
+        canvas.restoreState()
+    
+    # Create custom page template
+    page_template = PageTemplate(
+        'custom_template',
+        frames=[Frame(
+            doc.leftMargin,
+            doc.bottomMargin,
+            doc.width,
+            doc.height,
+            id='normal'
+        )],
+        onPage=header
+    )
+    
+    # Add template to document
+    doc.addPageTemplates([page_template])
     
     # Container for the 'Flowable' objects
     elements = []
@@ -3500,7 +3539,6 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         fontSize=12,
         textColor=colors.black,
     )
-
     
     # Add meeting details
     meeting_data = meeting[0]
@@ -3712,7 +3750,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         elements.append(Spacer(1, 12))
 
     # Build PDF
-    doc.build(elements)
+    doc.build(elements, onFirstPage=header, onLaterPages=header)
     
     # Reset buffer position
     buffer.seek(0)
