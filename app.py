@@ -3467,7 +3467,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     # Get prepared by, approved by, and noted by users
     prepared_by = Users.query.get(meeting[0].minutes_of_the_meeting_prepared_by)
     approved_by = Users.query.get(meeting[0].minutes_of_the_meeting_approved_by)
-    noted_by = Users.query.get(meeting[0].minutes_of_the_meeting_noted_by)
+    noted_by = Signatories.query.get(meeting[0].minutes_of_the_meeting_noted_by)
     
     # Create BytesIO buffer to receive PDF data
     buffer = BytesIO()
@@ -3502,12 +3502,13 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         textColor=colors.black,
     )
     
-    # Add title
-    elements.append(Paragraph('Council Meeting SY', title_style))
-    elements.append(Spacer(1, 12))
-    
     # Add meeting details
     meeting_data = meeting[0]
+
+    # Add title
+    elements.append(Paragraph(f'Council Meeting SY {meeting_data.minutes_of_the_meeting_academic_year}', title_style))
+    elements.append(Spacer(1, 12))
+    
     elements.append(Paragraph(
         f'Date & Time: {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y, %I:%M %p")}' + 
         (f' - {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}' if meeting_data.minutes_of_the_meeting_adjourned else ''),
@@ -3538,6 +3539,34 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     elements.append(Paragraph(meeting_data.minutes_of_the_meeting_notes, section_style))
     elements.append(Spacer(1, 12))
     
+    if meeting_data.minutes_of_the_meeting_adjourned:
+        elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', normal_style))
+    elements.append(Spacer(1, 12))
+
+    # Add Signatures section
+    elements.append(Paragraph('Signatures', heading_style))
+
+    # Prepared By
+    if prepared_by:
+        elements.append(Paragraph(
+            f'Prepared By: {prepared_by.users_first_name} {prepared_by.users_last_name} - {prepared_by.users_student_organization_position}',
+            section_style
+        ))
+    
+    # Approved By
+    if approved_by:
+        elements.append(Paragraph(
+            f'Approved By: {approved_by.users_first_name} {approved_by.users_last_name} - {approved_by.users_student_organization_position}',
+            section_style
+        ))
+    
+    # Noted By
+    if noted_by:
+        elements.append(Paragraph(
+            f'Noted By: {noted_by.signatory_first_name} {noted_by.signatory_last_name} - {noted_by.signatory_position}, {noted_by.signatory_department}',
+            section_style
+        ))
+    
     # Add Photo Documentation section if there are photos
     if photos:
         elements.append(Paragraph('Photo Documentation', heading_style))
@@ -3561,35 +3590,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
                     section_style
                 ))
         elements.append(Spacer(1, 12))
-    
-    # Add Signatures section
-    elements.append(Paragraph('Signatures', heading_style))
-    
-    if meeting_data.minutes_of_the_meeting_adjourned:
-        elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', normal_style))
-    elements.append(Spacer(1, 12))
 
-    # Prepared By
-    if prepared_by:
-        elements.append(Paragraph(
-            f'Prepared By: {prepared_by.users_first_name} {prepared_by.users_last_name} - {prepared_by.users_student_organization_position}',
-            section_style
-        ))
-    
-    # Approved By
-    if approved_by:
-        elements.append(Paragraph(
-            f'Approved By: {approved_by.users_first_name} {approved_by.users_last_name} - {approved_by.users_student_organization_position}',
-            section_style
-        ))
-    
-    # Noted By
-    if noted_by:
-        elements.append(Paragraph(
-            f'Noted By: {noted_by.users_first_name} {noted_by.users_last_name} - {noted_by.users_student_organization_position}',
-            section_style
-        ))
-    
     # Build PDF
     doc.build(elements)
     
