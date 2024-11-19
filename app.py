@@ -709,9 +709,12 @@ class EventPhotoDocumentationImages(db.Model):
         return f'<EventPhotoDocumentationImages {self.event_photo_documentation_images_id}>'
 
 # Custom Jinja2 Filters
-def truncate_text(text, length=100):
+@app.template_filter('truncate')
+def truncate_text(text, length=100, suffix='...'):
+    if text is None:
+        return ''
     if len(text) > length:
-        return text[:length] + '...'
+        return text[:length].rsplit(' ', 1)[0] + suffix
     return text
 
 app.jinja_env.filters['truncate'] = truncate_text
