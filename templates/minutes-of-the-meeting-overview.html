@@ -107,7 +107,7 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href=""
+                    <a href="{{ url_for('generate_mom_pdf', minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id) }}"
                         class="primary-button">View</a>
                     <a href="{{ url_for('update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
                         class="secondary-button">Update</a>
