@@ -1704,7 +1704,7 @@ def events_overview():
     event_data = []
 
     for event in events:
-        transactions = TransactionHistory.query.filter_by(events_id=event.events_id).all()
+        transactions = TransactionHistory.query.filter_by(transaction_events_id=event.events_id).all()
         total_income = sum(safe_decimal_conversion(t.transaction_total) for t in transactions if t.transaction_type == 'Income')
         total_expense = sum(safe_decimal_conversion(t.transaction_total) for t in transactions if t.transaction_type == 'Expense')
         events_budget = safe_decimal_conversion(event.events_budget) if event.events_budget else Decimal('0.00')
