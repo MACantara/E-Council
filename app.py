@@ -3501,6 +3501,8 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         fontSize=12,
         textColor=colors.black,
     )
+
+    
     
     # Add meeting details
     meeting_data = meeting[0]
@@ -3534,10 +3536,48 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     elements.append(Paragraph(meeting_data.minutes_of_the_meeting_agenda, section_style))
     elements.append(Spacer(1, 12))
     
-    # Add Notes section
+    # Add Notes section with subsections
     elements.append(Paragraph('Notes', heading_style))
-    elements.append(Paragraph(meeting_data.minutes_of_the_meeting_notes, section_style))
     elements.append(Spacer(1, 12))
+    
+    # Split notes into sections
+    notes = meeting_data.minutes_of_the_meeting_notes
+    
+    # Helper function to extract section content
+    def extract_section(text, section_name):
+        pattern = f"{section_name}:(.*?)(?=(?:Summary:|Key Discussion Points:|Action Items:|Next Steps:|$))"
+        match = re.search(pattern, text, re.DOTALL)
+        return match.group(1).strip() if match else ""
+    
+    # Extract each section
+    summary = extract_section(notes, "Summary")
+    key_points = extract_section(notes, "Key Discussion Points")
+    action_items = extract_section(notes, "Action Items")
+    next_steps = extract_section(notes, "Next Steps")
+    
+    # Add Summary
+    if summary:
+        elements.append(Paragraph("Summary", heading_style))
+        elements.append(Paragraph(summary, section_style))
+        elements.append(Spacer(1, 12))
+    
+    # Add Key Discussion Points
+    if key_points:
+        elements.append(Paragraph("Key Discussion Points", heading_style))
+        elements.append(Paragraph(key_points, section_style))
+        elements.append(Spacer(1, 12))
+    
+    # Add Action Items
+    if action_items:
+        elements.append(Paragraph("Action Items", heading_style))
+        elements.append(Paragraph(action_items, section_style))
+        elements.append(Spacer(1, 12))
+    
+    # Add Next Steps
+    if next_steps:
+        elements.append(Paragraph("Next Steps", heading_style))
+        elements.append(Paragraph(next_steps, section_style))
+        elements.append(Spacer(1, 12))
     
     if meeting_data.minutes_of_the_meeting_adjourned:
         elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', normal_style))
