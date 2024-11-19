@@ -3503,18 +3503,23 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     )
     
     # Add title
-    elements.append(Paragraph('Minutes of Meeting', title_style))
+    elements.append(Paragraph('Council Meeting SY', title_style))
     elements.append(Spacer(1, 12))
     
     # Add meeting details
     meeting_data = meeting[0]
-    elements.append(Paragraph(f'Date: {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y")}', normal_style))
-    elements.append(Paragraph(f'Time: {meeting_data.minutes_of_the_meeting_date.strftime("%I:%M %p")}', normal_style))
-    elements.append(Paragraph(f'Agenda: {meeting_data.minutes_of_the_meeting_agenda}', normal_style))
-    if meeting_data.minutes_of_the_meeting_adjourned:
-        elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', normal_style))
-    elements.append(Spacer(1, 12))
-    
+    elements.append(Paragraph(
+        f'Date & Time: {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y, %I:%M %p")}' + 
+        (f' - {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}' if meeting_data.minutes_of_the_meeting_adjourned else ''),
+        normal_style
+    ))
+
+    # Presiding Officer
+    elements.append(Paragraph(
+        f'Presiding Officer: {meeting[1]} {meeting[2]}',
+        section_style
+    ))
+
     # Add Attendees section
     elements.append(Paragraph('Attendees', heading_style))
     for attendee in attendees:
@@ -3522,6 +3527,10 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
             f'• {attendee[1].users_first_name} {attendee[1].users_last_name} - {attendee[1].users_student_organization_position}',
             section_style
         ))
+    elements.append(Spacer(1, 12))
+
+    elements.append(Paragraph(f'Agenda:', heading_style))
+    elements.append(Paragraph(meeting_data.minutes_of_the_meeting_agenda, section_style))
     elements.append(Spacer(1, 12))
     
     # Add Notes section
@@ -3556,12 +3565,10 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     # Add Signatures section
     elements.append(Paragraph('Signatures', heading_style))
     
-    # Presiding Officer
-    elements.append(Paragraph(
-        f'Presiding Officer: {meeting[1]} {meeting[2]} - {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y")}',
-        section_style
-    ))
-    
+    if meeting_data.minutes_of_the_meeting_adjourned:
+        elements.append(Paragraph(f'Meeting Adjourned: {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}', normal_style))
+    elements.append(Spacer(1, 12))
+
     # Prepared By
     if prepared_by:
         elements.append(Paragraph(
