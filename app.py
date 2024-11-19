@@ -3484,12 +3484,16 @@ def add_minutes_of_the_meeting():
                 time.sleep(2)  # Wait 2 seconds for file processing
 
                 # Create prompt for Gemini
-                prompt = f"""Please analyze this meeting transcript and provide a structured response with:
-                1. Summary
+                prompt = f"""Please analyze this meeting transcript and provide a response with only:
+                1. Summary (single paragraph overview)
                 2. Key Discussion Points
+                   Use sub-numbering (2.1, 2.2, etc.) for each distinct point
                 3. Action Items
+                   Use sub-numbering (3.1, 3.2, etc.) for each action item
                 4. Next Steps
-                """
+                   Use sub-numbering (4.1, 4.2, etc.) for each step
+
+                No text formatting, markdown, or other formatting. No additional analysis or comments."""
 
                 # Process with Gemini Flash
                 response = model_gemini_flash.generate_content([
