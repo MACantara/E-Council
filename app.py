@@ -1,6 +1,6 @@
 import os
 import re
-from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify, send_file
 from jinja2 import Environment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
@@ -15,6 +15,13 @@ from markupsafe import Markup
 from datetime import datetime, timedelta
 from sqlalchemy import Enum
 from decimal import Decimal, InvalidOperation
+
+from io import BytesIO
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 import cloudinary
 import cloudinary.uploader
@@ -3435,6 +3442,83 @@ def minutes_of_the_meeting_overview():
     meetings_only = [meeting for meeting, _, _ in minutes_of_the_meeting]
 
     return render_template("minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date, meetings_only=meetings_only)
+
+@app.route('/generate-mom-pdf/<int:minutes_of_the_meeting_id>')
+@login_required
+def generate_mom_pdf(minutes_of_the_meeting_id):
+    # Get the meeting data with presiding officer
+    meeting = db.session.query(MinutesOfTheMeeting, Users.users_first_name, Users.users_last_name)\
+        .join(Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id)\
+        .filter(MinutesOfTheMeeting.minutes_of_the_meeting_id == minutes_of_the_meeting_id)\
+        .first_or_404()
+    
+    # Create BytesIO buffer to receive PDF data
+    buffer = BytesIO()
+    
+    # Create the PDF object using ReportLab
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=72,
+        leftMargin=72,
+        topMargin=72,
+        bottomMargin=72
+    )
+    
+    # Container for the 'Flowable' objects
+    elements = []
+    
+    # Get styles
+    styles = getSampleStyleSheet()
+    title_style = styles['Heading1']
+    heading_style = styles['Heading2']
+    normal_style = styles['Normal']
+    
+    # Custom style for sections
+    section_style = ParagraphStyle(
+        'SectionStyle',
+        parent=styles['Normal'],
+        spaceBefore=12,
+        spaceAfter=6,
+        leftIndent=0,
+        fontSize=12,
+        textColor=colors.black,
+    )
+    
+    # Add title
+    elements.append(Paragraph('Minutes of Meeting', title_style))
+    elements.append(Spacer(1, 12))
+    
+    # Add meeting details
+    meeting_data = meeting[0]
+    elements.append(Paragraph(f'Date: {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y")}', normal_style))
+    elements.append(Paragraph(f'Time: {meeting_data.minutes_of_the_meeting_date.strftime("%I:%M %p")}', normal_style))
+    elements.append(Paragraph(f'Agenda: {meeting_data.minutes_of_the_meeting_agenda}', normal_style))
+    elements.append(Spacer(1, 12))
+    
+    # Add Notes section
+    elements.append(Paragraph('Notes', heading_style))
+    elements.append(Paragraph(meeting_data.minutes_of_the_meeting_notes, section_style))
+    elements.append(Spacer(1, 12))
+    
+    # Add Presiding Officer
+    elements.append(Paragraph(
+        f'Presiding Officer: {meeting[1]} {meeting[2]}',
+        normal_style
+    ))
+    
+    # Build PDF
+    doc.build(elements)
+    
+    # Reset buffer position
+    buffer.seek(0)
+    
+    # Return the PDF as a download
+    return send_file(
+        buffer,
+        download_name=f'minutes-of-meeting-{meeting_data.minutes_of_the_meeting_id}.pdf',
+        mimetype='application/pdf'
+    )
 
 @app.route('/add-minutes-of-the-meeting', methods=['GET', 'POST'])
 @login_required
