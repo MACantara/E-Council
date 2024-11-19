@@ -120,9 +120,15 @@
                     <textarea name="minutes-of-the-meeting-agenda" id="minutes-of-the-meeting-agenda" placeholder="Agenda" required></textarea>
                 </div>
 
+
                 <div class="input-pair">
-                    <label for="minutes-of-the-meeting-notes">Notes</label>
-                    <textarea name="minutes-of-the-meeting-notes" id="minutes-of-the-meeting-notes" placeholder="Notes"></textarea>
+                    <label for="meeting-recording">Meeting Recording</label>
+                    <input type="file" name="meeting-recording" id="meeting-recording" hidden accept="audio/*,video/*">
+                    <label for="meeting-recording" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="meeting-recording-file-name" class="file-name">No files chosen</span>
+                    </label>
+                    <p>Upload audio (max 9.5 hours) or video (max 2 hours) recording of the meeting</p>
                 </div>
 
                 <div class="input-pair">
@@ -196,7 +202,7 @@
                     <input type="file" name="photo-documentation" id="photo-documentation" hidden accept="image/jpeg, image/jpg, image/png" multiple>
                     <label for="photo-documentation" class="custom-file-upload-input">
                         <span class="choose-file-text">Choose Files</span>
-                        <span id="file-name" class="file-name">No files chosen</span>
+                        <span id="photo-documentation-file-name" class="file-name">No files chosen</span>
                     </label>
                     <p>Supported file types: .jpeg, .jpg, .png</p>
                 </div>
@@ -229,9 +235,14 @@
             }
         });
 
+        document.getElementById('meeting-recording').addEventListener('change', function () {
+            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
+            document.getElementById('meeting-recording-file-name').textContent = fileNames;
+        });
+
         document.getElementById('photo-documentation').addEventListener('change', function () {
             const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
-            document.getElementById('file-name').textContent = fileNames;
+            document.getElementById('photo-documentation-file-name').textContent = fileNames;
         });
 
         const notedBySelect = document.getElementById('minutes-of-the-meeting-noted-by');
