@@ -3482,7 +3482,6 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         bottomMargin=72
     )
 
-    # Create a custom header function
     def header(canvas, doc):
         canvas.saveState()
         
@@ -3503,6 +3502,14 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         # Calculate right position: leftMargin + pageWidth - imageWidth
         iso_x = doc.leftMargin + doc.width - 80
         header_iso.drawOn(canvas, iso_x, doc.height + doc.topMargin + 15)
+        
+        # Add text below ISO logo
+        canvas.setFont("Helvetica-Bold", 10)
+        text = "College of Computer Studies"
+        text_width = canvas.stringWidth(text, "Helvetica-Bold", 10)
+        # Center the text below the ISO logo
+        text_x = iso_x + (50 - text_width)/2
+        canvas.drawString(text_x, doc.height + doc.topMargin, text)
         
         canvas.restoreState()
     
