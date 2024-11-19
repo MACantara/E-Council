@@ -3616,17 +3616,26 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     # Add Signatures section
     elements.append(Paragraph('Signatures', heading_style))
 
+    # Get the student organizations for prepared_by and approved_by
+    prepared_by_org = None
+    approved_by_org = None
+    
+    if prepared_by:
+        prepared_by_org = StudentOrganizations.query.get(prepared_by.users_student_organization)
+    if approved_by:
+        approved_by_org = StudentOrganizations.query.get(approved_by.users_student_organization)
+
     # Prepared By
     if prepared_by:
         elements.append(Paragraph(
-            f'Prepared By: {prepared_by.users_first_name} {prepared_by.users_last_name} - {prepared_by.users_student_organization_position}',
+            f'Prepared By: {prepared_by.users_first_name} {prepared_by.users_last_name} - {prepared_by.users_student_organization_position}, {prepared_by_org.student_organizations_name if prepared_by_org else ""}',
             section_style
         ))
     
     # Approved By
     if approved_by:
         elements.append(Paragraph(
-            f'Approved By: {approved_by.users_first_name} {approved_by.users_last_name} - {approved_by.users_student_organization_position}',
+            f'Approved By: {approved_by.users_first_name} {approved_by.users_last_name} - {approved_by.users_student_organization_position}, {approved_by_org.student_organizations_name if approved_by_org else ""}',
             section_style
         ))
     
