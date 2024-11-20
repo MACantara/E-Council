@@ -60,7 +60,11 @@
                     <canvas id="remaining-budget-chart"></canvas>
                 </div>
 
-                <p>Remaining Budget: ₱ {{ "{:,.2f}".format(remaining_budget) }}</p>
+                {% if remaining_budget is string %}
+                    <p>Remaining Budget: {{ remaining_budget }}</p>
+                {% else %}
+                    <p>Remaining Budget: ₱ {{ "{:,.2f}".format(remaining_budget) }}</p>
+                {% endif %}
             </div>
         </div>
 

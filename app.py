@@ -1930,19 +1930,19 @@ def event_dashboard(event_id):
     event = Events.query.get_or_404(event_id)
     
     # Fetch the transaction history for the given event_id, sorted by most recent
-    transactions = TransactionHistory.query.filter_by(events_id=event_id).order_by(TransactionHistory.transaction_date.desc()).all()
+    transactions = TransactionHistory.query.filter_by(transaction_events_id=event_id).order_by(TransactionHistory.transaction_date.desc()).all()
 
     # Query top 5 income transactions grouped by category
     top5_income = db.session.query(
         TransactionHistory.transaction_category,
         db.func.sum(TransactionHistory.transaction_total).label('transaction_total')
-    ).filter_by(events_id=event_id, transaction_type='Income').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
+    ).filter_by(transaction_events_id=event_id, transaction_type='Income').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
 
     # Query top 5 expense transactions grouped by category
     top5_expense = db.session.query(
         TransactionHistory.transaction_category,
         db.func.sum(TransactionHistory.transaction_total).label('transaction_total')
-    ).filter_by(events_id=event_id, transaction_type='Expense').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
+    ).filter_by(transaction_events_id=event_id, transaction_type='Expense').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
 
     # Convert TransactionHistory objects to dictionaries
     def transaction_to_dict(transaction):
@@ -1958,9 +1958,17 @@ def event_dashboard(event_id):
     total_income = sum(transaction['transaction_total'] for transaction in top5_income_dicts) or 0
     total_expense = sum(transaction['transaction_total'] for transaction in top5_expense_dicts) or 0
 
+    # Safely convert the event budget to a float if possible
+    try:
+        events_budget = float(event.events_budget or 0)
+    except (ValueError, TypeError):
+        events_budget = event.events_budget  # Keep it as a string or handle it as needed
+
     # Calculate remaining budget
-    events_budget = float(event.events_budget or 0)
-    remaining_budget = total_income - total_expense + events_budget
+    if isinstance(events_budget, float):
+        remaining_budget = total_income - total_expense + events_budget
+    else:
+        remaining_budget = f"Budget: {events_budget}"  # Return as string if not a float
 
     return render_template("event-dashboard.html", event=event, transactions=transactions, top5_income=top5_income_dicts, top5_expense=top5_expense_dicts, total_income=total_income, total_expense=total_expense, remaining_budget=remaining_budget)
 
