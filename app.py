@@ -22,7 +22,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable
 
 import cloudinary
 import cloudinary.uploader
@@ -3606,10 +3606,13 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     elements.append(Paragraph(f'Agenda:', heading_style))
     elements.append(Paragraph(meeting_data.minutes_of_the_meeting_agenda, section_style))
     elements.append(Spacer(1, 12))
-    
-    # Add Notes section with subsections
-    elements.append(Paragraph('Notes', heading_style))
-    elements.append(Spacer(1, 12))
+    elements.append(HRFlowable(
+        width="100%",
+        thickness=1,
+        color=colors.black,
+        spaceBefore=6,
+        spaceAfter=6
+    ))
     
     # Split notes into sections
     notes = meeting_data.minutes_of_the_meeting_notes
