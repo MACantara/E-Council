@@ -3487,9 +3487,9 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         
         # Add header images with manual positioning
         # PERPS header - left side
-        header_perps = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/HEADER-PERPS.png', width=200, height=50)
+        header_perps = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/HEADER-PERPS.png', width=325, height=75)
         perps_x = doc.leftMargin - 35
-        header_perps.drawOn(canvas, perps_x, doc.height + doc.topMargin + 15)
+        header_perps.drawOn(canvas, perps_x, doc.height + doc.topMargin)
         
         # CCS Logo - center
         header_ccs = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/CCS-LOGO.png', width=35, height=50)
@@ -3523,14 +3523,16 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         
         canvas.restoreState()
     
-    # Create custom page template
+    # Create custom page template with extra space after header
+    header_space = 20  # Adjust this value to control space after header
     page_template = PageTemplate(
         'custom_template',
         frames=[Frame(
             doc.leftMargin,
             doc.bottomMargin,
             doc.width,
-            doc.height,
+            doc.height - header_space,  # Reduce frame height to create space after header
+            topPadding=header_space,  # Add explicit top padding
             id='normal'
         )],
         onPage=header
@@ -3767,7 +3769,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
                 ))
         elements.append(Spacer(1, 12))
 
-    # Build PDF
+    # Build PDF with header on all pages
     doc.build(elements, onFirstPage=header, onLaterPages=header)
     
     # Reset buffer position
