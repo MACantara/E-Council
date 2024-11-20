@@ -146,8 +146,8 @@
                     <label for="minutes-of-the-meeting-approved-by">Approved By</label>
                     <select name="minutes-of-the-meeting-approved-by" id="minutes-of-the-meeting-approved-by">
                         <option value="" disabled selected>Select a User</option>
-                        {% for organization, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
-                        <optgroup label="{{ organization }}">
+                        {% for organization_id, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
+                        <optgroup label="{{ org_dict[organization_id] }}">
                             {% for user in members %}
                             <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
                             {% endfor %}
