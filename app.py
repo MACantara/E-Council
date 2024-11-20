@@ -3987,7 +3987,10 @@ def add_minutes_of_the_meeting():
     # Query for student organizations and their members
     student_organizations = StudentOrganizations.query.all()
 
-    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories, student_organizations=student_organizations)
+    student_org = StudentOrganizations.query.get(current_user.users_student_organization)
+    student_org_name = student_org.student_organizations_name if student_org else "Unknown Organization"
+
+    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories, student_organizations=student_organizations, student_org_name=student_org_name, current_user=current_user)
 
 @app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
 @login_required

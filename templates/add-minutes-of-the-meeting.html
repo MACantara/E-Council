@@ -138,7 +138,7 @@
 
                 <div class="input-pair">
                     <label for="minutes-of-the-meeting-prepared-by">Prepared By</label>
-                    <input type="text" name="minutes-of-the-meeting-prepared-by-display" id="minutes-of-the-meeting-prepared-by-display" value="{{ current_user.users_first_name }} {{ current_user.users_last_name }} - {{ current_user.users_student_organization_position }} - {{ current_user.users_student_organization }}" readonly>
+                    <input type="text" name="minutes-of-the-meeting-prepared-by-display" id="minutes-of-the-meeting-prepared-by-display" value="{{ current_user.users_first_name }} {{ current_user.users_last_name }} - {{ current_user.users_student_organization_position }} - {{ student_org_name }}" readonly>
                     <input type="hidden" name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by" value="{{ current_user.users_id }}">
                 </div>
 
