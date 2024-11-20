@@ -23,6 +23,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable
+from reportlab.pdfgen import canvas
 
 import cloudinary
 import cloudinary.uploader
@@ -3471,7 +3472,31 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     
     # Create BytesIO buffer to receive PDF data
     buffer = BytesIO()
-    
+
+    # Create the PDF object
+    class NumberedCanvas(canvas.Canvas):
+        def __init__(self, *args, **kwargs):
+            canvas.Canvas.__init__(self, *args, **kwargs)
+            self._saved_page_states = []
+            self._page_count = 0
+
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._page_count += 1
+            canvas.Canvas.showPage(self)
+
+        def save(self):
+            """Add page info to each page (page x of y)"""
+            num_pages = self._page_count
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self.draw_page_number(num_pages)
+                canvas.Canvas.showPage(self)
+            canvas.Canvas.save(self)
+
+        def draw_page_number(self, page_count):
+            self._doc.page_count = page_count
+
     # Create the PDF object using ReportLab
     doc = SimpleDocTemplate(
         buffer,
@@ -3481,6 +3506,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         topMargin=72,
         bottomMargin=72
     )
+    doc.page_count = 3  # Initialize page count
 
     def header(canvas, doc):
         canvas.saveState()
@@ -3520,6 +3546,24 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         line_start_x = (doc.width - line_length) / 2 + doc.leftMargin
         line_end_x = line_start_x + line_length
         canvas.line(line_start_x - 5, line_y, line_end_x, line_y)
+        
+        # Add footer
+        # Draw black line
+        canvas.setStrokeColorRGB(0, 0, 0)  # Black color
+        canvas.setLineWidth(1)
+        footer_y = doc.bottomMargin - 20  # Position the line above the footer text
+        canvas.line(doc.leftMargin, footer_y, doc.leftMargin + doc.width, footer_y)
+        
+        # Add footer text
+        canvas.setFont("Helvetica", 8)
+        
+        # Left aligned text
+        canvas.drawString(doc.leftMargin, footer_y - 15, "UPHMO-CCS-GEN-912/rev0")
+        
+        # Right aligned text with page numbers
+        page_text = f"Council Meeting | Page {canvas.getPageNumber()} of {doc.page_count}"
+        text_width = canvas.stringWidth(page_text, "Helvetica", 8)
+        canvas.drawString(doc.leftMargin + doc.width - text_width, footer_y - 15, page_text)
         
         canvas.restoreState()
     
