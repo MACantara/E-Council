@@ -3901,12 +3901,13 @@ def add_minutes_of_the_meeting():
 
                 # Create prompt for Gemini
                 prompt = f"""Please analyze this meeting transcript and provide a response with only:
-                1. Summary (single paragraph overview)
-                2. Key Discussion Points
+                1. Summary:
+                   Use a single paragraph for the summary
+                2. Key Discussion Points:
                    Use sub-numbering (2.1, 2.2, etc.) for each distinct point
-                3. Action Items
+                3. Action Items:
                    Use sub-numbering (3.1, 3.2, etc.) for each action item
-                4. Next Steps
+                4. Next Steps:
                    Use sub-numbering (4.1, 4.2, etc.) for each step
 
                 No text formatting, markdown, or other formatting. No additional analysis or comments."""
