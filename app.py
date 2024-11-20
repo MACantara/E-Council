@@ -3546,10 +3546,25 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     
     # Get styles
     styles = getSampleStyleSheet()
-    title_style = styles['Heading1']
     heading_style = styles['Heading2']
     normal_style = styles['Normal']
     
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        alignment=1  # 1 is for center alignment
+    )
+    
+    # Custom style for centered sections
+    centered_section_style = ParagraphStyle(
+        'CenteredSection',
+        parent=styles['Normal'],
+        spaceAfter=6,
+        fontSize=12,
+        textColor=colors.black,
+        alignment=1  # 1 is for center alignment
+    )
+
     # Custom style for sections
     section_style = ParagraphStyle(
         'SectionStyle',
@@ -3565,13 +3580,13 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
 
     # Add title
     elements.append(Paragraph(f'Council Meeting SY {meeting_data.minutes_of_the_meeting_academic_year}', title_style))
-    elements.append(Spacer(1, 12))
     
     elements.append(Paragraph(
         f'Date & Time: {meeting_data.minutes_of_the_meeting_date.strftime("%B %d, %Y, %I:%M %p")}' + 
         (f' - {meeting_data.minutes_of_the_meeting_adjourned.strftime("%I:%M %p")}' if meeting_data.minutes_of_the_meeting_adjourned else ''),
-        section_style
+        centered_section_style
     ))
+    elements.append(Spacer(1, 12))
 
     # Presiding Officer
     elements.append(Paragraph(
