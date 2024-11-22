@@ -30,7 +30,6 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 
 import google.generativeai as genai
-from moviepy.editor import VideoFileClip
 import tempfile
 
 # Load environment variables from .env file
