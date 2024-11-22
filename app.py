@@ -3515,23 +3515,25 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     )
     doc.page_count = 3  # Initialize page count
 
+    img_path = "static/img/"
+
     def header(canvas, doc):
         canvas.saveState()
         
         # Add header images with manual positioning
         # PERPS header - left side
-        header_perps = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/HEADER-PERPS.png', width=325, height=75)
+        header_perps = Image('./static/img/HEADER-PERPS.png', width=325, height=75)
         perps_x = doc.leftMargin - 35
         header_perps.drawOn(canvas, perps_x, doc.height + doc.topMargin)
         
         # CCS Logo - center
-        header_ccs = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/CCS-LOGO.png', width=35, height=50)
+        header_ccs = Image('./static/img/CCS-LOGO.png', width=35, height=50)
         # Calculate center position: leftMargin + (pageWidth - imageWidth)/2
         ccs_x = doc.leftMargin + (doc.width - 35)/2 + 125
         header_ccs.drawOn(canvas, ccs_x, doc.height + doc.topMargin + 15)
         
         # ISO Logo - right side
-        header_iso = Image('E:/Projects/Programming-projects/Work-in-Progress/E-Council/static/img/ISO.png', width=100, height=50)
+        header_iso = Image('./static/img/ISO.png', width=100, height=50)
         # Calculate right position: leftMargin + pageWidth - imageWidth
         iso_x = doc.leftMargin + doc.width - 80
         header_iso.drawOn(canvas, iso_x, doc.height + doc.topMargin + 15)
