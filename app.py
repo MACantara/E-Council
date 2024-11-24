@@ -763,7 +763,7 @@ app.jinja_env.filters['has_papers'] = has_papers
 # Define the has_documentations filter
 @app.template_filter('has_documentations')
 def has_documentations(documentations, semester, academic_year):
-    return any(doc.documentation_semester == semester and doc.documentation_academic_year == academic_year for doc in documentations)
+    return any(doc[0].documentation_semester == semester and doc[0].documentation_academic_year == academic_year for doc in documentations)
 
 # Python functions
 def send_verification_email(users_email):
@@ -2810,10 +2810,30 @@ def delete_concept_paper(paper_id):
 @app.route("/documentation-overview")
 @login_required
 def documentation_overview():
-    # Query for all documentation
-    documentations = Documentation.query.all()
+    # Query for all documentation with concept paper subject, ordered by academic year (desc) and semester
+    documentations = db.session.query(
+        Documentation,
+        ConceptPaperForms.concept_paper_forms_subject
+    ).outerjoin(
+        ActivityReportForms,
+        Documentation.documentation_activity_report_forms_id == ActivityReportForms.activity_report_forms_id
+    ).outerjoin(
+        LearningJournalForms,
+        Documentation.documentation_learning_journal_forms_id == LearningJournalForms.learning_journal_forms_id
+    ).outerjoin(
+        ConceptPaperForms,
+        db.or_(
+            ActivityReportForms.activity_report_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id,
+            LearningJournalForms.learning_journal_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id
+        )
+    ).order_by(
+        Documentation.documentation_academic_year.desc(),
+        Documentation.documentation_semester.desc()
+    ).all()
 
-    return render_template("documentation-overview.html", documentations=documentations)
+    return render_template("documentation-overview.html", 
+                         documentations=documentations, 
+                         sort_by_date='recent-to-old')
 
 @app.route('/add-documentation', methods=['GET', 'POST'])
 @login_required
@@ -2863,42 +2883,34 @@ def add_documentation():
         # Add the new documentation to the database
         db.session.add(new_documentation)
         db.session.flush()  # Ensure the documentation ID is available
+        documentation_id = new_documentation.documentation_id  # Get the documentation ID
 
         # Add activity strengths
         for strength_content in activity_strengths:
             if strength_content:
-                strength = ActivityStrengths(activity_strengths_content=strength_content)
-                db.session.add(strength)
-                db.session.flush()  # Ensure the strength ID is available
-                activity_report_strength = ActivityReportFormsActivityStrengths(
-                    activity_report_forms_id=documentation_activity_report_forms_id,
-                    activity_strengths_id=strength.activity_strengths_id
+                strength = ActivityStrengths(
+                    activity_strengths_documentation_id=documentation_id,
+                    activity_strengths_content=strength_content
                 )
-                db.session.add(activity_report_strength)
+                db.session.add(strength)
 
         # Add activity weaknesses
         for weakness_content in activity_weaknesses:
             if weakness_content:
-                weakness = ActivityWeaknesses(activity_weaknesses_content=weakness_content)
-                db.session.add(weakness)
-                db.session.flush()  # Ensure the weakness ID is available
-                activity_report_weakness = ActivityReportFormsActivityWeaknesses(
-                    activity_report_forms_id=documentation_activity_report_forms_id,
-                    activity_weaknesses_id=weakness.activity_weaknesses_id
+                weakness = ActivityWeaknesses(
+                    activity_weaknesses_documentation_id=documentation_id,
+                    activity_weaknesses_content=weakness_content
                 )
-                db.session.add(activity_report_weakness)
+                db.session.add(weakness)
 
         # Add activity recommendations
         for recommendation_content in activity_recommendations:
             if recommendation_content:
-                recommendation = ActivityRecommendations(activity_recommendations_content=recommendation_content)
-                db.session.add(recommendation)
-                db.session.flush()  # Ensure the recommendation ID is available
-                activity_report_recommendation = ActivityReportFormsActivityRecommendations(
-                    activity_report_forms_id=documentation_activity_report_forms_id,
-                    activity_recommendations_id=recommendation.activity_recommendations_id
+                recommendation = ActivityRecommendations(
+                    activity_recommendations_documentation_id=documentation_id,
+                    activity_recommendations_content=recommendation_content
                 )
-                db.session.add(activity_report_recommendation)
+                db.session.add(recommendation)
 
         db.session.commit()
         flash("Documentation added successfully!", "success")
@@ -3007,7 +3019,42 @@ def update_documentation(documentation_id):
     # Query for learning journal forms
     learning_journals = LearningJournalForms.query.all()
 
-    return render_template('update-documentation.html', documentation=documentation, events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
+    # Query for activity report forms with concept paper subject
+    activity_reports = db.session.query(
+        ActivityReportForms, ConceptPaperForms.concept_paper_forms_subject
+    ).join(
+        ConceptPaperForms,
+        ActivityReportForms.activity_report_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id
+    ).all()
+
+    # Prepare activity reports data
+    activity_reports_data = [{
+        'activity_report_forms_id': report.ActivityReportForms.activity_report_forms_id,
+        'events_name': report.concept_paper_forms_subject
+    } for report in activity_reports]
+
+    # Query for learning journal forms with concept paper subject
+    learning_journals = db.session.query(
+        LearningJournalForms, ConceptPaperForms.concept_paper_forms_subject
+    ).join(
+        ConceptPaperForms,
+        LearningJournalForms.learning_journal_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id
+    ).all()
+
+    # Prepare learning journals data
+    learning_journals_data = [{
+        'learning_journal_forms_id': journal.LearningJournalForms.learning_journal_forms_id,
+        'events_name': journal.concept_paper_forms_subject
+    } for journal in learning_journals]
+
+    return render_template('update-documentation.html', 
+                         documentation=documentation, 
+                         events=events, 
+                         academic_years=academic_years, 
+                         users=users, 
+                         signatories=signatories, 
+                         activity_reports=activity_reports_data, 
+                         learning_journals=learning_journals_data)
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
 @login_required
