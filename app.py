@@ -763,7 +763,7 @@ app.jinja_env.filters['has_papers'] = has_papers
 # Define the has_documentations filter
 @app.template_filter('has_documentations')
 def has_documentations(documentations, semester, academic_year):
-    return any(doc.documentation_semester == semester and doc.documentation_academic_year == academic_year for doc in documentations)
+    return any(doc[0].documentation_semester == semester and doc[0].documentation_academic_year == academic_year for doc in documentations)
 
 # Python functions
 def send_verification_email(users_email):
@@ -2810,8 +2810,23 @@ def delete_concept_paper(paper_id):
 @app.route("/documentation-overview")
 @login_required
 def documentation_overview():
-    # Query for all documentation, ordered by academic year (desc) and semester
-    documentations = Documentation.query.order_by(
+    # Query for all documentation with concept paper subject, ordered by academic year (desc) and semester
+    documentations = db.session.query(
+        Documentation,
+        ConceptPaperForms.concept_paper_forms_subject
+    ).outerjoin(
+        ActivityReportForms,
+        Documentation.documentation_activity_report_forms_id == ActivityReportForms.activity_report_forms_id
+    ).outerjoin(
+        LearningJournalForms,
+        Documentation.documentation_learning_journal_forms_id == LearningJournalForms.learning_journal_forms_id
+    ).outerjoin(
+        ConceptPaperForms,
+        db.or_(
+            ActivityReportForms.activity_report_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id,
+            LearningJournalForms.learning_journal_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id
+        )
+    ).order_by(
         Documentation.documentation_academic_year.desc(),
         Documentation.documentation_semester.desc()
     ).all()
