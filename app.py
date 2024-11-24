@@ -3004,7 +3004,42 @@ def update_documentation(documentation_id):
     # Query for learning journal forms
     learning_journals = LearningJournalForms.query.all()
 
-    return render_template('update-documentation.html', documentation=documentation, events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
+    # Query for activity report forms with concept paper subject
+    activity_reports = db.session.query(
+        ActivityReportForms, ConceptPaperForms.concept_paper_forms_subject
+    ).join(
+        ConceptPaperForms,
+        ActivityReportForms.activity_report_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id
+    ).all()
+
+    # Prepare activity reports data
+    activity_reports_data = [{
+        'activity_report_forms_id': report.ActivityReportForms.activity_report_forms_id,
+        'events_name': report.concept_paper_forms_subject
+    } for report in activity_reports]
+
+    # Query for learning journal forms with concept paper subject
+    learning_journals = db.session.query(
+        LearningJournalForms, ConceptPaperForms.concept_paper_forms_subject
+    ).join(
+        ConceptPaperForms,
+        LearningJournalForms.learning_journal_forms_concept_paper_forms_id == ConceptPaperForms.concept_paper_forms_id
+    ).all()
+
+    # Prepare learning journals data
+    learning_journals_data = [{
+        'learning_journal_forms_id': journal.LearningJournalForms.learning_journal_forms_id,
+        'events_name': journal.concept_paper_forms_subject
+    } for journal in learning_journals]
+
+    return render_template('update-documentation.html', 
+                         documentation=documentation, 
+                         events=events, 
+                         academic_years=academic_years, 
+                         users=users, 
+                         signatories=signatories, 
+                         activity_reports=activity_reports_data, 
+                         learning_journals=learning_journals_data)
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
 @login_required
