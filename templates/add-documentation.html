@@ -71,22 +71,25 @@
                 <div class="input-pair">
                     <label for="activity-strengths">Activity Strengths</label>
                     <div id="activity-strengths">
-                        <input type="text" name="activity-strengths" value="">
+                        <input type="text" name="activity-strengths" placeholder="Enter Activity Strength" value="">
                     </div>
+                    <button type="button" class="secondary-button" onclick="addNewField('activity-strengths', 'Activity Strength')">Add New Strength</button>
                 </div>
 
                 <div class="input-pair">
                     <label for="activity-weaknesses">Activity Weaknesses</label>
                     <div id="activity-weaknesses">
-                        <input type="text" name="activity-weaknesses" value="">
+                        <input type="text" name="activity-weaknesses" placeholder="Enter Activity Weakness" value="">
                     </div>
+                    <button type="button" class="secondary-button" onclick="addNewField('activity-weaknesses', 'Activity Weakness')">Add New Weakness</button>
                 </div>
 
                 <div class="input-pair">
                     <label for="activity-recommendations">Activity Recommendations</label>
                     <div id="activity-recommendations">
-                        <input type="text" name="activity-recommendations" value="">
+                        <input type="text" name="activity-recommendations" placeholder="Enter Activity Recommendation" value="">
                     </div>
+                    <button type="button" class="secondary-button" onclick="addNewField('activity-recommendations', 'Activity Recommendation')">Add New Recommendation</button>
                 </div>
 
                 <div class="input-pair">
@@ -171,9 +174,6 @@
         const eventsSelect = document.getElementById('documentation-events-id');
         const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
         const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
-        const strengthsList = document.getElementById('activity-strengths');
-        const weaknessesList = document.getElementById('activity-weaknesses');
-        const recommendationsList = document.getElementById('activity-recommendations');
 
         eventsSelect.addEventListener('change', function () {
             const eventId = this.value;
@@ -204,6 +204,15 @@
                 .catch(error => console.error('Error fetching related forms:', error));
         });
     });
+
+    function addNewField(containerId, placeholder) {
+        const container = document.getElementById(containerId);
+        const newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.name = containerId;  // Remove the [] from the name
+        newInput.placeholder = `Enter ${placeholder}`;
+        container.appendChild(newInput);
+    }
 </script>
 
 {% endblock %}
