@@ -2810,10 +2810,15 @@ def delete_concept_paper(paper_id):
 @app.route("/documentation-overview")
 @login_required
 def documentation_overview():
-    # Query for all documentation
-    documentations = Documentation.query.all()
+    # Query for all documentation, ordered by academic year (desc) and semester
+    documentations = Documentation.query.order_by(
+        Documentation.documentation_academic_year.desc(),
+        Documentation.documentation_semester.desc()
+    ).all()
 
-    return render_template("documentation-overview.html", documentations=documentations)
+    return render_template("documentation-overview.html", 
+                         documentations=documentations, 
+                         sort_by_date='recent-to-old')
 
 @app.route('/add-documentation', methods=['GET', 'POST'])
 @login_required
