@@ -3562,8 +3562,6 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     )
     doc.page_count = 3  # Initialize page count
 
-    img_path = "static/img/"
-
     def header(canvas, doc):
         canvas.saveState()
         
