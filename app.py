@@ -2863,42 +2863,34 @@ def add_documentation():
         # Add the new documentation to the database
         db.session.add(new_documentation)
         db.session.flush()  # Ensure the documentation ID is available
+        documentation_id = new_documentation.documentation_id  # Get the documentation ID
 
         # Add activity strengths
         for strength_content in activity_strengths:
             if strength_content:
-                strength = ActivityStrengths(activity_strengths_content=strength_content)
-                db.session.add(strength)
-                db.session.flush()  # Ensure the strength ID is available
-                activity_report_strength = ActivityReportFormsActivityStrengths(
-                    activity_report_forms_id=documentation_activity_report_forms_id,
-                    activity_strengths_id=strength.activity_strengths_id
+                strength = ActivityStrengths(
+                    activity_strengths_documentation_id=documentation_id,
+                    activity_strengths_content=strength_content
                 )
-                db.session.add(activity_report_strength)
+                db.session.add(strength)
 
         # Add activity weaknesses
         for weakness_content in activity_weaknesses:
             if weakness_content:
-                weakness = ActivityWeaknesses(activity_weaknesses_content=weakness_content)
-                db.session.add(weakness)
-                db.session.flush()  # Ensure the weakness ID is available
-                activity_report_weakness = ActivityReportFormsActivityWeaknesses(
-                    activity_report_forms_id=documentation_activity_report_forms_id,
-                    activity_weaknesses_id=weakness.activity_weaknesses_id
+                weakness = ActivityWeaknesses(
+                    activity_weaknesses_documentation_id=documentation_id,
+                    activity_weaknesses_content=weakness_content
                 )
-                db.session.add(activity_report_weakness)
+                db.session.add(weakness)
 
         # Add activity recommendations
         for recommendation_content in activity_recommendations:
             if recommendation_content:
-                recommendation = ActivityRecommendations(activity_recommendations_content=recommendation_content)
-                db.session.add(recommendation)
-                db.session.flush()  # Ensure the recommendation ID is available
-                activity_report_recommendation = ActivityReportFormsActivityRecommendations(
-                    activity_report_forms_id=documentation_activity_report_forms_id,
-                    activity_recommendations_id=recommendation.activity_recommendations_id
+                recommendation = ActivityRecommendations(
+                    activity_recommendations_documentation_id=documentation_id,
+                    activity_recommendations_content=recommendation_content
                 )
-                db.session.add(activity_report_recommendation)
+                db.session.add(recommendation)
 
         db.session.commit()
         flash("Documentation added successfully!", "success")
