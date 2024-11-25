@@ -2941,6 +2941,28 @@ def add_documentation():
                 )
                 db.session.add(recommendation)
 
+        # Get learnings and observations
+        learnings = request.form.getlist('learnings')
+        observations = request.form.getlist('observations')
+        
+        # Add learnings
+        for learning_content in learnings:
+            if learning_content.strip():  # Only add non-empty learnings
+                new_learning = Learnings(
+                    learnings_learning_journal_forms_id=learning_journal_forms_id,
+                    learnings_content=learning_content
+                )
+                db.session.add(new_learning)
+
+        # Add observations
+        for observation_content in observations:
+            if observation_content.strip():  # Only add non-empty observations
+                new_observation = Observations(
+                    observations_learning_journal_forms_id=learning_journal_forms_id,
+                    observations_content=observation_content
+                )
+                db.session.add(new_observation)
+
         db.session.commit()
         flash("Documentation added successfully!", "success")
         return redirect(url_for('documentation_overview'))
