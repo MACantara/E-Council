@@ -2845,9 +2845,9 @@ def add_documentation():
         documentation_activity_report_forms_id = request.form.get('documentation-activity-report-forms-id')
         documentation_prepared_by = request.form.get('documentation-prepared-by')
         documentation_learning_journal_forms_id = request.form.get('documentation-learning-journal-forms-id')
-        documentation_checked_by = request.form.get('documentation-checked-by')
         documentation_noted_by = request.form.get('documentation-noted-by')
         documentation_date_of_submission = request.form.get('documentation-date-of-submission')
+        documentation_checked_by = request.form.get('learning-journal-forms-checked-by')
         documentation_rating = request.form.get('documentation-rating')
         documentation_comments_suggestions = request.form.get('documentation-comments-suggestions')
 
@@ -2860,7 +2860,6 @@ def add_documentation():
         learning_journal_forms_name_of_student = request.form.get('learning-journal-forms-name-of-student')
         learning_journal_forms_course_year_level = request.form.get('learning-journal-forms-course-year-level')
         learning_journal_forms_id_number = request.form.get('learning-journal-forms-id-number')
-        learning_journal_forms_date = request.form.get('learning-journal-forms-date')
         learning_journal_forms_overall_reflection = request.form.get('learning-journal-forms-overall-reflection')
         learning_journal_forms_prepared_by = request.form.get('learning-journal-forms-prepared-by')
         learning_journal_forms_seen_and_read_by = request.form.get('learning-journal-forms-seen-and-read-by')
@@ -2944,7 +2943,7 @@ def add_documentation():
         # Get learnings and observations
         learnings = request.form.getlist('learnings')
         observations = request.form.getlist('observations')
-        
+
         # Add learnings
         for learning_content in learnings:
             if learning_content.strip():  # Only add non-empty learnings
