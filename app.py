@@ -3112,8 +3112,14 @@ def get_related_forms(event_id):
     # Query for learning journal forms related to the concept paper form
     learning_journals = db.session.query(LearningJournalForms).filter(LearningJournalForms.learning_journal_forms_concept_paper_forms_id == concept_paper_form_id).all()
 
-    # Query for all signatories
-    signatories = db.session.query(Signatories).all()
+    # Get unique signatory IDs from learning_journal_forms_checked_by
+    checked_by_ids = set()
+    for journal in learning_journals:
+        if journal.learning_journal_forms_checked_by:
+            checked_by_ids.add(journal.learning_journal_forms_checked_by)
+
+    # Query for filtered signatories
+    signatories = db.session.query(Signatories).filter(Signatories.signatory_id.in_(checked_by_ids)).all()
 
     # Prepare the data to be sent as JSON
     activity_reports_data = [{'activity_report_forms_id': report.activity_report_forms_id, 'events_name': report.concept_paper_form.concept_paper_forms_subject} for report in activity_reports]

@@ -73,7 +73,8 @@
                     <div id="activity-strengths">
                         <input type="text" name="activity-strengths" placeholder="Enter Activity Strength" value="">
                     </div>
-                    <button type="button" class="secondary-button" onclick="addNewField('activity-strengths', 'Activity Strength')">Add New Strength</button>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('activity-strengths', 'Activity Strength')">Add New Strength</button>
                 </div>
 
                 <div class="input-pair">
@@ -81,15 +82,19 @@
                     <div id="activity-weaknesses">
                         <input type="text" name="activity-weaknesses" placeholder="Enter Activity Weakness" value="">
                     </div>
-                    <button type="button" class="secondary-button" onclick="addNewField('activity-weaknesses', 'Activity Weakness')">Add New Weakness</button>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('activity-weaknesses', 'Activity Weakness')">Add New Weakness</button>
                 </div>
 
                 <div class="input-pair">
                     <label for="activity-recommendations">Activity Recommendations</label>
                     <div id="activity-recommendations">
-                        <input type="text" name="activity-recommendations" placeholder="Enter Activity Recommendation" value="">
+                        <input type="text" name="activity-recommendations" placeholder="Enter Activity Recommendation"
+                            value="">
                     </div>
-                    <button type="button" class="secondary-button" onclick="addNewField('activity-recommendations', 'Activity Recommendation')">Add New Recommendation</button>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('activity-recommendations', 'Activity Recommendation')">Add New
+                        Recommendation</button>
                 </div>
 
                 <div class="input-pair">
@@ -124,20 +129,23 @@
                         <option value="" disabled selected>Select Learning Journal Form</option>
                     </select>
                 </div>
-    
+
                 <div class="input-pair">
                     <label for="learning-journal-forms-name-of-student">Name of Student</label>
-                    <input type="text" name="learning-journal-forms-name-of-student" id="learning-journal-forms-name-of-student" required>
+                    <input type="text" name="learning-journal-forms-name-of-student"
+                        id="learning-journal-forms-name-of-student" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-forms-course-year-level">Course & Year Level</label>
-                    <input type="text" name="learning-journal-forms-course-year-level" id="learning-journal-forms-course-year-level" required>
+                    <input type="text" name="learning-journal-forms-course-year-level"
+                        id="learning-journal-forms-course-year-level" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-forms-id-number">ID Number</label>
-                    <input type="text" name="learning-journal-forms-id-number" id="learning-journal-forms-id-number" required>
+                    <input type="text" name="learning-journal-forms-id-number" id="learning-journal-forms-id-number"
+                        required>
                 </div>
 
                 <div class="input-pair">
@@ -147,7 +155,8 @@
 
                 <div class="input-pair">
                     <label for="learning-journal-forms-overall-reflection">Overall Reflection</label>
-                    <textarea name="learning-journal-forms-overall-reflection" id="learning-journal-forms-overall-reflection" rows="4" required></textarea>
+                    <textarea name="learning-journal-forms-overall-reflection"
+                        id="learning-journal-forms-overall-reflection" rows="4" required></textarea>
                 </div>
 
                 <div class="input-pair">
@@ -155,14 +164,16 @@
                     <select name="learning-journal-forms-prepared-by" id="learning-journal-forms-prepared-by" required>
                         <option value="" disabled selected>Select User</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-forms-seen-and-read-by">Seen and Read By</label>
-                    <input type="text" name="learning-journal-forms-seen-and-read-by" id="learning-journal-forms-seen-and-read-by">
+                    <input type="text" name="learning-journal-forms-seen-and-read-by"
+                        id="learning-journal-forms-seen-and-read-by">
                 </div>
 
                 <div class="input-pair">
@@ -188,20 +199,21 @@
 
                 <div class="input-pair">
                     <label for="documentation-rating">Rating</label>
-                    <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating" min="1"
-                        max="5">
+                    <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating"
+                        min="1" max="5">
                 </div>
-    
+
                 <div class="input-pair">
                     <label for="documentation-comments-suggestions">Comments/Suggestions</label>
                     <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
                         placeholder="Comments/Suggestions"></textarea>
                 </div>
-    
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    
+
                 <div class="horizontal-input-pair">
-                    <a href="{{ url_for('documentation_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <a href="{{ url_for('documentation_overview') }}"
+                        class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Add Documentation</button>
                 </div>
             </div>
@@ -214,6 +226,7 @@
         const eventsSelect = document.getElementById('documentation-events-id');
         const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
         const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
+        const learningJournalCheckedBySelect = document.getElementById('learning-journal-forms-checked-by');
 
         eventsSelect.addEventListener('change', function () {
             const eventId = this.value;
@@ -239,6 +252,16 @@
                         option.textContent = journal.events_name;
                         option.selected = true;
                         learningJournalSelect.appendChild(option);
+                    });
+
+                    // Update Checked By select with filtered signatories
+                    learningJournalCheckedBySelect.innerHTML = '<option value="" disabled selected>Select Signatory</option>';
+                    data.signatories.forEach(signatory => {
+                        const option = document.createElement('option');
+                        option.value = signatory.signatory_id;
+                        option.textContent = `${signatory.signatory_first_name} ${signatory.signatory_last_name} - ${signatory.signatory_position}`;
+                        option.selected = true;
+                        learningJournalCheckedBySelect.appendChild(option);
                     });
                 })
                 .catch(error => console.error('Error fetching related forms:', error));
