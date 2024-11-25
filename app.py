@@ -2850,18 +2850,47 @@ def add_documentation():
         documentation_date_of_submission = request.form.get('documentation-date-of-submission')
         documentation_rating = request.form.get('documentation-rating')
         documentation_comments_suggestions = request.form.get('documentation-comments-suggestions')
+
+        # Retrieve activity strengths, weaknesses, and recommendations
         activity_strengths = request.form.getlist('activity-strengths')
         activity_weaknesses = request.form.getlist('activity-weaknesses')
         activity_recommendations = request.form.getlist('activity-recommendations')
+
+        # Get Learning Journal Form fields
+        learning_journal_forms_name_of_student = request.form.get('learning-journal-forms-name-of-student')
+        learning_journal_forms_course_year_level = request.form.get('learning-journal-forms-course-year-level')
+        learning_journal_forms_id_number = request.form.get('learning-journal-forms-id-number')
+        learning_journal_forms_date = request.form.get('learning-journal-forms-date')
+        learning_journal_forms_overall_reflection = request.form.get('learning-journal-forms-overall-reflection')
+        learning_journal_forms_prepared_by = request.form.get('learning-journal-forms-prepared-by')
+        learning_journal_forms_seen_and_read_by = request.form.get('learning-journal-forms-seen-and-read-by')
 
         # Retrieve event details using documentation_events_id
         event = Events.query.get(documentation_events_id)
         if event:
             documentation_academic_year = event.events_academic_year
             documentation_semester = event.events_semester
+            concept_paper_id = event.events_concept_paper_forms_id
+
+            # Get the learning journal form linked to the concept paper
+            concept_paper_learning_journal = LearningJournalForms.query.filter_by(
+                learning_journal_forms_concept_paper_forms_id=concept_paper_id
+            ).first()
 
         # Convert date fields to datetime objects
         documentation_date_of_submission = datetime.strptime(documentation_date_of_submission, '%Y-%m-%d')
+        learning_journal_forms_date = datetime.strptime(learning_journal_forms_date, '%Y-%m-%d') if learning_journal_forms_date else None
+
+        # Update learning journal form details if it exists
+        if concept_paper_learning_journal and learning_journal_forms_name_of_student and learning_journal_forms_course_year_level:
+            concept_paper_learning_journal.learning_journal_forms_name_of_student = learning_journal_forms_name_of_student
+            concept_paper_learning_journal.learning_journal_forms_course_year_level = learning_journal_forms_course_year_level
+            concept_paper_learning_journal.learning_journal_forms_id_number = learning_journal_forms_id_number
+            concept_paper_learning_journal.learning_journal_forms_date = learning_journal_forms_date
+            concept_paper_learning_journal.learning_journal_forms_overall_reflection = learning_journal_forms_overall_reflection
+            concept_paper_learning_journal.learning_journal_forms_prepared_by = learning_journal_forms_prepared_by
+            concept_paper_learning_journal.learning_journal_forms_seen_and_read_by = learning_journal_forms_seen_and_read_by
+            learning_journal_forms_id = concept_paper_learning_journal.learning_journal_forms_id
 
         # Create a new documentation entry
         new_documentation = Documentation(

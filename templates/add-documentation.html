@@ -126,11 +126,51 @@
                 </div>
     
                 <div class="input-pair">
-                    <label for="documentation-checked-by">Checked By</label>
-                    <select name="documentation-checked-by" id="documentation-checked-by" required>
-                        <option value="" disabled selected>Select Checker</option>
+                    <label for="learning-journal-forms-name-of-student">Name of Student</label>
+                    <input type="text" name="learning-journal-forms-name-of-student" id="learning-journal-forms-name-of-student" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-course-year-level">Course & Year Level</label>
+                    <input type="text" name="learning-journal-forms-course-year-level" id="learning-journal-forms-course-year-level" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-id-number">ID Number</label>
+                    <input type="text" name="learning-journal-forms-id-number" id="learning-journal-forms-id-number" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-date">Date</label>
+                    <input type="date" name="learning-journal-forms-date" id="learning-journal-forms-date" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-overall-reflection">Overall Reflection</label>
+                    <textarea name="learning-journal-forms-overall-reflection" id="learning-journal-forms-overall-reflection" rows="4" required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-prepared-by">Prepared By</label>
+                    <select name="learning-journal-forms-prepared-by" id="learning-journal-forms-prepared-by" required>
+                        <option value="" disabled selected>Select User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-seen-and-read-by">Seen and Read By</label>
+                    <input type="text" name="learning-journal-forms-seen-and-read-by" id="learning-journal-forms-seen-and-read-by">
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-checked-by">Checked By</label>
+                    <select name="learning-journal-forms-checked-by" id="learning-journal-forms-checked-by" required>
+                        <option value="" disabled selected>Select Signatory</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
+                        <option value="{{ signatory.signatories_id }}">{{ signatory.signatory_first_name }} {{
                             signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
