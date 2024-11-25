@@ -3114,7 +3114,12 @@ def get_related_forms(event_id):
 
     # Prepare the data to be sent as JSON
     activity_reports_data = [{'activity_report_forms_id': report.activity_report_forms_id, 'events_name': report.concept_paper_form.concept_paper_forms_subject} for report in activity_reports]
-    learning_journals_data = [{'learning_journal_forms_id': journal.learning_journal_forms_id, 'events_name': journal.concept_paper_form.concept_paper_forms_subject} for journal in learning_journals]
+
+    learning_journals_data = [{
+        'learning_journal_forms_id': journal.learning_journal_forms_id, 
+        'events_name': journal.concept_paper_form.concept_paper_forms_subject,
+        'learning_journal_forms_checked_by': journal.learning_journal_forms_checked_by
+    } for journal in learning_journals]
 
     return jsonify(activity_reports=activity_reports_data, learning_journals=learning_journals_data)
 
