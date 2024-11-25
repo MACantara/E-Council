@@ -153,15 +153,17 @@
                     <div id="learnings">
                         <input type="text" name="learnings" placeholder="Enter Learning" value="">
                     </div>
-                    <button type="button" class="secondary-button" onclick="addNewField('learnings', 'Learning')">Add New Learning</button>
+                    <button type="button" class="secondary-button" onclick="addNewField('learnings', 'Learning')">Add
+                        New Learning</button>
                 </div>
-                
+
                 <div class="input-pair">
                     <label for="observations">Observations</label>
                     <div id="observations">
                         <input type="text" name="observations" placeholder="Enter Observation" value="">
                     </div>
-                    <button type="button" class="secondary-button" onclick="addNewField('observations', 'Observation')">Add New Observation</button>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('observations', 'Observation')">Add New Observation</button>
                 </div>
 
                 <div class="input-pair">
@@ -207,6 +209,48 @@
 
             <div class="form-container">
                 <h3>Tally</h3>
+
+                <div id="tally-items">
+                    <div class="tally-item">
+                        <div class="input-pair">
+                            <label for="tally-items-name">Tally Item Name</label>
+                            <input type="text" name="tally-items-name[]" placeholder="Enter tally item name" required>
+                        </div>
+
+                        <div class="input-pair">
+                            <label>Ratings</label>
+                            <div class="rating-inputs">
+                                <div>
+                                    <label for="extremely-satisfied">Extremely Satisfied</label>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </div>
+                                <div>
+                                    <label for="satisfied">Satisfied</label>
+                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0" value="0"
+                                        required>
+                                </div>
+                                <div>
+                                    <label for="neutral">Neutral</label>
+                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0" value="0"
+                                        required>
+                                </div>
+                                <div>
+                                    <label for="dissatisfied">Dissatisfied</label>
+                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </div>
+                                <div>
+                                    <label for="extremely-dissatisfied">Extremely Dissatisfied</label>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
+                                        min="0" value="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="secondary-button" onclick="addNewTallyItem()">Add New Tally Item</button>
 
                 <div class="input-pair">
                     <label for="documentation-rating">Rating</label>
@@ -286,6 +330,23 @@
         newInput.name = containerId;  // Remove the [] from the name
         newInput.placeholder = `Enter ${placeholder}`;
         container.appendChild(newInput);
+    }
+
+    function addNewTallyItem() {
+        const tallyItemsContainer = document.getElementById('tally-items');
+        const newItem = tallyItemsContainer.children[0].cloneNode(true);
+
+        // Clear all input values
+        const inputs = newItem.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.type === 'number') {
+                input.value = '0';
+            } else {
+                input.value = '';
+            }
+        });
+
+        tallyItemsContainer.appendChild(newItem);
     }
 </script>
 

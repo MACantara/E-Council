@@ -993,3 +993,28 @@ textarea {
 .form-container > h3 {
     text-align: center;
 }
+
+/* Tally Item Styles */
+.tally-item {
+    border: 1px solid var(--secondary-color);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: var(--border-radius);
+}
+
+.rating-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.rating-inputs > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.rating-inputs input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
