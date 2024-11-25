@@ -3112,6 +3112,9 @@ def get_related_forms(event_id):
     # Query for learning journal forms related to the concept paper form
     learning_journals = db.session.query(LearningJournalForms).filter(LearningJournalForms.learning_journal_forms_concept_paper_forms_id == concept_paper_form_id).all()
 
+    # Query for all signatories
+    signatories = db.session.query(Signatories).all()
+
     # Prepare the data to be sent as JSON
     activity_reports_data = [{'activity_report_forms_id': report.activity_report_forms_id, 'events_name': report.concept_paper_form.concept_paper_forms_subject} for report in activity_reports]
 
@@ -3121,7 +3124,15 @@ def get_related_forms(event_id):
         'learning_journal_forms_checked_by': journal.learning_journal_forms_checked_by
     } for journal in learning_journals]
 
-    return jsonify(activity_reports=activity_reports_data, learning_journals=learning_journals_data)
+    signatories_data = [{
+        'signatory_id': signatory.signatory_id,
+        'signatory_first_name': signatory.signatory_first_name,
+        'signatory_last_name': signatory.signatory_last_name,
+        'signatory_position': signatory.signatory_position,
+        'signatory_department': signatory.signatory_department
+    } for signatory in signatories]
+
+    return jsonify(activity_reports=activity_reports_data, learning_journals=learning_journals_data, signatories=signatories_data)
 
 @app.route('/get-activity-report-details/<int:activity_report_id>', methods=['GET'])
 @login_required
