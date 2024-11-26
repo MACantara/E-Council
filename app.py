@@ -3165,42 +3165,46 @@ def update_documentation(documentation_id):
                          activity_reports=activity_reports_data, 
                          learning_journals=learning_journals_data)
 
-@app.route('/delete-documentation/<int:documentation_id>', methods=['POST'])
+@app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
 @login_required
 def delete_documentation(documentation_id):
-    try:
-        # Get the documentation and its associated images
-        documentation = Documentation.query.get_or_404(documentation_id)
-        evaluation_images = ResultsOfTheEvaluationImages.query.filter_by(
-            results_of_the_evaluation_images_documentation_id=documentation_id
-        ).all()
+    documentation = Documentation.query.get_or_404(documentation_id)
 
-        # Delete images from Cloudinary and database
-        for image in evaluation_images:
-            try:
-                # Delete from Cloudinary
-                if image.results_of_the_evaluation_images_cloudinary_public_id:
-                    cloudinary.uploader.destroy(
-                        image.results_of_the_evaluation_images_cloudinary_public_id,
-                        resource_type="image"
-                    )
-                # Delete database entry
-                db.session.delete(image)
-            except Exception as e:
-                app.logger.error(f"Failed to delete image: {str(e)}")
-                # Continue with deletion even if one image fails
+    if request.method == 'POST':
+        try:
+            # Get the documentation and its associated images
+            documentation = Documentation.query.get_or_404(documentation_id)
+            evaluation_images = ResultsOfTheEvaluationImages.query.filter_by(
+                results_of_the_evaluation_images_documentation_id=documentation_id
+            ).all()
 
-        # Delete the documentation entry
-        db.session.delete(documentation)
-        db.session.commit()
-        
-        flash('Documentation deleted successfully!', 'success')
-    except Exception as e:
-        db.session.rollback()
-        app.logger.error(f"Failed to delete documentation: {str(e)}")
-        flash('Failed to delete documentation.', 'error')
-    
-    return redirect(url_for('documentation_overview'))
+            # Delete images from Cloudinary and database
+            for image in evaluation_images:
+                try:
+                    # Delete from Cloudinary
+                    if image.results_of_the_evaluation_images_cloudinary_public_id:
+                        cloudinary.uploader.destroy(
+                            image.results_of_the_evaluation_images_cloudinary_public_id,
+                            resource_type="image"
+                        )
+                    # Delete database entry
+                    db.session.delete(image)
+                except Exception as e:
+                    app.logger.error(f"Failed to delete image: {str(e)}")
+                    # Continue with deletion even if one image fails
+
+            # Delete the documentation entry
+            db.session.delete(documentation)
+            db.session.commit()
+            
+            flash('Documentation deleted successfully!', 'success')
+            return redirect(url_for('documentation_overview'))
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Failed to delete documentation: {str(e)}")
+            flash('Failed to delete documentation.', 'error')
+
+    return render_template('delete-documentation.html', documentation=documentation)
 
 @app.route('/get-related-forms/<int:event_id>', methods=['GET'])
 @login_required
