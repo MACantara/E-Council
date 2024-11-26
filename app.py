@@ -3312,6 +3312,70 @@ def update_documentation(documentation_id):
                         flash('Error uploading some evaluation images', 'error')
                         return redirect(url_for('update_documentation', documentation_id=documentation_id))
         
+        # Handle attendance images deletion
+        deleted_attendance_image_ids = request.form.get('deleted_attendance_images', '').split(',')
+        if deleted_attendance_image_ids and deleted_attendance_image_ids[0]:
+            for image_id in deleted_attendance_image_ids:
+                image = SummaryOfAttendanceImages.query.get(int(image_id))
+                if image:
+                    try:
+                        if image.summary_of_attendance_images_cloudinary_public_id:
+                            cloudinary.uploader.destroy(
+                                image.summary_of_attendance_images_cloudinary_public_id
+                            )
+                        db.session.delete(image)
+                    except Exception as e:
+                        flash('Error deleting some attendance images', 'error')
+
+        # Handle event photo documentation images deletion
+        deleted_event_photo_doc_image_ids = request.form.get('deleted_event_photo_doc_images', '').split(',')
+        if deleted_event_photo_doc_image_ids and deleted_event_photo_doc_image_ids[0]:
+            for image_id in deleted_event_photo_doc_image_ids:
+                image = EventPhotoDocumentationImages.query.get(int(image_id))
+                if image:
+                    try:
+                        if image.event_photo_documentation_images_cloudinary_public_id:
+                            cloudinary.uploader.destroy(
+                                image.event_photo_documentation_images_cloudinary_public_id
+                            )
+                        db.session.delete(image)
+                    except Exception as e:
+                        flash('Error deleting some event photo documentation images', 'error')
+
+        # Handle new attendance image uploads
+        attendance_images = request.files.getlist('attendance-images[]')
+        if attendance_images:
+            for image in attendance_images:
+                if image and allowed_image_file(image.filename):
+                    try:
+                        upload_result = cloudinary.uploader.upload(image)
+                        new_image = SummaryOfAttendanceImages(
+                            summary_of_attendance_images_documentation_id=documentation_id,
+                            summary_of_attendance_images_cloudinary_url=upload_result['secure_url'],
+                            summary_of_attendance_images_cloudinary_public_id=upload_result['public_id']
+                        )
+                        db.session.add(new_image)
+                    except Exception as e:
+                        flash('Error uploading some attendance images', 'error')
+                        return redirect(url_for('update_documentation', documentation_id=documentation_id))
+
+        # Handle new event photo documentation image uploads
+        event_photo_doc_images = request.files.getlist('event-photo-documentation-images[]')
+        if event_photo_doc_images:
+            for image in event_photo_doc_images:
+                if image and allowed_image_file(image.filename):
+                    try:
+                        upload_result = cloudinary.uploader.upload(image)
+                        new_image = EventPhotoDocumentationImages(
+                            event_photo_documentation_images_documentation_id=documentation_id,
+                            event_photo_documentation_images_cloudinary_url=upload_result['secure_url'],
+                            event_photo_documentation_images_cloudinary_public_id=upload_result['public_id']
+                        )
+                        db.session.add(new_image)
+                    except Exception as e:
+                        flash('Error uploading some event photo documentation images', 'error')
+                        return redirect(url_for('update_documentation', documentation_id=documentation_id))
+
         db.session.commit()
 
         flash('Documentation updated successfully!', 'success')
@@ -3421,6 +3485,10 @@ def update_documentation(documentation_id):
         results_of_the_evaluation_images_documentation_id=documentation_id
     ).all()
 
+    event_photo_documentation_images = EventPhotoDocumentationImages.query.filter_by(
+        event_photo_documentation_images_documentation_id=documentation_id
+    ).all()
+
     return render_template('update-documentation.html', 
                          documentation=documentation, 
                          events=events, 
@@ -3435,7 +3503,8 @@ def update_documentation(documentation_id):
                          learnings=learnings,
                          observations=observations,
                          tally_items=tally_items_data,
-                         evaluation_images=evaluation_images
+                         evaluation_images=evaluation_images,
+                         event_photo_documentation_images=event_photo_documentation_images
     )
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])

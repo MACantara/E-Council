@@ -435,7 +435,8 @@
                     <div class="selected-files-list">
                         {% for image in documentation.results_of_the_evaluation_images %}
                         <div class="selected-file-item" data-image-id="{{ image.results_of_the_evaluation_images_id }}">
-                            <button type="button" class="remove-file-button" onclick="removeExistingImage(this)" title="Remove image">×</button>
+                            <button type="button" class="remove-file-button" onclick="removeExistingImage(this)"
+                                title="Remove image">×</button>
                             <div class="file-preview-container">
                                 <img src="{{ image.results_of_the_evaluation_images_cloudinary_url }}"
                                     class="file-preview" alt="Evaluation Image">
@@ -486,27 +487,39 @@
                 </div>
             </div>
 
+            <!-- Summary of Attendance Images Section -->
             <div class="form-container">
                 <h3>Summary of Attendance Images</h3>
-
                 <div class="input-pair">
-                    <label for="attendance-images">Upload Images</label>
-                    <input type="file" name="attendance-images[]" id="attendance-images" multiple accept="image/*"
+                    <label for="attendance-images">Upload Attendance Images</label>
+                    <input type="file" name="attendance-images[]" id="attendance-images" accept="image/*" multiple
                         hidden>
                     <label for="attendance-images" class="custom-file-upload-input">
                         <span class="choose-file-text">Choose Files</span>
-                        <span id="attendance-files-name" class="file-name">
-                            {% if attendance_images %}Files selected{% else %}No files chosen{% endif %}
-                        </span>
+                        <span id="attendance-files-name" class="file-name">No files chosen</span>
                     </label>
-                    <div id="attendance-files-list" class="selected-files-list">
-                        {% if attendance_images %}
-                        {% for image in attendance_images %}
-                        <div class="file-item">{{ image.filename }}</div>
+                    <div id="attendance-files-list" class="selected-files-list"></div>
+                </div>
+
+                {% if documentation.summary_of_attendance_images %}
+                <div class="existing-images">
+                    <h5>Current Attendance Images</h5>
+                    <div class="selected-files-list">
+                        {% for image in documentation.summary_of_attendance_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.summary_of_attendance_images_id }}">
+                            <button type="button" class="remove-file-button"
+                                onclick="removeExistingAttendanceImage(this)" title="Remove image">×</button>
+                            <div class="file-preview-container">
+                                <img src="{{ image.summary_of_attendance_images_cloudinary_url }}" class="file-preview"
+                                    alt="Attendance Image">
+                            </div>
+                            <span class="file-item-name">Current Image {{ loop.index }}</span>
+                        </div>
                         {% endfor %}
-                        {% endif %}
                     </div>
                 </div>
+                {% endif %}
+                <input type="hidden" name="deleted_attendance_images" id="deleted-attendance-images" value="">
             </div>
 
             <div class="form-container">
@@ -534,26 +547,39 @@
                 </div>
             </div>
 
+            <!-- Event Photo Documentation Section -->
             <div class="form-container">
-                <h3>Photo Documentation</h3>
+                <h3>Event Photo Documentation</h3>
                 <div class="input-pair">
-                    <label for="photo-documentation-images">Upload Photo Documentation</label>
-                    <input type="file" name="photo-documentation-images[]" id="photo-documentation-images"
+                    <label for="event-photo-documentation-images">Upload Event Photo Documentation</label>
+                    <input type="file" name="event-photo-documentation-images[]" id="event-photo-documentation-images"
                         accept="image/*" multiple hidden>
-                    <label for="photo-documentation-images" class="custom-file-upload-input">
+                    <label for="event-photo-documentation-images" class="custom-file-upload-input">
                         <span class="choose-file-text">Choose Files</span>
-                        <span id="photo-doc-files-name" class="file-name">
-                            {% if photo_documentation_images %}Files selected{% else %}No files chosen{% endif %}
-                        </span>
+                        <span id="event-photo-doc-files-name" class="file-name">No files chosen</span>
                     </label>
-                    <div id="photo-doc-files-list" class="selected-files-list">
-                        {% if photo_documentation_images %}
-                        {% for image in photo_documentation_images %}
-                        <div class="file-item">{{ image.filename }}</div>
+                    <div id="event-photo-doc-files-list" class="selected-files-list"></div>
+                </div>
+
+                {% if documentation.event_photo_documentation_images %}
+                <div class="existing-images">
+                    <h5>Current Event Photo Documentation</h5>
+                    <div class="selected-files-list">
+                        {% for image in documentation.event_photo_documentation_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.event_photo_documentation_images_id }}">
+                            <button type="button" class="remove-file-button"
+                                onclick="removeExistingEventPhotoDocImage(this)" title="Remove image">×</button>
+                            <div class="file-preview-container">
+                                <img src="{{ image.event_photo_documentation_images_cloudinary_url }}"
+                                    class="file-preview" alt="Event Photo Documentation">
+                            </div>
+                            <span class="file-item-name">Current Image {{ loop.index }}</span>
+                        </div>
                         {% endfor %}
-                        {% endif %}
                     </div>
                 </div>
+                {% endif %}
+                <input type="hidden" name="deleted_event_photo_doc_images" id="deleted-event-photo-doc-images" value="">
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -669,47 +695,47 @@
     }
 
     // Evaluation Images file handling
-    document.getElementById('evaluation-images').addEventListener('change', function(e) {
+    document.getElementById('evaluation-images').addEventListener('change', function (e) {
         const fileNameSpan = document.getElementById('evaluation-files-name');
         const filesList = document.getElementById('evaluation-files-list');
         const input = this;
-        
+
         if (this.files.length > 0) {
             fileNameSpan.textContent = `${this.files.length} file(s) selected`;
             filesList.innerHTML = '';
-            
+
             Array.from(this.files).forEach((file, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'selected-file-item';
                 fileItem.dataset.index = index;
-                
+
                 const fileName = document.createElement('span');
                 fileName.className = 'file-item-name';
                 fileName.textContent = file.name;
-                
+
                 const previewContainer = document.createElement('div');
                 previewContainer.className = 'file-preview-container';
-                
+
                 const preview = document.createElement('img');
                 preview.className = 'file-preview';
                 preview.src = URL.createObjectURL(file);
-                
+
                 const removeButton = document.createElement('button');
                 removeButton.className = 'remove-file-button';
                 removeButton.innerHTML = '×';
                 removeButton.type = 'button';
                 removeButton.title = 'Remove image';
-                
-                removeButton.addEventListener('click', function() {
+
+                removeButton.addEventListener('click', function () {
                     const dt = new DataTransfer();
                     const files = Array.from(input.files);
                     files.splice(index, 1);
-                    
+
                     files.forEach(file => dt.items.add(file));
                     input.files = dt.files;
-                    
+
                     fileItem.remove();
-                    
+
                     if (input.files.length > 0) {
                         fileNameSpan.textContent = `${input.files.length} file(s) selected`;
                     } else {
@@ -717,7 +743,7 @@
                         filesList.innerHTML = '';
                     }
                 });
-                
+
                 previewContainer.appendChild(preview);
                 fileItem.appendChild(removeButton);
                 fileItem.appendChild(previewContainer);
@@ -734,14 +760,111 @@
     function removeExistingImage(button) {
         const imageContainer = button.closest('.selected-file-item');
         const imageId = imageContainer.dataset.imageId;
-        
+
         // Add the image ID to the hidden input
         const deletedImagesInput = document.getElementById('deleted-evaluation-images');
         const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
         deletedImages.push(imageId);
         deletedImagesInput.value = deletedImages.join(',');
-        
+
         // Remove the image container from the DOM
+        imageContainer.remove();
+    }
+
+    // Attendance Images file handling
+    document.getElementById('attendance-images').addEventListener('change', function (e) {
+        handleFileSelect(this, 'attendance-files-name', 'attendance-files-list');
+    });
+
+    // Event Photo Documentation file handling
+    document.getElementById('event-photo-documentation-images').addEventListener('change', function (e) {
+        handleFileSelect(this, 'event-photo-doc-files-name', 'event-photo-doc-files-list');
+    });
+
+    // Generic file handling function
+    function handleFileSelect(input, nameSpanId, filesListId) {
+        const fileNameSpan = document.getElementById(nameSpanId);
+        const filesList = document.getElementById(filesListId);
+
+        if (input.files.length > 0) {
+            fileNameSpan.textContent = `${input.files.length} file(s) selected`;
+            filesList.innerHTML = '';
+
+            Array.from(input.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                fileItem.dataset.index = index;
+
+                const fileName = document.createElement('span');
+                fileName.className = 'file-item-name';
+                fileName.textContent = file.name;
+
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'file-preview-container';
+
+                const preview = document.createElement('img');
+                preview.className = 'file-preview';
+                preview.src = URL.createObjectURL(file);
+
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-file-button';
+                removeButton.innerHTML = '×';
+                removeButton.type = 'button';
+                removeButton.title = 'Remove image';
+
+                removeButton.addEventListener('click', function () {
+                    const dt = new DataTransfer();
+                    const files = Array.from(input.files);
+                    files.splice(index, 1);
+
+                    files.forEach(file => dt.items.add(file));
+                    input.files = dt.files;
+
+                    fileItem.remove();
+
+                    if (input.files.length > 0) {
+                        fileNameSpan.textContent = `${input.files.length} file(s) selected`;
+                    } else {
+                        fileNameSpan.textContent = 'No files chosen';
+                        filesList.innerHTML = '';
+                    }
+                });
+
+                previewContainer.appendChild(preview);
+                fileItem.appendChild(removeButton);
+                fileItem.appendChild(previewContainer);
+                fileItem.appendChild(fileName);
+                filesList.appendChild(fileItem);
+            });
+        } else {
+            fileNameSpan.textContent = 'No files chosen';
+            filesList.innerHTML = '';
+        }
+    }
+
+    // Functions to remove existing images
+    function removeExistingAttendanceImage(button) {
+        const imageContainer = button.closest('.selected-file-item');
+        const imageId = imageContainer.dataset.imageId;
+
+        const deletedImagesInput = document.getElementById('deleted-attendance-images');
+        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
+        deletedImages.push(imageId);
+        deletedImagesInput.value = deletedImages.join(',');
+
+        imageContainer.remove();
+    }
+
+    // Function to remove existing event photo documentation images
+    function removeExistingEventPhotoDocImage(button) {
+        const imageContainer = button.closest('.selected-file-item');
+        const imageId = imageContainer.dataset.imageId;
+
+        const deletedImagesInput = document.getElementById('deleted-event-photo-doc-images');
+        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
+        deletedImages.push(imageId);
+        deletedImagesInput.value = deletedImages.join(',');
+
         imageContainer.remove();
     }
 </script>
