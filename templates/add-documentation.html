@@ -211,11 +211,11 @@
                                 <th colspan="5">Total Ratings</th>
                             </tr>
                             <tr>
-                                <th>Extremely Satisfied</th>
-                                <th>Satisfied</th>
-                                <th>Neutral</th>
-                                <th>Dissatisfied</th>
-                                <th>Extremely Dissatisfied</th>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Satisfied (4)</th>
+                                <th>Neutral (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -261,6 +261,69 @@
                     <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission"
                         required>
                 </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Results of the Evaluation Images</h3>
+
+                <div class="input-pair">
+                    <label for="evaluation-images">Upload Images</label>
+                    <input type="file" name="evaluation-images[]" id="evaluation-images" multiple accept="image/*"
+                        hidden>
+                    <label for="evaluation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="evaluation-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="selected-files-list" class="selected-files-list"></div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Evaluation Form</h3>
+
+                <div id="evaluation-tally-items" class="evaluation-tally-container">
+                    <!-- Tally items will be synced here -->
+                    <table class="evaluation-tally-table">
+                        <thead>
+                            <tr>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Very Satisfied (4)</th>
+                                <th>Satisfied (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items will be added here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="input-pair">
+                    <label>Overall Rating</label>
+                    <div class="rating-container">
+                        <div class="rating-item">
+                            <input type="radio" name="documentation-rating" id="documentation-rating-5" value="5">
+                            <label for="documentation-rating-5">5 - Excellent</label>
+                        </div>
+                        <div class="rating-item">
+                            <input type="radio" name="documentation-rating" id="documentation-rating-4" value="4">
+                            <label for="documentation-rating-4">4 - Very Satisfactory</label>
+                        </div>
+                        <div class="rating-item">
+                            <input type="radio" name="documentation-rating" id="documentation-rating-3" value="3">
+                            <label for="documentation-rating-3">3 - Satisfactory</label>
+                        </div>
+                        <div class="rating-item">
+                            <input type="radio" name="documentation-rating" id="documentation-rating-2" value="2">
+                            <label for="documentation-rating-2">2 - Fair</label>
+                        </div>
+                        <div class="rating-item">
+                            <input type="radio" name="documentation-rating" id="documentation-rating-1" value="1">
+                            <label for="documentation-rating-1">1 - Poor</label>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="input-pair">
                     <label for="documentation-rating">Rating</label>
@@ -272,20 +335,6 @@
                     <label for="documentation-comments-suggestions">Comments/Suggestions</label>
                     <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
                         placeholder="Comments/Suggestions"></textarea>
-                </div>
-            </div>
-
-            <div class="form-container">
-                <h3>Results of the Evaluation Images</h3>
-            
-                <div class="input-pair">
-                    <label for="evaluation-images">Upload Images</label>
-                    <input type="file" name="evaluation-images[]" id="evaluation-images" multiple accept="image/*" hidden>
-                    <label for="evaluation-images" class="custom-file-upload-input">
-                        <span class="choose-file-text">Choose Files</span>
-                        <span id="evaluation-files-name" class="file-name">No files chosen</span>
-                    </label>
-                    <div id="selected-files-list" class="selected-files-list"></div>
                 </div>
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -379,27 +428,27 @@
     document.getElementById('evaluation-images').addEventListener('change', function () {
         const fileList = document.getElementById('selected-files-list');
         const filesNameSpan = document.getElementById('evaluation-files-name');
-        
+
         // Clear previous list
         fileList.innerHTML = '';
-        
+
         if (this.files.length > 0) {
             filesNameSpan.textContent = `${this.files.length} file(s) selected`;
-            
+
             // Create list of selected files
             Array.from(this.files).forEach((file, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'selected-file-item';
-                
+
                 const fileName = document.createElement('span');
                 fileName.textContent = file.name;
-                
+
                 const removeBtn = document.createElement('button');
                 removeBtn.type = 'button';
                 removeBtn.className = 'remove-file-btn';
                 removeBtn.textContent = '×';
                 removeBtn.onclick = () => removeFile(index);
-                
+
                 fileItem.appendChild(fileName);
                 fileItem.appendChild(removeBtn);
                 fileList.appendChild(fileItem);
@@ -408,24 +457,87 @@
             filesNameSpan.textContent = 'No files chosen';
         }
     });
-    
+
     function removeFile(index) {
         const input = document.getElementById('evaluation-images');
         const dt = new DataTransfer();
         const { files } = input;
-        
+
         for (let i = 0; i < files.length; i++) {
             if (i !== index) {
                 dt.items.add(files[i]);
             }
         }
-        
+
         input.files = dt.files;
-        
+
         // Trigger change event to update the display
         const event = new Event('change');
         input.dispatchEvent(event);
     }
+
+    // Function to sync tally items to evaluation form
+    function syncTallyItems() {
+        // Get all name inputs from the tally table
+        const tallyRows = document.querySelectorAll('.tally-table tbody tr');
+        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
+
+        // Clear existing items
+        evaluationTallyContainer.innerHTML = '';
+
+        // Add each tally item to the evaluation form
+        tallyRows.forEach((row, index) => {
+            const nameInput = row.querySelector('input[type="text"]');
+            if (nameInput) {
+                // Create name row
+                const nameRow = document.createElement('tr');
+                const itemName = nameInput.value || `Item ${index + 1}`;
+                nameRow.innerHTML = `
+                <td colspan="6" class="tally-item-name">${itemName}</td>
+            `;
+
+                // Create ratings row
+                const ratingsRow = document.createElement('tr');
+                ratingsRow.innerHTML = `
+                <td><input type="radio" name="eval-tally-${index}" value="5" required></td>
+                <td><input type="radio" name="eval-tally-${index}" value="4"></td>
+                <td><input type="radio" name="eval-tally-${index}" value="3"></td>
+                <td><input type="radio" name="eval-tally-${index}" value="2"></td>
+                <td><input type="radio" name="eval-tally-${index}" value="1"></td>
+            `;
+
+                evaluationTallyContainer.appendChild(nameRow);
+                evaluationTallyContainer.appendChild(ratingsRow);
+            }
+        });
+    }
+
+    // Add event listeners for tally item changes
+    document.addEventListener('DOMContentLoaded', function () {
+        const tallyTable = document.querySelector('.tally-table');
+
+        // Initial sync
+        syncTallyItems();
+
+        // Sync when tally items change
+        tallyTable.addEventListener('input', function (e) {
+            if (e.target.type === 'text') {
+                syncTallyItems();
+            }
+        });
+
+        // Sync when add button is clicked
+        document.querySelector('.add-tally-button').addEventListener('click', function () {
+            setTimeout(syncTallyItems, 100); // Give time for the new row to be added
+        });
+
+        // Sync when remove button is clicked
+        tallyTable.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-tally-button')) {
+                setTimeout(syncTallyItems, 100); // Give time for the row to be removed
+            }
+        });
+    });
 </script>
 
 {% endblock %}

@@ -1088,7 +1088,7 @@ textarea {
     align-items: center;
     padding: var(--odd-padding-extra-small);
     background-color: var(--form-background-color);
-    border-radius: var(--small-border-radius);
+    border-radius: var(--border-radius);
     margin-bottom: var(--gap-small);
 }
 
@@ -1112,7 +1112,7 @@ textarea {
     padding: var(--padding-small);
     background-color: var(--form-background-color);
     border: 1px solid var(--divider-color);
-    border-radius: var(--small-border-radius);
+    border-radius: var(--border-radius);
     cursor: pointer;
 }
 
@@ -1131,29 +1131,62 @@ textarea {
 
 .evaluation-tally-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;  /* Changed from collapse to allow border-radius */
+    border-spacing: 0;  /* Maintain tight borders */
+    background-color: var(--background-color);
+    border: 1px solid var(--secondary-color);
     margin-top: var(--gap-small);
+    border-radius: var(--border-radius);
+    overflow: hidden;  /* Ensures inner elements don't break the border radius */
 }
 
 .evaluation-tally-table th,
 .evaluation-tally-table td {
     padding: var(--padding-small);
-    border: 1px solid var(--divider-color);
+    border: 1px solid var(--secondary-color);
     text-align: center;
 }
 
-.evaluation-tally-table th:first-child,
-.evaluation-tally-table td:first-child {
+.evaluation-tally-table th {
+    background-color: var(--secondary-color);
+    color: var(--on-secondary-color);
+    font-weight: 600;
+}
+
+.evaluation-tally-table .tally-item-name {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+    font-weight: 600;
     text-align: left;
 }
 
-.evaluation-tally-table th {
-    background-color: var(--primary-color);
-    color: var(--on-primary-color);
+.evaluation-tally-table tr:not(.tally-item-name) {
+    background-color: var(--form-background-color);
 }
 
-.evaluation-tally-table tr:nth-child(even) {
-    background-color: var(--form-background-color);
+.evaluation-tally-table tr:not(.tally-item-name):hover {
+    background-color: var(--hover-color);
+}
+
+.evaluation-tally-table input[type="radio"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    margin: 0;
+    border-radius: 50%;  /* Make radio buttons perfectly round */
+    border: 2px solid var(--secondary-color);
+}
+
+.evaluation-tally-table input[type="radio"]:hover {
+    transform: scale(1.1);
+}
+
+@media screen and (max-width: 768px) {
+    .evaluation-tally-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
 }
 
 .rating-container {
