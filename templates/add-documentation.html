@@ -343,9 +343,22 @@
                         <ul id="student-names-list"></ul>
                     </div>
                 </div>
+            </div>
 
+            <div class="form-container">
+                <h3>Photo Documentation</h3>
+                <div class="input-pair">
+                    <label for="photo-documentation-images">Upload Photo Documentation</label>
+                    <input type="file" name="photo-documentation-images[]" id="photo-documentation-images" accept="image/*" multiple hidden>
+                    <label for="photo-documentation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="photo-doc-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="photo-doc-files-list" class="selected-files-list"></div>
+                </div>
+            
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
+            
                 <div class="horizontal-input-pair">
                     <a href="{{ url_for('documentation_overview') }}"
                         class="secondary-button fit-content-button">Cancel</a>
@@ -684,6 +697,41 @@
         } else {
             fileNameSpan.textContent = 'No file chosen';
             preview.style.display = 'none';
+        }
+    });
+
+    // Photo Documentation file handling
+    document.getElementById('photo-documentation-images').addEventListener('change', function(e) {
+        const fileNameSpan = document.getElementById('photo-doc-files-name');
+        const filesList = document.getElementById('photo-doc-files-list');
+        
+        if (this.files.length > 0) {
+            fileNameSpan.textContent = `${this.files.length} file(s) selected`;
+            filesList.innerHTML = '';
+            
+            Array.from(this.files).forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                
+                const fileName = document.createElement('span');
+                fileName.className = 'file-item-name';
+                fileName.textContent = file.name;
+                
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'file-preview-container';
+                
+                const preview = document.createElement('img');
+                preview.className = 'file-preview';
+                preview.src = URL.createObjectURL(file);
+                
+                previewContainer.appendChild(preview);
+                fileItem.appendChild(previewContainer);
+                fileItem.appendChild(fileName);
+                filesList.appendChild(fileItem);
+            });
+        } else {
+            fileNameSpan.textContent = 'No files chosen';
+            filesList.innerHTML = '';
         }
     });
 </script>

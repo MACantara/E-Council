@@ -3070,6 +3070,28 @@ def add_documentation():
                     app.logger.error(f"Failed to process student list: {str(e)}")
                     flash("Failed to process student list Excel file.", "error")
 
+        # Handle photo documentation images upload
+        photo_doc_images = request.files.getlist('photo-documentation-images[]')
+        for image in photo_doc_images:
+            if image and allowed_image_file(image.filename):
+                try:
+                    # Upload to Cloudinary
+                    upload_result = cloudinary.uploader.upload(
+                        image,
+                        folder="event_photo_documentation_images",
+                        resource_type="auto"
+                    )
+                    
+                    # Create database entry for the image
+                    new_image = EventPhotoDocumentationImages(
+                        event_photo_documentation_images_documentation_id=documentation_id,
+                        event_photo_documentation_images_cloudinary_url=upload_result['secure_url'],
+                        event_photo_documentation_images_cloudinary_public_id=upload_result['public_id']
+                    )
+                    db.session.add(new_image)
+                except Exception as e:
+                    app.logger.error(f"Failed to upload event photo documentation image: {str(e)}")
+                    flash("Failed to upload one or more event photo documentation images.", "error")
 
         db.session.commit()
         flash("Documentation added successfully!", "success")
@@ -3259,6 +3281,23 @@ def delete_documentation(documentation_id):
                     db.session.delete(image)
                 except Exception as e:
                     app.logger.error(f"Failed to delete attendance image: {str(e)}")
+
+            # Get and delete event photo documentation images
+            event_photos = EventPhotoDocumentationImages.query.filter_by(
+                event_photo_documentation_images_documentation_id=documentation_id
+            ).all()
+
+            # Delete event photo documentation images from Cloudinary and database
+            for image in event_photos:
+                try:
+                    if image.event_photo_documentation_images_cloudinary_public_id:
+                        cloudinary.uploader.destroy(
+                            image.event_photo_documentation_images_cloudinary_public_id,
+                            resource_type="image"
+                        )
+                    db.session.delete(image)
+                except Exception as e:
+                    app.logger.error(f"Failed to delete event photo documentation image: {str(e)}")
 
             # Delete the documentation entry
             db.session.delete(documentation)

@@ -1240,3 +1240,46 @@ textarea {
 .student-list-preview li:last-child {
     border-bottom: none;
 }
+
+/* Photo Documentation Styles */
+.photo-documentation-container {
+    margin-top: var(--gap-medium);
+}
+
+.file-preview-container {
+    width: 120px;
+    height: 120px;
+    margin-right: var(--gap-small);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid var(--divider-color);
+}
+
+.file-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+}
+
+.selected-file-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--gap-small);
+    padding: var(--padding-small);
+    background-color: var(--form-background-color);
+    border-radius: var(--border-radius);
+}
+
+.file-item-name {
+    margin-left: var(--gap-small);
+    color: var(--primary-text-color);
+    font-size: 0.9em;
+    word-break: break-all;
+}
+
+.selected-files-list {
+    margin-top: var(--gap-small);
+    max-height: 400px;
+    overflow-y: auto;
+}
