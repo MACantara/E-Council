@@ -90,19 +90,17 @@
                         value="{{ documentation.documentation_type }}" required>
                 </div>
             </div>
+
             <div class="form-container">
                 <h3>Activity Report Form</h3>
 
                 <div class="input-pair">
                     <label for="documentation-activity-report-forms-id">Activity Report Form</label>
-                    <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id">
-                        <option value="" disabled {% if not documentation.documentation_activity_report_forms_id
-                            %}selected{% endif %}>Select Activity Report Form</option>
+                    <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id" class="form-select">
+                        <option value="" disabled {% if not documentation.documentation_activity_report_forms_id %}selected{% endif %}>Select Activity Report Form</option>
                         {% if activity_reports %}
                         {% for report in activity_reports %}
-                        <option value="{{ report.activity_report_forms_id }}" {% if
-                            documentation.documentation_activity_report_forms_id==report.activity_report_forms_id
-                            %}selected{% endif %}>
+                        <option value="{{ report.activity_report_forms_id }}" {% if documentation.documentation_activity_report_forms_id==report.activity_report_forms_id %}selected{% endif %}>
                             {{ report.events_name }} Activity Report Form
                         </option>
                         {% endfor %}
@@ -117,15 +115,13 @@
                         {% if strengths %}
                         {% for strength in strengths %}
                         <div class="dynamic-item">
-                            <input type="text" name="activity-strengths[]"
-                                value="{{ strength.activity_strengths_content }}" placeholder="Enter strength" required>
-                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">&times;</button>
+                            <input type="text" name="activity-strengths[]" class="form-input" value="{{ strength.activity_strengths_content }}" placeholder="Enter strength" required>
+                            <button type="button" class="remove-item-btn secondary-button" onclick="removeItem(this)">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
-                    <button type="button" class="add-item-btn" onclick="addNewField('strengths', 'strength')">Add
-                        Strength</button>
+                    <button type="button" class="add-item-btn primary-button" onclick="addNewField('strengths', 'strength')">Add Strength</button>
                 </div>
 
                 <!-- Activity Weaknesses Section -->
@@ -135,16 +131,13 @@
                         {% if weaknesses %}
                         {% for weakness in weaknesses %}
                         <div class="dynamic-item">
-                            <input type="text" name="activity-weaknesses[]"
-                                value="{{ weakness.activity_weaknesses_content }}" placeholder="Enter weakness"
-                                required>
-                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">&times;</button>
+                            <input type="text" name="activity-weaknesses[]" class="form-input" value="{{ weakness.activity_weaknesses_content }}" placeholder="Enter weakness" required>
+                            <button type="button" class="remove-item-btn secondary-button" onclick="removeItem(this)">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
-                    <button type="button" class="add-item-btn" onclick="addNewField('weaknesses', 'weakness')">Add
-                        Weakness</button>
+                    <button type="button" class="add-item-btn primary-button" onclick="addNewField('weaknesses', 'weakness')">Add Weakness</button>
                 </div>
 
                 <!-- Activity Recommendations Section -->
@@ -154,16 +147,13 @@
                         {% if recommendations %}
                         {% for recommendation in recommendations %}
                         <div class="dynamic-item">
-                            <input type="text" name="activity-recommendations[]"
-                                value="{{ recommendation.activity_recommendations_content }}"
-                                placeholder="Enter recommendation" required>
-                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">&times;</button>
+                            <input type="text" name="activity-recommendations[]" class="form-input" value="{{ recommendation.activity_recommendations_content }}" " placeholder="Enter recommendation" required>
+                            <button type="button" class="remove-item-btn secondary-button" onclick="removeItem(this)">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
-                    <button type="button" class="add-item-btn"
-                        onclick="addNewField('recommendations', 'recommendation')">Add Recommendation</button>
+                    <button type="button" class="add-item-btn primary-button" onclick="addNewField('recommendations', 'recommendation')">Add Recommendation</button>
                 </div>
 
                 <div class="input-pair">
@@ -325,6 +315,7 @@
         
         div.innerHTML = `
             <input type="text" 
+                   class="form-input"
                    name="${settings.inputName}" 
                    placeholder="${settings.placeholder}" 
                    required>
