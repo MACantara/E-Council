@@ -1365,3 +1365,17 @@ textarea {
 .existing-images .card:hover {
     transform: translateY(-5px);
 }
+
+.dynamic-list input[type="text"] {
+    flex: 1;
+    padding: var(--padding-small);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-normal);
+}
+
+.dynamic-list .dynamic-item {
+    display: flex;
+    gap: var(--gap-small);
+    margin-bottom: var(--gap-small);
+}

@@ -524,26 +524,27 @@
 
             <div class="form-container">
                 <h3>Evaluation Student List</h3>
-
                 <div class="input-pair">
-                    <label for="student-list-excel">Upload Student List (.xlsx)</label>
-                    <input type="file" name="student-list-excel" id="student-list-excel" accept=".xlsx" hidden>
-                    <label for="student-list-excel" class="custom-file-upload-input">
-                        <span class="choose-file-text">Choose Excel File</span>
-                        <span id="excel-file-name" class="file-name">
-                            {% if student_list %}{{ student_list.filename }}{% else %}No file chosen{% endif %}
-                        </span>
-                    </label>
-                    <div id="student-list-preview" class="student-list-preview">
-                        <h4 class="student-list-preview-title">Detected Students:</h4>
-                        <ul id="student-names-list">
-                            {% if student_names %}
-                            {% for name in student_names %}
-                            <li>{{ name }}</li>
+                    <label>Student Names</label>
+                    <div id="evaluation-student-list" class="dynamic-list">
+                        {% if evaluation_student_list %}
+                            {% for student in evaluation_student_list %}
+                            <div class="dynamic-item">
+                                <input type="text" name="evaluation-student-names[]" 
+                                       value="{{ student.evaluation_list_of_student_names_student }}" 
+                                       placeholder="Enter student name">
+                                <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                            </div>
                             {% endfor %}
-                            {% endif %}
-                        </ul>
+                        {% else %}
+                            <div class="dynamic-item">
+                                <input type="text" name="evaluation-student-names[]" 
+                                       placeholder="Enter student name">
+                                <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                            </div>
+                        {% endif %}
                     </div>
+                    <button type="button" class="secondary-button" onclick="addNewStudent()">Add Student</button>
                 </div>
             </div>
 
@@ -866,6 +867,19 @@
         deletedImagesInput.value = deletedImages.join(',');
 
         imageContainer.remove();
+    }
+
+    function addNewStudent() {
+        const container = document.getElementById('evaluation-student-list');
+        const newItem = document.createElement('div');
+        newItem.className = 'dynamic-item';
+        
+        newItem.innerHTML = `
+            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+        `;
+        
+        container.appendChild(newItem);
     }
 </script>
 {% endblock %}

@@ -3376,6 +3376,23 @@ def update_documentation(documentation_id):
                         flash('Error uploading some event photo documentation images', 'error')
                         return redirect(url_for('update_documentation', documentation_id=documentation_id))
 
+        # Get the list of student names from the form
+        student_names = request.form.getlist('evaluation-student-names[]')
+
+        # Delete existing student names
+        EvaluationListOfStudentNames.query.filter_by(
+            evaluation_list_of_student_names_documentation_id=documentation_id
+        ).delete()
+
+        # Add new student names
+        for student_name in student_names:
+            if student_name.strip():  # Only add if name is not empty
+                new_student = EvaluationListOfStudentNames(
+                    evaluation_list_of_student_names_documentation_id=documentation_id,
+                    evaluation_list_of_student_names_student=student_name.strip()
+                )
+                db.session.add(new_student)
+
         db.session.commit()
 
         flash('Documentation updated successfully!', 'success')
@@ -3489,6 +3506,10 @@ def update_documentation(documentation_id):
         event_photo_documentation_images_documentation_id=documentation_id
     ).all()
 
+    evaluation_student_list = EvaluationListOfStudentNames.query.filter_by(
+        evaluation_list_of_student_names_documentation_id=documentation_id
+    ).all()
+
     return render_template('update-documentation.html', 
                          documentation=documentation, 
                          events=events, 
@@ -3504,7 +3525,8 @@ def update_documentation(documentation_id):
                          observations=observations,
                          tally_items=tally_items_data,
                          evaluation_images=evaluation_images,
-                         event_photo_documentation_images=event_photo_documentation_images
+                         event_photo_documentation_images=event_photo_documentation_images,
+                         evaluation_student_list=evaluation_student_list
     )
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
