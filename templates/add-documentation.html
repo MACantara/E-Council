@@ -734,6 +734,71 @@
             filesList.innerHTML = '';
         }
     });
+
+    // Photo Documentation file handling
+    document.getElementById('photo-documentation-images').addEventListener('change', function(e) {
+        const fileNameSpan = document.getElementById('photo-doc-files-name');
+        const filesList = document.getElementById('photo-doc-files-list');
+        const input = this;
+        
+        if (this.files.length > 0) {
+            fileNameSpan.textContent = `${this.files.length} file(s) selected`;
+            filesList.innerHTML = '';
+            
+            Array.from(this.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                fileItem.dataset.index = index;
+                
+                const fileName = document.createElement('span');
+                fileName.className = 'file-item-name';
+                fileName.textContent = file.name;
+                
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'file-preview-container';
+                
+                const preview = document.createElement('img');
+                preview.className = 'file-preview';
+                preview.src = URL.createObjectURL(file);
+                
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-file-button';
+                removeButton.innerHTML = '×';
+                removeButton.type = 'button';
+                removeButton.title = 'Remove image';
+                
+                removeButton.addEventListener('click', function() {
+                    // Convert FileList to Array and remove the selected file
+                    const dt = new DataTransfer();
+                    const files = Array.from(input.files);
+                    files.splice(index, 1);
+                    
+                    files.forEach(file => dt.items.add(file));
+                    input.files = dt.files;
+                    
+                    // Remove the preview item
+                    fileItem.remove();
+                    
+                    // Update the file count display
+                    if (input.files.length > 0) {
+                        fileNameSpan.textContent = `${input.files.length} file(s) selected`;
+                    } else {
+                        fileNameSpan.textContent = 'No files chosen';
+                        filesList.innerHTML = '';
+                    }
+                });
+                
+                previewContainer.appendChild(preview);
+                fileItem.appendChild(removeButton);
+                fileItem.appendChild(previewContainer);
+                fileItem.appendChild(fileName);
+                filesList.appendChild(fileItem);
+            });
+        } else {
+            fileNameSpan.textContent = 'No files chosen';
+            filesList.innerHTML = '';
+        }
+    });
 </script>
 
 {% endblock %}

@@ -1102,7 +1102,7 @@ textarea {
 }
 
 .remove-file-btn:hover {
-    color: #ff0000;
+    color: var(--secondary-button-hover-background-color);
 }
 
 .custom-file-upload-input {
@@ -1263,6 +1263,7 @@ textarea {
 }
 
 .selected-file-item {
+    position: relative;
     display: flex;
     align-items: center;
     margin-bottom: var(--gap-small);
@@ -1282,4 +1283,27 @@ textarea {
     margin-top: var(--gap-small);
     max-height: 400px;
     overflow-y: auto;
+}
+
+.remove-file-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--secondary-color);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: background-color 0.2s;
+    z-index: 1;
+}
+
+.remove-file-button:hover {
+    background-color: var(--secondary-button-hover-background-color);
 }
