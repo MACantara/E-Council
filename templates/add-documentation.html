@@ -211,43 +211,53 @@
                 <h3>Tally</h3>
 
                 <div id="tally-items">
-                    <div class="tally-item">
-                        <div class="input-pair">
-                            <label for="tally-items-name">Tally Item Name</label>
-                            <input type="text" name="tally-items-name[]" placeholder="Enter tally item name" required>
-                        </div>
-
-                        <div class="input-pair">
-                            <label>Ratings</label>
-                            <div class="rating-inputs">
-                                <div>
-                                    <label for="extremely-satisfied">Extremely Satisfied</label>
+                    <table class="tally-table">
+                        <thead>
+                            <tr>
+                                <th colspan="5">Total Ratings</th>
+                            </tr>
+                            <tr>
+                                <th>Extremely Satisfied</th>
+                                <th>Satisfied</th>
+                                <th>Neutral</th>
+                                <th>Dissatisfied</th>
+                                <th>Extremely Dissatisfied</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="tally-item-name">
+                                <td colspan="5">
+                                    <div class="tally-name-container">
+                                        <label for="tally-items-name">Tally Item Name</label>
+                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
+                                            placeholder="Enter tally item name" required>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tally-item-ratings">
+                                <td>
                                     <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
                                         value="0" required>
-                                </div>
-                                <div>
-                                    <label for="satisfied">Satisfied</label>
+                                </td>
+                                <td>
                                     <input type="number" name="tally-items-satisfied-rating-total[]" min="0" value="0"
                                         required>
-                                </div>
-                                <div>
-                                    <label for="neutral">Neutral</label>
+                                </td>
+                                <td>
                                     <input type="number" name="tally-items-neutral-rating-total[]" min="0" value="0"
                                         required>
-                                </div>
-                                <div>
-                                    <label for="dissatisfied">Dissatisfied</label>
+                                </td>
+                                <td>
                                     <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
                                         value="0" required>
-                                </div>
-                                <div>
-                                    <label for="extremely-dissatisfied">Extremely Dissatisfied</label>
+                                </td>
+                                <td>
                                     <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
                                         min="0" value="0" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <button type="button" class="secondary-button" onclick="addNewTallyItem()">Add New Tally Item</button>
@@ -333,20 +343,22 @@
     }
 
     function addNewTallyItem() {
-        const tallyItemsContainer = document.getElementById('tally-items');
-        const newItem = tallyItemsContainer.children[0].cloneNode(true);
+        const tallyItemsContainer = document.querySelector('#tally-items tbody');
+        const nameRow = tallyItemsContainer.querySelector('.tally-item-name').cloneNode(true);
+        const ratingsRow = tallyItemsContainer.querySelector('.tally-item-ratings').cloneNode(true);
 
         // Clear all input values
-        const inputs = newItem.querySelectorAll('input');
-        inputs.forEach(input => {
+        nameRow.querySelectorAll('input').forEach(input => {
+            input.value = '';
+        });
+        ratingsRow.querySelectorAll('input').forEach(input => {
             if (input.type === 'number') {
                 input.value = '0';
-            } else {
-                input.value = '';
             }
         });
 
-        tallyItemsContainer.appendChild(newItem);
+        tallyItemsContainer.appendChild(nameRow);
+        tallyItemsContainer.appendChild(ratingsRow);
     }
 </script>
 

@@ -995,26 +995,84 @@ textarea {
 }
 
 /* Tally Item Styles */
-.tally-item {
+/* Tally Item Styles */
+.tally-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    background-color: var(--background-color);
     border: 1px solid var(--secondary-color);
-    padding: 15px;
-    margin-bottom: 15px;
     border-radius: var(--border-radius);
+    overflow: hidden;
 }
 
-.rating-inputs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
+.tally-table th,
+.tally-table td {
+    padding: var(--padding-small);
+    text-align: center;
+    border: 1px solid var(--divider-color);
 }
 
-.rating-inputs > div {
+.tally-table th {
+    background-color: var(--secondary-color);
+    color: var(--primary-button-text-color);
+    font-weight: 600;
+}
+
+.tally-table input[type="text"],
+.tally-table input[type="number"] {
+    width: 100%;
+    padding: var(--odd-padding-extra-small);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--small-border-radius);
+    text-align: center;
+    background-color: var(--white-background-color);
+    color: var(--primary-text-color-dark);
+}
+
+.tally-table input[type="text"] {
+    text-align: left;
+}
+
+.tally-table tbody tr:hover {
+    background-color: var(--form-background-color);
+}
+
+.tally-table .tally-item-name td {
+    background-color: var(--form-background-color);
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.tally-table .tally-item-name input[type="text"] {
+    font-weight: 600;
+    font-size: var(--font-size-medium);
+}
+
+.tally-table thead tr:first-child th {
+    border-bottom: none;
+}
+
+.tally-name-container {
     display: flex;
     flex-direction: column;
+    gap: var(--gap-small);
 }
 
-.rating-inputs input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
+.tally-name-container label {
+    font-weight: 600;
+    color: var(--primary-text-color);
+    text-align: left;
+}
+
+.tally-table .tally-item-name input[type="text"] {
+    margin-top: 0.25rem;
+}
+
+/* Make the table responsive */
+@media (max-width: 992px) {
+    .tally-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
 }
