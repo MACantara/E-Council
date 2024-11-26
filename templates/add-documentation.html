@@ -312,6 +312,20 @@
                     <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
                         placeholder="Comments/Suggestions"></textarea>
                 </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Summary of Attendance Images</h3>
+            
+                <div class="input-pair">
+                    <label for="attendance-images">Upload Images</label>
+                    <input type="file" name="attendance-images[]" id="attendance-images" multiple accept="image/*" hidden>
+                    <label for="attendance-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="attendance-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="attendance-files-list" class="selected-files-list"></div>
+                </div>
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -554,6 +568,58 @@
             calculateOverallRating();
         }
     });
+
+    // Summary of Attendance Images file upload
+    document.getElementById('attendance-images').addEventListener('change', function () {
+        const fileList = document.getElementById('attendance-files-list');
+        const filesNameSpan = document.getElementById('attendance-files-name');
+        
+        // Clear previous list
+        fileList.innerHTML = '';
+        
+        if (this.files.length > 0) {
+            filesNameSpan.textContent = `${this.files.length} file(s) selected`;
+            
+            // Create list of selected files
+            Array.from(this.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-file-btn';
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => removeAttendanceFile(index);
+                
+                fileItem.appendChild(fileName);
+                fileItem.appendChild(removeBtn);
+                fileList.appendChild(fileItem);
+            });
+        } else {
+            filesNameSpan.textContent = 'No files chosen';
+        }
+    });
+    
+    function removeAttendanceFile(index) {
+        const input = document.getElementById('attendance-images');
+        const dt = new DataTransfer();
+        const { files } = input;
+        
+        for (let i = 0; i < files.length; i++) {
+            if (i !== index) {
+                dt.items.add(files[i]);
+            }
+        }
+        
+        input.files = dt.files;
+        
+        // Trigger change event to update the display
+        const event = new Event('change');
+        input.dispatchEvent(event);
+    }
 </script>
 
 {% endblock %}

@@ -3021,6 +3021,29 @@ def add_documentation():
                     app.logger.error(f"Failed to upload image: {str(e)}")
                     flash("Failed to upload one or more images.", "error")
 
+        # Handle summary of attendance images upload
+        attendance_images = request.files.getlist('attendance-images[]')
+        for image in attendance_images:
+            if image and allowed_image_file(image.filename):
+                try:
+                    # Upload to Cloudinary
+                    upload_result = cloudinary.uploader.upload(
+                        image,
+                        folder="attendance_images",
+                        resource_type="auto"
+                    )
+                    
+                    # Create database entry for the image
+                    new_image = SummaryOfAttendanceImages(
+                        summary_of_attendance_images_documentation_id=documentation_id,
+                        summary_of_attendance_images_cloudinary_url=upload_result['secure_url'],
+                        summary_of_attendance_images_cloudinary_public_id=upload_result['public_id']
+                    )
+                    db.session.add(new_image)
+                except Exception as e:
+                    app.logger.error(f"Failed to upload attendance image: {str(e)}")
+                    flash("Failed to upload one or more attendance images.", "error")
+
         db.session.commit()
         flash("Documentation added successfully!", "success")
         return redirect(url_for('documentation_overview'))
@@ -3192,6 +3215,23 @@ def delete_documentation(documentation_id):
                 except Exception as e:
                     app.logger.error(f"Failed to delete image: {str(e)}")
                     # Continue with deletion even if one image fails
+
+            # Get and delete attendance images
+            attendance_images = SummaryOfAttendanceImages.query.filter_by(
+                summary_of_attendance_images_documentation_id=documentation_id
+            ).all()
+
+            # Delete attendance images from Cloudinary and database
+            for image in attendance_images:
+                try:
+                    if image.summary_of_attendance_images_cloudinary_public_id:
+                        cloudinary.uploader.destroy(
+                            image.summary_of_attendance_images_cloudinary_public_id,
+                            resource_type="image"
+                        )
+                    db.session.delete(image)
+                except Exception as e:
+                    app.logger.error(f"Failed to delete attendance image: {str(e)}")
 
             # Delete the documentation entry
             db.session.delete(documentation)
