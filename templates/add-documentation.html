@@ -326,6 +326,23 @@
                     </label>
                     <div id="attendance-files-list" class="selected-files-list"></div>
                 </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Evaluation Student List</h3>
+
+                <div class="input-pair">
+                    <label for="student-list-excel">Upload Student List (.xlsx)</label>
+                    <input type="file" name="student-list-excel" id="student-list-excel" accept=".xlsx" hidden>
+                    <label for="student-list-excel" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Excel File</span>
+                        <span id="excel-file-name" class="file-name">No file chosen</span>
+                    </label>
+                    <div id="student-list-preview" class="student-list-preview">
+                        <h4 class="student-list-preview-title">Detected Students:</h4>
+                        <ul id="student-names-list"></ul>
+                    </div>
+                </div>
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -620,6 +637,55 @@
         const event = new Event('change');
         input.dispatchEvent(event);
     }
+
+    // Excel file handling
+    document.getElementById('student-list-excel').addEventListener('change', function(e) {
+        const fileNameSpan = document.getElementById('excel-file-name');
+        const preview = document.getElementById('student-list-preview');
+        const namesList = document.getElementById('student-names-list');
+        
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            fileNameSpan.textContent = file.name;
+            
+            // Create FormData and send to server
+            const formData = new FormData();
+            formData.append('excel_file', file);
+            
+            // Show loading state
+            namesList.innerHTML = '<li>Loading...</li>';
+            preview.style.display = 'block';
+            
+            // Send to server for processing
+            fetch('/process-student-excel', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                namesList.innerHTML = '';
+                if (data.success) {
+                    data.students.forEach(student => {
+                        const li = document.createElement('li');
+                        li.textContent = student;
+                        namesList.appendChild(li);
+                    });
+                } else {
+                    namesList.innerHTML = `<li class="error">${data.error}</li>`;
+                }
+            })
+            .catch(error => {
+                namesList.innerHTML = '<li class="error">Failed to process file</li>';
+                console.error('Error:', error);
+            });
+        } else {
+            fileNameSpan.textContent = 'No file chosen';
+            preview.style.display = 'none';
+        }
+    });
 </script>
 
 {% endblock %}

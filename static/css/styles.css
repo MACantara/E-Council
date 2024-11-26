@@ -1211,3 +1211,32 @@ textarea {
 .calculated-rating span:last-child {
     color: var(--primary-color);
 }
+
+/* Evaluation Student List Styles */
+.student-list-preview {
+    margin-top: var(--gap-small);
+    background-color: var(--form-background-color);
+    border-radius: var(--border-radius);
+    display: none;
+}
+
+.student-list-preview h4 {
+    margin-bottom: var(--gap-small);
+    color: var(--primary-text-color);
+}
+
+.student-list-preview ul {
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+}
+
+.student-list-preview li {
+    padding: var(--padding-extra-small);
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.student-list-preview li:last-child {
+    border-bottom: none;
+}

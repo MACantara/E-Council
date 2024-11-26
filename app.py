@@ -34,6 +34,8 @@ from cloudinary.utils import cloudinary_url
 import google.generativeai as genai
 import tempfile
 
+import pandas as pd
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -3044,6 +3046,31 @@ def add_documentation():
                     app.logger.error(f"Failed to upload attendance image: {str(e)}")
                     flash("Failed to upload one or more attendance images.", "error")
 
+        # Process student list Excel file
+        if 'student-list-excel' in request.files:
+            file = request.files['student-list-excel']
+            if file and file.filename.endswith('.xlsx'):
+                try:
+                    df = pd.read_excel(file)
+                    name_column = None
+                    for col in df.columns:
+                        if 'full name' in col.lower():
+                            name_column = col
+                            break
+                    
+                    if name_column:
+                        student_names = df[name_column].dropna().tolist()
+                        for student_name in student_names:
+                            new_student = EvaluationListOfStudentNames(
+                                evaluation_list_of_student_names_documentation_id=documentation_id,
+                                evaluation_list_of_student_names_student=student_name
+                            )
+                            db.session.add(new_student)
+                except Exception as e:
+                    app.logger.error(f"Failed to process student list: {str(e)}")
+                    flash("Failed to process student list Excel file.", "error")
+
+
         db.session.commit()
         flash("Documentation added successfully!", "success")
         return redirect(url_for('documentation_overview'))
@@ -3304,6 +3331,45 @@ def get_activity_report_details(activity_report_id):
     recommendations_data = [{'activity_recommendations_content': recommendation.activity_recommendations_content} for recommendation in recommendations]
 
     return jsonify(strengths=strengths_data, weaknesses=weaknesses_data, recommendations=recommendations_data)
+
+@app.route('/process-student-excel', methods=['POST'])
+@login_required
+def process_student_excel():
+    if 'excel_file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    
+    file = request.files['excel_file']
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'No file selected'})
+    
+    if not file.filename.endswith('.xlsx'):
+        return jsonify({'success': False, 'error': 'Please upload an Excel (.xlsx) file'})
+    
+    try:
+        # Read the Excel file
+        df = pd.read_excel(file)
+        
+        # Find column containing 'full name' (case insensitive)
+        name_column = None
+        for col in df.columns:
+            if 'full name' in col.lower():
+                name_column = col
+                break
+        
+        if name_column is None:
+            return jsonify({'success': False, 'error': 'No column containing "full name" found'})
+        
+        # Get student names
+        student_names = df[name_column].dropna().tolist()
+        
+        return jsonify({
+            'success': True,
+            'students': student_names
+        })
+    
+    except Exception as e:
+        app.logger.error(f"Error processing Excel file: {str(e)}")
+        return jsonify({'success': False, 'error': 'Failed to process Excel file'})
 
 @app.route("/financial-reports-overview")
 @login_required
