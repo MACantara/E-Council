@@ -1366,6 +1366,7 @@ textarea {
     transform: translateY(-5px);
 }
 
+/* Evaluation Student List Styles */
 .dynamic-list input[type="text"] {
     flex: 1;
     padding: var(--padding-small);
@@ -1378,4 +1379,43 @@ textarea {
     display: flex;
     gap: var(--gap-small);
     margin-bottom: var(--gap-small);
+}
+
+.scrollable-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: var(--padding-small);
+    margin-bottom: var(--gap-small);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.scrollable-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable-list::-webkit-scrollbar-track {
+    background: var(--primary-color);
+    border-radius: var(--border-radius);
+}
+
+.scrollable-list::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: var(--border-radius);
+}
+
+.scrollable-list::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
+.scrollable-list .dynamic-item:last-child {
+    margin-bottom: 0;
+}
+
+.scrollable-list .dynamic-item {
+    background-color: var(--form-background-color);
+}
+
+.scrollable-list .dynamic-item:hover {
+    background-color: var(--hover-background-color);
 }

@@ -526,22 +526,30 @@
                 <h3>Evaluation Student List</h3>
                 <div class="input-pair">
                     <label>Student Names</label>
-                    <div id="evaluation-student-list" class="dynamic-list">
+                    <div id="evaluation-student-list" class="dynamic-list scrollable-list">
                         {% if evaluation_student_list %}
-                            {% for student in evaluation_student_list %}
-                            <div class="dynamic-item">
-                                <input type="text" name="evaluation-student-names[]" 
-                                       value="{{ student.evaluation_list_of_student_names_student }}" 
-                                       placeholder="Enter student name">
-                                <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
-                            </div>
-                            {% endfor %}
+                        {% for student in evaluation_student_list %}
+                        <div class="dynamic-item">
+                            <input type="text" name="evaluation-student-names[]"
+                                value="{{ student.evaluation_list_of_student_names_student }}"
+                                placeholder="Enter student name">
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                        </div>
+                        {% endfor %}
+                        {# Add additional empty entries to make it 10 #}
+                        {% for _ in range(10 - evaluation_student_list|length) %}
+                        <div class="dynamic-item">
+                            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                        </div>
+                        {% endfor %}
                         {% else %}
-                            <div class="dynamic-item">
-                                <input type="text" name="evaluation-student-names[]" 
-                                       placeholder="Enter student name">
-                                <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
-                            </div>
+                        {% for _ in range(10) %}
+                        <div class="dynamic-item">
+                            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                        </div>
+                        {% endfor %}
                         {% endif %}
                     </div>
                     <button type="button" class="secondary-button" onclick="addNewStudent()">Add Student</button>
@@ -873,12 +881,12 @@
         const container = document.getElementById('evaluation-student-list');
         const newItem = document.createElement('div');
         newItem.className = 'dynamic-item';
-        
+
         newItem.innerHTML = `
             <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
             <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
         `;
-        
+
         container.appendChild(newItem);
     }
 </script>
