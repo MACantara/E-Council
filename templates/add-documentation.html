@@ -273,6 +273,20 @@
                     <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
                         placeholder="Comments/Suggestions"></textarea>
                 </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Results of the Evaluation Images</h3>
+            
+                <div class="input-pair">
+                    <label for="evaluation-images">Upload Images</label>
+                    <input type="file" name="evaluation-images[]" id="evaluation-images" multiple accept="image/*" hidden>
+                    <label for="evaluation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="evaluation-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="selected-files-list" class="selected-files-list"></div>
+                </div>
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -359,6 +373,58 @@
 
         tallyItemsContainer.appendChild(nameRow);
         tallyItemsContainer.appendChild(ratingsRow);
+    }
+
+    // Evaluation Images file upload
+    document.getElementById('evaluation-images').addEventListener('change', function () {
+        const fileList = document.getElementById('selected-files-list');
+        const filesNameSpan = document.getElementById('evaluation-files-name');
+        
+        // Clear previous list
+        fileList.innerHTML = '';
+        
+        if (this.files.length > 0) {
+            filesNameSpan.textContent = `${this.files.length} file(s) selected`;
+            
+            // Create list of selected files
+            Array.from(this.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-file-btn';
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => removeFile(index);
+                
+                fileItem.appendChild(fileName);
+                fileItem.appendChild(removeBtn);
+                fileList.appendChild(fileItem);
+            });
+        } else {
+            filesNameSpan.textContent = 'No files chosen';
+        }
+    });
+    
+    function removeFile(index) {
+        const input = document.getElementById('evaluation-images');
+        const dt = new DataTransfer();
+        const { files } = input;
+        
+        for (let i = 0; i < files.length; i++) {
+            if (i !== index) {
+                dt.items.add(files[i]);
+            }
+        }
+        
+        input.files = dt.files;
+        
+        // Trigger change event to update the display
+        const event = new Event('change');
+        input.dispatchEvent(event);
     }
 </script>
 

@@ -27,6 +27,8 @@ from reportlab.pdfgen import canvas
 
 import cloudinary
 import cloudinary.uploader
+import cloudinary.api
+from cloudinary.exceptions import Error as CloudinaryError
 from cloudinary.utils import cloudinary_url
 
 import google.generativeai as genai
@@ -765,6 +767,13 @@ app.jinja_env.filters['has_papers'] = has_papers
 def has_documentations(documentations, semester, academic_year):
     return any(doc[0].documentation_semester == semester and doc[0].documentation_academic_year == academic_year for doc in documentations)
 
+# Error handlers
+@app.errorhandler(CloudinaryError)
+def handle_cloudinary_error(error):
+    app.logger.error(f"Cloudinary error: {str(error)}")
+    flash("An error occurred while processing images.", "error")
+    return redirect(url_for('documentation_overview'))
+
 # Python functions
 def send_verification_email(users_email):
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -1103,6 +1112,13 @@ def safe_decimal_conversion(value):
         return Decimal(value)
     except (ValueError, TypeError, InvalidOperation):
         return str(value)
+
+def allowed_image_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 
 # Routes
 @app.route("/")
@@ -2982,6 +2998,29 @@ def add_documentation():
                 )
                 db.session.add(new_tally_item)
 
+                # Handle evaluation images upload
+        evaluation_images = request.files.getlist('evaluation-images[]')
+        for image in evaluation_images:
+            if image and allowed_image_file(image.filename):
+                try:
+                    # Upload to Cloudinary
+                    upload_result = cloudinary.uploader.upload(
+                        image,
+                        folder="evaluation_images",  # Optional: organize in folders
+                        resource_type="auto"
+                    )
+                    
+                    # Create database entry for the image
+                    new_image = ResultsOfTheEvaluationImages(
+                        results_of_the_evaluation_images_documentation_id=documentation_id,
+                        results_of_the_evaluation_images_cloudinary_url=upload_result['secure_url'],
+                        results_of_the_evaluation_images_cloudinary_public_id=upload_result['public_id']
+                    )
+                    db.session.add(new_image)
+                except Exception as e:
+                    app.logger.error(f"Failed to upload image: {str(e)}")
+                    flash("Failed to upload one or more images.", "error")
+
         db.session.commit()
         flash("Documentation added successfully!", "success")
         return redirect(url_for('documentation_overview'))
@@ -3126,20 +3165,42 @@ def update_documentation(documentation_id):
                          activity_reports=activity_reports_data, 
                          learning_journals=learning_journals_data)
 
-@app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
+@app.route('/delete-documentation/<int:documentation_id>', methods=['POST'])
 @login_required
 def delete_documentation(documentation_id):
-    documentation = Documentation.query.get_or_404(documentation_id)
+    try:
+        # Get the documentation and its associated images
+        documentation = Documentation.query.get_or_404(documentation_id)
+        evaluation_images = ResultsOfTheEvaluationImages.query.filter_by(
+            results_of_the_evaluation_images_documentation_id=documentation_id
+        ).all()
 
-    if request.method == 'POST':
-        # Delete the documentation
+        # Delete images from Cloudinary and database
+        for image in evaluation_images:
+            try:
+                # Delete from Cloudinary
+                if image.results_of_the_evaluation_images_cloudinary_public_id:
+                    cloudinary.uploader.destroy(
+                        image.results_of_the_evaluation_images_cloudinary_public_id,
+                        resource_type="image"
+                    )
+                # Delete database entry
+                db.session.delete(image)
+            except Exception as e:
+                app.logger.error(f"Failed to delete image: {str(e)}")
+                # Continue with deletion even if one image fails
+
+        # Delete the documentation entry
         db.session.delete(documentation)
         db.session.commit()
-
+        
         flash('Documentation deleted successfully!', 'success')
-        return redirect(url_for('documentation_overview'))
-
-    return render_template('delete-documentation.html', documentation=documentation)
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Failed to delete documentation: {str(e)}")
+        flash('Failed to delete documentation.', 'error')
+    
+    return redirect(url_for('documentation_overview'))
 
 @app.route('/get-related-forms/<int:event_id>', methods=['GET'])
 @login_required

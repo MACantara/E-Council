@@ -1074,3 +1074,52 @@ textarea {
         white-space: nowrap;
     }
 }
+
+/* Custome File Upload Styles */
+.selected-files-list {
+    margin-top: var(--gap-small);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.selected-file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--odd-padding-extra-small);
+    background-color: var(--form-background-color);
+    border-radius: var(--small-border-radius);
+    margin-bottom: var(--gap-small);
+}
+
+.remove-file-btn {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 var(--even-padding-extra-small);
+}
+
+.remove-file-btn:hover {
+    color: #ff0000;
+}
+
+.custom-file-upload-input {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--padding-small);
+    background-color: var(--form-background-color);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--small-border-radius);
+    cursor: pointer;
+}
+
+.choose-file-text {
+    font-weight: 600;
+}
+
+.file-name {
+    color: var(--primary-text-color);
+}
