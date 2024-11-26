@@ -22,7 +22,7 @@
         </div>
         {% endif %}
         {% endwith %}
-        <form method="POST"
+        <form method="POST" enctype="multipart/form-data"
             action="{{ url_for('update_documentation', documentation_id=documentation.documentation_id) }}">
             <div class="form-container">
                 <h2>Update Documentation</h2>
@@ -411,32 +411,43 @@
 
                 <div class="input-pair">
                     <label for="documentation-date-of-submission">Date of Submission</label>
-                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission" value="{{ documentation.documentation_date_of_submission.strftime('%Y-%m-%d') }}"
-                        required>
+                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission"
+                        value="{{ documentation.documentation_date_of_submission.strftime('%Y-%m-%d') }}" required>
                 </div>
             </div>
 
             <div class="form-container">
                 <h3>Results of the Evaluation Images</h3>
-
                 <div class="input-pair">
-                    <label for="evaluation-images">Upload Images</label>
-                    <input type="file" name="evaluation-images[]" id="evaluation-images" multiple accept="image/*"
+                    <label for="evaluation-images">Upload Evaluation Images</label>
+                    <input type="file" name="evaluation-images[]" id="evaluation-images" accept="image/*" multiple
                         hidden>
                     <label for="evaluation-images" class="custom-file-upload-input">
                         <span class="choose-file-text">Choose Files</span>
-                        <span id="evaluation-files-name" class="file-name">
-                            {% if evaluation_images %}Files selected{% else %}No files chosen{% endif %}
-                        </span>
+                        <span id="evaluation-files-name" class="file-name">No files chosen</span>
                     </label>
-                    <div id="selected-files-list" class="selected-files-list">
-                        {% if evaluation_images %}
-                        {% for image in evaluation_images %}
-                        <div class="file-item">{{ image.filename }}</div>
+                    <div id="evaluation-files-list" class="selected-files-list"></div>
+                </div>
+
+                {% if documentation.results_of_the_evaluation_images %}
+                <div class="existing-images">
+                    <h5>Current Evaluation Images</h5>
+                    <div class="selected-files-list">
+                        {% for image in documentation.results_of_the_evaluation_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.results_of_the_evaluation_images_id }}">
+                            <button type="button" class="remove-file-button" onclick="removeExistingImage(this)" title="Remove image">×</button>
+                            <div class="file-preview-container">
+                                <img src="{{ image.results_of_the_evaluation_images_cloudinary_url }}"
+                                    class="file-preview" alt="Evaluation Image">
+                            </div>
+                            <span class="file-item-name">Current Image {{ loop.index }}</span>
+                        </div>
                         {% endfor %}
-                        {% endif %}
                     </div>
                 </div>
+                {% endif %}
+                <!-- Hidden input to track deleted images -->
+                <input type="hidden" name="deleted_evaluation_images" id="deleted-evaluation-images" value="">
             </div>
 
             <div class="form-container">
@@ -655,6 +666,83 @@
 
     function removeItem(button) {
         button.parentElement.remove();
+    }
+
+    // Evaluation Images file handling
+    document.getElementById('evaluation-images').addEventListener('change', function(e) {
+        const fileNameSpan = document.getElementById('evaluation-files-name');
+        const filesList = document.getElementById('evaluation-files-list');
+        const input = this;
+        
+        if (this.files.length > 0) {
+            fileNameSpan.textContent = `${this.files.length} file(s) selected`;
+            filesList.innerHTML = '';
+            
+            Array.from(this.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                fileItem.dataset.index = index;
+                
+                const fileName = document.createElement('span');
+                fileName.className = 'file-item-name';
+                fileName.textContent = file.name;
+                
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'file-preview-container';
+                
+                const preview = document.createElement('img');
+                preview.className = 'file-preview';
+                preview.src = URL.createObjectURL(file);
+                
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-file-button';
+                removeButton.innerHTML = '×';
+                removeButton.type = 'button';
+                removeButton.title = 'Remove image';
+                
+                removeButton.addEventListener('click', function() {
+                    const dt = new DataTransfer();
+                    const files = Array.from(input.files);
+                    files.splice(index, 1);
+                    
+                    files.forEach(file => dt.items.add(file));
+                    input.files = dt.files;
+                    
+                    fileItem.remove();
+                    
+                    if (input.files.length > 0) {
+                        fileNameSpan.textContent = `${input.files.length} file(s) selected`;
+                    } else {
+                        fileNameSpan.textContent = 'No files chosen';
+                        filesList.innerHTML = '';
+                    }
+                });
+                
+                previewContainer.appendChild(preview);
+                fileItem.appendChild(removeButton);
+                fileItem.appendChild(previewContainer);
+                fileItem.appendChild(fileName);
+                filesList.appendChild(fileItem);
+            });
+        } else {
+            fileNameSpan.textContent = 'No files chosen';
+            filesList.innerHTML = '';
+        }
+    });
+
+    // Function to remove existing evaluation images
+    function removeExistingImage(button) {
+        const imageContainer = button.closest('.selected-file-item');
+        const imageId = imageContainer.dataset.imageId;
+        
+        // Add the image ID to the hidden input
+        const deletedImagesInput = document.getElementById('deleted-evaluation-images');
+        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
+        deletedImages.push(imageId);
+        deletedImagesInput.value = deletedImages.join(',');
+        
+        // Remove the image container from the DOM
+        imageContainer.remove();
     }
 </script>
 {% endblock %}

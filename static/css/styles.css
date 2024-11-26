@@ -1349,3 +1349,19 @@ textarea {
     background-color: var(--secondary-button-hover-background-color);
     color: var(--primary-button-text-color);
 }
+
+/* Results of the Evaluation Images Styles */
+.card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.existing-images .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.existing-images .card:hover {
+    transform: translateY(-5px);
+}
