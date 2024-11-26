@@ -300,28 +300,10 @@
                 </div>
 
                 <div class="input-pair">
-                    <label>Overall Rating</label>
-                    <div class="rating-container">
-                        <div class="rating-item">
-                            <input type="radio" name="documentation-rating" id="documentation-rating-5" value="5">
-                            <label for="documentation-rating-5">5 - Excellent</label>
-                        </div>
-                        <div class="rating-item">
-                            <input type="radio" name="documentation-rating" id="documentation-rating-4" value="4">
-                            <label for="documentation-rating-4">4 - Very Satisfactory</label>
-                        </div>
-                        <div class="rating-item">
-                            <input type="radio" name="documentation-rating" id="documentation-rating-3" value="3">
-                            <label for="documentation-rating-3">3 - Satisfactory</label>
-                        </div>
-                        <div class="rating-item">
-                            <input type="radio" name="documentation-rating" id="documentation-rating-2" value="2">
-                            <label for="documentation-rating-2">2 - Fair</label>
-                        </div>
-                        <div class="rating-item">
-                            <input type="radio" name="documentation-rating" id="documentation-rating-1" value="1">
-                            <label for="documentation-rating-1">1 - Poor</label>
-                        </div>
+                    <div class="calculated-rating">
+                        <span>Overall Rating: </span>
+                        <span id="calculated-rating-value">0</span>
+                        <input type="hidden" name="documentation-rating" id="documentation-rating" value="0">
                     </div>
                 </div>
 
@@ -537,6 +519,46 @@
                 setTimeout(syncTallyItems, 100); // Give time for the row to be removed
             }
         });
+    });
+
+    // Function to calculate and update overall rating
+    function calculateOverallRating() {
+        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
+        const rows = evaluationTallyContainer.querySelectorAll('tr:not(.tally-item-name)');
+        let totalRating = 0;
+        let totalItems = 0;
+
+        rows.forEach(row => {
+            const selectedRadio = row.querySelector('input[type="radio"]:checked');
+            if (selectedRadio) {
+                totalRating += parseInt(selectedRadio.value);
+                totalItems++;
+            }
+        });
+
+        // Calculate average rating
+        let averageRating = totalItems > 0 ? totalRating / totalItems : 0;
+
+        // Round to nearest 0.01 (two decimal places)
+        averageRating = Math.round(averageRating * 100) / 100;
+
+        // Update the display and hidden input with two decimal places
+        document.getElementById('calculated-rating-value').textContent = averageRating.toFixed(2);
+        document.getElementById('documentation-rating').value = averageRating;
+
+        // Update radio buttons
+        const roundedRating = Math.round(averageRating);
+        const radioButton = document.getElementById(`documentation-rating-${roundedRating}`);
+        if (radioButton) {
+            radioButton.checked = true;
+        }
+    }
+
+    // Add event listener for radio button changes in evaluation form
+    document.querySelector('.evaluation-tally-table').addEventListener('change', function (e) {
+        if (e.target.type === 'radio') {
+            calculateOverallRating();
+        }
     });
 </script>
 

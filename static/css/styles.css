@@ -1125,10 +1125,6 @@ textarea {
 }
 
 /* Evaluation Form Styles */
-.evaluation-tally-container {
-    margin-bottom: var(--gap-medium);
-}
-
 .evaluation-tally-table {
     width: 100%;
     border-collapse: separate;  /* Changed from collapse to allow border-radius */
@@ -1203,4 +1199,15 @@ textarea {
 
 .rating-item input[type="radio"] {
     margin: 0;
+}
+
+.calculated-rating {
+    background-color: var(--form-background-color);
+    border-radius: var(--border-radius);
+    text-align: left;
+    font-weight: 600;
+}
+
+.calculated-rating span:last-child {
+    color: var(--primary-color);
 }
