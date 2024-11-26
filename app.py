@@ -3184,6 +3184,50 @@ def update_documentation(documentation_id):
         documentation.documentation_rating = documentation_rating
         documentation.documentation_comments_suggestions = documentation_comments_suggestions
 
+        # Update strengths
+        # First, delete existing strengths
+        ActivityStrengths.query.filter_by(
+            activity_strengths_documentation_id=documentation_id
+        ).delete()
+        
+        # Add new strengths
+        strengths = request.form.getlist('activity-strengths[]')
+        for strength in strengths:
+            if strength.strip():  # Only add non-empty strengths
+                new_strength = ActivityStrengths(
+                    activity_strengths_documentation_id=documentation_id,
+                    activity_strengths_content=strength.strip()
+                )
+                db.session.add(new_strength)
+
+        # Update weaknesses
+        ActivityWeaknesses.query.filter_by(
+            activity_weaknesses_documentation_id=documentation_id
+        ).delete()
+        
+        weaknesses = request.form.getlist('activity-weaknesses[]')
+        for weakness in weaknesses:
+            if weakness.strip():
+                new_weakness = ActivityWeaknesses(
+                    activity_weaknesses_documentation_id=documentation_id,
+                    activity_weaknesses_content=weakness.strip()
+                )
+                db.session.add(new_weakness)
+
+        # Update recommendations
+        ActivityRecommendations.query.filter_by(
+            activity_recommendations_documentation_id=documentation_id
+        ).delete()
+        
+        recommendations = request.form.getlist('activity-recommendations[]')
+        for recommendation in recommendations:
+            if recommendation.strip():
+                new_recommendation = ActivityRecommendations(
+                    activity_recommendations_documentation_id=documentation_id,
+                    activity_recommendations_content=recommendation.strip()
+                )
+                db.session.add(new_recommendation)
+
         db.session.commit()
 
         flash('Documentation updated successfully!', 'success')
@@ -3236,6 +3280,19 @@ def update_documentation(documentation_id):
         'events_name': journal.concept_paper_forms_subject
     } for journal in learning_journals]
 
+    # Get strengths, weaknesses, and recommendations
+    strengths = ActivityStrengths.query.filter_by(
+        activity_strengths_documentation_id=documentation_id
+    ).all()
+
+    weaknesses = ActivityWeaknesses.query.filter_by(
+        activity_weaknesses_documentation_id=documentation_id
+    ).all()
+
+    recommendations = ActivityRecommendations.query.filter_by(
+        activity_recommendations_documentation_id=documentation_id
+    ).all()
+
     return render_template('update-documentation.html', 
                          documentation=documentation, 
                          events=events, 
@@ -3243,7 +3300,11 @@ def update_documentation(documentation_id):
                          users=users, 
                          signatories=signatories, 
                          activity_reports=activity_reports_data, 
-                         learning_journals=learning_journals_data)
+                         learning_journals=learning_journals_data,
+                        strengths=strengths,
+                        weaknesses=weaknesses,
+                        recommendations=recommendations
+    )
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
 @login_required

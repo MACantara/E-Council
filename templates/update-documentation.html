@@ -9,7 +9,8 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to Documentation Overview</a>
+        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to
+            Documentation Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -21,18 +22,20 @@
         </div>
         {% endif %}
         {% endwith %}
+        <form method="POST"
+            action="{{ url_for('update_documentation', documentation_id=documentation.documentation_id) }}">
+            <div class="form-container">
+                <h2>Update Documentation</h2>
+                <h3>Documentation Details</h3>
 
-        <div class="container">
-            <span id="close-update-documentation-modal-button" class="close-button">&times;</span>
-            <h2>Update Documentation</h2>
-
-            <form method="POST" action="{{ url_for('update_documentation', documentation_id=documentation.documentation_id) }}">
                 <div class="input-pair">
                     <label for="documentation-events-id">Event</label>
                     <select name="documentation-events-id" id="documentation-events-id" required>
                         <option value="" disabled>Select Event</option>
                         {% for event in events %}
-                        <option value="{{ event.events_id }}" {% if documentation.documentation_events_id == event.events_id %}selected{% endif %}>{{ event.events_name }}</option>
+                        <option value="{{ event.events_id }}" {% if
+                            documentation.documentation_events_id==event.events_id %}selected{% endif %}>{{
+                            event.events_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -42,7 +45,8 @@
                     <select name="documentation-academic-year" id="documentation-academic-year" required>
                         <option value="" disabled>Select Academic Year</option>
                         {% for year in academic_years %}
-                        <option value="{{ year }}" {% if documentation.documentation_academic_year == year %}selected{% endif %}>{{ year }}</option>
+                        <option value="{{ year }}" {% if documentation.documentation_academic_year==year %}selected{%
+                            endif %}>{{ year }}</option>
                         {% endfor %}
                         <option value="Other">Other A.Y.</option>
                     </select>
@@ -50,15 +54,18 @@
 
                 <div class="input-pair" id="other-academic-year-container" style="display: none;">
                     <label for="other-academic-year">Other Academic Year</label>
-                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
+                    <input type="text" name="other-academic-year" id="other-academic-year"
+                        placeholder="Enter Academic Year">
                 </div>
 
                 <div class="input-pair">
                     <label for="documentation-semester">Semester</label>
                     <select name="documentation-semester" id="documentation-semester" required>
                         <option value="" disabled>Select a Semester</option>
-                        <option value="1st Semester" {% if documentation.documentation_semester == '1st Semester' %}selected{% endif %}>1st Semester</option>
-                        <option value="2nd Semester" {% if documentation.documentation_semester == '2nd Semester' %}selected{% endif %}>2nd Semester</option>
+                        <option value="1st Semester" {% if documentation.documentation_semester=='1st Semester'
+                            %}selected{% endif %}>1st Semester</option>
+                        <option value="2nd Semester" {% if documentation.documentation_semester=='2nd Semester'
+                            %}selected{% endif %}>2nd Semester</option>
                     </select>
                 </div>
 
@@ -66,31 +73,97 @@
                     <label for="documentation-status">Status</label>
                     <select name="documentation-status" id="documentation-status" required>
                         <option value="" disabled>Select Status</option>
-                        <option value="Upcoming" {% if documentation.documentation_status == 'Upcoming' %}selected{% endif %}>Upcoming</option>
-                        <option value="Postponed" {% if documentation.documentation_status == 'Postponed' %}selected{% endif %}>Postponed</option>
-                        <option value="Done" {% if documentation.documentation_status == 'Done' %}selected{% endif %}>Done</option>
-                        <option value="Cancelled" {% if documentation.documentation_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="Upcoming" {% if documentation.documentation_status=='Upcoming' %}selected{% endif
+                            %}>Upcoming</option>
+                        <option value="Postponed" {% if documentation.documentation_status=='Postponed' %}selected{%
+                            endif %}>Postponed</option>
+                        <option value="Done" {% if documentation.documentation_status=='Done' %}selected{% endif %}>Done
+                        </option>
+                        <option value="Cancelled" {% if documentation.documentation_status=='Cancelled' %}selected{%
+                            endif %}>Cancelled</option>
                     </select>
                 </div>
 
                 <div class="input-pair">
                     <label for="documentation-type">Type</label>
-                    <input type="text" name="documentation-type" id="documentation-type" placeholder="Type" value="{{ documentation.documentation_type }}" required>
+                    <input type="text" name="documentation-type" id="documentation-type" placeholder="Type"
+                        value="{{ documentation.documentation_type }}" required>
                 </div>
+            </div>
+            <div class="form-container">
+                <h3>Activity Report Form</h3>
 
                 <div class="input-pair">
                     <label for="documentation-activity-report-forms-id">Activity Report Form</label>
                     <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id">
-                        <option value="" disabled {% if not documentation.documentation_activity_report_forms_id %}selected{% endif %}>Select Activity Report Form</option>
+                        <option value="" disabled {% if not documentation.documentation_activity_report_forms_id
+                            %}selected{% endif %}>Select Activity Report Form</option>
                         {% if activity_reports %}
-                            {% for report in activity_reports %}
-                            <option value="{{ report.activity_report_forms_id }}" 
-                                {% if documentation.documentation_activity_report_forms_id == report.activity_report_forms_id %}selected{% endif %}>
-                                {{ report.events_name }} Activity Report Form
-                            </option>
-                            {% endfor %}
+                        {% for report in activity_reports %}
+                        <option value="{{ report.activity_report_forms_id }}" {% if
+                            documentation.documentation_activity_report_forms_id==report.activity_report_forms_id
+                            %}selected{% endif %}>
+                            {{ report.events_name }} Activity Report Form
+                        </option>
+                        {% endfor %}
                         {% endif %}
                     </select>
+                </div>
+
+                <!-- Activity Strengths Section -->
+                <div class="input-pair">
+                    <label>Activity Strengths</label>
+                    <div class="dynamic-list" id="strengths-list">
+                        {% if strengths %}
+                        {% for strength in strengths %}
+                        <div class="dynamic-item">
+                            <input type="text" name="activity-strengths[]"
+                                value="{{ strength.activity_strengths_content }}" placeholder="Enter strength" required>
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addNewField('strengths', 'strength')">Add
+                        Strength</button>
+                </div>
+
+                <!-- Activity Weaknesses Section -->
+                <div class="input-pair">
+                    <label>Activity Weaknesses</label>
+                    <div class="dynamic-list" id="weaknesses-list">
+                        {% if weaknesses %}
+                        {% for weakness in weaknesses %}
+                        <div class="dynamic-item">
+                            <input type="text" name="activity-weaknesses[]"
+                                value="{{ weakness.activity_weaknesses_content }}" placeholder="Enter weakness"
+                                required>
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addNewField('weaknesses', 'weakness')">Add
+                        Weakness</button>
+                </div>
+
+                <!-- Activity Recommendations Section -->
+                <div class="input-pair">
+                    <label>Activity Recommendations</label>
+                    <div class="dynamic-list" id="recommendations-list">
+                        {% if recommendations %}
+                        {% for recommendation in recommendations %}
+                        <div class="dynamic-item">
+                            <input type="text" name="activity-recommendations[]"
+                                value="{{ recommendation.activity_recommendations_content }}"
+                                placeholder="Enter recommendation" required>
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn"
+                        onclick="addNewField('recommendations', 'recommendation')">Add Recommendation</button>
                 </div>
 
                 <div class="input-pair">
@@ -98,32 +171,8 @@
                     <select name="documentation-prepared-by" id="documentation-prepared-by" required>
                         <option value="" disabled>Select Preparer</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}" {% if documentation.documentation_prepared_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
-                    <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id">
-                        <option value="" disabled {% if not documentation.documentation_learning_journal_forms_id %}selected{% endif %}>Select Learning Journal Form</option>
-                        {% if learning_journals %}
-                            {% for journal in learning_journals %}
-                            <option value="{{ journal.learning_journal_forms_id }}"
-                                {% if documentation.documentation_learning_journal_forms_id == journal.learning_journal_forms_id %}selected{% endif %}>
-                                {{ journal.events_name }} Learning Journal Form
-                            </option>
-                            {% endfor %}
-                        {% endif %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="documentation-checked-by">Checked By</label>
-                    <select name="documentation-checked-by" id="documentation-checked-by" required>
-                        <option value="" disabled>Select Checker</option>
-                        {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if documentation.documentation_checked_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ user.users_id }}" {% if documentation.documentation_prepared_by==user.users_id
+                            %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -133,34 +182,71 @@
                     <select name="documentation-noted-by" id="documentation-noted-by" required>
                         <option value="" disabled>Select Noter</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}" {% if documentation.documentation_noted_by == signatory.signatory_id %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            documentation.documentation_noted_by==signatory.signatory_id %}selected{% endif %}>{{
+                            signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
-                <div class="input-pair">
-                    <label for="documentation-date-of-submission">Date of Submission</label>
-                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission" value="{{ documentation.documentation_date_of_submission.strftime('%Y-%m-%d') }}" required>
-                </div>
+            <div class="input-pair">
+                <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
+                <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id">
+                    <option value="" disabled {% if not documentation.documentation_learning_journal_forms_id
+                        %}selected{% endif %}>Select Learning Journal Form</option>
+                    {% if learning_journals %}
+                    {% for journal in learning_journals %}
+                    <option value="{{ journal.learning_journal_forms_id }}" {% if
+                        documentation.documentation_learning_journal_forms_id==journal.learning_journal_forms_id
+                        %}selected{% endif %}>
+                        {{ journal.events_name }} Learning Journal Form
+                    </option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
 
-                <div class="input-pair">
-                    <label for="documentation-rating">Rating</label>
-                    <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating" min="1" max="5" value="{{ documentation.documentation_rating }}">
-                </div>
+            <div class="input-pair">
+                <label for="documentation-checked-by">Checked By</label>
+                <select name="documentation-checked-by" id="documentation-checked-by" required>
+                    <option value="" disabled>Select Checker</option>
+                    {% for signatory in signatories %}
+                    <option value="{{ signatory.signatory_id }}" {% if
+                        documentation.documentation_checked_by==signatory.signatory_id %}selected{% endif %}>{{
+                        signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                        signatory.signatory_position }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                <div class="input-pair">
-                    <label for="documentation-comments-suggestions">Comments/Suggestions</label>
-                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions" placeholder="Comments/Suggestions">{{ documentation.documentation_comments_suggestions }}</textarea>
-                </div>
+            <div class="input-pair">
+                <label for="documentation-date-of-submission">Date of Submission</label>
+                <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission"
+                    value="{{ documentation.documentation_date_of_submission.strftime('%Y-%m-%d') }}" required>
+            </div>
 
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="input-pair">
+                <label for="documentation-rating">Rating</label>
+                <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating" min="1"
+                    max="5" value="{{ documentation.documentation_rating }}">
+            </div>
 
-                <div class="horizontal-button-pair-positioned-right">
-                    <a href="{{ url_for('documentation_overview') }}" class="secondary-button fit-content-button" type="button">Cancel</a>
-                    <button class="primary-button" type="submit">Update Documentation</button>
-                </div>
-            </form>
-        </div>
+            <div class="input-pair">
+                <label for="documentation-comments-suggestions">Comments/Suggestions</label>
+                <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
+                    placeholder="Comments/Suggestions">{{ documentation.documentation_comments_suggestions }}</textarea>
+            </div>
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="horizontal-button-pair-positioned-right">
+                <a href="{{ url_for('documentation_overview') }}" class="secondary-button fit-content-button"
+                    type="button">Cancel</a>
+                <button class="primary-button" type="submit">Update Documentation</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -210,5 +296,48 @@
                 .catch(error => console.error('Error fetching related forms:', error));
         });
     });
+
+    function addNewField(type, placeholder) {
+        const config = {
+            strengths: {
+                listId: 'strengths-list',
+                inputName: 'activity-strengths[]',
+                placeholder: 'Enter strength'
+            },
+            weaknesses: {
+                listId: 'weaknesses-list',
+                inputName: 'activity-weaknesses[]',
+                placeholder: 'Enter weakness'
+            },
+            recommendations: {
+                listId: 'recommendations-list',
+                inputName: 'activity-recommendations[]',
+                placeholder: 'Enter recommendation'
+            }
+        };
+
+        const settings = config[type];
+        if (!settings) return;
+
+        const list = document.getElementById(settings.listId);
+        const div = document.createElement('div');
+        div.className = 'dynamic-item';
+        
+        div.innerHTML = `
+            <input type="text" 
+                   name="${settings.inputName}" 
+                   placeholder="${settings.placeholder}" 
+                   required>
+            <button type="button" 
+                    class="remove-item-btn" 
+                    onclick="removeItem(this)">&times;</button>
+        `;
+        
+        list.appendChild(div);
+    }
+
+    function removeItem(button) {
+        button.parentElement.remove();
+    }
 </script>
 {% endblock %}
