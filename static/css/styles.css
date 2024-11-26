@@ -995,11 +995,9 @@ textarea {
 }
 
 /* Tally Item Styles */
-/* Tally Item Styles */
 .tally-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1rem;
     background-color: var(--background-color);
     border: 1px solid var(--secondary-color);
     border-radius: var(--border-radius);
