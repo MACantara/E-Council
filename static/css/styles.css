@@ -994,7 +994,7 @@ textarea {
     text-align: center;
 }
 
-/* Tally Item Styles */
+/* Tally Section Styles */
 .tally-table {
     width: 100%;
     border-collapse: collapse;
@@ -1122,4 +1122,52 @@ textarea {
 
 .file-name {
     color: var(--primary-text-color);
+}
+
+/* Evaluation Form Styles */
+.evaluation-tally-container {
+    margin-bottom: var(--gap-medium);
+}
+
+.evaluation-tally-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--gap-small);
+}
+
+.evaluation-tally-table th,
+.evaluation-tally-table td {
+    padding: var(--padding-small);
+    border: 1px solid var(--divider-color);
+    text-align: center;
+}
+
+.evaluation-tally-table th:first-child,
+.evaluation-tally-table td:first-child {
+    text-align: left;
+}
+
+.evaluation-tally-table th {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.evaluation-tally-table tr:nth-child(even) {
+    background-color: var(--form-background-color);
+}
+
+.rating-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+}
+
+.rating-item {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-small);
+}
+
+.rating-item input[type="radio"] {
+    margin: 0;
 }
