@@ -3146,6 +3146,15 @@ def update_documentation_status(documentation_id):
 def update_documentation(documentation_id):
     documentation = Documentation.query.get_or_404(documentation_id)
 
+    # Get or create learning journal
+    learning_journal = None
+    if documentation.documentation_learning_journal_forms_id:
+        learning_journal = LearningJournalForms.query.get(documentation.documentation_learning_journal_forms_id)
+    else:
+        learning_journal = LearningJournalForms()
+        db.session.add(learning_journal)
+        documentation.documentation_learning_journal_forms_id = learning_journal.learning_journal_forms_id
+
     if request.method == 'POST':
         documentation_events_id = request.form.get('documentation-events-id')
         documentation_academic_year = request.form.get('documentation-academic-year')
@@ -3228,6 +3237,43 @@ def update_documentation(documentation_id):
                 )
                 db.session.add(new_recommendation)
 
+        # Update Learning Journal fields
+        learning_journal.learning_journal_forms_name_of_student = request.form.get('student-name')
+        learning_journal.learning_journal_forms_course_year_level = request.form.get('course-year-level')
+        learning_journal.learning_journal_forms_id_number = request.form.get('id-number')
+        learning_journal.learning_journal_forms_overall_reflection = request.form.get('overall-reflection')
+        learning_journal.learning_journal_forms_seen_and_read_by = request.form.get('seen-read-by')
+        learning_journal.learning_journal_forms_prepared_by = request.form.get('documentation-prepared-by')
+        learning_journal.learning_journal_forms_checked_by = request.form.get('documentation-checked-by')
+
+        # Update learnings
+        Learnings.query.filter_by(
+            learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id
+        ).delete()
+        
+        learnings = request.form.getlist('learnings[]')
+        for learning in learnings:
+            if learning.strip():
+                new_learning = Learnings(
+                    learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
+                    learnings_content=learning.strip()
+                )
+                db.session.add(new_learning)
+
+        # Update observations
+        Observations.query.filter_by(
+            observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id
+        ).delete()
+        
+        observations = request.form.getlist('observations[]')
+        for observation in observations:
+            if observation.strip():
+                new_observation = Observations(
+                    observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
+                    observations_content=observation.strip()
+                )
+                db.session.add(new_observation)
+
         db.session.commit()
 
         flash('Documentation updated successfully!', 'success')
@@ -3277,7 +3323,15 @@ def update_documentation(documentation_id):
     # Prepare learning journals data
     learning_journals_data = [{
         'learning_journal_forms_id': journal.LearningJournalForms.learning_journal_forms_id,
-        'events_name': journal.concept_paper_forms_subject
+        'events_name': journal.concept_paper_forms_subject,
+        'learning_journal_forms_name_of_student': journal.LearningJournalForms.learning_journal_forms_name_of_student,
+        'learning_journal_forms_course_year_level': journal.LearningJournalForms.learning_journal_forms_course_year_level,
+        'learning_journal_forms_id_number': journal.LearningJournalForms.learning_journal_forms_id_number,
+        'learning_journal_forms_date': journal.LearningJournalForms.learning_journal_forms_date,
+        'learning_journal_forms_overall_reflection': journal.LearningJournalForms.learning_journal_forms_overall_reflection,
+        'learning_journal_forms_prepared_by': journal.LearningJournalForms.learning_journal_forms_prepared_by,
+        'learning_journal_forms_seen_and_read_by': journal.LearningJournalForms.learning_journal_forms_seen_and_read_by,
+        'learning_journal_forms_checked_by': journal.LearningJournalForms.learning_journal_forms_checked_by
     } for journal in learning_journals]
 
     # Get strengths, weaknesses, and recommendations
@@ -3293,6 +3347,21 @@ def update_documentation(documentation_id):
         activity_recommendations_documentation_id=documentation_id
     ).all()
 
+    # Query for existing data
+    learning_journal = None
+    learnings = []
+    observations = []
+
+    if documentation.documentation_learning_journal_forms_id:
+        learning_journal = LearningJournalForms.query.get(documentation.documentation_learning_journal_forms_id)
+        if learning_journal:
+            learnings = Learnings.query.filter_by(
+                learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id
+            ).all()
+            observations = Observations.query.filter_by(
+                observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id
+            ).all()
+
     return render_template('update-documentation.html', 
                          documentation=documentation, 
                          events=events, 
@@ -3301,9 +3370,11 @@ def update_documentation(documentation_id):
                          signatories=signatories, 
                          activity_reports=activity_reports_data, 
                          learning_journals=learning_journals_data,
-                        strengths=strengths,
-                        weaknesses=weaknesses,
-                        recommendations=recommendations
+                         strengths=strengths,
+                         weaknesses=weaknesses,
+                         recommendations=recommendations,
+                         learnings=learnings,
+                         observations=observations
     )
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
