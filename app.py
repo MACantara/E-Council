@@ -699,10 +699,18 @@ class EvaluationListOfStudentNames(db.Model):
     __tablename__ = 'evaluation_list_of_student_names'
 
     evaluation_list_of_student_names_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    evaluation_list_of_student_names_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id'), nullable=True)
+    evaluation_list_of_student_names_documentation_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('documentation.documentation_id', ondelete='CASCADE'),
+        nullable=True
+    )
     evaluation_list_of_student_names_student = db.Column(db.String(255), nullable=True)
     
-    documentation = db.relationship('Documentation', backref='evaluation_list_of_student_names', lazy=True)
+    documentation = db.relationship(
+        'Documentation',
+        backref=db.backref('evaluation_list_of_student_names', passive_deletes=True),
+        lazy=True
+    )
 
     def __repr__(self):
         return f'<EvaluationListOfStudentNames {self.evaluation_list_of_student_names_id}>'
