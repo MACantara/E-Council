@@ -3274,6 +3274,34 @@ def update_documentation(documentation_id):
                 )
                 db.session.add(new_observation)
 
+        # Update tally items
+        # First, delete existing tally items
+        TallyItems.query.filter_by(
+            tally_items_documentation_id=documentation_id
+        ).delete()
+        
+        # Get the tally items data from the form
+        tally_names = request.form.getlist('tally-items-name[]')
+        extremely_satisfied = request.form.getlist('tally-items-extremely-satisfied-rating-total[]')
+        satisfied = request.form.getlist('tally-items-satisfied-rating-total[]')
+        neutral = request.form.getlist('tally-items-neutral-rating-total[]')
+        dissatisfied = request.form.getlist('tally-items-dissatisfied-rating-total[]')
+        extremely_dissatisfied = request.form.getlist('tally-items-extremely-dissatisfied-rating-total[]')
+        
+        # Create new tally items
+        for i in range(len(tally_names)):
+            if tally_names[i].strip():  # Only add if name is not empty
+                new_tally_item = TallyItems(
+                    tally_items_documentation_id=documentation_id,
+                    tally_items_name=tally_names[i].strip(),
+                    tally_items_extremely_satisfied_rating_total=int(extremely_satisfied[i]),
+                    tally_items_satisfied_rating_total=int(satisfied[i]),
+                    tally_items_neutral_rating_total=int(neutral[i]),
+                    tally_items_dissatisfied_rating_total=int(dissatisfied[i]),
+                    tally_items_extremely_dissatisfied_rating_total=int(extremely_dissatisfied[i])
+                )
+                db.session.add(new_tally_item)
+
         db.session.commit()
 
         flash('Documentation updated successfully!', 'success')
@@ -3362,20 +3390,35 @@ def update_documentation(documentation_id):
                 observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id
             ).all()
 
-    return render_template('update-documentation.html', 
-                         documentation=documentation, 
-                         events=events, 
-                         academic_years=academic_years, 
-                         users=users, 
-                         signatories=signatories, 
-                         activity_reports=activity_reports_data, 
-                         learning_journals=learning_journals_data,
-                         strengths=strengths,
-                         weaknesses=weaknesses,
-                         recommendations=recommendations,
-                         learnings=learnings,
-                         observations=observations
-    )
+    # Get tally items data
+    tally_items = TallyItems.query.filter_by(
+        tally_items_documentation_id=documentation_id
+    ).all()
+    
+    # Convert tally items to a list of dictionaries
+    tally_items_data = [{
+        'tally_items_id': item.tally_items_id,
+        'tally_items_name': item.tally_items_name,
+        'tally_items_extremely_satisfied_rating_total': item.tally_items_extremely_satisfied_rating_total,
+        'tally_items_satisfied_rating_total': item.tally_items_satisfied_rating_total,
+        'tally_items_neutral_rating_total': item.tally_items_neutral_rating_total,
+        'tally_items_dissatisfied_rating_total': item.tally_items_dissatisfied_rating_total,
+        'tally_items_extremely_dissatisfied_rating_total': item.tally_items_extremely_dissatisfied_rating_total
+    } for item in tally_items]
+    
+    # Add tally_items to the template context
+    return render_template('update-documentation.html',
+        documentation=documentation,
+        events=events,
+        users=users,
+        signatories=signatories,
+        learning_journals=learning_journals,
+        learnings=learnings,
+        observations=observations,
+        tally_items=tally_items_data,  # Add this line
+        strengths=strengths,
+        weaknesses=weaknesses,
+        recommendations=recommendations)
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
 @login_required

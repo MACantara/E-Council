@@ -220,8 +220,8 @@
                 <div class="input-pair">
                     <label for="student-name">Name of Student</label>
                     <input type="text" name="student-name" id="student-name" class="form-input"
-                           value="{{ learning_journals[0].learning_journal_forms_name_of_student if learning_journals else '' }}"
-                           required>
+                        value="{{ learning_journals[0].learning_journal_forms_name_of_student if learning_journals else '' }}"
+                        required>
                 </div>
 
                 <div class="input-pair">
@@ -233,8 +233,9 @@
 
                 <div class="input-pair">
                     <label for="id-number">ID Number</label>
-                    <input type="text" name="id-number" id="id-number" class="form-input" 
-                           value="{{ learning_journals[0].learning_journal_forms_id_number if learning_journals else '' }}" required>
+                    <input type="text" name="id-number" id="id-number" class="form-input"
+                        value="{{ learning_journals[0].learning_journal_forms_id_number if learning_journals else '' }}"
+                        required>
                 </div>
 
                 <div class="input-pair">
@@ -243,13 +244,16 @@
                         {% if learnings %}
                         {% for learning in learnings %}
                         <div class="dynamic-item">
-                            <input type="text" name="learnings[]" class="form-input" value="{{ learning.learnings_content }}" placeholder="Enter learning" required>
-                            <button type="button" class="remove-item-btn secondary-button" onclick="removeItem(this)">&times;</button>
+                            <input type="text" name="learnings[]" class="form-input"
+                                value="{{ learning.learnings_content }}" placeholder="Enter learning" required>
+                            <button type="button" class="remove-item-btn secondary-button"
+                                onclick="removeItem(this)">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
-                    <button type="button" class="add-item-btn secondary-button" onclick="addNewField('learnings', 'learning')">Add Learning</button>
+                    <button type="button" class="add-item-btn secondary-button"
+                        onclick="addNewField('learnings', 'learning')">Add Learning</button>
                 </div>
 
                 <div class="input-pair">
@@ -258,18 +262,22 @@
                         {% if observations %}
                         {% for observation in observations %}
                         <div class="dynamic-item">
-                            <input type="text" name="observations[]" class="form-input" value="{{ observation.observations_content }}" placeholder="Enter observation" required>
-                            <button type="button" class="remove-item-btn secondary-button" onclick="removeItem(this)">&times;</button>
+                            <input type="text" name="observations[]" class="form-input"
+                                value="{{ observation.observations_content }}" placeholder="Enter observation" required>
+                            <button type="button" class="remove-item-btn secondary-button"
+                                onclick="removeItem(this)">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
-                    <button type="button" class="add-item-btn secondary-button" onclick="addNewField('observations', 'observation')">Add Observation</button>
+                    <button type="button" class="add-item-btn secondary-button"
+                        onclick="addNewField('observations', 'observation')">Add Observation</button>
                 </div>
 
                 <div class="input-pair">
                     <label for="overall-reflection">Overall Reflection</label>
-                    <textarea name="overall-reflection" id="overall-reflection" class="form-input" required>{{ learning_journals[0].learning_journal_forms_overall_reflection if learning_journals else '' }}</textarea>
+                    <textarea name="overall-reflection" id="overall-reflection" class="form-input"
+                        required>{{ learning_journals[0].learning_journal_forms_overall_reflection if learning_journals else '' }}</textarea>
                 </div>
 
                 <div class="input-pair">
@@ -288,8 +296,9 @@
 
                 <div class="input-pair">
                     <label for="seen-read-by">Seen and Read By</label>
-                    <input type="text" name="seen-read-by" id="seen-read-by" class="form-input" 
-                           value="{{ learning_journals[0].learning_journal_forms_seen_and_read_by if learning_journals else '' }}" required>
+                    <input type="text" name="seen-read-by" id="seen-read-by" class="form-input"
+                        value="{{ learning_journals[0].learning_journal_forms_seen_and_read_by if learning_journals else '' }}"
+                        required>
                 </div>
 
                 <div class="input-pair">
@@ -307,30 +316,241 @@
                 </div>
             </div>
 
-            <div class="input-pair">
-                <label for="documentation-date-of-submission">Date of Submission</label>
-                <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission"
-                    value="{{ documentation.documentation_date_of_submission.strftime('%Y-%m-%d') }}" required>
+            <div class="form-container">
+                <h3>Tally</h3>
+
+                <div id="tally-items">
+                    <table class="tally-table">
+                        <thead>
+                            <tr>
+                                <th colspan="5">Total Ratings</th>
+                            </tr>
+                            <tr>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Satisfied (4)</th>
+                                <th>Neutral (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if tally_items %}
+                            {% for item in tally_items %}
+                            <tr class="tally-item-name">
+                                <td colspan="5">
+                                    <div class="tally-name-container">
+                                        <label for="tally-items-name">Tally Item Name</label>
+                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
+                                            value="{{ item.tally_items_name }}" placeholder="Enter tally item name"
+                                            required>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tally-item-ratings">
+                                <td>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
+                                        value="{{ item.tally_items_extremely_satisfied_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0"
+                                        value="{{ item.tally_items_satisfied_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0"
+                                        value="{{ item.tally_items_neutral_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
+                                        value="{{ item.tally_items_dissatisfied_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
+                                        min="0" value="{{ item.tally_items_extremely_dissatisfied_rating_total }}"
+                                        required>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr class="tally-item-name">
+                                <td colspan="5">
+                                    <div class="tally-name-container">
+                                        <label for="tally-items-name">Tally Item Name</label>
+                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
+                                            placeholder="Enter tally item name" required>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tally-item-ratings">
+                                <td>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0" value="0"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0" value="0"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
+                                        min="0" value="0" required>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" class="secondary-button" onclick="addNewTallyItem()">Add New Tally Item</button>
+
+                <div class="input-pair">
+                    <label for="documentation-date-of-submission">Date of Submission</label>
+                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission" value="{{ documentation.documentation_date_of_submission.strftime('%Y-%m-%d') }}"
+                        required>
+                </div>
             </div>
 
-            <div class="input-pair">
-                <label for="documentation-rating">Rating</label>
-                <input type="number" name="documentation-rating" id="documentation-rating" placeholder="Rating" min="1"
-                    max="5" value="{{ documentation.documentation_rating }}">
+            <div class="form-container">
+                <h3>Results of the Evaluation Images</h3>
+
+                <div class="input-pair">
+                    <label for="evaluation-images">Upload Images</label>
+                    <input type="file" name="evaluation-images[]" id="evaluation-images" multiple accept="image/*"
+                        hidden>
+                    <label for="evaluation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="evaluation-files-name" class="file-name">
+                            {% if evaluation_images %}Files selected{% else %}No files chosen{% endif %}
+                        </span>
+                    </label>
+                    <div id="selected-files-list" class="selected-files-list">
+                        {% if evaluation_images %}
+                        {% for image in evaluation_images %}
+                        <div class="file-item">{{ image.filename }}</div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
-            <div class="input-pair">
-                <label for="documentation-comments-suggestions">Comments/Suggestions</label>
-                <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
-                    placeholder="Comments/Suggestions">{{ documentation.documentation_comments_suggestions }}</textarea>
+            <div class="form-container">
+                <h3>Evaluation Form</h3>
+
+                <div id="evaluation-tally-items" class="evaluation-tally-container">
+                    <table class="evaluation-tally-table">
+                        <thead>
+                            <tr>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Very Satisfied (4)</th>
+                                <th>Satisfied (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items will be added here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="input-pair">
+                    <div class="calculated-rating">
+                        <span>Overall Rating: </span>
+                        <span id="calculated-rating-value">{{ documentation.documentation_rating|default(0) }}</span>
+                        <input type="hidden" name="documentation-rating" id="documentation-rating"
+                            value="{{ documentation.documentation_rating|default(0) }}">
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-comments-suggestions">Comments/Suggestions</label>
+                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
+                        placeholder="Comments/Suggestions">{{ documentation.documentation_comments_suggestions }}</textarea>
+                </div>
             </div>
 
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-container">
+                <h3>Summary of Attendance Images</h3>
 
-            <div class="horizontal-button-pair-positioned-right">
-                <a href="{{ url_for('documentation_overview') }}" class="secondary-button fit-content-button"
-                    type="button">Cancel</a>
-                <button class="primary-button" type="submit">Update Documentation</button>
+                <div class="input-pair">
+                    <label for="attendance-images">Upload Images</label>
+                    <input type="file" name="attendance-images[]" id="attendance-images" multiple accept="image/*"
+                        hidden>
+                    <label for="attendance-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="attendance-files-name" class="file-name">
+                            {% if attendance_images %}Files selected{% else %}No files chosen{% endif %}
+                        </span>
+                    </label>
+                    <div id="attendance-files-list" class="selected-files-list">
+                        {% if attendance_images %}
+                        {% for image in attendance_images %}
+                        <div class="file-item">{{ image.filename }}</div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Evaluation Student List</h3>
+
+                <div class="input-pair">
+                    <label for="student-list-excel">Upload Student List (.xlsx)</label>
+                    <input type="file" name="student-list-excel" id="student-list-excel" accept=".xlsx" hidden>
+                    <label for="student-list-excel" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Excel File</span>
+                        <span id="excel-file-name" class="file-name">
+                            {% if student_list %}{{ student_list.filename }}{% else %}No file chosen{% endif %}
+                        </span>
+                    </label>
+                    <div id="student-list-preview" class="student-list-preview">
+                        <h4 class="student-list-preview-title">Detected Students:</h4>
+                        <ul id="student-names-list">
+                            {% if student_names %}
+                            {% for name in student_names %}
+                            <li>{{ name }}</li>
+                            {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Photo Documentation</h3>
+                <div class="input-pair">
+                    <label for="photo-documentation-images">Upload Photo Documentation</label>
+                    <input type="file" name="photo-documentation-images[]" id="photo-documentation-images"
+                        accept="image/*" multiple hidden>
+                    <label for="photo-documentation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="photo-doc-files-name" class="file-name">
+                            {% if photo_documentation_images %}Files selected{% else %}No files chosen{% endif %}
+                        </span>
+                    </label>
+                    <div id="photo-doc-files-list" class="selected-files-list">
+                        {% if photo_documentation_images %}
+                        {% for image in photo_documentation_images %}
+                        <div class="file-item">{{ image.filename }}</div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('documentation_overview') }}"
+                        class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Update Documentation</button>
+                </div>
             </div>
         </form>
     </div>
