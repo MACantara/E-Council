@@ -2453,7 +2453,7 @@ def add_concept_paper():
         new_excuse_letter_form = ExcuseLetterForms(
             excuse_letter_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
             excuse_letter_forms_department_office_unit=excuse_letter_department_office_unit,
-            excuse_letter_forms_faculty_in_charge=excuse_letter_faculty_in_charge,
+            excuse_letter_forms_personnel_in_charge_forms_id=excuse_letter_faculty_in_charge,
             excuse_letter_forms_dean=excuse_letter_dean,
             excuse_letter_forms_noted_by=excuse_letter_noted_by
         )
