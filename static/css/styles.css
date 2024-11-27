@@ -1451,3 +1451,18 @@ textarea {
 .description-group .generate-description-btn {
     align-self: flex-end;
 }
+
+/* Concept Paper Forms Styles */
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
