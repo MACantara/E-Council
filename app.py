@@ -695,6 +695,18 @@ class EvaluationForm(db.Model):
     # Relationship
     documentation = db.relationship('Documentation', backref=db.backref('evaluation_forms', lazy=True))
 
+    def to_dict(self):
+        return {
+            'evaluation_form_id': self.evaluation_form_id,
+            'evaluation_form_documentation_id': self.evaluation_form_documentation_id,
+            'evaluation_form_name': self.evaluation_form_name,
+            'evaluation_form_extremely_satisfied_rating': self.evaluation_form_extremely_satisfied_rating,
+            'evaluation_form_satisfied_rating': self.evaluation_form_satisfied_rating,
+            'evaluation_form_neutral_rating': self.evaluation_form_neutral_rating,
+            'evaluation_form_dissatisfied_rating': self.evaluation_form_dissatisfied_rating,
+            'evaluation_form_extremely_dissatisfied_rating': self.evaluation_form_extremely_dissatisfied_rating
+        }
+
 class SummaryOfAttendanceImages(db.Model):
     __tablename__ = 'summary_of_attendance_images'
 
@@ -3659,6 +3671,7 @@ def update_documentation(documentation_id):
     evaluation_forms = EvaluationForm.query.filter_by(
         evaluation_form_documentation_id=documentation_id
     ).all()
+    evaluation_forms_dict = [form.to_dict() for form in evaluation_forms]
 
     return render_template('update-documentation.html', 
                          documentation=documentation, 
@@ -3677,7 +3690,7 @@ def update_documentation(documentation_id):
                          evaluation_images=evaluation_images,
                          event_photo_documentation_images=event_photo_documentation_images,
                          evaluation_student_list=evaluation_student_list,
-                         evaluation_forms=evaluation_forms
+                         evaluation_forms=evaluation_forms_dict
     )
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])

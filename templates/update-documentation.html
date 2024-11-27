@@ -890,15 +890,17 @@
         container.appendChild(newItem);
     }
 
+    const evaluationForms = {{ evaluation_forms|tojson|safe }};
+
     // Function to sync tally items to evaluation form
     function syncTallyItems() {
         // Get all name inputs from the tally table
         const tallyRows = document.querySelectorAll('.tally-table tbody tr');
         const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
-
+    
         // Clear existing items
         evaluationTallyContainer.innerHTML = '';
-
+    
         // Add each tally item to the evaluation form
         tallyRows.forEach((row, index) => {
             const nameInput = row.querySelector('input[type="text"]');
@@ -907,23 +909,40 @@
                 const nameRow = document.createElement('tr');
                 const itemName = nameInput.value || `Item ${index + 1}`;
                 nameRow.innerHTML = `
-                <td colspan="6" class="tally-item-name">${itemName}</td>
-            `;
-
+                    <td colspan="6" class="tally-item-name">${itemName}</td>
+                `;
+    
                 // Create ratings row
                 const ratingsRow = document.createElement('tr');
+                
+                // Get existing evaluation form data for this item
+                const evaluationForm = evaluationForms.find(form => form.evaluation_form_name === itemName);
+                let selectedValue = '3'; // Default to neutral if no existing data
+    
+                if (evaluationForm) {
+                    // Determine which rating has a value of 1
+                    if (evaluationForm.evaluation_form_extremely_satisfied_rating === 1) selectedValue = '5';
+                    else if (evaluationForm.evaluation_form_satisfied_rating === 1) selectedValue = '4';
+                    else if (evaluationForm.evaluation_form_neutral_rating === 1) selectedValue = '3';
+                    else if (evaluationForm.evaluation_form_dissatisfied_rating === 1) selectedValue = '2';
+                    else if (evaluationForm.evaluation_form_extremely_dissatisfied_rating === 1) selectedValue = '1';
+                }
+    
                 ratingsRow.innerHTML = `
-                <td><input type="radio" name="eval-tally-${index}" value="5" required></td>
-                <td><input type="radio" name="eval-tally-${index}" value="4"></td>
-                <td><input type="radio" name="eval-tally-${index}" value="3"></td>
-                <td><input type="radio" name="eval-tally-${index}" value="2"></td>
-                <td><input type="radio" name="eval-tally-${index}" value="1"></td>
-            `;
-
+                    <td><input type="radio" name="eval-tally-${index}" value="5" ${selectedValue === '5' ? 'checked' : ''} required></td>
+                    <td><input type="radio" name="eval-tally-${index}" value="4" ${selectedValue === '4' ? 'checked' : ''}></td>
+                    <td><input type="radio" name="eval-tally-${index}" value="3" ${selectedValue === '3' ? 'checked' : ''}></td>
+                    <td><input type="radio" name="eval-tally-${index}" value="2" ${selectedValue === '2' ? 'checked' : ''}></td>
+                    <td><input type="radio" name="eval-tally-${index}" value="1" ${selectedValue === '1' ? 'checked' : ''}></td>
+                `;
+    
                 evaluationTallyContainer.appendChild(nameRow);
                 evaluationTallyContainer.appendChild(ratingsRow);
             }
         });
+    
+        // After syncing, calculate the overall rating
+        calculateOverallRating();
     }
 
     // Add event listeners for tally item changes
