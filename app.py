@@ -4788,28 +4788,31 @@ def generate_description():
         # Format amount with commas and two decimal places if provided
         formatted_amount = f"₱{float(total_amount):,.2f}" if total_amount else "the specified amount"
         
-        prompt = f"""Generate a formal description for a board resolution with the following details:
-        Event: {event_name}
-        Title: {title}
-        Total Amount: {formatted_amount}
+        prompt = f"""Generate a formal description for a proposed board resolution with the following details:
+                Event: {event_name}
+                Title: {title}
+                Total Amount: {formatted_amount}
+                
+                Requirements:
+                1. Use clear, formal language in present tense
+                2. Focus only on describing the purpose, scope, and proposed decisions
+                3. Keep it concise and straightforward
+                4. Do not include any signatories
+                5. Do not use any text formatting
+                6. Do not include the board resolution title
+                7. Do not include any resolution numbers
+                8. Do not use 'WHEREAS' statements
+                9. Begin with 'The College of Computer Studies Student Council proposes to'
+                10. Use language that indicates the resolution is pending approval (e.g., 'seeks to allocate', 'proposes to implement')
+                11. Explicitly mention the total amount in the main paragraph using the phrase 'with a proposed budget of {formatted_amount}'
+                12. Include a financial breakdown section with the following format:
+                    Proposed Financial Breakdown:
+                    [List all relevant expense categories based on the event type and purpose]
+                    Proposed Total Amount: {formatted_amount}
+                13. The description should be 1 paragraph only, followed by the financial breakdown
+                14. End with exactly this date: '{formatted_date}'
         
-        Requirements:
-        1. Use clear, formal language
-        2. Focus only on describing the purpose, scope, and decisions made
-        3. Keep it concise and straightforward
-        4. Do not include any signatories
-        5. Do not use any text formatting
-        6. Do not include the board resolution title
-        7. Do not include any resolution numbers
-        8. Do not use 'WHEREAS' statements
-        9. Include a financial breakdown section with the following format:
-           Financial Breakdown:
-           [List all relevant expense categories based on the event type and purpose]
-           Total Amount: {formatted_amount}
-        10. The description should be 1 paragraph only, followed by the financial breakdown
-        11. End with exactly this date: '{formatted_date}'
-
-        Note: Create a comprehensive list of expense categories appropriate for this specific event"""
+                Note: Create a comprehensive list of expense categories appropriate for this specific event"""
         
         app.logger.info("Sending request to Gemini API")
         try:
