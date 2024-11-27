@@ -889,5 +889,108 @@
 
         container.appendChild(newItem);
     }
+
+    // Function to sync tally items to evaluation form
+    function syncTallyItems() {
+        // Get all name inputs from the tally table
+        const tallyRows = document.querySelectorAll('.tally-table tbody tr');
+        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
+
+        // Clear existing items
+        evaluationTallyContainer.innerHTML = '';
+
+        // Add each tally item to the evaluation form
+        tallyRows.forEach((row, index) => {
+            const nameInput = row.querySelector('input[type="text"]');
+            if (nameInput) {
+                // Create name row
+                const nameRow = document.createElement('tr');
+                const itemName = nameInput.value || `Item ${index + 1}`;
+                nameRow.innerHTML = `
+                <td colspan="6" class="tally-item-name">${itemName}</td>
+            `;
+
+                // Create ratings row
+                const ratingsRow = document.createElement('tr');
+                ratingsRow.innerHTML = `
+                <td><input type="radio" name="eval-tally-${index}" value="5" required></td>
+                <td><input type="radio" name="eval-tally-${index}" value="4"></td>
+                <td><input type="radio" name="eval-tally-${index}" value="3"></td>
+                <td><input type="radio" name="eval-tally-${index}" value="2"></td>
+                <td><input type="radio" name="eval-tally-${index}" value="1"></td>
+            `;
+
+                evaluationTallyContainer.appendChild(nameRow);
+                evaluationTallyContainer.appendChild(ratingsRow);
+            }
+        });
+    }
+
+    // Add event listeners for tally item changes
+    document.addEventListener('DOMContentLoaded', function () {
+        const tallyTable = document.querySelector('.tally-table');
+
+        // Initial sync
+        syncTallyItems();
+
+        // Sync when tally items change
+        tallyTable.addEventListener('input', function (e) {
+            if (e.target.type === 'text') {
+                syncTallyItems();
+            }
+        });
+
+        // Sync when add button is clicked
+        document.querySelector('.add-tally-button').addEventListener('click', function () {
+            setTimeout(syncTallyItems, 100); // Give time for the new row to be added
+        });
+
+        // Sync when remove button is clicked
+        tallyTable.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-tally-button')) {
+                setTimeout(syncTallyItems, 100); // Give time for the row to be removed
+            }
+        });
+    });
+
+    // Function to calculate and update overall rating
+    function calculateOverallRating() {
+        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
+        const rows = evaluationTallyContainer.querySelectorAll('tr:not(.tally-item-name)');
+        let totalRating = 0;
+        let totalItems = 0;
+
+        rows.forEach(row => {
+            const selectedRadio = row.querySelector('input[type="radio"]:checked');
+            if (selectedRadio) {
+                totalRating += parseInt(selectedRadio.value);
+                totalItems++;
+            }
+        });
+
+        // Calculate average rating
+        let averageRating = totalItems > 0 ? totalRating / totalItems : 0;
+
+        // Round to nearest 0.01 (two decimal places)
+        averageRating = Math.round(averageRating * 100) / 100;
+
+        // Update the display and hidden input with two decimal places
+        document.getElementById('calculated-rating-value').textContent = averageRating.toFixed(2);
+        document.getElementById('documentation-rating').value = averageRating;
+
+        // Update radio buttons
+        const roundedRating = Math.round(averageRating);
+        const radioButton = document.getElementById(`documentation-rating-${roundedRating}`);
+        if (radioButton) {
+            radioButton.checked = true;
+        }
+    }
+
+    // Add event listener for radio button changes in evaluation form
+    document.querySelector('.evaluation-tally-table').addEventListener('change', function (e) {
+        if (e.target.type === 'radio') {
+            calculateOverallRating();
+        }
+    });
 </script>
 {% endblock %}

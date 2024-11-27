@@ -682,6 +682,19 @@ class ResultsOfTheEvaluationImages(db.Model):
     def __repr__(self):
         return f'<ResultsOfTheEvaluationImages {self.results_of_the_evaluation_images_id}>'
 
+class EvaluationForm(db.Model):
+    evaluation_form_id = db.Column(db.Integer, primary_key=True)
+    evaluation_form_documentation_id = db.Column(db.Integer, db.ForeignKey('documentation.documentation_id', ondelete='CASCADE'))
+    evaluation_form_name = db.Column(db.String(255))
+    evaluation_form_extremely_satisfied_rating = db.Column(db.Integer, default=0)
+    evaluation_form_satisfied_rating = db.Column(db.Integer, default=0)
+    evaluation_form_neutral_rating = db.Column(db.Integer, default=0)
+    evaluation_form_dissatisfied_rating = db.Column(db.Integer, default=0)
+    evaluation_form_extremely_dissatisfied_rating = db.Column(db.Integer, default=0)
+
+    # Relationship
+    documentation = db.relationship('Documentation', backref=db.backref('evaluation_forms', lazy=True))
+
 class SummaryOfAttendanceImages(db.Model):
     __tablename__ = 'summary_of_attendance_images'
 
@@ -3008,7 +3021,7 @@ def add_documentation():
                 )
                 db.session.add(new_tally_item)
 
-                # Handle evaluation images upload
+        # Handle evaluation images upload
         evaluation_images = request.files.getlist('evaluation-images[]')
         for image in evaluation_images:
             if image and allowed_image_file(image.filename):
@@ -3030,6 +3043,28 @@ def add_documentation():
                 except Exception as e:
                     app.logger.error(f"Failed to upload image: {str(e)}")
                     flash("Failed to upload one or more images.", "error")
+
+        # Get the evaluation form data from the form
+        evaluation_names = request.form.getlist('evaluation-form-name[]')
+        extremely_satisfied = request.form.getlist('evaluation-form-extremely-satisfied[]')
+        satisfied = request.form.getlist('evaluation-form-satisfied[]')
+        neutral = request.form.getlist('evaluation-form-neutral[]')
+        dissatisfied = request.form.getlist('evaluation-form-dissatisfied[]')
+        extremely_dissatisfied = request.form.getlist('evaluation-form-extremely-dissatisfied[]')
+
+        # Create evaluation form entries
+        for i in range(len(evaluation_names)):
+            if evaluation_names[i].strip():  # Only add if name is not empty
+                new_evaluation = EvaluationForm(
+                    evaluation_form_documentation_id=documentation_id,
+                    evaluation_form_name=evaluation_names[i].strip(),
+                    evaluation_form_extremely_satisfied_rating=int(extremely_satisfied[i] or 0),
+                    evaluation_form_satisfied_rating=int(satisfied[i] or 0),
+                    evaluation_form_neutral_rating=int(neutral[i] or 0),
+                    evaluation_form_dissatisfied_rating=int(dissatisfied[i] or 0),
+                    evaluation_form_extremely_dissatisfied_rating=int(extremely_dissatisfied[i] or 0)
+                )
+                db.session.add(new_evaluation)
 
         # Handle summary of attendance images upload
         attendance_images = request.files.getlist('attendance-images[]')
@@ -3168,8 +3203,6 @@ def update_documentation(documentation_id):
         documentation_checked_by = request.form.get('documentation-checked-by')
         documentation_noted_by = request.form.get('documentation-noted-by')
         documentation_date_of_submission = request.form.get('documentation-date-of-submission')
-        documentation_rating = request.form.get('documentation-rating')
-        documentation_comments_suggestions = request.form.get('documentation-comments-suggestions')
 
         # Use the value from the additional input field if "Other A.Y." is selected
         if documentation_academic_year == "Other":
@@ -3190,8 +3223,6 @@ def update_documentation(documentation_id):
         documentation.documentation_checked_by = documentation_checked_by
         documentation.documentation_noted_by = documentation_noted_by
         documentation.documentation_date_of_submission = documentation_date_of_submission
-        documentation.documentation_rating = documentation_rating
-        documentation.documentation_comments_suggestions = documentation_comments_suggestions
 
         # Update strengths
         # First, delete existing strengths
@@ -3274,7 +3305,6 @@ def update_documentation(documentation_id):
                 )
                 db.session.add(new_observation)
 
-        # In your update_documentation route, before handling new uploads
         # Get the list of images to delete
         deleted_image_ids = request.form.get('deleted_evaluation_images', '').split(',')
         if deleted_image_ids and deleted_image_ids[0]:  # Check if there are any deleted images
@@ -3393,6 +3423,122 @@ def update_documentation(documentation_id):
                 )
                 db.session.add(new_student)
 
+        # Get the tally items data
+        tally_names = request.form.getlist('tally-items-name[]')
+        extremely_satisfied = request.form.getlist('tally-items-extremely-satisfied-rating-total[]')
+        satisfied = request.form.getlist('tally-items-satisfied-rating-total[]')
+        neutral = request.form.getlist('tally-items-neutral-rating-total[]')
+        dissatisfied = request.form.getlist('tally-items-dissatisfied-rating-total[]')
+        extremely_dissatisfied = request.form.getlist('tally-items-extremely-dissatisfied-rating-total[]')
+        
+        # Get existing tally items
+        existing_tally_items = TallyItems.query.filter_by(
+            tally_items_documentation_id=documentation_id
+        ).all()
+        
+        # Create a dictionary of existing tally items for quick lookup
+        existing_tally_dict = {item.tally_items_name: item for item in existing_tally_items}
+        
+        # Process tally items
+        processed_tally_names = set()
+        
+        for i in range(len(tally_names)):
+            if tally_names[i].strip():  # Only process if name is not empty
+                tally_name = tally_names[i].strip()
+                processed_tally_names.add(tally_name)
+        
+                # Get the rating counts
+                es_count = int(extremely_satisfied[i] or 0)
+                s_count = int(satisfied[i] or 0)
+                n_count = int(neutral[i] or 0)
+                d_count = int(dissatisfied[i] or 0)
+                ed_count = int(extremely_dissatisfied[i] or 0)
+        
+                if tally_name in existing_tally_dict:
+                    # Update existing tally item
+                    existing_tally = existing_tally_dict[tally_name]
+                    existing_tally.tally_items_extremely_satisfied_rating_total = es_count
+                    existing_tally.tally_items_satisfied_rating_total = s_count
+                    existing_tally.tally_items_neutral_rating_total = n_count
+                    existing_tally.tally_items_dissatisfied_rating_total = d_count
+                    existing_tally.tally_items_extremely_dissatisfied_rating_total = ed_count
+                else:
+                    # Create new tally item
+                    new_tally = TallyItems(
+                        tally_items_documentation_id=documentation_id,
+                        tally_items_name=tally_name,
+                        tally_items_extremely_satisfied_rating_total=es_count,
+                        tally_items_satisfied_rating_total=s_count,
+                        tally_items_neutral_rating_total=n_count,
+                        tally_items_dissatisfied_rating_total=d_count,
+                        tally_items_extremely_dissatisfied_rating_total=ed_count
+                    )
+                    db.session.add(new_tally)
+        
+        # Delete tally items that are no longer in the form
+        for tally_item in existing_tally_items:
+            if tally_item.tally_items_name not in processed_tally_names:
+                db.session.delete(tally_item)
+        
+        # Now process evaluation forms
+        # Get existing evaluation forms
+        existing_forms = EvaluationForm.query.filter_by(
+            evaluation_form_documentation_id=documentation_id
+        ).all()
+        
+        # Create a dictionary of existing forms for quick lookup
+        existing_forms_dict = {form.evaluation_form_name: form for form in existing_forms}
+        
+        # Process evaluation forms
+        processed_eval_names = set()
+        
+        for i in range(len(tally_names)):
+            if tally_names[i].strip():  # Only process if name is not empty
+                form_name = tally_names[i].strip()
+                processed_eval_names.add(form_name)
+        
+                # Get the evaluation rating for this item
+                eval_rating_key = f'eval-tally-{i}'
+                rating_value = request.form.get(eval_rating_key)
+                
+                # Convert radio button value to rating counts
+                es_count = 1 if rating_value == '5' else 0
+                s_count = 1 if rating_value == '4' else 0
+                n_count = 1 if rating_value == '3' else 0
+                d_count = 1 if rating_value == '2' else 0
+                ed_count = 1 if rating_value == '1' else 0
+        
+                if form_name in existing_forms_dict:
+                    # Update existing form
+                    existing_form = existing_forms_dict[form_name]
+                    existing_form.evaluation_form_extremely_satisfied_rating = es_count
+                    existing_form.evaluation_form_satisfied_rating = s_count
+                    existing_form.evaluation_form_neutral_rating = n_count
+                    existing_form.evaluation_form_dissatisfied_rating = d_count
+                    existing_form.evaluation_form_extremely_dissatisfied_rating = ed_count
+                else:
+                    # Create new evaluation form entry
+                    new_evaluation = EvaluationForm(
+                        evaluation_form_documentation_id=documentation_id,
+                        evaluation_form_name=form_name,
+                        evaluation_form_extremely_satisfied_rating=es_count,
+                        evaluation_form_satisfied_rating=s_count,
+                        evaluation_form_neutral_rating=n_count,
+                        evaluation_form_dissatisfied_rating=d_count,
+                        evaluation_form_extremely_dissatisfied_rating=ed_count
+                    )
+                    db.session.add(new_evaluation)
+        
+        # Delete evaluation forms that are no longer in the tally items
+        for form in existing_forms:
+            if form.evaluation_form_name not in processed_eval_names:
+                db.session.delete(form)
+
+        # Update documentation rating
+        documentation = Documentation.query.get_or_404(documentation_id)
+        documentation.documentation_rating = float(request.form.get('documentation-rating', 0))
+        documentation.documentation_comments_suggestions = request.form.get('documentation-comments-suggestions', '')
+
         db.session.commit()
 
         flash('Documentation updated successfully!', 'success')
@@ -3510,6 +3656,10 @@ def update_documentation(documentation_id):
         evaluation_list_of_student_names_documentation_id=documentation_id
     ).all()
 
+    evaluation_forms = EvaluationForm.query.filter_by(
+        evaluation_form_documentation_id=documentation_id
+    ).all()
+
     return render_template('update-documentation.html', 
                          documentation=documentation, 
                          events=events, 
@@ -3526,7 +3676,8 @@ def update_documentation(documentation_id):
                          tally_items=tally_items_data,
                          evaluation_images=evaluation_images,
                          event_photo_documentation_images=event_photo_documentation_images,
-                         evaluation_student_list=evaluation_student_list
+                         evaluation_student_list=evaluation_student_list,
+                         evaluation_forms=evaluation_forms
     )
 
 @app.route('/delete-documentation/<int:documentation_id>', methods=['GET', 'POST'])
