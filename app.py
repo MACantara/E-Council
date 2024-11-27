@@ -4359,6 +4359,18 @@ def delete_financial_report(report_id):
 @app.route('/generate-financial-report-pdf/<int:financial_report_id>')
 @login_required
 def generate_financial_report_pdf(financial_report_id):
+    # Get financial report with event details
+    report = db.session.query(FinancialReports, Events)\
+        .outerjoin(Events, FinancialReports.financial_reports_events_id == Events.events_id)\
+        .filter(FinancialReports.financial_reports_id == financial_report_id)\
+        .first_or_404()
+    
+    # Get all transactions for this event
+    transactions = TransactionHistory.query\
+        .filter_by(transaction_events_id=report[0].financial_reports_events_id)\
+        .order_by(TransactionHistory.transaction_date)\
+        .all()
+
     buffer = BytesIO()
     
     def header(canvas, doc):
@@ -4420,7 +4432,91 @@ def generate_financial_report_pdf(financial_report_id):
         bottomMargin=72
     )
     
+    # Create the story (content) for the PDF
     story = []
+    styles = getSampleStyleSheet()
+    
+    # Add title
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        alignment=1,
+        spaceAfter=30
+    )
+    story.append(Paragraph("FINANCIAL REPORT", title_style))
+    story.append(Spacer(1, 20))
+    
+    # Add report details
+    story.append(Paragraph(f"<b>Title:</b> {report[0].financial_reports_title}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Date:</b> {report[0].financial_reports_date.strftime('%B %d, %Y')}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Academic Year:</b> {report[0].financial_reports_academic_year}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Semester:</b> {report[0].financial_reports_semester}", styles['Normal']))
+    story.append(Spacer(1, 20))
+    
+    # Add event details if available
+    if report[1]:
+        story.append(Paragraph("<b>Activity Details</b>", styles['Heading2']))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph(f"<b>Event Name:</b> {report[1].events_name}", styles['Normal']))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph(f"<b>Event Description:</b> {report[1].events_description}", styles['Normal']))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph(f"<b>Start Date:</b> {report[1].events_start_date_and_time.strftime('%B %d, %Y %I:%M %p')}", styles['Normal']))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph(f"<b>End Date:</b> {report[1].events_end_date_and_time.strftime('%B %d, %Y %I:%M %p')}", styles['Normal']))
+        story.append(Spacer(1, 20))
+    
+    # Add transaction history
+    story.append(Paragraph("<b>Transaction History</b>", styles['Heading2']))
+    story.append(Spacer(1, 12))
+    
+    if transactions:
+        # Create transaction table
+        table_style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('ALIGN', (-1, 0), (-1, -1), 'RIGHT'),
+        ])
+        
+        # Table headers
+        table_data = [['Date', 'Transaction', 'Unit Amount', 'Unit Price', 'Total']]
+        
+        # Add transaction rows
+        total_amount = 0
+        for trans in transactions:
+            table_data.append([
+                trans.transaction_date.strftime('%B %d, %Y'),
+                trans.transaction_name,
+                str(trans.transaction_unit_amount),
+                f"₱ {trans.transaction_unit_price:,.2f}",
+                f"₱ {trans.transaction_total:,.2f}"
+            ])
+            total_amount += trans.transaction_total
+        
+        # Add total row
+        table_data.append(['', '', '', 'Total:', f"₱ {total_amount:,.2f}"])
+        table_style.add('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold')
+        
+        # Create and add table to story
+        table = Table(table_data, colWidths=[doc.width/5.0]*5)
+        table.setStyle(table_style)
+        story.append(table)
+    else:
+        story.append(Paragraph("No transactions recorded.", styles['Normal']))
+    
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
