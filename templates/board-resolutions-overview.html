@@ -115,7 +115,7 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href=""
+                    <a href="{{ url_for('generate_board_resolution_pdf', resolution_id=resolution.board_resolutions_id) }}"
                         class="primary-button">View</a>
                     <a href="{{ url_for('update_board_resolution', resolution_id=resolution.board_resolutions_id) }}"
                         class="secondary-button">Update</a>

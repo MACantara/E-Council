@@ -4517,6 +4517,108 @@ def generate_description():
         app.logger.error(f"Error generating description: {str(e)}")
         return make_response(jsonify({'error': str(e)}), 500)
 
+@app.route('/generate-board-resolution-pdf/<int:resolution_id>')
+@login_required
+def generate_board_resolution_pdf(resolution_id):
+    # Get the resolution data
+    resolution = BoardResolutions.query.get_or_404(resolution_id)
+    
+    # Get prepared by and approved by users
+    prepared_by = Users.query.get(resolution.board_resolutions_prepared_by)
+    approved_by = Signatories.query.get(resolution.board_resolutions_approved_by)
+    
+    # Get student signatories
+    student_signatories = db.session.query(BoardResolutionsStudentSignatories, Users)\
+        .join(Users, BoardResolutionsStudentSignatories.board_resolutions_users_id == Users.users_id)\
+        .filter(BoardResolutionsStudentSignatories.board_resolutions_id == resolution_id)\
+        .all()
+    
+    # Create BytesIO buffer for PDF
+    buffer = BytesIO()
+    
+    # Create the PDF document
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=72,
+        leftMargin=72,
+        topMargin=72,
+        bottomMargin=72
+    )
+    
+    # Create the story (content) for the PDF
+    story = []
+    styles = getSampleStyleSheet()
+    
+    # Add title
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        alignment=1,
+        spaceAfter=30
+    )
+    story.append(Paragraph("BOARD RESOLUTION", title_style))
+    
+    # Add resolution details
+    story.append(Paragraph(f"<b>Title:</b> {resolution.board_resolutions_title}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Description:</b> {resolution.board_resolutions_description}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Total Amount:</b> ₱{resolution.board_resolutions_total_amount:,.2f}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    
+    # Add event information if available
+    if resolution.board_resolutions_events_id:
+        event = Events.query.get(resolution.board_resolutions_events_id)
+        story.append(Paragraph(f"<b>Event:</b> {event.events_name}", styles['Normal']))
+        story.append(Spacer(1, 12))
+    
+    # Add academic details
+    story.append(Paragraph(f"<b>Academic Year:</b> {resolution.board_resolutions_academic_year}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Semester:</b> {resolution.board_resolutions_semester}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    
+    # Add date
+    story.append(Paragraph(f"<b>Date:</b> {resolution.board_resolutions_date.strftime('%B %d, %Y')}", styles['Normal']))
+    story.append(Spacer(1, 30))
+    
+    # Add signatories section
+    signature_style = ParagraphStyle(
+        'Signature',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=0,
+        spaceAfter=20
+    )
+    
+    # Prepared by
+    story.append(Paragraph("Prepared by:", signature_style))
+    story.append(Paragraph(f"{prepared_by.users_first_name} {prepared_by.users_last_name}", signature_style))
+    story.append(Spacer(1, 20))
+    
+    # Approved by
+    story.append(Paragraph("Approved by:", signature_style))
+    story.append(Paragraph(f"{approved_by.signatory_first_name} {approved_by.signatory_last_name}", signature_style))
+    story.append(Spacer(1, 20))
+    
+    # Student signatories
+    story.append(Paragraph("Student Signatories:", signature_style))
+    for signatory in student_signatories:
+        story.append(Paragraph(f"{signatory[1].users_first_name} {signatory[1].users_last_name}", signature_style))
+    
+    # Build the PDF
+    doc.build(story)
+    
+    # Prepare the response
+    buffer.seek(0)
+    return send_file(
+        buffer,
+        download_name=f'Board_Resolution_{resolution_id}.pdf',
+        mimetype='application/pdf'
+    )
+
 @app.route("/minutes-of-the-meeting-overview")
 @login_required
 def minutes_of_the_meeting_overview():
