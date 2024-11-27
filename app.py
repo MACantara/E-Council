@@ -4356,6 +4356,80 @@ def delete_financial_report(report_id):
 
     return render_template('delete-financial-report.html', report=report)
 
+@app.route('/generate-financial-report-pdf/<int:financial_report_id>')
+@login_required
+def generate_financial_report_pdf(financial_report_id):
+    buffer = BytesIO()
+    
+    def header(canvas, doc):
+        canvas.saveState()
+        
+        # Add header images with manual positioning
+        # PERPS header - left side
+        header_perps = Image('./static/img/HEADER-PERPS.png', width=325, height=75)
+        perps_x = doc.leftMargin - 35
+        header_perps.drawOn(canvas, perps_x, doc.height + doc.topMargin)
+        
+        # CCS Logo - center
+        header_ccs = Image('./static/img/CCS-LOGO.png', width=35, height=50)
+        ccs_x = doc.leftMargin + (doc.width - 35)/2 + 125
+        header_ccs.drawOn(canvas, ccs_x, doc.height + doc.topMargin + 15)
+        
+        # ISO Logo - right side
+        header_iso = Image('./static/img/ISO.png', width=100, height=50)
+        iso_x = doc.leftMargin + doc.width - 80
+        header_iso.drawOn(canvas, iso_x, doc.height + doc.topMargin + 15)
+        
+        # Add text below ISO logo
+        canvas.setFont("Helvetica-Bold", 10)
+        text = "College of Computer Studies"
+        text_width = canvas.stringWidth(text, "Helvetica-Bold", 10)
+        text_x = iso_x + (50 - text_width)/2
+        canvas.drawString(text_x, doc.height + doc.topMargin, text)
+        
+        # Add red line after text
+        canvas.setStrokeColorRGB(0x8c/255, 0x04/255, 0x04/255)  # #8c0404
+        canvas.setLineWidth(2)
+        line_y = doc.height + doc.topMargin - 10
+        line_length = 510
+        line_start_x = (doc.width - line_length) / 2 + doc.leftMargin
+        line_end_x = line_start_x + line_length
+        canvas.line(line_start_x - 5, line_y, line_end_x, line_y)
+        
+        # Add footer
+        canvas.setStrokeColorRGB(0, 0, 0)
+        canvas.setLineWidth(1)
+        footer_y = doc.bottomMargin - 20
+        canvas.line(doc.leftMargin, footer_y, doc.leftMargin + doc.width, footer_y)
+        
+        # Add footer text
+        canvas.setFont("Helvetica", 8)
+        canvas.drawString(doc.leftMargin, footer_y - 15, "UPHMO-CCS-GEN-912/rev0")
+        right_text = "Financial Report"
+        right_text_width = canvas.stringWidth(right_text, "Helvetica", 8)
+        canvas.drawString(doc.leftMargin + doc.width - right_text_width, footer_y - 15, right_text)
+        
+        canvas.restoreState()
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=72,
+        leftMargin=72,
+        topMargin=72,
+        bottomMargin=72
+    )
+    
+    story = []
+    doc.build(story, onFirstPage=header, onLaterPages=header)
+    
+    buffer.seek(0)
+    return send_file(
+        buffer,
+        download_name=f'Financial_Report_{financial_report_id}.pdf',
+        mimetype='application/pdf'
+    )
+
 @app.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
