@@ -455,6 +455,17 @@ class ConceptPaperForms(db.Model):
     prepared_by_user = db.relationship('Users', foreign_keys=[concept_paper_forms_prepared_by])
     signed_and_reviewed_by_user = db.relationship('Users', foreign_keys=[concept_paper_forms_signed_and_reviewed_by])
     department = db.relationship('Departments', foreign_keys=[concept_paper_forms_departments_id])
+    objectives = db.relationship('ObjectivesOfTheActivity', 
+                               backref='concept_paper',
+                               lazy='dynamic',
+                               cascade="all, delete-orphan",
+                               primaryjoin="ConceptPaperForms.concept_paper_forms_id==ObjectivesOfTheActivity.objectives_of_the_activity_concept_paper_forms_id")
+
+    learning_outcomes = db.relationship('LearningOutcomes', 
+                                      backref='concept_paper',
+                                      lazy='dynamic',
+                                      cascade="all, delete-orphan",
+                                      primaryjoin="ConceptPaperForms.concept_paper_forms_id==LearningOutcomes.learning_outcomes_concept_paper_forms_id")
 
     def __repr__(self):
         return f'<ConceptPaperForms {self.concept_paper_forms_id}: {self.concept_paper_forms_subject}>'
