@@ -2132,7 +2132,7 @@ def add_transaction(event_id):
 
         # Create a new transaction
         new_transaction = TransactionHistory(
-            events_id=event_id,
+            transaction_events_id=event_id,
             transaction_name=transaction_name,
             transaction_date=datetime.strptime(transaction_date, '%Y-%m-%dT%H:%M'),
             transaction_unit_amount=unit_amount,
