@@ -151,7 +151,7 @@
                     <select name="board-resolutions-approved-by" id="board-resolutions-approved-by" required>
                         <option value="" disabled selected>Select Approver</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}"></option>
+                        <option value="{{ signatory.signatory_id }}">
                         {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
                         signatory.signatory_position }}{% if signatory.signatory_department %}, {{
                         signatory.signatory_department }}{% endif %}
