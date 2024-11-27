@@ -4220,22 +4220,50 @@ def generate_description():
             
         event_name = data.get('event_name')
         title = data.get('title')
+        date = data.get('date')
+        total_amount = data.get('total_amount')
         
         if not event_name or not title:
             return make_response(jsonify({'error': 'Missing event_name or title'}), 400)
         
-        app.logger.info(f"Generating description for event: {event_name}, title: {title}")
+        app.logger.info(f"Generating description for event: {event_name}, title: {title}, date: {date}, amount: {total_amount}")
+        
+        # Convert date to proper format
+        try:
+            if date:
+                date_obj = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+                formatted_date = f"Signed this {date_obj.day}th of {date_obj.strftime('%B')} in the name of the Lord Jesus Christ {date_obj.year}"
+            else:
+                formatted_date = "Signed this 13th of May in the name of the Lord Jesus Christ 2024"  # Default date
+        except ValueError as e:
+            app.logger.error(f"Date parsing error: {str(e)}")
+            formatted_date = "Signed this 13th of May in the name of the Lord Jesus Christ 2024"  # Default date
+        
+        # Format amount with commas and two decimal places if provided
+        formatted_amount = f"₱{float(total_amount):,.2f}" if total_amount else "the specified amount"
         
         prompt = f"""Generate a formal description for a board resolution with the following details:
         Event: {event_name}
         Title: {title}
+        Total Amount: {formatted_amount}
         
-        The description should:
-        1. Be professional and formal in tone
-        2. Explain the purpose and scope of the resolution
-        3. Include standard resolution language
-        4. Be approximately 2-3 paragraphs long
-        5. Follow standard board resolution format"""
+        Requirements:
+        1. Use clear, formal language
+        2. Focus only on describing the purpose, scope, and decisions made
+        3. Keep it concise and straightforward
+        4. Do not include any signatories
+        5. Do not use any text formatting
+        6. Do not include the board resolution title
+        7. Do not include any resolution numbers
+        8. Do not use 'WHEREAS' statements
+        9. Include a financial breakdown section with the following format:
+           Financial Breakdown:
+           [List all relevant expense categories based on the event type and purpose]
+           Total Amount: {formatted_amount}
+        10. The description should be 1 paragraph only, followed by the financial breakdown
+        11. End with exactly this date: '{formatted_date}'
+
+        Note: Create a comprehensive list of expense categories appropriate for this specific event"""
         
         app.logger.info("Sending request to Gemini API")
         try:

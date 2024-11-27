@@ -9,8 +9,8 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('board_resolutions_overview') }}"
-            class="primary-button fit-content-button">Back to Board Resolutions Overview</a>
+        <a href="{{ url_for('board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board
+            Resolutions Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -22,12 +22,11 @@
         </div>
         {% endif %}
         {% endwith %}
-        
+
         <div class="container">
             <h2>Add Board Resolution</h2>
 
-            <form method="POST" enctype="multipart/form-data"
-                action="{{ url_for('add_board_resolution')}}">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_board_resolution')}}">
                 <div class="input-pair">
                     <label for="board-resolutions-date">Date</label>
                     <input type="datetime-local" name="board-resolutions-date" id="board-resolutions-date" required>
@@ -35,26 +34,32 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-events-id">Event Name</label>
-                    <select name="board-resolutions-events-id" id="board-resolutions-events-id" required onchange="updateTitle()">
+                    <select name="board-resolutions-events-id" id="board-resolutions-events-id" required
+                        onchange="updateTitle()">
                         <option value="" disabled selected>Select Event</option>
                         <option value="None">None</option>
                         {% for event in events %}
-                        <option value="{{ event.events_id }}" data-event-name="{{ event.events_name }}">{{ event.events_name }}</option>
+                        <option value="{{ event.events_id }}" data-event-name="{{ event.events_name }}">{{
+                            event.events_name }}</option>
                         {% endfor %}
                         <option value="Other">Other</option>
                     </select>
-                    <label for="other-event-name" id="other-event-name-label" style="display: none; margin-top: 10px;">Other Event Name</label>
-                    <input type="text" name="other-event-name" id="other-event-name-input" placeholder="Enter Event Name" style="display: none; margin-top: 10px;" oninput="updateTitle()">
+                    <label for="other-event-name" id="other-event-name-label"
+                        style="display: none; margin-top: 10px;">Other Event Name</label>
+                    <input type="text" name="other-event-name" id="other-event-name-input"
+                        placeholder="Enter Event Name" style="display: none; margin-top: 10px;" oninput="updateTitle()">
                 </div>
 
                 <div class="input-pair">
                     <label for="board-resolutions-title">Title</label>
-                    <input type="text" name="board-resolutions-title" id="board-resolutions-title" placeholder="Title" required>
+                    <input type="text" name="board-resolutions-title" id="board-resolutions-title" placeholder="Title"
+                        required>
                 </div>
 
                 <div class="input-pair">
                     <label for="board-resolutions-academic-year">Academic Year</label>
-                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required onchange="toggleOtherAcademicYear()">
+                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required
+                        onchange="toggleOtherAcademicYear()">
                         <option value="" disabled selected>Select Academic Year</option>
                         {% for year in academic_years %}
                         <option value="{{ year }}">{{ year }}</option>
@@ -62,8 +67,10 @@
                         <option value="Other">Other</option>
                     </select>
                     <div class="input-pair">
-                        <label for="other-academic-year" id="other-academic-year-label" style="display: none; margin-top: 10px;">Other Academic Year</label>
-                        <input type="text" name="other-academic-year" id="other-academic-year-input" placeholder="Enter Academic Year" style="display: none;">
+                        <label for="other-academic-year" id="other-academic-year-label"
+                            style="display: none; margin-top: 10px;">Other Academic Year</label>
+                        <input type="text" name="other-academic-year" id="other-academic-year-input"
+                            placeholder="Enter Academic Year" style="display: none;">
                     </div>
                 </div>
 
@@ -89,14 +96,17 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-total-amount">Total Amount</label>
-                    <input type="number" step="0.01" name="board-resolutions-total-amount" id="board-resolutions-total-amount" placeholder="Total Amount" required>
+                    <input type="number" step="0.01" name="board-resolutions-total-amount"
+                        id="board-resolutions-total-amount" placeholder="Total Amount" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="board-resolutions-description">Description</label>
                     <div class="input-group description-group">
-                        <textarea name="board-resolutions-description" id="board-resolutions-description" placeholder="Description" required></textarea>
-                        <button type="button" class="secondary-button generate-description-btn" onclick="generateDescription()">Generate Description</button>
+                        <textarea name="board-resolutions-description" id="board-resolutions-description"
+                            placeholder="Description" required></textarea>
+                        <button type="button" class="secondary-button generate-description-btn"
+                            onclick="generateDescription()">Generate Description</button>
                     </div>
                 </div>
 
@@ -108,8 +118,10 @@
                             <legend>{{ organization.student_organizations_name }}</legend>
                             {% for user in organization.users %}
                             <div>
-                                <input type="checkbox" name="board-resolutions-student-signatories" value="{{ user.users_id }}" id="user-{{ user.users_id }}">
-                                <label for="user-{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
+                                <input type="checkbox" name="board-resolutions-student-signatories"
+                                    value="{{ user.users_id }}" id="user-{{ user.users_id }}">
+                                <label for="user-{{ user.users_id }}">{{ user.users_first_name }} {{
+                                    user.users_last_name }} - {{ user.users_student_organization_position }}</label>
                             </div>
                             {% endfor %}
                         </fieldset>
@@ -125,7 +137,8 @@
                         <optgroup label="{{ organization.student_organizations_name }}">
                             {% for user in organization.users %}
                             <option value="{{ user.users_id }}">
-                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{
+                                user.users_student_organization_position }}
                             </option>
                             {% endfor %}
                         </optgroup>
@@ -139,7 +152,9 @@
                         <option value="" disabled selected>Select Approver</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}"></option>
-                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}{% if signatory.signatory_department %}, {{ signatory.signatory_department }}{% endif %}
+                        {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                        signatory.signatory_position }}{% if signatory.signatory_department %}, {{
+                        signatory.signatory_department }}{% endif %}
                         </option>
                         {% endfor %}
                     </select>
@@ -215,11 +230,13 @@
 
     async function generateDescription() {
         const eventSelect = document.getElementById('board-resolutions-events-id');
-        const eventName = eventSelect.value === 'Other' 
-            ? document.getElementById('other-event-name-input').value 
+        const eventName = eventSelect.value === 'Other'
+            ? document.getElementById('other-event-name-input').value
             : eventSelect.options[eventSelect.selectedIndex].text;
         const title = document.getElementById('board-resolutions-title').value;
-        
+        const date = document.getElementById('board-resolutions-date').value;
+        const totalAmount = document.getElementById('board-resolutions-total-amount').value;
+
         if (!eventName || !title) {
             alert('Please select an event and provide a title first');
             return;
@@ -237,13 +254,15 @@
                     'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     event_name: eventName,
-                    title: title
+                    title: title,
+                    date: date,
+                    total_amount: totalAmount
                 }),
                 credentials: 'same-origin'
             });
-            
+
             let data;
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
@@ -251,11 +270,11 @@
             } else {
                 throw new Error('Server returned non-JSON response');
             }
-            
+
             if (!response.ok) {
                 throw new Error(data.error || `Server error: ${response.status}`);
             }
-            
+
             if (data.description) {
                 document.getElementById('board-resolutions-description').value = data.description;
             } else {
