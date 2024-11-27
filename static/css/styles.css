@@ -1436,3 +1436,18 @@ textarea {
     align-self: flex-start;
     white-space: nowrap;
 }
+
+/* Description specific styles */
+.description-group {
+    flex-direction: column;
+}
+
+.description-group textarea {
+    width: 100%;
+    min-height: 150px;
+    margin-bottom: 10px;
+}
+
+.description-group .generate-description-btn {
+    align-self: flex-end;
+}
