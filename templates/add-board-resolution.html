@@ -94,7 +94,10 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-description">Description</label>
-                    <textarea name="board-resolutions-description" id="board-resolutions-description" placeholder="Description" required></textarea>
+                    <div class="input-group">
+                        <textarea name="board-resolutions-description" id="board-resolutions-description" placeholder="Description" required></textarea>
+                        <button type="button" class="secondary-button" onclick="generateDescription()">Generate Description</button>
+                    </div>
                 </div>
 
                 <div class="input-pair">
@@ -209,6 +212,63 @@
         const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
         dateInput.value = formattedDate;
     });
+
+    async function generateDescription() {
+        const eventSelect = document.getElementById('board-resolutions-events-id');
+        const eventName = eventSelect.value === 'Other' 
+            ? document.getElementById('other-event-name-input').value 
+            : eventSelect.options[eventSelect.selectedIndex].text;
+        const title = document.getElementById('board-resolutions-title').value;
+        
+        if (!eventName || !title) {
+            alert('Please select an event and provide a title first');
+            return;
+        }
+
+        const generateButton = document.querySelector('[onclick="generateDescription()"]');
+        const originalText = generateButton.textContent;
+        generateButton.textContent = 'Generating...';
+        generateButton.disabled = true;
+
+        try {
+            const response = await fetch('/generate-description', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ 
+                    event_name: eventName,
+                    title: title
+                }),
+                credentials: 'same-origin'
+            });
+            
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                throw new Error('Server returned non-JSON response');
+            }
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Server error: ${response.status}`);
+            }
+            
+            if (data.description) {
+                document.getElementById('board-resolutions-description').value = data.description;
+            } else {
+                throw new Error('No description generated');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Error: ${error.message || 'Failed to generate description. Please try again.'}`);
+        } finally {
+            generateButton.textContent = originalText;
+            generateButton.disabled = false;
+        }
+    }
 </script>
 
 {% endblock %}

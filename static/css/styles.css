@@ -1419,3 +1419,20 @@ textarea {
 .scrollable-list .dynamic-item:hover {
     background-color: var(--hover-background-color);
 }
+
+/* Board Resolution Styles */
+.input-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.input-group input,
+.input-group textarea {
+    flex: 1;
+}
+
+.input-group button {
+    align-self: flex-start;
+    white-space: nowrap;
+}

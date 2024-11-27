@@ -1,7 +1,7 @@
 import os
 import re
 import requests
-from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify, send_file
+from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify, send_file, make_response
 from jinja2 import Environment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
@@ -32,6 +32,7 @@ from cloudinary.exceptions import Error as CloudinaryError
 from cloudinary.utils import cloudinary_url
 
 import google.generativeai as genai
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import tempfile
 
 import pandas as pd
@@ -73,7 +74,15 @@ cloudinary.config(
 
 # Gemini AI Configuration
 genai.configure(api_key=os.getenv("GOOGLE_GEMINI_AI_API_KEY"))
+model = genai.GenerativeModel('gemini-1.5-flash')
 model_gemini_flash = genai.GenerativeModel('gemini-1.5-flash')
+
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+}
 
 csrf = CSRFProtect(app)
 
@@ -4197,6 +4206,60 @@ def update_board_resolution_status(resolution_id):
     db.session.commit()
 
     return jsonify(success=True)
+
+@app.route('/generate-description', methods=['POST'])
+@login_required
+def generate_description():
+    if not request.is_json:
+        return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
+        
+    try:
+        data = request.json
+        if not data:
+            return make_response(jsonify({'error': 'No JSON data provided'}), 400)
+            
+        event_name = data.get('event_name')
+        title = data.get('title')
+        
+        if not event_name or not title:
+            return make_response(jsonify({'error': 'Missing event_name or title'}), 400)
+        
+        app.logger.info(f"Generating description for event: {event_name}, title: {title}")
+        
+        prompt = f"""Generate a formal description for a board resolution with the following details:
+        Event: {event_name}
+        Title: {title}
+        
+        The description should:
+        1. Be professional and formal in tone
+        2. Explain the purpose and scope of the resolution
+        3. Include standard resolution language
+        4. Be approximately 2-3 paragraphs long
+        5. Follow standard board resolution format"""
+        
+        app.logger.info("Sending request to Gemini API")
+        try:
+            response = model.generate_content(
+                prompt,
+                safety_settings=safety_settings
+            )
+            app.logger.info("Received response from Gemini API")
+            
+            if response and hasattr(response, 'text'):
+                description = response.text.strip()
+                app.logger.info(f"Generated description: {description[:100]}...")
+                return make_response(jsonify({'description': description}), 200)
+            else:
+                app.logger.error("Invalid response format from Gemini API")
+                return make_response(jsonify({'error': 'Invalid response from AI model'}), 500)
+                
+        except Exception as gemini_error:
+            app.logger.error(f"Gemini API error: {str(gemini_error)}")
+            return make_response(jsonify({'error': f'AI generation error: {str(gemini_error)}'}), 500)
+            
+    except Exception as e:
+        app.logger.error(f"Error generating description: {str(e)}")
+        return make_response(jsonify({'error': str(e)}), 500)
 
 @app.route("/minutes-of-the-meeting-overview")
 @login_required
