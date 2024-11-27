@@ -1153,7 +1153,65 @@ def allowed_image_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def process_tally_items(documentation_id, tally_names, extremely_satisfied, satisfied, neutral, dissatisfied, extremely_dissatisfied):
+    # First, delete all existing tally items
+    TallyItems.query.filter_by(tally_items_documentation_id=documentation_id).delete()
+    
+    # Process new tally items
+    for i in range(len(tally_names)):
+        if tally_names[i].strip():  # Only process if name is not empty
+            tally_name = tally_names[i].strip()
+            
+            # Get the rating counts for tally
+            es_count = int(extremely_satisfied[i] or 0)
+            s_count = int(satisfied[i] or 0)
+            n_count = int(neutral[i] or 0)
+            d_count = int(dissatisfied[i] or 0)
+            ed_count = int(extremely_dissatisfied[i] or 0)
+            
+            # Create new tally item
+            new_tally = TallyItems(
+                tally_items_documentation_id=documentation_id,
+                tally_items_name=tally_name,
+                tally_items_extremely_satisfied_rating_total=es_count,
+                tally_items_satisfied_rating_total=s_count,
+                tally_items_neutral_rating_total=n_count,
+                tally_items_dissatisfied_rating_total=d_count,
+                tally_items_extremely_dissatisfied_rating_total=ed_count
+            )
+            db.session.add(new_tally)
 
+def process_evaluation_forms(documentation_id, tally_names, request):
+    # First, delete all existing evaluation forms
+    EvaluationForm.query.filter_by(evaluation_form_documentation_id=documentation_id).delete()
+    
+    # Process new evaluation forms
+    for i in range(len(tally_names)):
+        if tally_names[i].strip():  # Only process if name is not empty
+            tally_name = tally_names[i].strip()
+            
+            # Get the evaluation rating for this item
+            eval_rating_key = f'eval-tally-{i}'
+            rating_value = request.form.get(eval_rating_key)
+            
+            # Convert radio button value to rating counts
+            eval_es_count = 1 if rating_value == '5' else 0
+            eval_s_count = 1 if rating_value == '4' else 0
+            eval_n_count = 1 if rating_value == '3' else 0
+            eval_d_count = 1 if rating_value == '2' else 0
+            eval_ed_count = 1 if rating_value == '1' else 0
+            
+            # Create new evaluation form entry
+            new_evaluation = EvaluationForm(
+                evaluation_form_documentation_id=documentation_id,
+                evaluation_form_name=tally_name,
+                evaluation_form_extremely_satisfied_rating=eval_es_count,
+                evaluation_form_satisfied_rating=eval_s_count,
+                evaluation_form_neutral_rating=eval_n_count,
+                evaluation_form_dissatisfied_rating=eval_d_count,
+                evaluation_form_extremely_dissatisfied_rating=eval_ed_count
+            )
+            db.session.add(new_evaluation)
 
 # Routes
 @app.route("/")
@@ -3446,53 +3504,10 @@ def update_documentation(documentation_id):
         # First, delete all existing tally items and evaluation forms
         TallyItems.query.filter_by(tally_items_documentation_id=documentation_id).delete()
         EvaluationForm.query.filter_by(evaluation_form_documentation_id=documentation_id).delete()
-        
-        # Process new tally items and evaluation forms
-        for i in range(len(tally_names)):
-            if tally_names[i].strip():  # Only process if name is not empty
-                tally_name = tally_names[i].strip()
-                
-                # Get the rating counts for tally
-                es_count = int(extremely_satisfied[i] or 0)
-                s_count = int(satisfied[i] or 0)
-                n_count = int(neutral[i] or 0)
-                d_count = int(dissatisfied[i] or 0)
-                ed_count = int(extremely_dissatisfied[i] or 0)
-                
-                # Create new tally item
-                new_tally = TallyItems(
-                    tally_items_documentation_id=documentation_id,
-                    tally_items_name=tally_name,
-                    tally_items_extremely_satisfied_rating_total=es_count,
-                    tally_items_satisfied_rating_total=s_count,
-                    tally_items_neutral_rating_total=n_count,
-                    tally_items_dissatisfied_rating_total=d_count,
-                    tally_items_extremely_dissatisfied_rating_total=ed_count
-                )
-                db.session.add(new_tally)
-                
-                # Get the evaluation rating for this item
-                eval_rating_key = f'eval-tally-{i}'
-                rating_value = request.form.get(eval_rating_key)
-                
-                # Convert radio button value to rating counts
-                eval_es_count = 1 if rating_value == '5' else 0
-                eval_s_count = 1 if rating_value == '4' else 0
-                eval_n_count = 1 if rating_value == '3' else 0
-                eval_d_count = 1 if rating_value == '2' else 0
-                eval_ed_count = 1 if rating_value == '1' else 0
-                
-                # Create new evaluation form entry
-                new_evaluation = EvaluationForm(
-                    evaluation_form_documentation_id=documentation_id,
-                    evaluation_form_name=tally_name,
-                    evaluation_form_extremely_satisfied_rating=eval_es_count,
-                    evaluation_form_satisfied_rating=eval_s_count,
-                    evaluation_form_neutral_rating=eval_n_count,
-                    evaluation_form_dissatisfied_rating=eval_d_count,
-                    evaluation_form_extremely_dissatisfied_rating=eval_ed_count
-                )
-                db.session.add(new_evaluation)
+    
+        # Process tally items and evaluation forms separately
+        process_tally_items(documentation_id, tally_names, extremely_satisfied, satisfied, neutral, dissatisfied, extremely_dissatisfied)
+        process_evaluation_forms(documentation_id, tally_names, request)
 
         # Update documentation rating
         documentation = Documentation.query.get_or_404(documentation_id)
