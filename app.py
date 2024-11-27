@@ -2648,56 +2648,54 @@ def update_concept_paper(paper_id):
         concept_paper.concept_paper_forms_approved_by = concept_paper_approved_by
 
         # Update objectives of the activity
-        # First delete existing objectives
-        for objective_link in concept_paper.objectives_of_the_activity:
-            db.session.delete(objective_link.objective_of_the_activity)
-            db.session.delete(objective_link)
-        
-        # Add new objectives
-        for objective_content in concept_paper_objectives:
+        # First, delete existing objectives
+        ObjectivesOfTheActivity.query.filter_by(
+            objectives_of_the_activity_concept_paper_forms_id=concept_paper.concept_paper_forms_id
+        ).delete()
+
+        # Then add new objectives
+        for objective in concept_paper_objectives:
             new_objective = ObjectivesOfTheActivity(
-                objectives_of_the_activity_content=objective_content,
-                objectives_of_the_activity_concept_paper_forms_id=paper_id
+                objectives_of_the_activity_concept_paper_forms_id=concept_paper.concept_paper_forms_id,
+                objectives_of_the_activity_content=objective
             )
             db.session.add(new_objective)
-            db.session.commit()
 
         # Update learning outcomes
         # First delete existing learning outcomes
-        for outcome_link in concept_paper.learning_outcomes:
-            db.session.delete(outcome_link.learning_outcome)
-            db.session.delete(outcome_link)
-        
-        # Add new learning outcomes
-        for outcome_content in concept_paper_learning_outcomes:
+        LearningOutcomes.query.filter_by(
+            learning_outcomes_concept_paper_forms_id=concept_paper.concept_paper_forms_id
+        ).delete()
+
+        # Then add new learning outcomes
+        for outcome in concept_paper_learning_outcomes:
             new_outcome = LearningOutcomes(
-                learning_outcomes_content=outcome_content,
-                learning_outcomes_concept_paper_forms_id=paper_id
+                learning_outcomes_concept_paper_forms_id=concept_paper.concept_paper_forms_id,
+                learning_outcomes_content=outcome
             )
             db.session.add(new_outcome)
-            db.session.commit()
 
         # Update observations in the observations table
-        LearningJournalFormsObservations.query.filter_by(learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
+        Observations.query.filter_by(observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
         for observation_content in concept_paper_observations:
             observation = Observations(observations_content=observation_content)
             db.session.add(observation)
             db.session.commit()
-            learning_journal_observation = LearningJournalFormsObservations(
-                learning_journal_forms_id=learning_journal.learning_journal_forms_id,
+            learning_journal_observation = Observations(
+                observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
                 observations_id=observation.observations_id
             )
             db.session.add(learning_journal_observation)
             db.session.commit()
 
         # Update learnings in the learnings table
-        LearningJournalFormsLearnings.query.filter_by(learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
+        Learnings.query.filter_by(learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
         for learning_content in concept_paper_learnings:
             learning = Learnings(learnings_content=learning_content)
             db.session.add(learning)
             db.session.commit()
-            learning_journal_learning = LearningJournalFormsLearnings(
-                learning_journal_forms_id=learning_journal.learning_journal_forms_id,
+            learning_journal_learning = Learnings(
+                learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
                 learnings_id=learning.learnings_id
             )
             db.session.add(learning_journal_learning)
@@ -2748,52 +2746,43 @@ def update_concept_paper(paper_id):
             db.session.commit()
 
             # Update strengths
-            ActivityReportFormsActivityStrengths.query.filter_by(
-                activity_report_forms_id=activity_report.activity_report_forms_id
+            ActivityStrengths.query.filter_by(
+                activity_strengths_documentation_id=activity_report.activity_report_forms_id
             ).delete()
-            
+
             for strength in activity_strengths:
-                new_strength = ActivityStrengths(activity_strengths_content=strength)
-                db.session.add(new_strength)
-                db.session.commit()
-                
-                strength_link = ActivityReportFormsActivityStrengths(
-                    activity_report_forms_id=activity_report.activity_report_forms_id,
-                    activity_strengths_id=new_strength.activity_strengths_id
+                new_strength = ActivityStrengths(
+                    activity_strengths_documentation_id=activity_report.activity_report_forms_id,
+                    activity_strengths_content=strength
                 )
-                db.session.add(strength_link)
+                db.session.add(new_strength)
 
             # Update weaknesses
-            ActivityReportFormsActivityWeaknesses.query.filter_by(
-                activity_report_forms_id=activity_report.activity_report_forms_id
+            ActivityWeaknesses.query.filter_by(
+                activity_weaknesses_documentation_id=activity_report.activity_report_forms_id
             ).delete()
-            
+
             for weakness in activity_weaknesses:
-                new_weakness = ActivityWeaknesses(activity_weaknesses_content=weakness)
-                db.session.add(new_weakness)
-                db.session.commit()
-                
-                weakness_link = ActivityReportFormsActivityWeaknesses(
-                    activity_report_forms_id=activity_report.activity_report_forms_id,
-                    activity_weaknesses_id=new_weakness.activity_weaknesses_id
+                new_weakness = ActivityWeaknesses(
+                    activity_weaknesses_documentation_id=activity_report.activity_report_forms_id,
+                    activity_weaknesses_content=weakness
                 )
-                db.session.add(weakness_link)
+                db.session.add(new_weakness)
 
             # Update recommendations
-            ActivityReportFormsActivityRecommendations.query.filter_by(
-                activity_report_forms_id=activity_report.activity_report_forms_id
+            ActivityRecommendations.query.filter_by(
+                activity_recommendations_documentation_id=activity_report.activity_report_forms_id
             ).delete()
-            
+
             for recommendation in activity_recommendations:
-                new_recommendation = ActivityRecommendations(activity_recommendations_content=recommendation)
-                db.session.add(new_recommendation)
-                db.session.commit()
-                
-                recommendation_link = ActivityReportFormsActivityRecommendations(
-                    activity_report_forms_id=activity_report.activity_report_forms_id,
-                    activity_recommendations_id=new_recommendation.activity_recommendations_id
+                new_recommendation = ActivityRecommendations(
+                    activity_recommendations_documentation_id=activity_report.activity_report_forms_id,
+                    activity_recommendations_content=recommendation
                 )
-                db.session.add(recommendation_link)
+                db.session.add(new_recommendation)
+
+            # Single commit at the end for better performance
+            db.session.commit()
 
         # Personnel In Charge Form data
         personnel_in_charge = request.form.get('personnel-in-charge')
@@ -2901,12 +2890,12 @@ def update_concept_paper(paper_id):
 
     # Fetch objectives of the activity and learning outcomes
     objectives_of_the_activity = [
-        obj.objective_of_the_activity.objectives_of_the_activity_content
-        for obj in ConceptPaperFormObjectivesOfTheActivity.query.filter_by(concept_paper_forms_id=paper_id).all()
+        obj.objectives_of_the_activity_content
+        for obj in ObjectivesOfTheActivity.query.filter_by(objectives_of_the_activity_concept_paper_forms_id=paper_id).all()
     ]
     learning_outcomes = [
-        outcome.learning_outcome.learning_outcomes_content
-        for outcome in ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).all()
+        outcome.learning_outcomes_content
+        for outcome in LearningOutcomes.query.filter_by(learning_outcomes_concept_paper_forms_id=paper_id).all()
     ]
 
     # Fetch noted by college dean and noted by head of sas for the personnel in charge form
