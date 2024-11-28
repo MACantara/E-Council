@@ -4966,6 +4966,11 @@ def generate_board_resolution_pdf(resolution_id):
         spaceAfter=20
     )
     
+    # Student signatories
+    story.append(Paragraph("Student Signatories:", signature_style))
+    for signatory in student_signatories:
+        story.append(Paragraph(f"{signatory[1].users_first_name} {signatory[1].users_last_name}", signature_style))
+    
     # Prepared by
     story.append(Paragraph("Prepared by:", signature_style))
     story.append(Paragraph(f"{prepared_by.users_first_name} {prepared_by.users_last_name}", signature_style))
