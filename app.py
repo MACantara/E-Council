@@ -22,11 +22,12 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable, Flowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable, Flowable, PageBreak
 from reportlab.pdfgen import canvas
 from reportlab.lib.enums import TA_RIGHT
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.units import inch
 
 import cloudinary
 import cloudinary.uploader
@@ -4693,6 +4694,58 @@ def generate_financial_report_pdf(financial_report_id):
     story.append(Paragraph("APPROVED BY:", signature_style))
     story.append(Paragraph(f"{adviser.signatory_title} {adviser.signatory_first_name} {adviser.signatory_middle_name if adviser.signatory_middle_name else ''} {adviser.signatory_last_name}", name_style))
     story.append(Paragraph(f"Adviser, {organization.student_organizations_name}", position_style))
+
+    # Add a page break before the receipt
+    story.append(PageBreak())
+
+    # Add the receipt image if it exists
+    if transactions:       
+        # Add each receipt image
+        for idx, transaction in enumerate(transactions, 1):
+            if transaction.transaction_receipt_cloudinary_url:
+                # Add receipt number if there are multiple receipts
+                if len(transactions) > 1:
+                    story.append(Paragraph(f"Receipt {idx}", ParagraphStyle(
+                        'ReceiptNumber',
+                        parent=styles['Normal'],
+                        fontSize=12,
+                        alignment=1,
+                        spaceAfter=10
+                    )))
+                
+                # Get the image from Cloudinary URL
+                receipt_image = Image(transaction.transaction_receipt_cloudinary_url)
+                
+                # Calculate available space (leaving margins)
+                available_width = letter[0] - 2*inch  # Letter width minus 2-inch margins
+                available_height = letter[1] - 4*inch  # Letter height minus 4-inch margins
+                
+                # Calculate scaling ratios for both width and height
+                width_ratio = available_width / receipt_image.imageWidth
+                height_ratio = available_height / receipt_image.imageHeight
+                
+                # Use the smaller ratio to ensure image fits both dimensions
+                scale_ratio = min(width_ratio, height_ratio)
+                
+                # Apply the scaling
+                receipt_image.drawWidth = receipt_image.imageWidth * scale_ratio
+                receipt_image.drawHeight = receipt_image.imageHeight * scale_ratio
+                
+                story.append(receipt_image)
+                
+                # Add space between receipts
+                if idx < len(transactions):
+                    story.append(Spacer(1, 30))
+    else:
+        story.append(Paragraph("Transaction Receipts", receipt_title_style))
+        # Add a message if no receipts are available
+        no_receipt_style = ParagraphStyle(
+            'NoReceipt',
+            parent=styles['Normal'],
+            fontSize=12,
+            alignment=1  # Center alignment
+        )
+        story.append(Paragraph("No transaction receipts available", no_receipt_style))
     
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
