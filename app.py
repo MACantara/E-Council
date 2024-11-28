@@ -4428,7 +4428,7 @@ def generate_financial_report_pdf(financial_report_id):
         pagesize=letter,
         rightMargin=72,
         leftMargin=72,
-        topMargin=72,
+        topMargin=100,
         bottomMargin=72
     )
     
