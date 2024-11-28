@@ -4634,6 +4634,65 @@ def generate_financial_report_pdf(financial_report_id):
     financial_table = Table(table_data, colWidths=[340, 125])
     financial_table.setStyle(table_style)
     story.append(financial_table)
+
+    # Add signature section after the financial table
+    story.append(Spacer(1, 30))  # Add space between table and signatures
+
+    # Create styles for signature sections
+    signature_style = ParagraphStyle(
+        'Signature',
+        parent=styles['Normal'],
+        fontSize=12,
+        spaceAfter=30  # Space between signature blocks
+    )
+
+    name_style = ParagraphStyle(
+        'SignatureName',
+        parent=styles['Normal'],
+        fontSize=12,
+        fontName='Helvetica-Bold'
+    )
+
+    position_style = ParagraphStyle(
+        'Position',
+        parent=styles['Normal'],
+        fontSize=12
+    )
+
+    # Get user data for each position from Users table
+    auditor = Users.query.get(report[0].financial_reports_audited_and_prepared_by)
+    treasurer = Users.query.get(report[0].financial_reports_noted_by)
+    president = Users.query.get(report[0].financial_reports_recommending_approval_by)
+    
+    # Get adviser data from Signatories table
+    adviser = Signatories.query.get(report[0].financial_reports_approved_by)
+
+    # Get organization data from the first user's student organization
+    organization = auditor.student_organization
+
+    # Add signature blocks with dynamic data
+    # Auditor section
+    story.append(Paragraph("AUDITED AND PREPARED BY:", signature_style))
+    story.append(Paragraph(f"{auditor.users_first_name} {auditor.users_middle_name if auditor.users_middle_name else ''} {auditor.users_last_name}", name_style))
+    story.append(Paragraph(f"{auditor.users_student_organization_position}, {organization.student_organizations_name}", position_style))
+    story.append(Spacer(1, 30))
+
+    # Treasurer section
+    story.append(Paragraph("NOTED BY:", signature_style))
+    story.append(Paragraph(f"{treasurer.users_first_name} {treasurer.users_middle_name if treasurer.users_middle_name else ''} {treasurer.users_last_name}", name_style))
+    story.append(Paragraph(f"{treasurer.users_student_organization_position}, {organization.student_organizations_name}", position_style))
+    story.append(Spacer(1, 30))
+
+    # President section
+    story.append(Paragraph("RECOMMENDING APPROVAL BY:", signature_style))
+    story.append(Paragraph(f"{president.users_first_name} {president.users_middle_name if president.users_middle_name else ''} {president.users_last_name}", name_style))
+    story.append(Paragraph(f"{president.users_student_organization_position}, {organization.student_organizations_name}", position_style))
+    story.append(Spacer(1, 30))
+
+    # Adviser section
+    story.append(Paragraph("APPROVED BY:", signature_style))
+    story.append(Paragraph(f"{adviser.signatory_title} {adviser.signatory_first_name} {adviser.signatory_middle_name if adviser.signatory_middle_name else ''} {adviser.signatory_last_name}", name_style))
+    story.append(Paragraph(f"Adviser, {organization.student_organizations_name}", position_style))
     
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
