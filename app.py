@@ -4965,7 +4965,7 @@ def generate_board_resolution_pdf(resolution_id):
     content_style = ParagraphStyle(
         'Content',
         parent=styles['Normal'],
-        fontSize=11,
+        fontSize=12,
         leading=14,
         alignment=4,  # Justified alignment
         firstLineIndent=36  # Add indentation for paragraph
