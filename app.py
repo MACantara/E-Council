@@ -5192,14 +5192,14 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         canvas.line(doc.leftMargin, footer_y, doc.leftMargin + doc.width, footer_y)
         
         # Add footer text
-        canvas.setFont("Helvetica", 8)
+        canvas.setFont("Helvetica", 12)
         
         # Left aligned text
         canvas.drawString(doc.leftMargin, footer_y - 15, "UPHMO-CCS-GEN-912/rev0")
         
         # Right aligned text with page numbers
         page_text = f"Council Meeting | Page {canvas.getPageNumber()} of {doc.page_count}"
-        text_width = canvas.stringWidth(page_text, "Helvetica", 8)
+        text_width = canvas.stringWidth(page_text, "Helvetica", 12)
         canvas.drawString(doc.leftMargin + doc.width - text_width, footer_y - 15, page_text)
         
         canvas.restoreState()
