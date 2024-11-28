@@ -5027,13 +5027,18 @@ def generate_board_resolution_pdf(resolution_id):
     
     # Prepared by
     story.append(Paragraph("Prepared by:", signature_style))
-    story.append(Paragraph(f"{prepared_by.users_first_name} {prepared_by.users_last_name}", signature_style))
+    prepared_by_text = f"<b>{prepared_by.users_first_name} {prepared_by.users_last_name}</b>"
+    if prepared_by.users_student_organization_position:
+        org_acronym = org_acronyms.get('College of Computer Studies - Student Council', 'CCSC')
+        prepared_by_text += f"<br/><i>{org_acronym}, {prepared_by.users_student_organization_position}</i>"
+    story.append(Paragraph(prepared_by_text, signature_style))
     story.append(Spacer(1, 20))
-    
+
     # Approved by
     story.append(Paragraph("Approved by:", signature_style))
-    story.append(Paragraph(f"{approved_by.signatory_first_name} {approved_by.signatory_last_name}", signature_style))
-    story.append(Spacer(1, 20))
+    approved_by_text = f"<b>{approved_by.signatory_first_name} {approved_by.signatory_last_name}</b>"
+    approved_by_text += "<br/><i>Adviser, College of Computer Studies - Student Council</i>"
+    story.append(Paragraph(approved_by_text, signature_style))
 
     # Build the PDF
     doc.build(story, onFirstPage=header, onLaterPages=header)
