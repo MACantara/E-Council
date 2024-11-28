@@ -25,6 +25,8 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable, Flowable
 from reportlab.pdfgen import canvas
 from reportlab.lib.enums import TA_RIGHT
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 import cloudinary
 import cloudinary.uploader
@@ -4554,12 +4556,23 @@ def generate_financial_report_pdf(financial_report_id):
         alignment=TA_RIGHT
     )
 
+    # Register DejaVu Sans font with the correct path
+    font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'DejaVuSans.ttf')
+    pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
+
+    # Create a style that uses the Unicode-compatible font
+    amount_style = ParagraphStyle(
+        'Amount',
+        parent=styles['Normal'],
+        fontName='DejaVuSans'
+    )
+
     # Create combined data for a single table
     table_data = [
         # Source of Fund section
         [Paragraph("<b>Source of Fund:</b>", styles['Normal']), Paragraph("", styles['Normal'])],
-        [Paragraph("CCS Bankbook", styles['Normal']), Paragraph(f"₱{budget:,.2f}", styles['Normal'])],
-        [Paragraph("<b>Total Budget:</b>", right_aligned_style), Paragraph(f"<b>₱{budget:,.2f}</b>", styles['Normal'])],
+        [Paragraph("CCS Bankbook", styles['Normal']), Paragraph(f"₱{budget:,.2f}", amount_style)],
+        [Paragraph("<b>Total Budget:</b>", right_aligned_style), Paragraph(f"<b>₱{budget:,.2f}</b>", amount_style)],
         ["", [CustomUnderline(180, 0.5, y_offset=8),  # Thin line slightly above
             CustomUnderline(180, 0.5, y_offset=6)]],   # Thick line at base  # Right-aligned total
         
@@ -4572,7 +4585,7 @@ def generate_financial_report_pdf(financial_report_id):
         transaction_total = float(transaction.transaction_total)
         table_data.append([
             Paragraph(transaction.transaction_name, styles['Normal']),
-            Paragraph(f"₱{transaction_total:,.2f}", styles['Normal'])
+            Paragraph(f"₱{transaction_total:,.2f}", amount_style)
         ])
 
     # Add empty row before totals
@@ -4580,12 +4593,12 @@ def generate_financial_report_pdf(financial_report_id):
 
     table_data.extend([
         [Paragraph("<b>Total Expenses:</b>", right_aligned_style), 
-            Paragraph(f"<b>₱{total_expenses:,.2f}</b>", styles['Normal'])],
+            Paragraph(f"<b>₱{total_expenses:,.2f}</b>", amount_style)],
         ["", [CustomUnderline(180, 0.5, y_offset=8),  # Thin line slightly above
             CustomUnderline(180, 0.5, y_offset=6)]],   # Thick line at base
         [Paragraph("", styles['Normal']), Paragraph("", styles['Normal'])],  # Empty row for spacing
         [Paragraph("<b>Total Remaining Money:</b>", styles['Normal']), 
-            Paragraph(f"<b>₱{remaining_money:,.2f}</b>", styles['Normal'])]
+            Paragraph(f"<b>₱{remaining_money:,.2f}</b>", amount_style)]
     ])
 
     # Create table style with selective borders
