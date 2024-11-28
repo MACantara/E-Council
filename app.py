@@ -4898,6 +4898,15 @@ def generate_board_resolution_pdf(resolution_id):
         line_end_x = line_start_x + line_length
         canvas.line(line_start_x - 5, line_y, line_end_x, line_y)
         
+        # Add "Continuation of the Board Resolution" text if not the first page
+        if doc.page > 1:  # Check if this is not the first page
+            canvas.setFont("Helvetica", 12)
+            continuation_text = "Continuation of the Board Resolution"
+            # Use doc.leftMargin for left alignment
+            text_x = doc.leftMargin
+            # Increase space after the text by adjusting the y-coordinate (from -30 to -40)
+            canvas.drawString(text_x, doc.height + doc.topMargin - 30, continuation_text)
+
         # Add footer
         canvas.setStrokeColorRGB(0, 0, 0)
         canvas.setLineWidth(1)
@@ -4921,7 +4930,7 @@ def generate_board_resolution_pdf(resolution_id):
         pagesize=letter,
         rightMargin=72,
         leftMargin=72,
-        topMargin=100,
+        topMargin=110,
         bottomMargin=72
     )
     
