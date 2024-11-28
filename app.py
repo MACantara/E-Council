@@ -4915,7 +4915,7 @@ def generate_board_resolution_pdf(resolution_id):
         pagesize=letter,
         rightMargin=72,
         leftMargin=72,
-        topMargin=72,
+        topMargin=100,
         bottomMargin=72
     )
     
@@ -4927,34 +4927,46 @@ def generate_board_resolution_pdf(resolution_id):
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
-        fontSize=16,
+        fontSize=12,
         alignment=1,
-        spaceAfter=30
+        spaceBefore=5,
+        spaceAfter=-15
     )
-    story.append(Paragraph("BOARD RESOLUTION", title_style))
+
+    # Add the academic year subtitle
+    academic_year_style = ParagraphStyle(
+        'AcademicYear',
+        parent=styles['Heading1'],
+        fontSize=11,
+        alignment=1,
+        spaceAfter=20
+    )
+
+    # Add resolution title style
+    resolution_style = ParagraphStyle(
+        'Resolution',
+        parent=styles['Heading1'],
+        fontSize=12,
+        alignment=1,
+        spaceAfter=20
+    )
+
+    story.append(Paragraph("College of Computer Studies Council", title_style))
+    story.append(Paragraph(f"A.Y. {resolution.board_resolutions_academic_year}", academic_year_style))
+    story.append(Paragraph("Resolution", resolution_style))
     
+    # Create a style for the main content
+    content_style = ParagraphStyle(
+        'Content',
+        parent=styles['Normal'],
+        fontSize=11,
+        leading=14,
+        alignment=4,  # Justified alignment
+        firstLineIndent=36  # Add indentation for paragraph
+    )
+
     # Add resolution details
-    story.append(Paragraph(f"<b>Title:</b> {resolution.board_resolutions_title}", styles['Normal']))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(f"<b>Description:</b> {resolution.board_resolutions_description}", styles['Normal']))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(f"<b>Total Amount:</b> ₱{resolution.board_resolutions_total_amount:,.2f}", styles['Normal']))
-    story.append(Spacer(1, 12))
-    
-    # Add event information if available
-    if resolution.board_resolutions_events_id:
-        event = Events.query.get(resolution.board_resolutions_events_id)
-        story.append(Paragraph(f"<b>Event:</b> {event.events_name}", styles['Normal']))
-        story.append(Spacer(1, 12))
-    
-    # Add academic details
-    story.append(Paragraph(f"<b>Academic Year:</b> {resolution.board_resolutions_academic_year}", styles['Normal']))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(f"<b>Semester:</b> {resolution.board_resolutions_semester}", styles['Normal']))
-    story.append(Spacer(1, 12))
-    
-    # Add date
-    story.append(Paragraph(f"<b>Date:</b> {resolution.board_resolutions_date.strftime('%B %d, %Y')}", styles['Normal']))
+    story.append(Paragraph(resolution.board_resolutions_description, content_style))
     story.append(Spacer(1, 30))
     
     # Add signatories section
@@ -4980,12 +4992,7 @@ def generate_board_resolution_pdf(resolution_id):
     story.append(Paragraph("Approved by:", signature_style))
     story.append(Paragraph(f"{approved_by.signatory_first_name} {approved_by.signatory_last_name}", signature_style))
     story.append(Spacer(1, 20))
-    
-    # Student signatories
-    story.append(Paragraph("Student Signatories:", signature_style))
-    for signatory in student_signatories:
-        story.append(Paragraph(f"{signatory[1].users_first_name} {signatory[1].users_last_name}", signature_style))
-    
+
     # Build the PDF
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
