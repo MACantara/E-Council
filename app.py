@@ -5136,24 +5136,6 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         
         canvas.restoreState()
     
-    # Create custom page template with extra space after header
-    header_space = 20  # Adjust this value to control space after header
-    page_template = PageTemplate(
-        'custom_template',
-        frames=[Frame(
-            doc.leftMargin,
-            doc.bottomMargin,
-            doc.width,
-            doc.height - header_space,  # Reduce frame height to create space after header
-            topPadding=header_space,  # Add explicit top padding
-            id='normal'
-        )],
-        onPage=header
-    )
-    
-    # Add template to document
-    doc.addPageTemplates([page_template])
-    
     # Container for the 'Flowable' objects
     elements = []
     
