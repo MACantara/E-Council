@@ -4849,9 +4849,15 @@ def generate_board_resolution_pdf(resolution_id):
     approved_by = Signatories.query.get(resolution.board_resolutions_approved_by)
     
     # Get student signatories
-    student_signatories = db.session.query(BoardResolutionsStudentSignatories, Users)\
+    student_signatories = db.session.query(
+        BoardResolutionsStudentSignatories, 
+        Users,
+        StudentOrganizations
+    )\
         .join(Users, BoardResolutionsStudentSignatories.board_resolutions_users_id == Users.users_id)\
+        .join(StudentOrganizations, Users.users_student_organization == StudentOrganizations.student_organizations_id)\
         .filter(BoardResolutionsStudentSignatories.board_resolutions_id == resolution_id)\
+        .order_by(StudentOrganizations.student_organizations_name)\
         .all()
     
     # Create BytesIO buffer for PDF
@@ -4967,7 +4973,7 @@ def generate_board_resolution_pdf(resolution_id):
 
     # Add resolution details
     story.append(Paragraph(resolution.board_resolutions_description, content_style))
-    story.append(Spacer(1, 30))
+    story.append(Spacer(1, 15))
     
     # Add signatories section
     signature_style = ParagraphStyle(
@@ -4979,9 +4985,45 @@ def generate_board_resolution_pdf(resolution_id):
     )
     
     # Student signatories
-    story.append(Paragraph("Student Signatories:", signature_style))
-    for signatory in student_signatories:
-        story.append(Paragraph(f"{signatory[1].users_first_name} {signatory[1].users_last_name}", signature_style))
+    # Group signatories by organization
+    org_signatories = {}
+    for signatory, user, org in student_signatories:
+        if org.student_organizations_name not in org_signatories:
+            org_signatories[org.student_organizations_name] = []
+        org_signatories[org.student_organizations_name].append((signatory, user))
+
+    # Create styles for organization headers and signatures
+    org_header_style = ParagraphStyle(
+        'OrgHeader',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=0,
+        fontName='Helvetica-Bold',
+        spaceAfter=10
+    )
+
+    # Organization acronyms mapping
+    org_acronyms = {
+        'College of Computer Studies - Student Council': 'CCSC',
+        'Junior Philippine Computer Society': 'JPCS'
+    }
+
+    # Add grouped signatories to the story
+    for org_name, signatories in org_signatories.items():
+        # Add organization header
+        story.append(Paragraph(org_name, org_header_style))
+        
+        # Add signatories for this organization
+        for signatory, user in signatories:
+            # Make name bold using <b> tag
+            signature_text = f"<b>{user.users_first_name} {user.users_last_name}</b>"
+            if user.users_student_organization_position:  # Add position if available
+                # Get organization acronym, default to org_name if not in mapping
+                org_acronym = org_acronyms.get(org_name, org_name)
+                signature_text += f"<br/><i>{org_acronym}, {user.users_student_organization_position}</i>"
+            
+            story.append(Paragraph(signature_text, signature_style))
+            story.append(Spacer(1, 5))
     
     # Prepared by
     story.append(Paragraph("Prepared by:", signature_style))
