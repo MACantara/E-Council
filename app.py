@@ -513,6 +513,7 @@ class ActivityReportForms(db.Model):
 
     activity_report_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     activity_report_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
+    activity_report_forms_nature_of_the_activity = db.Column(db.String(255), nullable=True)
     activity_report_forms_personnel_in_charge_forms_id = db.Column(db.Integer, db.ForeignKey('personnel_in_charge_forms.personnel_in_charge_forms_id'), nullable=True)
     activity_report_forms_contact_numbers = db.Column(db.String(255), nullable=True)
     activity_report_forms_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
@@ -4441,11 +4442,11 @@ def generate_financial_report_pdf(financial_report_id):
         'CustomTitle',
         parent=styles['Heading1'],
         fontSize=16,
-        alignment=1,
-        spaceAfter=30
+        alignment=1
     )
-    story.append(Paragraph("FINANCIAL REPORT", title_style))
-    story.append(Spacer(1, 20))
+
+    story.append(Paragraph("Financial Report Form (FPF)", title_style))
+    story.append(Spacer(1, 12))
     
     # Add report details
     story.append(Paragraph(f"<b>Title:</b> {report[0].financial_reports_title}", styles['Normal']))
