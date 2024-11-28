@@ -4560,8 +4560,8 @@ def generate_financial_report_pdf(financial_report_id):
         [Paragraph("<b>Source of Fund:</b>", styles['Normal']), Paragraph("", styles['Normal'])],
         [Paragraph("CCS Bankbook", styles['Normal']), Paragraph(f"₱{budget:,.2f}", styles['Normal'])],
         [Paragraph("<b>Total Budget:</b>", right_aligned_style), Paragraph(f"<b>₱{budget:,.2f}</b>", styles['Normal'])],
-        ["", [CustomUnderline(230, 0.5, y_offset=8),  # Thin line slightly above
-            CustomUnderline(230, 0.5, y_offset=6)]],   # Thick line at base  # Right-aligned total
+        ["", [CustomUnderline(180, 0.5, y_offset=8),  # Thin line slightly above
+            CustomUnderline(180, 0.5, y_offset=6)]],   # Thick line at base  # Right-aligned total
         
         # Less Expense section
         [Paragraph("<b>Less Expense:</b>", styles['Normal']), Paragraph("", styles['Normal'])],
@@ -4581,8 +4581,8 @@ def generate_financial_report_pdf(financial_report_id):
     table_data.extend([
         [Paragraph("<b>Total Expenses:</b>", right_aligned_style), 
             Paragraph(f"<b>₱{total_expenses:,.2f}</b>", styles['Normal'])],
-        ["", [CustomUnderline(230, 0.5, y_offset=8),  # Thin line slightly above
-            CustomUnderline(230, 0.5, y_offset=6)]],   # Thick line at base
+        ["", [CustomUnderline(180, 0.5, y_offset=8),  # Thin line slightly above
+            CustomUnderline(180, 0.5, y_offset=6)]],   # Thick line at base
         [Paragraph("", styles['Normal']), Paragraph("", styles['Normal'])],  # Empty row for spacing
         [Paragraph("<b>Total Remaining Money:</b>", styles['Normal']), 
             Paragraph(f"<b>₱{remaining_money:,.2f}</b>", styles['Normal'])]
