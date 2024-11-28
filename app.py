@@ -5072,7 +5072,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         pagesize=letter,
         rightMargin=72,
         leftMargin=72,
-        topMargin=72,
+        topMargin=100,
         bottomMargin=72
     )
     doc.page_count = 3  # Initialize page count
