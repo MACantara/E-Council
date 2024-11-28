@@ -4530,7 +4530,7 @@ def generate_financial_report_pdf(financial_report_id):
     ])
 
     # Create and add table with two equal columns
-    col_widths = [250, 250]  # Adjust these values to match your needs
+    col_widths = [230, 230]  # Adjust these values to match your needs
     table = Table(table_data, colWidths=col_widths)
     table.setStyle(table_style)
     story.append(table)
@@ -4618,7 +4618,7 @@ def generate_financial_report_pdf(financial_report_id):
     ])
 
     # Create and add table
-    financial_table = Table(table_data, colWidths=[350, 150])
+    financial_table = Table(table_data, colWidths=[340, 125])
     financial_table.setStyle(table_style)
     story.append(financial_table)
     
