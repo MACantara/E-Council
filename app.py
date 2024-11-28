@@ -22,8 +22,9 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable, Flowable
 from reportlab.pdfgen import canvas
+from reportlab.lib.enums import TA_RIGHT
 
 import cloudinary
 import cloudinary.uploader
@@ -98,6 +99,21 @@ def load_user(user_id):
 def unauthorized():
     flash("You need to be logged in to access this page.", "error")
     return redirect(url_for("login"))
+
+class CustomUnderline(Flowable):
+    def __init__(self, width, thickness, y_offset=0, gap=2):
+        Flowable.__init__(self)
+        self.width = width
+        self.thickness = thickness
+        self.y_offset = y_offset  # Add vertical offset parameter
+        self.gap = gap
+        
+    def draw(self):
+        # Draw a shorter line (30% of the cell width)
+        shortened_width = self.width * 0.3
+        start_x = (self.width - shortened_width) / 2  # Center the line
+        self.canv.setLineWidth(self.thickness)
+        self.canv.line(start_x, self.y_offset, start_x + shortened_width, self.y_offset)
 
 # Database models
 class Users(db.Model, UserMixin):
@@ -4519,6 +4535,92 @@ def generate_financial_report_pdf(financial_report_id):
     table.setStyle(table_style)
     story.append(table)
     story.append(Spacer(1, 20))
+
+    # Add Collection and Expenses header
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("II. Collection and Expenses", section_header_style))
+    story.append(Spacer(1, 10))
+
+    # Get transactions for this event
+    transactions = TransactionHistory.query.filter_by(transaction_events_id=event.events_id).all()
+    total_expenses = sum(float(t.transaction_total) for t in transactions)
+    budget = float(event.events_budget)  # Convert to float first
+    remaining_money = budget - total_expenses
+
+    # Create a right-aligned style for totals
+    right_aligned_style = ParagraphStyle(
+        'RightAligned',
+        parent=styles['Normal'],
+        alignment=TA_RIGHT
+    )
+
+    # Create combined data for a single table
+    table_data = [
+        # Source of Fund section
+        [Paragraph("<b>Source of Fund:</b>", styles['Normal']), Paragraph("", styles['Normal'])],
+        [Paragraph("CCS Bankbook", styles['Normal']), Paragraph(f"₱{budget:,.2f}", styles['Normal'])],
+        [Paragraph("<b>Total Budget:</b>", right_aligned_style), Paragraph(f"<b>₱{budget:,.2f}</b>", styles['Normal'])],
+        ["", [CustomUnderline(230, 0.5, y_offset=8),  # Thin line slightly above
+            CustomUnderline(230, 0.5, y_offset=6)]],   # Thick line at base  # Right-aligned total
+        
+        # Less Expense section
+        [Paragraph("<b>Less Expense:</b>", styles['Normal']), Paragraph("", styles['Normal'])],
+    ]
+
+    # Add expenses
+    for transaction in transactions:
+        transaction_total = float(transaction.transaction_total)
+        table_data.append([
+            Paragraph(transaction.transaction_name, styles['Normal']),
+            Paragraph(f"₱{transaction_total:,.2f}", styles['Normal'])
+        ])
+
+    # Add empty row before totals
+    table_data.append([Paragraph("", styles['Normal']), Paragraph("", styles['Normal'])])
+
+    table_data.extend([
+        [Paragraph("<b>Total Expenses:</b>", right_aligned_style), 
+            Paragraph(f"<b>₱{total_expenses:,.2f}</b>", styles['Normal'])],
+        ["", [CustomUnderline(230, 0.5, y_offset=8),  # Thin line slightly above
+            CustomUnderline(230, 0.5, y_offset=6)]],   # Thick line at base
+        [Paragraph("", styles['Normal']), Paragraph("", styles['Normal'])],  # Empty row for spacing
+        [Paragraph("<b>Total Remaining Money:</b>", styles['Normal']), 
+            Paragraph(f"<b>₱{remaining_money:,.2f}</b>", styles['Normal'])]
+    ])
+
+    # Create table style with selective borders
+    table_style = TableStyle([
+        # General alignment
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),  # Right align all amounts
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        
+        # Padding
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        
+        # Add line above total expenses (assuming last two rows are totals)
+        ('LINEABOVE', (0, -4), (-1, -4), 1, colors.black),
+        
+        # Add more space after headers
+        ('TOPPADDING', (0, 4), (-1, 4), 8),  # Adjusted for new row
+        
+        # Add outer border
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),  # Add outer border to entire table
+        
+        # Add line above Total Budget row (now row 2)
+        ('LINEABOVE', (0, 2), (-1, 2), 1, colors.black),
+        
+        # Add line above Total Remaining Money (last row)
+        ('LINEABOVE', (0, -1), (-1, -1), 1, colors.black),
+    ])
+
+    # Create and add table
+    financial_table = Table(table_data, colWidths=[350, 150])
+    financial_table.setStyle(table_style)
+    story.append(financial_table)
     
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
