@@ -4918,12 +4918,13 @@ def generate_documentation_pdf(documentation_id):
     tally_header = [
         ['EXTREMELY\nSATISFIED', 'SATISFIED', 'NEUTRAL', 'DISSATISFIED', 'EXTREMELY\nDISSATISFIED'],
     ]
-
+    
     # Create table data with criteria spanning rows
     tally_data = []
-    for item in tally_items:
+    for index, item in enumerate(tally_items):
+        tally_letter = chr(65 + index)  # 65 is ASCII for 'A'
         # Add the criteria row
-        tally_data.append([item.tally_items_name, '', '', '', ''])
+        tally_data.append([f"{tally_letter}. {item.tally_items_name}", '', '', '', ''])
         # Add the ratings row
         tally_data.append([
             str(item.tally_items_extremely_satisfied_rating_total or 0),
@@ -4932,16 +4933,16 @@ def generate_documentation_pdf(documentation_id):
             str(item.tally_items_dissatisfied_rating_total or 0),
             str(item.tally_items_extremely_dissatisfied_rating_total or 0)
         ])
-
+    
     # Combine header and data
     full_tally_data = tally_header + tally_data
-
+    
     # Create tally table with equal column widths
     available_width = 475  # Total available width
-    col_width = available_width // 5  # Equal width for all columns
+    col_width = available_width // 5  # Equal width for all 5 columns
     col_widths = [col_width] * 5  # Five columns of equal width
     tally_table = Table(full_tally_data, colWidths=col_widths)
-
+    
     # Style the tally table
     tally_style = TableStyle([
         # Header styling
@@ -4950,21 +4951,28 @@ def generate_documentation_pdf(documentation_id):
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         
         # Criteria rows (odd rows after header)
-        ('SPAN', (0, 1), (4, 1)),  # A. Sending of Invitation
-        ('SPAN', (0, 3), (4, 3)),  # B. Whole conduct of Examination
-        ('SPAN', (0, 5), (4, 5)),  # C. Achievement of Objective
-        ('SPAN', (0, 7), (4, 7)),  # D. Venue
-        ('SPAN', (0, 9), (4, 9)),  # E. Organization of the Examination
-        ('SPAN', (0, 11), (4, 11)),  # F. Materials Provided
+        ('SPAN', (0, 1), (-1, 1)),  # A. Sending of Invitation
+        ('SPAN', (0, 3), (-1, 3)),  # B. Whole conduct of Examination
+        ('SPAN', (0, 5), (-1, 5)),  # C. Achievement of Objective
+        ('SPAN', (0, 7), (-1, 7)),  # D. Venue
+        ('SPAN', (0, 9), (-1, 9)),  # E. Organization of the Examination
+        ('SPAN', (0, 11), (-1, 11)),  # F. Materials Provided
         
-        # Alignment for criteria and values
-        ('ALIGN', (0, 1), (0, -1), 'LEFT'),  # Left align criteria text
-        ('ALIGN', (0, 2), (-1, 2), 'CENTER'),  # Center align values
-        ('ALIGN', (0, 4), (-1, 4), 'CENTER'),
-        ('ALIGN', (0, 6), (-1, 6), 'CENTER'),
-        ('ALIGN', (0, 8), (-1, 8), 'CENTER'),
-        ('ALIGN', (0, 10), (-1, 10), 'CENTER'),
-        ('ALIGN', (0, 12), (-1, 12), 'CENTER'),
+        # Alignment for criteria rows (odd numbered rows)
+        ('ALIGN', (0, 1), (-1, 1), 'LEFT'),  # A. Sending of Invitation
+        ('ALIGN', (0, 3), (-1, 3), 'LEFT'),  # B. Whole conduct of Examination
+        ('ALIGN', (0, 5), (-1, 5), 'LEFT'),  # C. Achievement of Objective
+        ('ALIGN', (0, 7), (-1, 7), 'LEFT'),  # D. Venue
+        ('ALIGN', (0, 9), (-1, 9), 'LEFT'),  # E. Organization of the Examination
+        ('ALIGN', (0, 11), (-1, 11), 'LEFT'),  # F. Materials Provided
+        
+        # Alignment for value rows (even numbered rows)
+        ('ALIGN', (0, 2), (-1, 2), 'CENTER'),  # Values for A
+        ('ALIGN', (0, 4), (-1, 4), 'CENTER'),  # Values for B
+        ('ALIGN', (0, 6), (-1, 6), 'CENTER'),  # Values for C
+        ('ALIGN', (0, 8), (-1, 8), 'CENTER'),  # Values for D
+        ('ALIGN', (0, 10), (-1, 10), 'CENTER'),  # Values for E
+        ('ALIGN', (0, 12), (-1, 12), 'CENTER'),  # Values for F
         
         # Font settings
         ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
