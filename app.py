@@ -4207,10 +4207,10 @@ def generate_documentation_pdf(documentation_id):
         canvas.line(doc.leftMargin, footer_y, doc.leftMargin + doc.width, footer_y)
         
         # Add footer text
-        canvas.setFont("Helvetica", 8)
+        canvas.setFont("Helvetica", 12)
         canvas.drawString(doc.leftMargin, footer_y - 15, "UPHMO-CCS-GEN-912/rev0")
         right_text = "Activity Report"
-        right_text_width = canvas.stringWidth(right_text, "Helvetica", 8)
+        right_text_width = canvas.stringWidth(right_text, "Helvetica", 12)
         canvas.drawString(doc.leftMargin + doc.width - right_text_width, footer_y - 15, right_text)
         
         canvas.restoreState()
@@ -4297,7 +4297,7 @@ def generate_documentation_pdf(documentation_id):
 
     # Add title and section header to the story list
     story.append(Paragraph("ACTIVITY REPORT FORM", title_style))
-    story.append(Paragraph("I. Activity Details", section_header_style))
+    story.append(Paragraph("I. ACTIVITY DETAILS", section_header_style))
 
     # Create a custom style for the cells without padding
     cell_style = ParagraphStyle(
@@ -4357,6 +4357,88 @@ def generate_documentation_pdf(documentation_id):
     # Add some space before the table
     story.append(Spacer(1, 10))
     story.append(table)
+
+    # After the first table, add a section header for Objectives
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("II. OBJECTIVES", section_header_style))
+
+    # Fetch objectives and learning outcomes
+    objectives = []
+    learning_outcomes = []
+
+    # Get concept_paper_forms_id from the event
+    concept_paper_forms_id = event.events_concept_paper_forms_id if event else None
+
+    if concept_paper_forms_id:
+        # Get objectives
+        objectives_query = db.session.query(ObjectivesOfTheActivity).filter(
+            ObjectivesOfTheActivity.objectives_of_the_activity_concept_paper_forms_id == concept_paper_forms_id
+        ).all()
+        objectives = [obj.objectives_of_the_activity_content for obj in objectives_query if obj.objectives_of_the_activity_content]
+        objectives = [f"{i+1}. {obj}" for i, obj in enumerate(objectives)]
+
+        # Get learning outcomes
+        outcomes_query = db.session.query(LearningOutcomes).filter(
+            LearningOutcomes.learning_outcomes_concept_paper_forms_id == concept_paper_forms_id
+        ).all()
+        learning_outcomes = [outcome.learning_outcomes_content for outcome in outcomes_query if outcome.learning_outcomes_content]
+        learning_outcomes = [f"{i+1}. {outcome}" for i, outcome in enumerate(learning_outcomes)]
+    
+    # Create header style for the columns
+    header_style = ParagraphStyle(
+        'HeaderStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        spaceBefore=0,
+        spaceAfter=6,
+        leading=14,
+        alignment=1
+    )
+    
+    # Create the objectives table data
+    objectives_data = [
+        # Headers row
+        [
+            Paragraph("<b>Objective/s</b>", header_style),
+            Paragraph("<b>Outcomes (Benefits of Clients)</b>", header_style)
+        ]
+    ]
+    
+    # Calculate the maximum length of both lists to determine number of rows
+    max_length = max(len(objectives), len(learning_outcomes))
+    
+    # Add content rows, using 'N/A' for empty entries
+    for i in range(max_length):
+        objective = objectives[i] if i < len(objectives) else "N/A"
+        outcome = learning_outcomes[i] if i < len(learning_outcomes) else "N/A"
+        objectives_data.append([
+            Paragraph(objective, cell_style),
+            Paragraph(outcome, cell_style)
+        ])
+    
+    # Create the objectives table
+    objectives_table = Table(objectives_data, colWidths=[235, 235])
+    
+    # Style for the objectives table
+    objectives_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Center align the header row
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+    ])
+    
+    objectives_table.setStyle(objectives_table_style)
+    
+    # Add some space before the objectives table
+    story.append(Spacer(1, 10))
+    story.append(objectives_table)
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
