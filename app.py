@@ -4493,6 +4493,101 @@ def generate_documentation_pdf(documentation_id):
     story.append(Spacer(1, 10))
     story.append(evaluation_table)
 
+    # After the evaluation table, add the signature section
+    story.append(Spacer(1, 30))  # Add more space before signatures
+    
+    # After the evaluation table and before the signature section, add these queries
+    documentation_data = None
+    
+    if event:
+        # Get documentation information using events_id
+        documentation_data = db.session.query(Documentation).filter(
+            Documentation.documentation_events_id == event.events_id
+        ).first()
+    
+    # Create signatory style for names and positions
+    signatory_style = ParagraphStyle(
+        'SignatoryStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=12,
+        spaceBefore=20,  # Add space before the signatory section
+        alignment=0  # 0 for left alignment
+    )
+
+    # Create position style with less spacing
+    position_style = ParagraphStyle(
+        'PositionStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=12,
+        spaceBefore=0,  # No extra space before position
+        alignment=0  # 0 for left alignment
+    )
+
+    # Update the signature_data to use position_style for the position rows
+    signature_data = [
+        [
+            Paragraph("Prepared by:", signatory_style),
+            Paragraph("Noted by:", signatory_style)
+        ],
+        [
+            Paragraph(
+                "<b>" + 
+                (documentation_data.prepared_by_user.users_first_name + " " + 
+                (documentation_data.prepared_by_user.users_middle_name + " " if documentation_data.prepared_by_user.users_middle_name else "") +
+                documentation_data.prepared_by_user.users_last_name +
+                (", " + documentation_data.prepared_by_user.users_suffix if documentation_data.prepared_by_user.users_suffix else "")) +
+                "</b>"
+                if documentation_data and documentation_data.prepared_by_user 
+                else "<b>Name</b>", 
+                signatory_style
+            ),
+            Paragraph(
+                "<b>" + 
+                documentation_data.noted_by_signatory.signatory_first_name + " " + documentation_data.noted_by_signatory.signatory_last_name +
+                "</b>"
+                if documentation_data and documentation_data.noted_by_signatory 
+                else "<b>Name</b>", 
+                signatory_style
+            )
+        ],
+        [
+            Paragraph(
+                f"{documentation_data.prepared_by_user.users_student_organization_position if documentation_data and documentation_data.prepared_by_user else 'Position'}, "
+                f"{documentation_data.prepared_by_user.student_organization.student_organizations_name if documentation_data and documentation_data.prepared_by_user and documentation_data.prepared_by_user.student_organization else 'Student Council'}",
+                position_style
+            ),
+            Paragraph(
+                f"{documentation_data.noted_by_signatory.signatory_position if documentation_data and documentation_data.noted_by_signatory else 'Position'}, "
+                f"{documentation_data.noted_by_signatory.signatory_department if documentation_data and documentation_data.noted_by_signatory else 'Department'}", 
+                position_style
+            )
+        ]
+    ]
+
+    # Create signature table
+    signature_table = Table(signature_data, colWidths=[235, 235])
+
+    # Style for signature table
+    signature_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 1), (-1, -1), 20),  # Space after headers
+        ('TOPPADDING', (0, 2), (-1, 2), 0),    # No extra space before position row
+    ])
+    
+    signature_table.setStyle(signature_table_style)
+    
+    # Add signature table to story
+    story.append(signature_table)
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
