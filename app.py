@@ -4696,6 +4696,31 @@ def generate_documentation_pdf(documentation_id):
     else:
         date_str = ""
 
+    # Fetch observations and learnings from the database
+    observations = []
+    learnings = []
+    if learning_journal_form:
+        # Get observations
+        observations_query = db.session.query(Observations).filter(
+            Observations.observations_learning_journal_forms_id == learning_journal_form.learning_journal_forms_id
+        ).all()
+        observations = [obs.observations_content for obs in observations_query if obs.observations_content]
+
+        # Get learnings
+        learnings_query = db.session.query(Learnings).filter(
+            Learnings.learnings_learning_journal_forms_id == learning_journal_form.learning_journal_forms_id
+        ).all()
+        learnings = [learn.learnings_content for learn in learnings_query if learn.learnings_content]
+
+    # Format observations and learnings with numbers
+    observations_text = ""
+    for i, obs in enumerate(observations, 1):
+        observations_text += f"{i}. {obs}<br/><br/>"
+
+    learnings_text = ""
+    for i, learn in enumerate(learnings, 1):
+        learnings_text += f"{i}. {learn}<br/><br/>"
+
     progress_notes_data = [
         # Header row with three columns
         [
@@ -4708,19 +4733,9 @@ def generate_documentation_pdf(documentation_id):
             # Empty cell for date column
             Paragraph("", cell_style),
             # Observations column
-            Paragraph(
-                "1. Even though there were a few minor technical issues, the certification exam was successful.<br/><br/>" +
-                "2. The certification exam everything proceeded well<br/><br/>" +
-                "3. Students are dedicated to passing the certification exam.",
-                cell_style
-            ),
+            Paragraph(observations_text if observations else "", cell_style),
             # Learnings column
-            Paragraph(
-                "1. The certification exam helps students in expanding their technological knowledge.<br/><br/>" +
-                "2. It is imperative that you take the certification exam seriously.<br/><br/>" +
-                "3. Students are made aware that they should take greater responsibility for their education",
-                cell_style
-            ),
+            Paragraph(learnings_text if learnings else "", cell_style),
         ]
     ]
 
