@@ -4791,6 +4791,94 @@ def generate_documentation_pdf(documentation_id):
     reflection_table.setStyle(reflection_table_style)
     story.append(reflection_table)
 
+    # Add signature section
+    story.append(Spacer(1, 30))
+    
+    # Create styles for signature text
+    signature_style = ParagraphStyle(
+        'SignatureStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+    )
+    position_style = ParagraphStyle(
+        'PositionStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=12,
+    )
+    
+    # Get user objects for signatures
+    prepared_by_user = None
+    seen_and_read_by_user = None
+    checked_by_signatory = None
+    if learning_journal_form:
+        if learning_journal_form.learning_journal_forms_prepared_by:
+            prepared_by_user = db.session.query(Users).filter(
+                Users.users_id == learning_journal_form.learning_journal_forms_prepared_by
+            ).first()
+        if learning_journal_form.learning_journal_forms_seen_and_read_by:
+            seen_and_read_by_user = db.session.query(Users).filter(
+                Users.users_id == learning_journal_form.learning_journal_forms_seen_and_read_by
+            ).first()
+
+    # Get the checked by user from documentation
+    if documentation:
+        if documentation.documentation_checked_by:
+            checked_by_signatory = db.session.query(Signatories).filter(
+                Signatories.signatory_id == documentation.documentation_checked_by
+            ).first()
+
+    # Create signature table data
+    signature_data = [
+        # First row - Labels
+        [
+            Paragraph("Prepared by:", signature_style),
+            Paragraph("Seen and read by:", signature_style),
+        ],
+        # Second row - Signatures
+        [
+            Image(prepared_by_user.users_signature_cloudinary_url, width=100, height=40) if prepared_by_user and prepared_by_user.users_signature_cloudinary_url else Paragraph("___________________", signature_style),
+            Image(seen_and_read_by_user.users_signature_cloudinary_url, width=100, height=40) if seen_and_read_by_user and seen_and_read_by_user.users_signature_cloudinary_url else Paragraph("__________________________", signature_style),
+        ],
+        # Third row - Titles
+        [
+            Paragraph("Signature of Student", position_style),
+            Paragraph("Signature over Name of Parent/Guardian", position_style),
+        ],
+        # Fourth row - Empty space
+        ["", ""],
+        # Fifth row - Checked by label
+        [
+            Paragraph("Checked by:", signature_style),
+            "",
+        ],
+        # Sixth row - Dean's signature
+        [
+            Paragraph("_____________________________", signature_style),
+            "",
+        ],
+        # Seventh row - Dean's name and position
+        [
+            Paragraph("<b>" + (checked_by_signatory.signatory_first_name if checked_by_signatory else "") + " " + (checked_by_signatory.signatory_last_name if checked_by_signatory else "") + "</b><br/>" + (checked_by_signatory.signatory_position if checked_by_signatory else "") + ", " + (checked_by_signatory.signatory_department if checked_by_signatory else ""), position_style),
+            "",
+        ],
+    ]
+
+    # Create signature table with two columns
+    signature_table = Table(signature_data, colWidths=[237, 238])  # Adjusted widths to fill the page
+    signature_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ])
+    
+    signature_table.setStyle(signature_style)
+    story.append(signature_table)
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
