@@ -4685,6 +4685,62 @@ def generate_documentation_pdf(documentation_id):
     learning_journal_table.setStyle(learning_journal_style)
     story.append(learning_journal_table)
 
+    # Add Activity Progress Notes section
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("II. Activity Progress Notes:", section_header_style))
+    story.append(Spacer(1, 10))
+
+    # Format the date string
+    if learning_journal_form and learning_journal_form.learning_journal_forms_date:
+        date_str = learning_journal_form.learning_journal_forms_date.strftime("%A, %B %d, %Y")
+    else:
+        date_str = ""
+
+    progress_notes_data = [
+        # Header row with three columns
+        [
+            Paragraph("Date: <b>" + date_str + "</b>", cell_style),
+            Paragraph("<b>Observations</b><br/>(not less than 3)", header_style),
+            Paragraph("<b>Learnings</b><br/>(not less than 3)", header_style),
+        ],
+        # Content row
+        [
+            # Empty cell for date column
+            Paragraph("", cell_style),
+            # Observations column
+            Paragraph(
+                "1. Even though there were a few minor technical issues, the certification exam was successful.<br/><br/>" +
+                "2. The certification exam everything proceeded well<br/><br/>" +
+                "3. Students are dedicated to passing the certification exam.",
+                cell_style
+            ),
+            # Learnings column
+            Paragraph(
+                "1. The certification exam helps students in expanding their technological knowledge.<br/><br/>" +
+                "2. It is imperative that you take the certification exam seriously.<br/><br/>" +
+                "3. Students are made aware that they should take greater responsibility for their education",
+                cell_style
+            ),
+        ]
+    ]
+
+    # Create and style the progress notes table with three columns
+    progress_notes_table = Table(progress_notes_data, colWidths=[115, 180, 180])
+    progress_notes_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ])
+
+    progress_notes_table.setStyle(progress_notes_style)
+    story.append(progress_notes_table)
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
