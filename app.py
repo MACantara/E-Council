@@ -4903,46 +4903,76 @@ def generate_documentation_pdf(documentation_id):
 
     story.append(Paragraph(event_date_str, centered_cell_style))
 
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 20))
     story.append(Paragraph("<b>Please rate your level of satisfaction:</b>", cell_style))
     story.append(Spacer(1, 10))
     
     # Create table header data
     tally_header = [
-        ['', 'EXTREMELY SATISFIED', 'SATISFIED', 'NEUTRAL', 'DISSATISFIED', 'EXTREMELY\nDISSATISFIED'],
+        ['EXTREMELY\nSATISFIED', 'SATISFIED', 'NEUTRAL', 'DISSATISFIED', 'EXTREMELY\nDISSATISFIED'],
     ]
-    
-    # Create table data for satisfaction ratings
+
+    # Create table data with criteria spanning rows
     tally_data = [
-        ['A. Sending of Invitation', '24', '7', '1', '0', '0'],
-        ['B. Whole conduct of Examination', '26', '6', '0', '0', '0'],
-        ['C. Achievement of Objective', '29', '3', '0', '0', '0'],
-        ['D. Venue', '23', '7', '2', '0', '0'],
-        ['E. Organization of the Examination', '25', '7', '0', '0', '0'],
-        ['F. Materials Provided', '23', '8', '0', '1', '0'],
+        ['A. Sending of Invitation', '', '', '', ''],
+        ['24', '7', '1', '0', '0'],
+        ['B. Whole conduct of Examination', '', '', '', ''],
+        ['26', '6', '0', '0', '0'],
+        ['C. Achievement of Objective', '', '', '', ''],
+        ['29', '3', '0', '0', '0'],
+        ['D. Venue', '', '', '', ''],
+        ['23', '7', '2', '0', '0'],
+        ['E. Organization of the Examination', '', '', '', ''],
+        ['25', '7', '0', '0', '0'],
+        ['F. Materials Provided', '', '', '', ''],
+        ['23', '8', '0', '1', '0'],
     ]
-    
+
     # Combine header and data
     full_tally_data = tally_header + tally_data
-    
-    # Create tally table
-    col_widths = [200, 55, 55, 55, 55, 55]  # Adjusted column widths
+
+    # Create tally table with equal column widths
+    available_width = 475  # Total available width
+    col_width = available_width // 5  # Equal width for all columns
+    col_widths = [col_width] * 5  # Five columns of equal width
     tally_table = Table(full_tally_data, colWidths=col_widths)
-    
+
     # Style the tally table
     tally_style = TableStyle([
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('ALIGN', (0, 1), (0, -1), 'LEFT'),  # Left align first column (criteria)
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        # Header styling
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        
+        # Criteria rows (odd rows after header)
+        ('SPAN', (0, 1), (4, 1)),  # A. Sending of Invitation
+        ('SPAN', (0, 3), (4, 3)),  # B. Whole conduct of Examination
+        ('SPAN', (0, 5), (4, 5)),  # C. Achievement of Objective
+        ('SPAN', (0, 7), (4, 7)),  # D. Venue
+        ('SPAN', (0, 9), (4, 9)),  # E. Organization of the Examination
+        ('SPAN', (0, 11), (4, 11)),  # F. Materials Provided
+        
+        # Alignment for criteria and values
+        ('ALIGN', (0, 1), (0, -1), 'LEFT'),  # Left align criteria text
+        ('ALIGN', (0, 2), (-1, 2), 'CENTER'),  # Center align values
+        ('ALIGN', (0, 4), (-1, 4), 'CENTER'),
+        ('ALIGN', (0, 6), (-1, 6), 'CENTER'),
+        ('ALIGN', (0, 8), (-1, 8), 'CENTER'),
+        ('ALIGN', (0, 10), (-1, 10), 'CENTER'),
+        ('ALIGN', (0, 12), (-1, 12), 'CENTER'),
+        
+        # Font settings
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
+        
+        # Padding and alignment
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
         ('LEFTPADDING', (0, 0), (-1, -1), 6),
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
     ])
-    
+
     tally_table.setStyle(tally_style)
     story.append(tally_table)
     story.append(Spacer(1, 10))
