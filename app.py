@@ -4996,14 +4996,25 @@ def generate_documentation_pdf(documentation_id):
         prepared_by_student = db.session.query(Users).filter(
             Users.users_id == documentation.documentation_prepared_by
         ).first()
-
+    
     # Get noted by signatory
     noted_by_signatory = None
     if documentation.documentation_noted_by:
         noted_by_signatory = db.session.query(Signatories).filter(
             Signatories.signatory_id == documentation.documentation_noted_by
         ).first()
-
+    
+    # Get student's organization details
+    student_org_position = ""
+    student_org_name = ""
+    if prepared_by_student:
+        student_org_position = prepared_by_student.users_student_organization_position
+        # Get organization name from StudentOrganizations table
+        student_org = db.session.query(StudentOrganizations).filter(
+            StudentOrganizations.student_organizations_id == prepared_by_student.users_student_organization
+        ).first()
+        student_org_name = student_org.student_organizations_name if student_org else "Student Organization"
+    
     # Create signature table data for tally with date of submission
     tally_signature_data = [
         # First row - Labels
@@ -5018,7 +5029,10 @@ def generate_documentation_pdf(documentation_id):
         ],
         # Third row - Names and Positions
         [
-            Paragraph("<b>" + (prepared_by_student.users_first_name.upper() if prepared_by_student else "") + " " + (prepared_by_student.users_last_name.upper() if prepared_by_student else "") + "</b><br/>Secretary, JPCS Council", position_style),
+            Paragraph("<b>" + (prepared_by_student.users_first_name.upper() if prepared_by_student else "") + " " + 
+                    (prepared_by_student.users_last_name.upper() if prepared_by_student else "") + "</b><br/>" +
+                    (student_org_position if student_org_position else "Member") + ", " +
+                    student_org_name, position_style),
             Paragraph("<b>" + (noted_by_signatory.signatory_first_name.upper() if noted_by_signatory else "") + " " + 
                     (noted_by_signatory.signatory_last_name.upper() if noted_by_signatory else "") + "</b><br/>" + 
                     (noted_by_signatory.signatory_position if noted_by_signatory else "") + ", " + 
