@@ -4445,6 +4445,39 @@ def generate_documentation_pdf(documentation_id):
     story.append(Spacer(1, 20))
     story.append(Paragraph("III. EVALUATION: (Make sure to have three answers for the strengths and weakness.) Weaknesses must have corresponding recommendations.", section_header_style))
     
+    # After getting the concept_paper_forms_id, add this:
+    documentation_data = None
+
+    if event:
+        # Get documentation information using events_id
+        documentation_data = db.session.query(Documentation).filter(
+            Documentation.documentation_events_id == event.events_id
+        ).first()
+
+    # Fetch evaluation data from database
+    strengths = []
+    weaknesses = []
+    recommendations = []
+    
+    if documentation_data:
+        # Get strengths
+        strengths_query = db.session.query(ActivityStrengths).filter(
+            ActivityStrengths.activity_strengths_documentation_id == documentation_data.documentation_id
+        ).all()
+        strengths = [strength.activity_strengths_content for strength in strengths_query if strength.activity_strengths_content]
+    
+        # Get weaknesses
+        weaknesses_query = db.session.query(ActivityWeaknesses).filter(
+            ActivityWeaknesses.activity_weaknesses_documentation_id == documentation_data.documentation_id
+        ).all()
+        weaknesses = [weakness.activity_weaknesses_content for weakness in weaknesses_query if weakness.activity_weaknesses_content]
+    
+        # Get recommendations
+        recommendations_query = db.session.query(ActivityRecommendations).filter(
+            ActivityRecommendations.activity_recommendations_documentation_id == documentation_data.documentation_id
+        ).all()
+        recommendations = [recommendation.activity_recommendations_content for recommendation in recommendations_query if recommendation.activity_recommendations_content]
+    
     # Create the evaluation table data
     evaluation_data = [
         # Headers row
@@ -4452,24 +4485,23 @@ def generate_documentation_pdf(documentation_id):
             Paragraph("<b>Strengths</b>", header_style),
             Paragraph("<b>Weaknesses</b>", header_style),
             Paragraph("<b>Recommendation</b>", header_style)
-        ],
-        # Content rows
-        [
-            Paragraph("1. The activity is well organized.", cell_style),
-            Paragraph("1. There are certain problems with certain computers.", cell_style),
-            Paragraph("1. Maintenance check of the computers.", cell_style)
-        ],
-        [
-            Paragraph("2. The things that are needed were provided well.", cell_style),
-            Paragraph("2. The internet is little bit slow.", cell_style),
-            Paragraph("2. Provide a faster internet connection", cell_style)
-        ],
-        [
-            Paragraph("3. The objectives are completed.", cell_style),
-            Paragraph("3. The students are being distracted by technical difficulties.", cell_style),
-            Paragraph("3. The arrangement of the seats needs to be farther apart.", cell_style)
         ]
     ]
+    
+    # Calculate maximum length of the lists
+    max_length = max(len(strengths), len(weaknesses), len(recommendations))
+    
+    # Add content rows with numbering
+    for i in range(max_length):
+        strength = f"{i+1}. {strengths[i]}" if i < len(strengths) else f"{i+1}. N/A"
+        weakness = f"{i+1}. {weaknesses[i]}" if i < len(weaknesses) else f"{i+1}. N/A"
+        recommendation = f"{i+1}. {recommendations[i]}" if i < len(recommendations) else f"{i+1}. N/A"
+        
+        evaluation_data.append([
+            Paragraph(strength, cell_style),
+            Paragraph(weakness, cell_style),
+            Paragraph(recommendation, cell_style)
+        ])
     
     # Create the evaluation table
     evaluation_table = Table(evaluation_data, colWidths=[157, 157, 157])  # Adjusted widths to fit the page
