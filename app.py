@@ -4976,7 +4976,7 @@ def generate_documentation_pdf(documentation_id):
         
         # Font settings
         ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
         
         # Padding and alignment
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
