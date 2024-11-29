@@ -4209,7 +4209,7 @@ def generate_documentation_pdf(documentation_id):
         # Add footer text
         canvas.setFont("Helvetica", 8)
         canvas.drawString(doc.leftMargin, footer_y - 15, "UPHMO-CCS-GEN-912/rev0")
-        right_text = "Documentation"
+        right_text = "Activity Report"
         right_text_width = canvas.stringWidth(right_text, "Helvetica", 8)
         canvas.drawString(doc.leftMargin + doc.width - right_text_width, footer_y - 15, right_text)
         
@@ -4220,11 +4220,117 @@ def generate_documentation_pdf(documentation_id):
         pagesize=letter,
         rightMargin=72,
         leftMargin=72,
-        topMargin=72,
+        topMargin=100,
         bottomMargin=72
     )
     
     story = []
+
+    documentation = Documentation.query.get_or_404(documentation_id)
+    event = documentation.events
+
+    # Get activity report form if it exists
+    activity_report = ActivityReportForms.query.get(documentation.documentation_activity_report_forms_id)
+
+    # Get personnel in charge through concept paper
+    personnel_in_charge = None
+    if event.events_concept_paper_forms_id:
+        personnel_form = PersonnelInChargeForms.query.filter_by(
+            personnel_in_charge_forms_concept_paper_forms_id=event.events_concept_paper_forms_id
+        ).first()
+        if personnel_form and personnel_form.personnel_in_charge_signatory:
+            signatory = personnel_form.personnel_in_charge_signatory
+            # Format full name with title and position
+            personnel_in_charge = f"{signatory.signatory_title} {signatory.signatory_first_name} "
+            if signatory.signatory_middle_name:
+                personnel_in_charge += f"{signatory.signatory_middle_name} "
+            personnel_in_charge += f"{signatory.signatory_last_name}"
+            if signatory.signatory_suffix:
+                personnel_in_charge += f" {signatory.signatory_suffix}"
+            personnel_in_charge += f", {signatory.signatory_position}"
+
+    # Format date and time from the combined fields
+    events_date = event.events_start_date_and_time.strftime("%A, %B %d, %Y") if event.events_start_date_and_time else "N/A"
+    events_time = (
+        f"{event.events_start_date_and_time.strftime('%I:%M %p')} - {event.events_end_date_and_time.strftime('%I:%M %p')}"
+        if event.events_start_date_and_time and event.events_end_date_and_time
+        else "N/A"
+    )
+
+    # Get department name through departments_events table
+    department_name = "N/A"
+    department_event = DepartmentsEvents.query.filter_by(events_id=event.events_id).first()
+    if department_event and department_event.department:
+        department_name = department_event.department.departments_name
+
+    # Get nature of activity from activity report form
+    nature_of_activity = activity_report.activity_report_forms_nature_of_the_activity if activity_report else "N/A"
+
+    # Get contact number from activity report form
+    contact_number = activity_report.activity_report_forms_contact_numbers if activity_report else "N/A"
+
+    # Get total participants from concept paper form
+    total_participants = "N/A"
+    if event.events_concept_paper_forms_id:
+        concept_paper = ConceptPaperForms.query.get(event.events_concept_paper_forms_id)
+        if concept_paper and concept_paper.concept_paper_forms_expected_number_of_participants:
+            total_participants = concept_paper.concept_paper_forms_expected_number_of_participants
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=14,
+        alignment=1,  # Center alignment
+        spaceAfter=20,
+        spaceBefore=20,
+        fontName='Helvetica-Bold'
+    )
+
+    section_header_style = ParagraphStyle(
+        'SectionHeader',
+        parent=styles['Heading2'],
+        fontSize=12,
+        spaceBefore=15,
+        fontName='Helvetica-Bold'
+    )
+
+    # Add title and section header to the story list
+    story.append(Paragraph("ACTIVITY REPORT FORM", title_style))
+    story.append(Paragraph("I. Activity Details", section_header_style))
+
+    data = [
+        ['Title of the Activity:', event.events_name],
+        ['Date:', events_date],
+        ['Nature of Activity:', nature_of_activity],
+        ['Time:', events_time],
+        ['College/Department:', department_name],
+        ['Venue:', event.events_venue],
+        ['Dean/Faculty in-charge/Officer in- charge:', personnel_in_charge or "N/A"],
+        ['Contact Numbers:', contact_number],
+        ['Total number of participants:', total_participants]
+    ]
+
+    # Create table
+    table = Table(data, colWidths=[doc.width/2.5, doc.width/2])
+
+    # Add style to table
+    table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ('TOPPADDING', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+    ])
+
+    table.setStyle(table_style)
+
+    # Add some space before the table
+    story.append(Spacer(1, 30))
+    story.append(table)
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
