@@ -4292,7 +4292,7 @@ def generate_documentation_pdf(documentation_id):
         parent=styles['Heading2'],
         fontSize=12,
         spaceBefore=15,
-        fontName='Helvetica-Bold'
+        fontName='Helvetica'
     )
 
     # Add title and section header to the story list
