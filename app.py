@@ -4860,7 +4860,7 @@ def generate_documentation_pdf(documentation_id):
         ],
         # Seventh row - Dean's name and position
         [
-            Paragraph("<b>" + (checked_by_signatory.signatory_first_name if checked_by_signatory else "") + " " + (checked_by_signatory.signatory_last_name if checked_by_signatory else "") + "</b><br/>" + (checked_by_signatory.signatory_position if checked_by_signatory else "") + ", " + (checked_by_signatory.signatory_department if checked_by_signatory else ""), position_style),
+            Paragraph("<b>" + (checked_by_signatory.signatory_first_name.upper() if checked_by_signatory else "") + " " + (checked_by_signatory.signatory_last_name.upper() if checked_by_signatory else "") + "</b><br/>" + (checked_by_signatory.signatory_position if checked_by_signatory else "") + ", " + (checked_by_signatory.signatory_department if checked_by_signatory else ""), position_style),
             "",
         ],
     ]
@@ -4878,6 +4878,135 @@ def generate_documentation_pdf(documentation_id):
     
     signature_table.setStyle(signature_style)
     story.append(signature_table)
+
+    # Create centered style for title and date
+    centered_header_style = ParagraphStyle(
+        'CenteredHeader',
+        parent=section_header_style,
+        alignment=1,  # 1 is for center alignment
+    )
+
+    centered_cell_style = ParagraphStyle(
+        'CenteredCell',
+        parent=cell_style,
+        alignment=1,  # 1 is for center alignment
+    )
+
+    # Add Tally Section
+    story.append(PageBreak())
+    story.append(Paragraph("<b>TALLY – " + event.events_name.upper() + "</b>", centered_header_style))
+
+    # Combine start and end date/time
+    event_date_str = event.events_start_date_and_time.strftime("%B %d, %Y")
+    if event.events_end_date_and_time and event.events_end_date_and_time.date() != event.events_start_date_and_time.date():
+        event_date_str = f"<b>{event.events_start_date_and_time.strftime('%B %d')} - {event.events_end_date_and_time.strftime('%B %d, %Y')}</b>"
+
+    story.append(Paragraph(event_date_str, centered_cell_style))
+
+    story.append(Spacer(1, 10))
+    story.append(Paragraph("<b>Please rate your level of satisfaction:</b>", cell_style))
+    story.append(Spacer(1, 10))
+    
+    # Create table header data
+    tally_header = [
+        ['', 'EXTREMELY SATISFIED', 'SATISFIED', 'NEUTRAL', 'DISSATISFIED', 'EXTREMELY\nDISSATISFIED'],
+    ]
+    
+    # Create table data for satisfaction ratings
+    tally_data = [
+        ['A. Sending of Invitation', '24', '7', '1', '0', '0'],
+        ['B. Whole conduct of Examination', '26', '6', '0', '0', '0'],
+        ['C. Achievement of Objective', '29', '3', '0', '0', '0'],
+        ['D. Venue', '23', '7', '2', '0', '0'],
+        ['E. Organization of the Examination', '25', '7', '0', '0', '0'],
+        ['F. Materials Provided', '23', '8', '0', '1', '0'],
+    ]
+    
+    # Combine header and data
+    full_tally_data = tally_header + tally_data
+    
+    # Create tally table
+    col_widths = [200, 55, 55, 55, 55, 55]  # Adjusted column widths
+    tally_table = Table(full_tally_data, colWidths=col_widths)
+    
+    # Style the tally table
+    tally_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 1), (0, -1), 'LEFT'),  # Left align first column (criteria)
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ])
+    
+    tally_table.setStyle(tally_style)
+    story.append(tally_table)
+    story.append(Spacer(1, 10))
+    
+    # Get prepared by user (student)
+    prepared_by_student = None
+    if documentation.documentation_prepared_by:
+        prepared_by_student = db.session.query(Users).filter(
+            Users.users_id == documentation.documentation_prepared_by
+        ).first()
+
+    # Get noted by signatory
+    noted_by_signatory = None
+    if documentation.documentation_noted_by:
+        noted_by_signatory = db.session.query(Signatories).filter(
+            Signatories.signatory_id == documentation.documentation_noted_by
+        ).first()
+
+    # Create signature table data for tally with date of submission
+    tally_signature_data = [
+        # First row - Labels
+        [
+            "Prepared by:",
+            "Noted by:",
+        ],
+        # Second row - Signatures
+        [
+            "___________________",
+            "___________________",
+        ],
+        # Third row - Names and Positions
+        [
+            Paragraph("<b>" + (prepared_by_student.users_first_name.upper() if prepared_by_student else "") + " " + (prepared_by_student.users_last_name.upper() if prepared_by_student else "") + "</b><br/>Secretary, JPCS Council", position_style),
+            Paragraph("<b>" + (noted_by_signatory.signatory_first_name.upper() if noted_by_signatory else "") + " " + 
+                    (noted_by_signatory.signatory_last_name.upper() if noted_by_signatory else "") + "</b><br/>" + 
+                    (noted_by_signatory.signatory_position if noted_by_signatory else "") + ", " + 
+                    (noted_by_signatory.signatory_department if noted_by_signatory else ""), position_style),
+        ],
+        # Fourth row - Empty space
+        ["", ""],
+        # Fifth row - Date of submission
+        [
+            "Date of Submission: " + documentation.documentation_date_of_submission.strftime("%B %d, %Y"),
+            "",
+        ],
+    ]
+
+    # Create signature table for tally
+    tally_signature_table = Table(tally_signature_data, colWidths=[237, 238])
+    tally_signature_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+    ])
+
+    tally_signature_table.setStyle(tally_signature_style)
+    story.append(Spacer(1, 30))
+    story.append(tally_signature_table)
+    story.append(Spacer(1, 20))
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
