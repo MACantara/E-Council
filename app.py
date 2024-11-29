@@ -4346,11 +4346,11 @@ def generate_documentation_pdf(documentation_id):
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  # Reduced padding
-        ('TOPPADDING', (0, 0), (-1, -1), 6),     # Reduced padding
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),    # Reduced padding
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),   # Reduced padding
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),    
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),   
     ])
 
     table.setStyle(table_style)
@@ -4620,6 +4620,70 @@ def generate_documentation_pdf(documentation_id):
     
     # Add signature table to story
     story.append(signature_table)
+
+    # Add Learning Journal Form section
+    story.append(PageBreak())  # Start on a new page
+    story.append(Paragraph("LEARNING JOURNAL FORM", title_style))
+    
+    story.append(Paragraph("I. Activity Details:", section_header_style))
+    story.append(Spacer(1, 10))
+    
+    # After getting documentation_data, add this:
+    learning_journal_form = None
+    if documentation_data:
+        learning_journal_form = db.session.query(LearningJournalForms).filter(
+            LearningJournalForms.learning_journal_forms_id == documentation_data.documentation_learning_journal_forms_id
+        ).first()
+
+    # Format the period covered from event start and end times
+    period_covered = ""
+    if event and event.events_start_date_and_time and event.events_end_date_and_time:
+        start_time = event.events_start_date_and_time.strftime("%I:%M %p")
+        end_time = event.events_end_date_and_time.strftime("%I:%M %p")
+        period_covered = f"{start_time} – {end_time}"
+
+    learning_journal_data = [
+        # First row - 3 columns
+        [
+            Paragraph(f"<b>Name of Student:</b><br/>{learning_journal_form.learning_journal_forms_name_of_student if learning_journal_form else ''}", cell_style),
+            Paragraph(f"<b>Course/Year level:</b><br/>{learning_journal_form.learning_journal_forms_course_year_level if learning_journal_form else ''}", cell_style),
+            Paragraph(f"<b>ID Number:</b><br/>{learning_journal_form.learning_journal_forms_id_number if learning_journal_form else ''}", cell_style)
+        ],
+        # Second row - 2 columns (2nd and 3rd merged)
+        [
+            Paragraph(f"<b>College/Department:</b><br/>College of Computer Studies", cell_style),
+            Paragraph(f"<b>Faculty in-charge:</b><br/>{personnel_in_charge if learning_journal_form else ''}", cell_style),
+        ],
+        # Third row - 3 columns
+        [
+            Paragraph(f"<b>Period Covered:</b><br/>{period_covered}", cell_style),
+            Paragraph(f"<b>Day:</b><br/>{learning_journal_form.learning_journal_forms_date.strftime('%A, %B %d, %Y') if learning_journal_form and learning_journal_form.learning_journal_forms_date else ''}", cell_style),
+            Paragraph(f"<b>Venue:</b><br/>{event.events_venue if event else ''}", cell_style)
+        ],
+        # Fourth row - 3 columns merged
+        [Paragraph(f"<b>Title of the Activity:</b><br/>{event.events_name if event else ''}", cell_style)]
+    ]
+    
+    # Create table for learning journal details with 3 columns
+    learning_journal_table = Table(learning_journal_data, colWidths=[157, 157, 157])
+    
+    # Style for learning journal table with merged cells
+    learning_journal_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # Changed from 'MIDDLE' to 'TOP'
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('SPAN', (1, 1), (2, 1)),  # Merge 2nd and 3rd columns in row 2
+        ('SPAN', (0, 3), (2, 3)),  # Merge all columns in row 4
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+    ])
+    
+    learning_journal_table.setStyle(learning_journal_style)
+    story.append(learning_journal_table)
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
