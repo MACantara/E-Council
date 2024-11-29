@@ -4907,26 +4907,31 @@ def generate_documentation_pdf(documentation_id):
     story.append(Paragraph("<b>Please rate your level of satisfaction:</b>", cell_style))
     story.append(Spacer(1, 10))
     
+    # First, get the tally items data from the database
+    tally_items = db.session.query(
+        TallyItems
+    ).filter(
+        TallyItems.tally_items_documentation_id == documentation_id
+    ).all()
+
     # Create table header data
     tally_header = [
         ['EXTREMELY\nSATISFIED', 'SATISFIED', 'NEUTRAL', 'DISSATISFIED', 'EXTREMELY\nDISSATISFIED'],
     ]
 
     # Create table data with criteria spanning rows
-    tally_data = [
-        ['A. Sending of Invitation', '', '', '', ''],
-        ['24', '7', '1', '0', '0'],
-        ['B. Whole conduct of Examination', '', '', '', ''],
-        ['26', '6', '0', '0', '0'],
-        ['C. Achievement of Objective', '', '', '', ''],
-        ['29', '3', '0', '0', '0'],
-        ['D. Venue', '', '', '', ''],
-        ['23', '7', '2', '0', '0'],
-        ['E. Organization of the Examination', '', '', '', ''],
-        ['25', '7', '0', '0', '0'],
-        ['F. Materials Provided', '', '', '', ''],
-        ['23', '8', '0', '1', '0'],
-    ]
+    tally_data = []
+    for item in tally_items:
+        # Add the criteria row
+        tally_data.append([item.tally_items_name, '', '', '', ''])
+        # Add the ratings row
+        tally_data.append([
+            str(item.tally_items_extremely_satisfied_rating_total or 0),
+            str(item.tally_items_satisfied_rating_total or 0),
+            str(item.tally_items_neutral_rating_total or 0),
+            str(item.tally_items_dissatisfied_rating_total or 0),
+            str(item.tally_items_extremely_dissatisfied_rating_total or 0)
+        ])
 
     # Combine header and data
     full_tally_data = tally_header + tally_data
