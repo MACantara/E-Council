@@ -4440,6 +4440,59 @@ def generate_documentation_pdf(documentation_id):
     story.append(Spacer(1, 10))
     story.append(objectives_table)
 
+    # After the objectives table, add the Evaluation section
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("III. EVALUATION: (Make sure to have three answers for the strengths and weakness.) Weaknesses must have corresponding recommendations.", section_header_style))
+    
+    # Create the evaluation table data
+    evaluation_data = [
+        # Headers row
+        [
+            Paragraph("<b>Strengths</b>", header_style),
+            Paragraph("<b>Weaknesses</b>", header_style),
+            Paragraph("<b>Recommendation</b>", header_style)
+        ],
+        # Content rows
+        [
+            Paragraph("1. The activity is well organized.", cell_style),
+            Paragraph("1. There are certain problems with certain computers.", cell_style),
+            Paragraph("1. Maintenance check of the computers.", cell_style)
+        ],
+        [
+            Paragraph("2. The things that are needed were provided well.", cell_style),
+            Paragraph("2. The internet is little bit slow.", cell_style),
+            Paragraph("2. Provide a faster internet connection", cell_style)
+        ],
+        [
+            Paragraph("3. The objectives are completed.", cell_style),
+            Paragraph("3. The students are being distracted by technical difficulties.", cell_style),
+            Paragraph("3. The arrangement of the seats needs to be farther apart.", cell_style)
+        ]
+    ]
+    
+    # Create the evaluation table
+    evaluation_table = Table(evaluation_data, colWidths=[157, 157, 157])  # Adjusted widths to fit the page
+    
+    # Style for the evaluation table
+    evaluation_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Center align the header row
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+    ])
+    
+    evaluation_table.setStyle(evaluation_table_style)
+    
+    # Add some space before the evaluation table
+    story.append(Spacer(1, 10))
+    story.append(evaluation_table)
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
