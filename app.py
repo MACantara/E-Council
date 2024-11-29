@@ -4312,7 +4312,7 @@ def generate_documentation_pdf(documentation_id):
     ]
 
     # Create table
-    table = Table(data, colWidths=[doc.width/2.5, doc.width/2])
+    table = Table(data, colWidths=[170, 300])
 
     # Add style to table
     table_style = TableStyle([
