@@ -4299,36 +4299,63 @@ def generate_documentation_pdf(documentation_id):
     story.append(Paragraph("ACTIVITY REPORT FORM", title_style))
     story.append(Paragraph("I. Activity Details", section_header_style))
 
+    # Create a custom style for the cells without padding
+    cell_style = ParagraphStyle(
+        'CellStyle',
+        parent=styles['Normal'],
+        spaceBefore=0,
+        spaceAfter=0,
+        leading=14  # Keep this to maintain readability between lines
+    )
+
     data = [
-        ['Title of the Activity:', event.events_name],
-        ['Date:', events_date],
-        ['Nature of Activity:', nature_of_activity],
-        ['Time:', events_time],
-        ['College/Department:', department_name],
-        ['Venue:', event.events_venue],
-        ['Dean/Faculty in-charge/Officer in- charge:', personnel_in_charge or "N/A"],
-        ['Contact Numbers:', contact_number],
-        ['Total number of participants:', total_participants]
+        # First Column, First Row
+        [
+            Paragraph(f"<b>Title of the Activity:</b><br/>{event.events_name}", cell_style),
+            Paragraph(f"<b>Date:</b><br/>{events_date}", cell_style)
+        ],
+        # First Column, Second Row
+        [
+            Paragraph(f"<b>Nature of Activity:</b><br/>{nature_of_activity}", cell_style),
+            Paragraph(f"<b>Time:</b><br/>{events_time}", cell_style)
+        ],
+        # Second Column, First Row
+        [
+            Paragraph(f"<b>College/Department:</b><br/>{department_name}", cell_style),
+            Paragraph(f"<b>Venue:</b><br/>{event.events_venue}", cell_style)
+        ],
+        # Second Column, Second Row
+        [
+            Paragraph(f"<b>Dean/Faculty in-charge/Officer in- charge:</b><br/>{personnel_in_charge or 'N/A'}", cell_style),
+            Paragraph(f"<b>Contact Numbers:</b><br/>{contact_number}", cell_style)
+        ],
+        # Last Row, spans both columns
+        [
+            Paragraph(f"<b>Total number of participants:</b><br/>{total_participants}", cell_style),
+            ''  # Empty cell for alignment
+        ]
     ]
 
-    # Create table
-    table = Table(data, colWidths=[170, 300])
+    # Create table with adjusted column widths
+    table = Table(data, colWidths=[235, 235])
 
-    # Add style to table
+    # Update table style with minimal padding
     table_style = TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
-        ('TOPPADDING', (0, 0), (-1, -1), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  # Reduced padding
+        ('TOPPADDING', (0, 0), (-1, -1), 6),     # Reduced padding
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),    # Reduced padding
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),   # Reduced padding
     ])
 
     table.setStyle(table_style)
 
     # Add some space before the table
-    story.append(Spacer(1, 30))
+    story.append(Spacer(1, 10))
     story.append(table)
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
