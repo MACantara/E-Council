@@ -4756,6 +4756,41 @@ def generate_documentation_pdf(documentation_id):
     progress_notes_table.setStyle(progress_notes_style)
     story.append(progress_notes_table)
 
+    # Add Overall Reflection section
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("III. Over-all Reflection (The reflection must be written in a narrative form not less than 5 sentences.)", section_header_style))
+    story.append(Spacer(1, 10))
+
+    # Get the reflection content from the learning journal form
+    reflection_text = ""
+    if learning_journal_form and learning_journal_form.learning_journal_forms_overall_reflection:
+        reflection_text = learning_journal_form.learning_journal_forms_overall_reflection
+
+    # Create reflection paragraph with justified alignment
+    reflection_style = ParagraphStyle(
+        'ReflectionStyle',
+        parent=cell_style,
+        alignment=4,  # 4 is for justified alignment
+        spaceBefore=6,
+        spaceAfter=6,
+        leading=16  # Increase line spacing for better readability
+    )
+
+    # Add the reflection text in a bordered table for consistent formatting
+    reflection_table = Table([[Paragraph(reflection_text if reflection_text else "", reflection_style)]], 
+                            colWidths=[475])  # Full width for the reflection
+    reflection_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ])
+    reflection_table.setStyle(reflection_table_style)
+    story.append(reflection_table)
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
