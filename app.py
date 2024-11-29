@@ -4305,7 +4305,8 @@ def generate_documentation_pdf(documentation_id):
         parent=styles['Normal'],
         spaceBefore=0,
         spaceAfter=0,
-        leading=14  # Keep this to maintain readability between lines
+        leading=14,  # Keep this to maintain readability between lines
+        fontSize=12
     )
 
     data = [
@@ -4389,7 +4390,7 @@ def generate_documentation_pdf(documentation_id):
         'HeaderStyle',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=10,
+        fontSize=12,
         spaceBefore=0,
         spaceAfter=6,
         leading=14,
