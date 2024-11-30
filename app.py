@@ -5104,6 +5104,137 @@ def generate_documentation_pdf(documentation_id):
     
     story.append(Spacer(1, 20))
 
+    # Add Evaluation Form section
+    story.append(PageBreak())
+    story.append(Paragraph("<b>EVALUATION FORM</b>", centered_header_style))
+    
+    # Add event name
+    story.append(Paragraph(f"<b><u>{event.events_name.upper()}</u></b>", centered_header_style))
+    
+    # Add date
+    event_date = event.events_start_date_and_time.strftime("%A, %B %d %Y") if event.events_start_date_and_time else "N/A"
+    story.append(Paragraph(f"<b>Date</b>: {event_date}", centered_header_style))
+    story.append(Spacer(1, 20))
+    
+    # Create an invisible table for instructions and rating scale
+    instruction_text = Paragraph("Please indicate your rating of the program in the categories below by circling the appropriate number, using the following scale:", cell_style)
+    rating_scale = [
+        ["5 – Extremely Satisfied", "2 – Dissatisfied"],
+        ["4 – Satisfied", "1 – Extremely Dissatisfied"],
+        ["3 – Neutral", ""],
+    ]
+    rating_table = Table(rating_scale, colWidths=[250, 250])
+    rating_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+    ]))
+
+    # Combine instruction and rating scale in an invisible table
+    instruction_container = Table(
+        [[instruction_text], [rating_table]],
+        colWidths=[500],
+        style=TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+        ])
+    )
+    story.append(instruction_container)
+    story.append(Spacer(1, 20))
+    
+    # Create evaluation table data
+    evaluation_data = [
+        ['Criteria', '5', '4', '3', '2', '1'],
+    ]
+    
+    # Get tally items for evaluation criteria
+    tally_items = TallyItems.query.filter_by(
+        tally_items_documentation_id=documentation_id
+    ).all()
+    
+    # Add each tally item to the evaluation table
+    for item in tally_items:
+        row = [
+            item.tally_items_name,
+            'O' if item.tally_items_extremely_satisfied_rating_total else '',
+            'O' if item.tally_items_satisfied_rating_total else '',
+            'O' if item.tally_items_neutral_rating_total else '',
+            'O' if item.tally_items_dissatisfied_rating_total else '',
+            'O' if item.tally_items_extremely_dissatisfied_rating_total else ''
+        ]
+        evaluation_data.append(row)
+    
+    # Calculate overall rating
+    total_responses = sum(
+        (item.tally_items_extremely_satisfied_rating_total or 0) * 5 +
+        (item.tally_items_satisfied_rating_total or 0) * 4 +
+        (item.tally_items_neutral_rating_total or 0) * 3 +
+        (item.tally_items_dissatisfied_rating_total or 0) * 2 +
+        (item.tally_items_extremely_dissatisfied_rating_total or 0)
+        for item in tally_items
+    )
+    
+    total_participants = sum(
+        (item.tally_items_extremely_satisfied_rating_total or 0) +
+        (item.tally_items_satisfied_rating_total or 0) +
+        (item.tally_items_neutral_rating_total or 0) +
+        (item.tally_items_dissatisfied_rating_total or 0) +
+        (item.tally_items_extremely_dissatisfied_rating_total or 0)
+        for item in tally_items
+    )
+    
+    overall_rating = round(total_responses / total_participants, 2) if total_participants > 0 else 0
+    
+    # Create evaluation table
+    col_widths = [250] + [50] * 5  # First column wider for criteria text
+    evaluation_table = Table(evaluation_data, colWidths=col_widths)
+    evaluation_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),  # Left align first column
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),  # Center align other columns
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Bold header row
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    story.append(evaluation_table)
+    story.append(Spacer(1, 10))
+    
+    # Create result and comments section using invisible table
+    result_text = Paragraph(f"<b>Result: {overall_rating}</b>", cell_style)
+    comments_header = Paragraph("<b>Comments/Suggestions:</b>", cell_style)
+    comments_intro = Paragraph("Here are some personal comments and suggestion from the participants:", cell_style)
+    comments_text = Paragraph(documentation.documentation_comments_suggestions if documentation.documentation_comments_suggestions else "", cell_style)
+
+    footer_data = [
+        [result_text],
+        [comments_header],
+        [comments_intro],
+        [comments_text]
+    ]
+
+    footer_table = Table(
+        footer_data,
+        colWidths=[500],
+        style=TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ])
+    )
+
+    story.append(footer_table)
+    story.append(Spacer(1, 20))
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
