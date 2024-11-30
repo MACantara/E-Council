@@ -5065,6 +5065,45 @@ def generate_documentation_pdf(documentation_id):
     story.append(tally_signature_table)
     story.append(Spacer(1, 20))
 
+    # Add Results of the Evaluation Images section
+    story.append(PageBreak())
+    story.append(Paragraph("<b>RESULTS OF THE EVALUATION IMAGES</b>", centered_header_style))
+    story.append(Spacer(1, 20))
+    
+    # Get evaluation images from the database
+    evaluation_images = ResultsOfTheEvaluationImages.query.filter_by(
+        results_of_the_evaluation_images_documentation_id=documentation_id
+    ).all()
+    
+    # Create an array to store image elements
+    image_elements = []
+    max_width = 500  # Maximum width for images
+    max_height = 400  # Maximum height for images
+    
+    # Process each image
+    for img in evaluation_images:
+        if img.results_of_the_evaluation_images_cloudinary_url:
+            try:
+                # Create image element
+                img_elem = Image(
+                    img.results_of_the_evaluation_images_cloudinary_url,
+                    width=max_width,
+                    height=max_height,
+                    kind='proportional'
+                )
+                image_elements.append(img_elem)
+                # Add spacing after each image
+                image_elements.append(Spacer(1, 20))
+            except Exception as e:
+                # Log error if image cannot be loaded
+                print(f"Error loading image: {e}")
+    
+    # Add all images to the story
+    for element in image_elements:
+        story.append(element)
+    
+    story.append(Spacer(1, 20))
+
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
