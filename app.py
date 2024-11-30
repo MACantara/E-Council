@@ -4951,20 +4951,20 @@ def generate_documentation_pdf(documentation_id):
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         
         # Criteria rows (odd rows after header)
-        ('SPAN', (0, 1), (-1, 1)),  # A. Sending of Invitation
-        ('SPAN', (0, 3), (-1, 3)),  # B. Whole conduct of Examination
-        ('SPAN', (0, 5), (-1, 5)),  # C. Achievement of Objective
-        ('SPAN', (0, 7), (-1, 7)),  # D. Venue
-        ('SPAN', (0, 9), (-1, 9)),  # E. Organization of the Examination
-        ('SPAN', (0, 11), (-1, 11)),  # F. Materials Provided
+        ('SPAN', (0, 1), (-1, 1)),
+        ('SPAN', (0, 3), (-1, 3)),
+        ('SPAN', (0, 5), (-1, 5)),
+        ('SPAN', (0, 7), (-1, 7)),
+        ('SPAN', (0, 9), (-1, 9)),
+        ('SPAN', (0, 11), (-1, 11)),
         
         # Alignment for criteria rows (odd numbered rows)
-        ('ALIGN', (0, 1), (-1, 1), 'LEFT'),  # A. Sending of Invitation
-        ('ALIGN', (0, 3), (-1, 3), 'LEFT'),  # B. Whole conduct of Examination
-        ('ALIGN', (0, 5), (-1, 5), 'LEFT'),  # C. Achievement of Objective
-        ('ALIGN', (0, 7), (-1, 7), 'LEFT'),  # D. Venue
-        ('ALIGN', (0, 9), (-1, 9), 'LEFT'),  # E. Organization of the Examination
-        ('ALIGN', (0, 11), (-1, 11), 'LEFT'),  # F. Materials Provided
+        ('ALIGN', (0, 1), (-1, 1), 'LEFT'),
+        ('ALIGN', (0, 3), (-1, 3), 'LEFT'),
+        ('ALIGN', (0, 5), (-1, 5), 'LEFT'),
+        ('ALIGN', (0, 7), (-1, 7), 'LEFT'),
+        ('ALIGN', (0, 9), (-1, 9), 'LEFT'),
+        ('ALIGN', (0, 11), (-1, 11), 'LEFT'),
         
         # Alignment for value rows (even numbered rows)
         ('ALIGN', (0, 2), (-1, 2), 'CENTER'),  # Values for A
@@ -5211,7 +5211,7 @@ def generate_documentation_pdf(documentation_id):
     result_text = Paragraph(f"<b>Result: {overall_rating}</b>", cell_style)
     comments_header = Paragraph("<b>Comments/Suggestions:</b>", cell_style)
     comments_intro = Paragraph("Here are some personal comments and suggestion from the participants:", cell_style)
-    comments_text = Paragraph("	“The computers are sometimes slow”, “The internet are slow”, “It is Organized”, “Good job for the faculties for giving out certificate for those who passed.”, “It would be better if the reviewer was disseminated earlier but it’s understandable.” “They should prepare the learning materials for the examination a week before the exam day.” ", cell_style)
+    comments_text = Paragraph(documentation.documentation_comments_suggestions if documentation.documentation_comments_suggestions else "", cell_style)
 
     footer_data = [
         [result_text],
@@ -5238,17 +5238,33 @@ def generate_documentation_pdf(documentation_id):
     # Create signatory section using invisible table
     prepared_by_text = Paragraph("Prepared by:", cell_style)
     noted_by_text = Paragraph("Noted by:", cell_style)
-    
+
     # Add spacing for signature
     signature_space = Paragraph("<br/><br/>", cell_style)
-    
-    # Add names and positions
-    secretary_name = Paragraph("<b>JENNY GAIL I. FAUSTINO</b>", cell_style)
-    secretary_position = Paragraph("Secretary, JPCS Council", cell_style)
-    
-    dean_name = Paragraph("<b>DR. PASTOR R. ARGUELLES JR.</b>", cell_style)
-    dean_position = Paragraph("Dean, College of Computer Studies", cell_style)
-    
+
+    # Get the prepared by user's name and position from the relationship
+    if documentation.prepared_by_user:
+        preparer_name = f"{documentation.prepared_by_user.users_first_name} {documentation.prepared_by_user.users_last_name}".upper()
+        preparer_position = f"{documentation.prepared_by_user.users_student_organization_position if documentation.prepared_by_user.users_student_organization_position else ''}, {documentation.prepared_by_user.student_organization.student_organizations_name if documentation.prepared_by_user.student_organization else ''}"
+    else:
+        preparer_name = "N/A"
+        preparer_position = "N/A"
+
+    # Get the noted by signatory's name and position from the relationship
+    if documentation.noted_by_signatory:
+        noter_name = f"{documentation.noted_by_signatory.signatory_first_name} {documentation.noted_by_signatory.signatory_last_name}".upper()
+        noter_position = f"{documentation.noted_by_signatory.signatory_position}, {documentation.noted_by_signatory.signatory_department}" if documentation.noted_by_signatory.signatory_position else "N/A"
+    else:
+        noter_name = "N/A"
+        noter_position = "N/A"
+
+    # Add names and positions using data from the database
+    secretary_name = Paragraph(f"<b>{preparer_name}</b>", cell_style)
+    secretary_position = Paragraph(preparer_position, cell_style)
+
+    dean_name = Paragraph(f"<b>{noter_name}</b>", cell_style)
+    dean_position = Paragraph(noter_position, cell_style)
+
     # Create signatory table
     signatory_data = [
         [prepared_by_text, noted_by_text],
@@ -5256,7 +5272,7 @@ def generate_documentation_pdf(documentation_id):
         [secretary_name, dean_name],
         [secretary_position, dean_position]
     ]
-    
+
     signatory_table = Table(
         signatory_data,
         colWidths=[250, 250],
@@ -5264,7 +5280,7 @@ def generate_documentation_pdf(documentation_id):
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('LEFTPADDING', (0, 0), (-1, -1), 0),
             ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-            ('TOPPADDING', (0, 0), (-1, -1), 5),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ])
