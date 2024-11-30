@@ -5275,7 +5275,7 @@ def generate_documentation_pdf(documentation_id):
 
     signatory_table = Table(
         signatory_data,
-        colWidths=[250, 250],
+        colWidths=[237, 238],
         style=TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('LEFTPADDING', (0, 0), (-1, -1), 0),
