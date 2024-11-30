@@ -5211,7 +5211,7 @@ def generate_documentation_pdf(documentation_id):
     result_text = Paragraph(f"<b>Result: {overall_rating}</b>", cell_style)
     comments_header = Paragraph("<b>Comments/Suggestions:</b>", cell_style)
     comments_intro = Paragraph("Here are some personal comments and suggestion from the participants:", cell_style)
-    comments_text = Paragraph(documentation.documentation_comments_suggestions if documentation.documentation_comments_suggestions else "", cell_style)
+    comments_text = Paragraph("	“The computers are sometimes slow”, “The internet are slow”, “It is Organized”, “Good job for the faculties for giving out certificate for those who passed.”, “It would be better if the reviewer was disseminated earlier but it’s understandable.” “They should prepare the learning materials for the examination a week before the exam day.” ", cell_style)
 
     footer_data = [
         [result_text],
@@ -5234,6 +5234,44 @@ def generate_documentation_pdf(documentation_id):
 
     story.append(footer_table)
     story.append(Spacer(1, 20))
+
+    # Create signatory section using invisible table
+    prepared_by_text = Paragraph("Prepared by:", cell_style)
+    noted_by_text = Paragraph("Noted by:", cell_style)
+    
+    # Add spacing for signature
+    signature_space = Paragraph("<br/><br/>", cell_style)
+    
+    # Add names and positions
+    secretary_name = Paragraph("<b>JENNY GAIL I. FAUSTINO</b>", cell_style)
+    secretary_position = Paragraph("Secretary, JPCS Council", cell_style)
+    
+    dean_name = Paragraph("<b>DR. PASTOR R. ARGUELLES JR.</b>", cell_style)
+    dean_position = Paragraph("Dean, College of Computer Studies", cell_style)
+    
+    # Create signatory table
+    signatory_data = [
+        [prepared_by_text, noted_by_text],
+        [signature_space, signature_space],
+        [secretary_name, dean_name],
+        [secretary_position, dean_position]
+    ]
+    
+    signatory_table = Table(
+        signatory_data,
+        colWidths=[250, 250],
+        style=TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 5),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ])
+    )
+    
+    story.append(Spacer(1, 30))  # Add extra space before signatory section
+    story.append(signatory_table)
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
