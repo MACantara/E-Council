@@ -5147,62 +5147,81 @@ def generate_documentation_pdf(documentation_id):
     story.append(instruction_container)
     story.append(Spacer(1, 20))
     
-    # Create evaluation table data
-    evaluation_data = [
-        ['Criteria', '5', '4', '3', '2', '1'],
-    ]
-    
-    # Get tally items for evaluation criteria
-    tally_items = TallyItems.query.filter_by(
-        tally_items_documentation_id=documentation_id
+    # Get evaluation forms for this documentation
+    evaluation_forms = EvaluationForm.query.filter_by(
+        evaluation_form_documentation_id=documentation_id
     ).all()
-    
-    # Add each tally item to the evaluation table
-    for item in tally_items:
+
+    # Create evaluation table data
+    evaluation_data = []
+
+    # Add each evaluation form to the table
+    for item in evaluation_forms:
         row = [
-            item.tally_items_name,
-            'O' if item.tally_items_extremely_satisfied_rating_total else '',
-            'O' if item.tally_items_satisfied_rating_total else '',
-            'O' if item.tally_items_neutral_rating_total else '',
-            'O' if item.tally_items_dissatisfied_rating_total else '',
-            'O' if item.tally_items_extremely_dissatisfied_rating_total else ''
+            item.evaluation_form_name,  # Just the name in first column
+            # For each rating column, only show rating if it exists
+            str(item.evaluation_form_extremely_satisfied_rating or ''),
+            str(item.evaluation_form_satisfied_rating or ''),
+            str(item.evaluation_form_neutral_rating or ''),
+            str(item.evaluation_form_dissatisfied_rating or ''),
+            str(item.evaluation_form_extremely_dissatisfied_rating or '')
         ]
         evaluation_data.append(row)
+
+    # If no evaluation forms exist, add a placeholder row
+    if not evaluation_forms:
+        evaluation_data.append(['No evaluation data available', '', '', '', '', ''])
     
     # Calculate overall rating
     total_responses = sum(
-        (item.tally_items_extremely_satisfied_rating_total or 0) * 5 +
-        (item.tally_items_satisfied_rating_total or 0) * 4 +
-        (item.tally_items_neutral_rating_total or 0) * 3 +
-        (item.tally_items_dissatisfied_rating_total or 0) * 2 +
-        (item.tally_items_extremely_dissatisfied_rating_total or 0)
-        for item in tally_items
+        (item.evaluation_form_extremely_satisfied_rating or 0) * 5 +
+        (item.evaluation_form_satisfied_rating or 0) * 4 +
+        (item.evaluation_form_neutral_rating or 0) * 3 +
+        (item.evaluation_form_dissatisfied_rating or 0) * 2 +
+        (item.evaluation_form_extremely_dissatisfied_rating or 0)
+        for item in evaluation_forms
     )
-    
+
     total_participants = sum(
-        (item.tally_items_extremely_satisfied_rating_total or 0) +
-        (item.tally_items_satisfied_rating_total or 0) +
-        (item.tally_items_neutral_rating_total or 0) +
-        (item.tally_items_dissatisfied_rating_total or 0) +
-        (item.tally_items_extremely_dissatisfied_rating_total or 0)
-        for item in tally_items
+        (item.evaluation_form_extremely_satisfied_rating or 0) +
+        (item.evaluation_form_satisfied_rating or 0) +
+        (item.evaluation_form_neutral_rating or 0) +
+        (item.evaluation_form_dissatisfied_rating or 0) +
+        (item.evaluation_form_extremely_dissatisfied_rating or 0)
+        for item in evaluation_forms
     )
-    
+
     overall_rating = round(total_responses / total_participants, 2) if total_participants > 0 else 0
     
     # Create evaluation table
     col_widths = [250] + [50] * 5  # First column wider for criteria text
     evaluation_table = Table(evaluation_data, colWidths=col_widths)
-    evaluation_table.setStyle(TableStyle([
+
+    # Initialize table style with basic formatting
+    table_style = [
         ('ALIGN', (0, 0), (0, -1), 'LEFT'),  # Left align first column
-        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),  # Center align other columns
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Bold header row
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),  # Center align rating columns
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 12),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-    ]))
+    ]
+
+    # Add blue background only to cells with ratings
+    for row_idx, item in enumerate(evaluation_forms):
+        if item.evaluation_form_extremely_satisfied_rating:
+            table_style.append(('BACKGROUND', (1, row_idx), (1, row_idx), colors.lightblue))
+        if item.evaluation_form_satisfied_rating:
+            table_style.append(('BACKGROUND', (2, row_idx), (2, row_idx), colors.lightblue))
+        if item.evaluation_form_neutral_rating:
+            table_style.append(('BACKGROUND', (3, row_idx), (3, row_idx), colors.lightblue))
+        if item.evaluation_form_dissatisfied_rating:
+            table_style.append(('BACKGROUND', (4, row_idx), (4, row_idx), colors.lightblue))
+        if item.evaluation_form_extremely_dissatisfied_rating:
+            table_style.append(('BACKGROUND', (5, row_idx), (5, row_idx), colors.lightblue))
+
+    evaluation_table.setStyle(TableStyle(table_style))
     
     story.append(evaluation_table)
     story.append(Spacer(1, 10))
