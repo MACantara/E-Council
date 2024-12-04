@@ -5159,12 +5159,12 @@ def generate_documentation_pdf(documentation_id):
     for item in evaluation_forms:
         row = [
             item.evaluation_form_name,  # Just the name in first column
-            # For each rating column, only show rating if it exists
-            str(item.evaluation_form_extremely_satisfied_rating or ''),
-            str(item.evaluation_form_satisfied_rating or ''),
-            str(item.evaluation_form_neutral_rating or ''),
-            str(item.evaluation_form_dissatisfied_rating or ''),
-            str(item.evaluation_form_extremely_dissatisfied_rating or '')
+            # For each rating column, show the rating number (5,4,3,2,1)
+            "5",  # Extremely Satisfied
+            "4",  # Satisfied
+            "3",  # Neutral
+            "2",  # Dissatisfied
+            "1",  # Extremely Dissatisfied
         ]
         evaluation_data.append(row)
 
