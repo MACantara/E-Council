@@ -5947,6 +5947,11 @@ def delete_board_resolution(resolution_id):
     resolution = BoardResolutions.query.get_or_404(resolution_id)
 
     if request.method == "POST":
+        # Retrieve and delete related BoardResolutionsStudentSignatories entries
+        related_signatories = BoardResolutionsStudentSignatories.query.filter_by(board_resolutions_id=resolution_id).all()
+        for signatory in related_signatories:
+            db.session.delete(signatory)
+        
         # Delete related records in the departments_events table
         DepartmentsEvents.query.filter_by(events_id=resolution.board_resolutions_events_id).delete()
 
