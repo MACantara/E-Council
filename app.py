@@ -6826,7 +6826,7 @@ def add_minutes_of_the_meeting():
 
                 # Wait for file to be ready (add a small delay)
                 import time
-                time.sleep(2)  # Wait 2 seconds for file processing
+                time.sleep(10)  # Wait 10 seconds for file processing
 
                 # Create prompt for Gemini
                 prompt = f"""Please analyze this meeting transcript and provide a response with only:
