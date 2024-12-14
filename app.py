@@ -2931,10 +2931,10 @@ def delete_concept_paper(paper_id):
 
     if request.method == 'POST':
         # Delete associated learning outcomes
-        ConceptPaperFormLearningOutcomes.query.filter_by(concept_paper_forms_id=paper_id).delete()
+        LearningOutcomes.query.filter_by(learning_outcomes_concept_paper_forms_id=paper_id).delete()
         
         # Delete associated objectives of the activity
-        ConceptPaperFormObjectivesOfTheActivity.query.filter_by(concept_paper_forms_id=paper_id).delete()
+        ObjectivesOfTheActivity.query.filter_by(objectives_of_the_activity_concept_paper_forms_id=paper_id).delete()
         
         # Delete the concept paper
         db.session.delete(concept_paper)
