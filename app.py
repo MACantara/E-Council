@@ -5370,6 +5370,57 @@ def generate_documentation_pdf(documentation_id):
         story.append(element)
     
     story.append(Spacer(1, 20))
+    
+    # Define centered header style for Summary of Attendance section
+    bold_centered_header_style = ParagraphStyle(
+        'CenteredHeader',
+        parent=styles['Heading1'],
+        fontSize=12,
+        alignment=1,  # 1 = Center alignment 
+        fontName='Helvetica-Bold',
+    )
+    
+    # Add Evaluation Student List section 
+    story.append(PageBreak())
+    story.append(Paragraph("EVALUATION", bold_centered_header_style))
+    story.append(Paragraph(event_name, bold_centered_header_style))
+    story.append(Spacer(1, 20))
+    
+    # Get student names from database
+    evaluation_students = EvaluationListOfStudentNames.query.filter_by(
+        evaluation_list_of_student_names_documentation_id=documentation_id
+    ).all()
+    
+    # Find longest name to determine width
+    max_width = max(
+        len(student.evaluation_list_of_student_names_student) 
+        for student in evaluation_students
+    ) if evaluation_students else 0
+    
+    # Add padding for comfortable reading (12pt font * max chars + margins)
+    col_width = (max_width * 7) + 20  # Approximate width calculation
+    
+    # Format student names into single column with left alignment
+    student_data = []
+    for student in evaluation_students:
+        student_data.append([Paragraph(student.evaluation_list_of_student_names_student, cell_style)])
+    
+    # Create table with left alignment
+    student_table = Table(student_data, colWidths=[col_width], hAlign='LEFT')
+    student_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+    
+    story.append(student_table)
+    story.append(Spacer(1, 20))
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
