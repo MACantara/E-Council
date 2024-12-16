@@ -3226,7 +3226,7 @@ def generate_concept_paper_pdf(concept_paper_id):
         pagesize=FOLIO,  # Use custom FOLIO size
         rightMargin=72,
         leftMargin=72,
-        topMargin=72,
+        topMargin=100,
         bottomMargin=72
     )
     
