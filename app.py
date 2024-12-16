@@ -3218,9 +3218,12 @@ def generate_concept_paper_pdf(concept_paper_id):
         
         canvas.restoreState()
 
+    # Define Folio size (8.5 x 13 inches)
+    FOLIO = (8.5 * inch, 13 * inch)
+
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=letter,
+        pagesize=FOLIO,  # Use custom FOLIO size
         rightMargin=72,
         leftMargin=72,
         topMargin=72,
