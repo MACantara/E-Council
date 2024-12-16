@@ -2486,18 +2486,6 @@ def add_concept_paper():
         activity_report_prepared_by = request.form.get('activity-report-prepared-by')
         activity_report_noted_by = request.form.get('activity-report-noted-by')
 
-        # Add Activity Report Form
-        if activity_report_date_submission:
-            new_activity_report = ActivityReportForms(
-                activity_report_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                activity_report_forms_contact_numbers=activity_report_contact_numbers,
-                activity_report_forms_prepared_by=activity_report_prepared_by,
-                activity_report_forms_noted_by=activity_report_noted_by,
-                activity_report_date_submission=datetime.strptime(activity_report_date_submission, '%Y-%m-%d')
-            )
-            db.session.add(new_activity_report)
-            db.session.commit()
-
         # Personnel In Charge Form data
         personnel_in_charge = request.form.get('personnel-in-charge')
         personnel_in_charge_noted_by_college_dean = request.form.get('personnel-in-charge-noted-by-college-dean')
