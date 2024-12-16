@@ -3210,10 +3210,10 @@ def generate_concept_paper_pdf(concept_paper_id):
         canvas.line(doc.leftMargin, footer_y, doc.leftMargin + doc.width, footer_y)
         
         # Add footer text
-        canvas.setFont("Helvetica", 8)
+        canvas.setFont("Helvetica", 12)
         canvas.drawString(doc.leftMargin, footer_y - 15, "UPHMO-CCS-GEN-912/rev0")
         right_text = "Concept Paper"
-        right_text_width = canvas.stringWidth(right_text, "Helvetica", 8)
+        right_text_width = canvas.stringWidth(right_text, "Helvetica", 12)
         canvas.drawString(doc.leftMargin + doc.width - right_text_width, footer_y - 15, right_text)
         
         canvas.restoreState()
