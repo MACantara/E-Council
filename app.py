@@ -3234,6 +3234,227 @@ def generate_concept_paper_pdf(concept_paper_id):
     available_width = FOLIO[0] - (72 * 2)  # Folio width (8.5") minus left and right margins
     
     story = []
+    
+    # Define styles
+    styles = getSampleStyleSheet()
+    normal_style = ParagraphStyle(
+        'NormalStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+        spaceAfter=12
+    )
+    
+    header_style = ParagraphStyle(
+        'HeaderStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+        spaceAfter=6,
+        fontName='Helvetica-Bold'
+    )
+    
+    # Define wrapped text style
+    wrapped_style = ParagraphStyle(
+        'WrappedStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+        spaceBefore=0,
+        spaceAfter=0
+    )
+    
+    # Create table with wrapped text
+    routing_data = [
+        ["FOR:", Paragraph("RENO R. RAYEL, DBA", wrapped_style)],
+        ["", Paragraph("School Director", wrapped_style)],
+        ["", ""],
+        ["THRU:", Paragraph("MS. KRISTINA ROSE G. CARLOS, RGC, RPm", wrapped_style)],
+        ["", Paragraph("Head, Student Affairs & Services", wrapped_style)],
+        ["", ""],
+        ["FROM:", Paragraph("MS. MARIBEL SANDAGON", wrapped_style)],
+        ["", Paragraph("OIC, College of Computer Studies", wrapped_style)],
+        ["", ""],
+        ["SUBJECT:", Paragraph("College of Computer Studies 1st Semester General Assembly S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", wrapped_style)],
+        ["", ""],
+        ["DATE:", Paragraph("September 30, 2024", wrapped_style)]
+    ]
+    
+    # Create table with automatic wrapping
+    routing_table = Table(routing_data, colWidths=[80, available_width - 80])
+    routing_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+
+    story.append(routing_table)
+    story.append(Spacer(1, 20))
+    
+    story.append(Paragraph("Greetings!", normal_style))
+    story.append(Spacer(1, 12))
+    
+    # Update normal style with justified alignment
+    normal_style = ParagraphStyle(
+        'NormalStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+        spaceAfter=12,
+        alignment=4  # 4 = justify alignment
+    )
+    
+    # Add main content with justified text
+    main_text = """<para firstLineIndent="36">The College of Computer Studies will conduct a 2nd Semester Onsite Orientation for S.Y. 2024-2025. The purpose of this event is to address concerns and orient students/participants as well as to discuss upcoming events and activities.</para>"""
+    story.append(Paragraph(main_text, normal_style))
+    
+    second_para = """<para firstLineIndent="36">All students in the College of Computer Studies are required to attend the 1st Semester Onsite Orientation that will be held in the New Gymnasium of UPHSD-Molino. We invited Mr. Reymart Castillo to discuss the CompTIA Certification programs and CCS alumni speaker Mr. Keith Bugayong. Also, our Council President, Mhartin Derez will be discuss the calendar of activities and the benefits of being a leader.</para>"""
+    story.append(Paragraph(second_para, normal_style))
+    
+    # Create bullet style
+    bullet_style = ParagraphStyle(
+        'BulletStyle',
+        parent=normal_style,
+        leftIndent=30,
+        firstLineIndent=-12,
+        spaceAfter=6
+    )
+    
+    story.append(Paragraph("Significant details are as follows:", normal_style))
+    
+    # Create details table data with wrapped text
+    details_data = [
+        [Paragraph("<b>DURATION OF THE EVENT</b>", normal_style), 
+         ":", 
+         Paragraph("Monday, September 30, 2024 (Tentative), 1:00 PM - 4:00 PM", wrapped_style)],
+        [Paragraph("<b>LOCATION</b>", normal_style), 
+         ":", 
+         Paragraph("UPHSD-Molino Gym 2", wrapped_style)],
+        [Paragraph("<b>PARTICIPANTS</b>", normal_style), 
+         ":", 
+         Paragraph("College of Computer Studies Students", wrapped_style)],
+        [Paragraph("<b>BUDGET</b>", normal_style), 
+         ":", 
+         Paragraph("c/o School Canteen PM food snack – Guest & CCS personnel", wrapped_style)]
+    ]
+    
+    # Create table with aligned columns and text wrapping
+    details_table = Table(details_data, colWidths=[200, 20, available_width - 250])
+    details_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),  # Left align properties
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'), # Center align colons
+        ('ALIGN', (2, 0), (2, -1), 'LEFT'),  # Left align values
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # Changed to TOP for wrapped text
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6)
+    ]))
+    story.append(details_table)
+    story.append(Spacer(1, 12))
+    
+    story.append(Paragraph("Please see attached proposed concept paper for the complete details.", normal_style))
+    story.append(Paragraph("Thank you.", normal_style))
+    story.append(Spacer(1, 30))
+    
+    # Update signature block width
+    signature_style = ParagraphStyle(
+        'SignatureStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=1,
+        spaceAfter=0,
+        width=available_width
+    )
+    
+    story.append(Spacer(1, 20))
+    
+        # Create signature styling for left-aligned text
+    left_signature_style = ParagraphStyle(
+        'LeftSignatureStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=0,  # 0 = left alignment
+        spaceAfter=0
+    )
+    
+    # First row - two columns with left-aligned names
+    row1_table = Table([
+        [
+            # Column 1
+            [
+                Paragraph("Endorsed by:", normal_style),
+                Spacer(1, 30),
+                Paragraph("MS. MARIBEL SANDAGON", left_signature_style),
+                Paragraph("OIC, College of Computer Studies", left_signature_style)
+            ],
+            # Column 2
+            [
+                Paragraph("Recommending Approval by:", normal_style),
+                Spacer(1, 30),
+                Paragraph("MS. KRISTINA ROSE G. CARLOS, RGC, RPm", left_signature_style),
+                Paragraph("Head, Student Affairs & Services", left_signature_style)
+            ]
+        ]
+    ], colWidths=[available_width/2, available_width/1.8])
+    
+    row1_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    
+    story.append(row1_table)
+    story.append(Spacer(1, 30))
+    
+    # Create centered header style
+    centered_header_style = ParagraphStyle(
+        'CenteredHeader',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=1,  # Center alignment
+        spaceAfter=0
+    )
+    
+    # Create inner table width (about 30% of available width)
+    inner_width = available_width * 0.3
+    
+    # Second row - nested tables for centering with left-aligned text
+    approved_table = Table([
+        [Paragraph("Approved by:", centered_header_style)],
+        [Spacer(1, 30)],
+        [
+            Table(
+                [[Paragraph("RENO R. RAYEL, DBA", left_signature_style)]],
+                colWidths=[inner_width]
+            )
+        ],
+        [
+            Table(
+                [[Paragraph("School Director", centered_header_style)]],
+                colWidths=[inner_width]
+            )
+        ]
+    ], colWidths=[available_width])
+    
+    approved_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    
+    story.append(approved_table)
+    
+    
+    
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
