@@ -3230,6 +3230,9 @@ def generate_concept_paper_pdf(concept_paper_id):
         bottomMargin=72
     )
     
+    # Calculate available width for content
+    available_width = FOLIO[0] - (72 * 2)  # Folio width (8.5") minus left and right margins
+    
     story = []
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
