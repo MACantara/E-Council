@@ -3687,6 +3687,388 @@ def generate_concept_paper_pdf(concept_paper_id):
     
     story.append(signature_table)
     
+    concept_paper = ConceptPaperForms.query.get_or_404(concept_paper_id)
+    
+    # Get activity report form using concept paper id
+    activity_report = ActivityReportForms.query.filter_by(
+        activity_report_forms_concept_paper_forms_id=concept_paper.concept_paper_forms_id
+    ).first()
+    
+    # Get events data using concept paper id
+    event = Events.query.filter_by(
+        events_concept_paper_forms_id=concept_paper.concept_paper_forms_id
+    ).first()
+
+    # Get personnel in charge through concept paper
+    personnel_in_charge = None
+    if event.events_concept_paper_forms_id:
+        personnel_form = PersonnelInChargeForms.query.filter_by(
+            personnel_in_charge_forms_concept_paper_forms_id=event.events_concept_paper_forms_id
+        ).first()
+        if personnel_form and personnel_form.personnel_in_charge_signatory:
+            signatory = personnel_form.personnel_in_charge_signatory
+            # Format full name with title and position
+            personnel_in_charge = f"{signatory.signatory_title} {signatory.signatory_first_name} "
+            if signatory.signatory_middle_name:
+                personnel_in_charge += f"{signatory.signatory_middle_name} "
+            personnel_in_charge += f"{signatory.signatory_last_name}"
+            if signatory.signatory_suffix:
+                personnel_in_charge += f" {signatory.signatory_suffix}"
+            personnel_in_charge += f", {signatory.signatory_position}"
+
+    # Format date and time from the combined fields
+    events_date = event.events_start_date_and_time.strftime("%A, %B %d, %Y") if event.events_start_date_and_time else "N/A"
+    events_time = (
+        f"{event.events_start_date_and_time.strftime('%I:%M %p')} - {event.events_end_date_and_time.strftime('%I:%M %p')}"
+        if event.events_start_date_and_time and event.events_end_date_and_time
+        else "N/A"
+    )
+
+    # Get department name through departments_events table
+    department_name = "N/A"
+    department_event = DepartmentsEvents.query.filter_by(events_id=event.events_id).first()
+    if department_event and department_event.department:
+        department_name = department_event.department.departments_name
+
+    # Get nature of activity from activity report form
+    nature_of_activity = activity_report.activity_report_forms_nature_of_the_activity if activity_report else "N/A"
+
+    # Get contact number from activity report form
+    contact_number = activity_report.activity_report_forms_contact_numbers if activity_report else "N/A"
+
+    # Get total participants from concept paper form
+    total_participants = "N/A"
+    if event.events_concept_paper_forms_id:
+        concept_paper = ConceptPaperForms.query.get(event.events_concept_paper_forms_id)
+        if concept_paper and concept_paper.concept_paper_forms_expected_number_of_participants:
+            total_participants = concept_paper.concept_paper_forms_expected_number_of_participants
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=14,
+        alignment=1,  # Center alignment
+        spaceAfter=20,
+        spaceBefore=20,
+        fontName='Helvetica-Bold'
+    )
+
+    section_header_style = ParagraphStyle(
+        'SectionHeader',
+        parent=styles['Heading2'],
+        fontSize=12,
+        spaceBefore=15,
+        fontName='Helvetica'
+    )
+
+    # Add title and section header to the story list
+    story.append(Paragraph("ACTIVITY REPORT FORM", title_style))
+    story.append(Paragraph("I. ACTIVITY DETAILS", section_header_style))
+
+    # Create a custom style for the cells without padding
+    cell_style = ParagraphStyle(
+        'CellStyle',
+        parent=styles['Normal'],
+        spaceBefore=0,
+        spaceAfter=0,
+        leading=14,  # Keep this to maintain readability between lines
+        fontSize=12
+    )
+
+    data = [
+        # First Column, First Row
+        [
+            Paragraph(f"<b>Title of the Activity:</b><br/>{event.events_name}", cell_style),
+            Paragraph(f"<b>Date:</b><br/>{events_date}", cell_style)
+        ],
+        # First Column, Second Row
+        [
+            Paragraph(f"<b>Nature of Activity:</b><br/>{nature_of_activity}", cell_style),
+            Paragraph(f"<b>Time:</b><br/>{events_time}", cell_style)
+        ],
+        # Second Column, First Row
+        [
+            Paragraph(f"<b>College/Department:</b><br/>{department_name}", cell_style),
+            Paragraph(f"<b>Venue:</b><br/>{event.events_venue}", cell_style)
+        ],
+        # Second Column, Second Row
+        [
+            Paragraph(f"<b>Dean/Faculty in-charge/Officer in- charge:</b><br/>{personnel_in_charge or 'N/A'}", cell_style),
+            Paragraph(f"<b>Contact Numbers:</b><br/>{contact_number}", cell_style)
+        ],
+        # Last Row, spans both columns
+        [
+            Paragraph(f"<b>Total number of participants:</b><br/>{total_participants}", cell_style),
+            ''  # Empty cell for alignment
+        ]
+    ]
+
+    # Create table with adjusted column widths
+    table = Table(data, colWidths=[235, 235])
+
+    # Update table style with minimal padding
+    table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),    
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),   
+    ])
+
+    table.setStyle(table_style)
+
+    # Add some space before the table
+    story.append(Spacer(1, 10))
+    story.append(table)
+
+    # After the first table, add a section header for Objectives
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("II. OBJECTIVES", section_header_style))
+
+    # Fetch objectives and learning outcomes
+    objectives = []
+    learning_outcomes = []
+
+    # Get concept_paper_forms_id from the event
+    concept_paper_forms_id = event.events_concept_paper_forms_id if event else None
+
+    if concept_paper_forms_id:
+        # Get objectives
+        objectives_query = db.session.query(ObjectivesOfTheActivity).filter(
+            ObjectivesOfTheActivity.objectives_of_the_activity_concept_paper_forms_id == concept_paper_forms_id
+        ).all()
+        objectives = [obj.objectives_of_the_activity_content for obj in objectives_query if obj.objectives_of_the_activity_content]
+        objectives = [f"{i+1}. {obj}" for i, obj in enumerate(objectives)]
+
+        # Get learning outcomes
+        outcomes_query = db.session.query(LearningOutcomes).filter(
+            LearningOutcomes.learning_outcomes_concept_paper_forms_id == concept_paper_forms_id
+        ).all()
+        learning_outcomes = [outcome.learning_outcomes_content for outcome in outcomes_query if outcome.learning_outcomes_content]
+        learning_outcomes = [f"{i+1}. {outcome}" for i, outcome in enumerate(learning_outcomes)]
+    
+    # Create header style for the columns
+    header_style = ParagraphStyle(
+        'HeaderStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        spaceBefore=0,
+        spaceAfter=6,
+        leading=14,
+        alignment=1
+    )
+    
+    # Create the objectives table data
+    objectives_data = [
+        # Headers row
+        [
+            Paragraph("<b>Objective/s</b>", header_style),
+            Paragraph("<b>Outcomes (Benefits of Clients)</b>", header_style)
+        ]
+    ]
+    
+    # Calculate the maximum length of both lists to determine number of rows
+    max_length = max(len(objectives), len(learning_outcomes))
+    
+    # Add content rows, using 'N/A' for empty entries
+    for i in range(max_length):
+        objective = objectives[i] if i < len(objectives) else "N/A"
+        outcome = learning_outcomes[i] if i < len(learning_outcomes) else "N/A"
+        objectives_data.append([
+            Paragraph(objective, cell_style),
+            Paragraph(outcome, cell_style)
+        ])
+    
+    # Create the objectives table
+    objectives_table = Table(objectives_data, colWidths=[235, 235])
+    
+    # Style for the objectives table
+    objectives_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Center align the header row
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+    ])
+    
+    objectives_table.setStyle(objectives_table_style)
+    
+    # Add some space before the objectives table
+    story.append(Spacer(1, 10))
+    story.append(objectives_table)
+
+    # After the objectives table, add the Evaluation section
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("III. EVALUATION: (Make sure to have three answers for the strengths and weakness.) Weaknesses must have corresponding recommendations.", section_header_style))
+    
+    # After getting the concept_paper_forms_id, add this:
+    documentation_data = None
+
+    if event:
+        # Get documentation information using events_id
+        documentation_data = db.session.query(Documentation).filter(
+            Documentation.documentation_events_id == event.events_id
+        ).first()
+
+    # Fetch evaluation data from database
+    strengths = []
+    weaknesses = []
+    recommendations = []
+    
+    # Create the evaluation table data
+    evaluation_data = [
+        # Headers row
+        [
+            Paragraph("<b>Strengths</b>", header_style),
+            Paragraph("<b>Weaknesses</b>", header_style),
+            Paragraph("<b>Recommendation</b>", header_style)
+        ]
+    ]
+    
+    # Calculate maximum length of the lists
+    max_length = max(len(strengths), len(weaknesses), len(recommendations))
+    
+    # Add content rows with numbering
+    for i in range(max_length):
+        strength = f"{i+1}. {strengths[i]}" if i < len(strengths) else f"{i+1}. N/A"
+        weakness = f"{i+1}. {weaknesses[i]}" if i < len(weaknesses) else f"{i+1}. N/A"
+        recommendation = f"{i+1}. {recommendations[i]}" if i < len(recommendations) else f"{i+1}. N/A"
+        
+        evaluation_data.append([
+            Paragraph(strength, cell_style),
+            Paragraph(weakness, cell_style),
+            Paragraph(recommendation, cell_style)
+        ])
+    
+    # Create the evaluation table
+    evaluation_table = Table(evaluation_data, colWidths=[157, 157, 157])  # Adjusted widths to fit the page
+    
+    # Style for the evaluation table
+    evaluation_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Center align the header row
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+    ])
+    
+    evaluation_table.setStyle(evaluation_table_style)
+    
+    # Add some space before the evaluation table
+    story.append(Spacer(1, 10))
+    story.append(evaluation_table)
+
+    # After the evaluation table, add the signature section
+    story.append(Spacer(1, 30))  # Add more space before signatures
+    
+    # After the evaluation table and before the signature section, add these queries
+    documentation_data = None
+    
+    if event:
+        # Get documentation information using events_id
+        documentation_data = db.session.query(Documentation).filter(
+            Documentation.documentation_events_id == event.events_id
+        ).first()
+    
+    # Create signatory style for names and positions
+    signatory_style = ParagraphStyle(
+        'SignatoryStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=12,
+        spaceBefore=20,  # Add space before the signatory section
+        alignment=0  # 0 for left alignment
+    )
+
+    # Create position style with less spacing
+    position_style = ParagraphStyle(
+        'PositionStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=12,
+        spaceBefore=0,  # No extra space before position
+        alignment=0  # 0 for left alignment
+    )
+
+    # Update the signature_data to use position_style for the position rows
+    signature_data = [
+        [
+            Paragraph("Prepared by:", signatory_style),
+            Paragraph("Noted by:", signatory_style)
+        ],
+        [
+            Paragraph(
+                "<b>" + 
+                (documentation_data.prepared_by_user.users_first_name + " " + 
+                (documentation_data.prepared_by_user.users_middle_name + " " if documentation_data.prepared_by_user.users_middle_name else "") +
+                documentation_data.prepared_by_user.users_last_name +
+                (", " + documentation_data.prepared_by_user.users_suffix if documentation_data.prepared_by_user.users_suffix else "")) +
+                "</b>"
+                if documentation_data and documentation_data.prepared_by_user 
+                else "<b>Name</b>", 
+                signatory_style
+            ),
+            Paragraph(
+                "<b>" + 
+                documentation_data.noted_by_signatory.signatory_first_name + " " + documentation_data.noted_by_signatory.signatory_last_name +
+                "</b>"
+                if documentation_data and documentation_data.noted_by_signatory 
+                else "<b>Name</b>", 
+                signatory_style
+            )
+        ],
+        [
+            Paragraph(
+                f"{documentation_data.prepared_by_user.users_student_organization_position if documentation_data and documentation_data.prepared_by_user else 'Position'}, "
+                f"{documentation_data.prepared_by_user.student_organization.student_organizations_name if documentation_data and documentation_data.prepared_by_user and documentation_data.prepared_by_user.student_organization else 'Student Council'}",
+                position_style
+            ),
+            Paragraph(
+                f"{documentation_data.noted_by_signatory.signatory_position if documentation_data and documentation_data.noted_by_signatory else 'Position'}, "
+                f"{documentation_data.noted_by_signatory.signatory_department if documentation_data and documentation_data.noted_by_signatory else 'Department'}", 
+                position_style
+            )
+        ]
+    ]
+
+    # Create signature table
+    signature_table = Table(signature_data, colWidths=[235, 235])
+
+    # Style for signature table
+    signature_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 1), (-1, -1), 20),  # Space after headers
+        ('TOPPADDING', (0, 2), (-1, 2), 0),    # No extra space before position row
+    ])
+    
+    signature_table.setStyle(signature_table_style)
+    
+    # Add signature table to story
+    story.append(signature_table)
+    
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
