@@ -2382,7 +2382,7 @@ def concept_papers_overview():
 @login_required
 def add_concept_paper():
     if request.method == 'POST':
-        concept_paper_date = request.form.get('concept-paper-date')
+        concept_paper_date_of_submission = request.form.get('concept-paper-date-of-submission')
         concept_paper_subject = request.form.get('concept-paper-subject')
         concept_paper_academic_year = request.form.get('concept-paper-academic-year')
         other_academic_year = request.form.get('other-academic-year')
@@ -2409,7 +2409,7 @@ def add_concept_paper():
             concept_paper_academic_year = other_academic_year
 
         # Convert date and time fields to datetime objects
-        concept_paper_date = datetime.strptime(concept_paper_date, '%Y-%m-%dT%H:%M')
+        concept_paper_date_of_submission = datetime.strptime(concept_paper_date_of_submission, '%Y-%m-%dT%H:%M')
         concept_paper_event_start_date_and_time = datetime.strptime(concept_paper_event_start_date_and_time, '%Y-%m-%dT%H:%M')
         concept_paper_event_end_date_and_time = datetime.strptime(concept_paper_event_end_date_and_time, '%Y-%m-%dT%H:%M')
 
@@ -2421,7 +2421,7 @@ def add_concept_paper():
 
         # Create a new concept paper
         new_concept_paper = ConceptPaperForms(
-            concept_paper_forms_date=concept_paper_date,
+            concept_paper_forms_date=concept_paper_date_of_submission,
             concept_paper_forms_subject=concept_paper_subject,
             concept_paper_forms_academic_year=concept_paper_academic_year,
             concept_paper_forms_semester=concept_paper_semester,
