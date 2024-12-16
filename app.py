@@ -5077,8 +5077,8 @@ def generate_documentation_pdf(documentation_id):
                 # Create image element
                 img_elem = Image(
                     img.results_of_the_evaluation_images_cloudinary_url,
-                    width=max_width,
-                    height=max_height,
+                    width=image_max_width,
+                    height=image_max_height,
                     kind='proportional'
                 )
                 image_elements.append(img_elem)
@@ -5355,8 +5355,8 @@ def generate_documentation_pdf(documentation_id):
                 # Create image element with same dimensions as evaluation images
                 img_elem = Image(
                     img.summary_of_attendance_images_cloudinary_url,
-                    width=max_width,
-                    height=max_height,
+                    width=image_max_width,
+                    height=image_max_height,
                     kind='proportional'
                 )
                 attendance_image_elements.append(img_elem)
