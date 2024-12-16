@@ -3574,6 +3574,119 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(signatories_table)
     story.append(Spacer(1, 20))
     
+    # Add Excuse Letter Form Section
+    story.append(PageBreak())
+    story.append(Paragraph("<b>EXCUSE LETTER FORM</b>", centered_header_style))
+    story.append(Spacer(1, 20))
+    
+    # I. Activity Details Section
+    story.append(Paragraph("I. Activity Details:", header_style))
+    story.append(Spacer(1, 12))
+    
+    activity_details = [
+        [Paragraph("<b>Title of Activity:</b><br/>" + 
+                  "College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", normal_style),
+         "", ""],  # Empty cells for spanning
+        [Paragraph("<b>Day/Date:</b><br/>Monday, September 30, 2024 (Tentative)", normal_style),
+         Paragraph("<b>Time:</b><br/>1:00 PM to 4:00 PM", normal_style),
+         Paragraph("<b>Venue:</b><br/>UPHSD Molino – New Gymnasium", normal_style)]
+    ]
+    
+    activity_table = Table(activity_details, colWidths=[available_width * 0.4, available_width * 0.3, available_width * 0.3])
+    activity_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('SPAN', (0, 0), (2, 0)),  # Span title across all columns
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    story.append(activity_table)
+    story.append(Spacer(1, 20))
+    
+    # Department Info Table
+    story.append(Paragraph("RESPONSIBLE DEPARTMENT", header_style))
+    story.append(Spacer(1, 12))
+    
+    dept_info = [
+        [Paragraph("<b>Department/Office Unit:</b><br/>College of Computer Studies", normal_style),
+         Paragraph("<b>Landline:</b><br/>", normal_style)],
+        [Paragraph("<b>Faculty In-Charge:</b><br/>Dolores Montesines", normal_style),
+         ""],
+        [Paragraph("<b>Dean:</b><br/>Ms. Maribel Sandagon", normal_style),
+         ""]
+    ]
+    
+    dept_table = Table(dept_info, colWidths=[available_width * 0.7, available_width * 0.3])
+    dept_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('PADDING', (0, 0), (-1, -1), 6),
+        ('SPAN', (0, 1), (1, 1)),  # Span Faculty In-Charge
+        ('SPAN', (0, 2), (1, 2))   # Span Dean
+    ]))
+    
+    story.append(dept_table)
+    story.append(Spacer(1, 20))
+    
+    # Letter Body Section
+    letter_data = [
+        ["Dear: ____________________________________", "", "Subject: ____________________", ""],
+        ["", Paragraph("Name of Professor", normal_style), "", ""],
+        ["Day/Date/Time of Class Affected: ______________", "", "Room Number: ______________", ""]
+    ]
+    
+    letter_table = Table(letter_data, colWidths=[
+        available_width * 0.20,  # Dear
+        available_width * 0.40,  # Professor Name
+        available_width * 0.20,  # Subject
+        available_width * 0.20   # Room Number
+    ])
+    
+    letter_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    story.append(letter_table)
+    story.append(Spacer(1, 12))
+    
+    # Letter Content
+    letter_content = """<para>Please excuse the following students to your class for they will be attending an activity sponsored by our college. Rest assured that they will be responsible in studying the lesson they had missed during their absence. Kindly see the attached list of the students.<br/><br/>Thank you!</para>"""
+    story.append(Paragraph(letter_content, normal_style))
+    story.append(Spacer(1, 20))
+    
+    # Signature Section
+    signature_data = [
+        ["Truly yours,", ""],
+        [Spacer(1, 30), ""],
+        ["____________________________", ""],
+        ["Signature of Personnel In-Charge", ""],
+        [Spacer(1, 10), ""],
+        ["Noted by:", ""],
+        [Spacer(1, 30), ""],
+        ["____________________________", ""],
+        [Paragraph("<b>MS. MARIBEL SANDAGON</b>", normal_style), ""],
+        ["Dean, College of Computer Studies", ""]
+    ]
+    
+    signature_table = Table(signature_data, colWidths=[available_width * 0.5] * 2)
+    signature_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    story.append(signature_table)
+    
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
