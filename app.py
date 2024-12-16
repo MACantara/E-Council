@@ -3235,6 +3235,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     
     story = []
     
+    # Concept Paper Body Section
     # Define styles
     styles = getSampleStyleSheet()
     normal_style = ParagraphStyle(
@@ -3266,13 +3267,13 @@ def generate_concept_paper_pdf(concept_paper_id):
     
     # Create table with wrapped text
     routing_data = [
-        ["FOR:", Paragraph("RENO R. RAYEL, DBA", wrapped_style)],
+        ["FOR:", Paragraph("<b>RENO R. RAYEL, DBA</b>", wrapped_style)],
         ["", Paragraph("School Director", wrapped_style)],
         ["", ""],
-        ["THRU:", Paragraph("MS. KRISTINA ROSE G. CARLOS, RGC, RPm", wrapped_style)],
+        ["THRU:", Paragraph("<b>MS. KRISTINA ROSE G. CARLOS, RGC, RPm</b>", wrapped_style)],
         ["", Paragraph("Head, Student Affairs & Services", wrapped_style)],
         ["", ""],
-        ["FROM:", Paragraph("MS. MARIBEL SANDAGON", wrapped_style)],
+        ["FROM:", Paragraph("<b>MS. MARIBEL SANDAGON</b>", wrapped_style)],
         ["", Paragraph("OIC, College of Computer Studies", wrapped_style)],
         ["", ""],
         ["SUBJECT:", Paragraph("College of Computer Studies 1st Semester General Assembly S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", wrapped_style)],
@@ -3453,7 +3454,125 @@ def generate_concept_paper_pdf(concept_paper_id):
     
     story.append(approved_table)
     
+    # Concept Paper Form Section
+    story.append(PageBreak())
+    story.append(Paragraph("<b>CONCEPT PAPER FORM</b>", centered_header_style))
+    story.append(Paragraph("College of Computer Studies 2nd Semester General Assembly S.Y 2024-2025: \"Future-Proofing Your Career: Navigating the A.I. Revolution\"", centered_header_style))
+    story.append(Paragraph("Monday, September 30, 2024 (Tentative)| 1:00 PM – 4:00 PM | UPHSD Molino – Gym 2", centered_header_style))
+    story.append(Spacer(1, 20))
     
+    # Define description text with proper formatting
+    description_text = """<para>The College of Computer Studies Department regularly conduct orientation to discuss about events, different examination related in IT's career and some important college activities. This theme explores how AI technologies are encouraging creativity, and equipping people to take on leadership roles in a world that is changing quickly. It focuses on the relationship between artificial intelligence (AI) and leadership development, outlining tactics to employ AI for digital era organizational growth, adaptable leadership, and sustainable advancement.</para>"""
+    
+    bold_centered_header_style = ParagraphStyle(
+        'CenteredHeader',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=1,  # Center alignment
+        spaceAfter=0,
+        fontName='Helvetica-Bold'
+    )
+    
+    # Create main structure table
+    structure_data = [
+        # Row 1
+        [Paragraph("DESCRIPTIONS", bold_centered_header_style),
+         Paragraph(description_text, normal_style),
+         ""],  # Empty cell for spanning
+        
+        # Row 2 - Headers
+        [Paragraph("OBJECTIVES, LEARNING OUTCOMES AND EXPECTED DELIVERABLES OF THE ACTIVITY", bold_centered_header_style),
+         Paragraph("OBJECTIVES OF THE ACTIVITY", bold_centered_header_style),
+         Paragraph("LEARNING OUTCOMES", bold_centered_header_style)],
+         
+        # Objectives and Outcomes in single cells
+        ["",  # Empty cell for first column
+         Paragraph("""1. To introduce the CompTia examinations that help students to certification for their career.<br/>
+                      2. To discuss the advantages of being a leader and encourage students to be part of one organization.<br/>
+                      3. To discuss the Calendar Activities for this second semester.<br/>
+                      4. To address the participants' concerns and inquiries.""", normal_style),
+         Paragraph("""1. The student will Understand the significance of CompTIA examinations in obtaining career certifications and will gain awareness of the different CompTIA certifications available and their relevance to various career paths.<br/>
+                      2. The students will Understand the essential qualities and skills required to be an effective leader Explore various leadership opportunities available within our Department.<br/>
+                      3. The students will be more familiarize with the calendar activities scheduled for the second semester and will understand the purpose and objectives behind each activity or event.<br/>
+                      4. This will help the students to provide a platform for participants to voice their concerns, questions, and inquiries""", normal_style)],
+        
+        # Row 3
+        [Paragraph("EXPECTED NO. OF PARTICIPANTS", bold_centered_header_style),
+         Paragraph("Students: 180", normal_style),
+         Paragraph("Faculty: 5 & 1 Dean", normal_style)],
+        
+        # Row 4
+        [Paragraph("BUDGET", bold_centered_header_style),
+         Paragraph("c/o Canteen the Food PM snack<br/>Food – c/o CCS Department Bankbook", normal_style),
+         Paragraph("For the Guest and CCS Personnel Council", normal_style)]
+    ]
+    
+    # Create table with specific column widths
+    structure_table = Table(structure_data, colWidths=[available_width * 0.3, available_width * 0.35, available_width * 0.35])
+    
+    # Update table styles to include vertical span
+    structure_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'CENTER'),  # Horizontal center align first column
+        ('VALIGN', (0, 0), (0, -1), 'MIDDLE'),  # Vertical middle align first column
+        ('ALIGN', (1, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (1, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('SPAN', (1, 0), (2, 0)),
+        ('SPAN', (0, 1), (0, 2)),
+        ('PADDING', (0, 0), (-1, -1), 6)
+    ]))
+    
+    story.append(structure_table)
+    story.append(Spacer(1, 20))
+    
+    # Create centered signature style
+    centered_signature_style = ParagraphStyle(
+        'CenteredSignature',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=1,  # Center alignment
+        spaceAfter=0
+    )
+    
+    signatories_data = [
+        # First block
+        [Paragraph("PREPARED BY:", centered_signature_style), Paragraph("SIGNED AND REVIEWED BY:", centered_signature_style)],
+        [Spacer(1, 30), Spacer(1, 30)],
+        [Paragraph("<b>ALEXANDER JON S. SOLIS</b>", centered_signature_style), Paragraph("<b>MHARTIN JOSHUA B. DEREZ</b>", centered_signature_style)],
+        [Paragraph("Secretary, CCS Council", centered_signature_style), Paragraph("President, CCS Council", centered_signature_style)],
+        ["", ""],
+        
+        # Second block
+        [Paragraph("NOTED AND ENDORSED BY:", centered_signature_style), ""],
+        [Spacer(1, 30), ""],
+        [Paragraph("<b>MS. MARIBEL SANDAGON</b>", centered_signature_style), ""],
+        [Paragraph("OIC, College of Computer Studies", centered_signature_style), ""],
+        ["", ""],
+        
+        # Third block
+        [Paragraph("RECOMMENDING APPROVAL BY:", centered_signature_style), Paragraph("APPROVED BY:", centered_signature_style)],
+        [Spacer(1, 30), Spacer(1, 30)],
+        [Paragraph("<b>KRISTINA ROSE G. CARLOS, RGC, RPm</b>", centered_signature_style), Paragraph("<b>RENO R. RAYEL, DBA</b>", centered_signature_style)],
+        [Paragraph("Head, Student Affairs & Services", centered_signature_style), Paragraph("School Director", centered_signature_style)]
+    ]
+    
+    signatories_table = Table(signatories_data, colWidths=[available_width/1.5] * 2)
+    signatories_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('SPAN', (0, 5), (1, 5)),  # Span "NOTED AND ENDORSED BY"
+        ('SPAN', (0, 6), (1, 6)),  # Span spacer
+        ('SPAN', (0, 7), (1, 7)),  # Span name
+        ('SPAN', (0, 8), (1, 8)),  # Span position
+        ('TOPPADDING', (0, 4), (-1, 4), 30),  # Space after first block
+        ('TOPPADDING', (0, 9), (-1, 9), 30),  # Space after second block
+    ]))
+    
+    story.append(signatories_table)
+    story.append(Spacer(1, 20))
     
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
