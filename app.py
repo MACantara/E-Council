@@ -2481,6 +2481,7 @@ def add_concept_paper():
         db.session.commit()
 
         # Activity Report Form data
+        activity_report_nature_of_the_activity = request.form.get('activity-report-nature-of-the-activity')
         activity_report_date_submission = request.form.get('activity-report-date-submission')
         activity_report_contact_numbers = request.form.get('activity-report-contact-numbers')
         activity_report_prepared_by = request.form.get('activity-report-prepared-by')
@@ -2506,6 +2507,7 @@ def add_concept_paper():
             if activity_report_date_submission:
                 new_activity_report = ActivityReportForms(
                     activity_report_forms_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
+                    activity_report_forms_nature_of_the_activity=activity_report_nature_of_the_activity,
                     activity_report_forms_personnel_in_charge_forms_id=new_personnel_in_charge.personnel_in_charge_forms_id,
                     activity_report_forms_contact_numbers=activity_report_contact_numbers,
                     activity_report_forms_prepared_by=activity_report_prepared_by,
