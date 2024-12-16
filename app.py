@@ -3391,14 +3391,14 @@ def generate_concept_paper_pdf(concept_paper_id):
             [
                 Paragraph("Endorsed by:", normal_style),
                 Spacer(1, 30),
-                Paragraph("MS. MARIBEL SANDAGON", left_signature_style),
+                Paragraph("<b>MS. MARIBEL SANDAGON</b>", left_signature_style),
                 Paragraph("OIC, College of Computer Studies", left_signature_style)
             ],
             # Column 2
             [
                 Paragraph("Recommending Approval by:", normal_style),
                 Spacer(1, 30),
-                Paragraph("MS. KRISTINA ROSE G. CARLOS, RGC, RPm", left_signature_style),
+                Paragraph("<b>MS. KRISTINA ROSE G. CARLOS, RGC, RPm</b>", left_signature_style),
                 Paragraph("Head, Student Affairs & Services", left_signature_style)
             ]
         ]
@@ -3432,7 +3432,7 @@ def generate_concept_paper_pdf(concept_paper_id):
         [Spacer(1, 30)],
         [
             Table(
-                [[Paragraph("RENO R. RAYEL, DBA", left_signature_style)]],
+                [[Paragraph("<b>RENO R. RAYEL, DBA</b>", left_signature_style)]],
                 colWidths=[inner_width]
             )
         ],
