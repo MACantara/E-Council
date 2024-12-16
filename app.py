@@ -5297,6 +5297,79 @@ def generate_documentation_pdf(documentation_id):
     
     story.append(Spacer(1, 30))  # Add extra space before signatory section
     story.append(signatory_table)
+    
+    # Add Summary of Attendance Images section
+    story.append(PageBreak())
+    
+    # Define centered header style for Summary of Attendance section
+    bold_centered_header_style = ParagraphStyle(
+        'CenteredHeader',
+        parent=styles['Heading1'],
+        fontSize=32,
+        alignment=1,  # 1 = Center alignment 
+        spaceAfter=30,
+        spaceBefore=30,
+        fontName='Helvetica-Bold',
+        leading=40     # Added leading for line spacing
+    )
+    
+    centered_header_style = ParagraphStyle(
+        'CenteredHeader',
+        parent=styles['Heading1'],
+        fontSize=24,
+        alignment=1,  # 1 = Center alignment
+        spaceAfter=20,
+        spaceBefore=20,
+        fontName='Helvetica'
+    )
+
+    # Add event details before images
+    story.append(Spacer(1, 140))
+    
+    # Get event name and format date
+    event_name = event.events_name.upper()
+    event_date = event.events_start_date_and_time.strftime("%A, %B %d, %Y").upper()
+    
+    # Add to story with appropriate styles
+    story.append(Paragraph(event_name, bold_centered_header_style))
+    story.append(Paragraph(event_date, centered_header_style))
+    
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("SUMMARY OF ATTENDANCE", centered_header_style))
+
+    # Force page break before images
+    story.append(PageBreak())
+    
+    # Get attendance images from the database
+    attendance_images = SummaryOfAttendanceImages.query.filter_by(
+        summary_of_attendance_images_documentation_id=documentation_id
+    ).all()
+    
+    # Create an array to store image elements
+    attendance_image_elements = []
+    
+    # Process each attendance image
+    for img in attendance_images:
+        if img.summary_of_attendance_images_cloudinary_url:
+            try:
+                # Create image element with same dimensions as evaluation images
+                img_elem = Image(
+                    img.summary_of_attendance_images_cloudinary_url,
+                    width=max_width,
+                    height=max_height,
+                    kind='proportional'
+                )
+                attendance_image_elements.append(img_elem)
+                # Add spacing after each image
+                attendance_image_elements.append(Spacer(1, 20))
+            except Exception as e:
+                print(f"Error loading attendance image: {e}")
+    
+    # Add all attendance images to the story
+    for element in attendance_image_elements:
+        story.append(element)
+    
+    story.append(Spacer(1, 20))
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
