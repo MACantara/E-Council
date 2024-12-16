@@ -5067,8 +5067,8 @@ def generate_documentation_pdf(documentation_id):
     
     # Create an array to store image elements
     image_elements = []
-    max_width = 500  # Maximum width for images
-    max_height = 400  # Maximum height for images
+    image_max_width = 500  # Maximum width for images
+    image_max_height = 400  # Maximum height for images
     
     # Process each image
     for img in evaluation_images:
@@ -5420,6 +5420,36 @@ def generate_documentation_pdf(documentation_id):
     ]))
     
     story.append(student_table)
+    story.append(Spacer(1, 20))
+    
+    # Add Documentation section
+    story.append(PageBreak())
+    story.append(Paragraph("PHOTO DOCUMENTATION", bold_centered_header_style))
+    story.append(Paragraph(event_name, bold_centered_header_style))
+    story.append(Paragraph(event_date, bold_centered_header_style))
+    story.append(Spacer(1, 20))
+    
+    # Get documentation images from database
+    documentation_images = EventPhotoDocumentationImages.query.filter_by(
+        event_photo_documentation_images_documentation_id=documentation_id
+    ).all()
+    
+    # Process documentation images
+    for img in documentation_images:
+        if img.event_photo_documentation_images_cloudinary_url:
+            try:
+                # Create image element with consistent sizing
+                img_elem = Image(
+                    img.event_photo_documentation_images_cloudinary_url,
+                    width=image_max_width,
+                    height=image_max_height,
+                    kind='proportional'
+                )
+                story.append(img_elem)
+                story.append(Spacer(1, 20))
+            except Exception as e:
+                print(f"Error loading documentation image: {e}")
+    
     story.append(Spacer(1, 20))
 
     doc.build(story, onFirstPage=header, onLaterPages=header)
