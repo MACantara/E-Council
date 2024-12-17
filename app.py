@@ -38,6 +38,7 @@ from cloudinary.utils import cloudinary_url
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import tempfile
+from string import ascii_lowercase
 
 import pandas as pd
 
@@ -4337,6 +4338,94 @@ def generate_concept_paper_pdf(concept_paper_id):
         parent=cell_style,
         alignment=1,  # 1 is for center alignment
     )
+    
+    # Add Personnel In-Charge Form
+    story.append(PageBreak())
+    story.append(Paragraph("Form 10", red_text_style))
+    story.append(Paragraph("PERSONNEL IN-CHARGE FORM (PICF)", title_style))
+    story.append(Spacer(1, 20))
+    
+    picf_details = [
+        # Row 1: Title spans 2 columns, Period Covered in last column
+        [
+            Paragraph("<b>Title of the Activity:</b><br/>College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", normal_style),
+            "",  # Empty cell for spanning
+            Paragraph("<b>Period Covered:</b><br/>1st Semester, September 30, 2024 (Tentative)", normal_style)
+        ],
+        # Row 2: Three separate cells
+        [
+            Paragraph("<b>Time:</b><br/>1:00 PM to 4:00 PM", normal_style),
+            Paragraph("<b>Venue:</b><br/>UPHSD Molino – New Gymnasium", normal_style),
+            Paragraph("<b>College/Department:</b><br/>College of Computer Studies", normal_style)
+        ]
+    ]
+    
+    picf_table = Table(picf_details, colWidths=[available_width/3] * 3)
+    picf_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('PADDING', (0, 0), (-1, -1), 6),
+        ('SPAN', (0, 0), (1, 0)),  # Span title across first two columns
+    ]))
+    
+    story.append(picf_table)
+    story.append(Spacer(1, 20))
+    
+    # Create styles for different text sections
+    list_style = ParagraphStyle(
+        'ListStyle',
+        parent=normal_style,
+        leftIndent=20,
+        spaceBefore=6,
+        spaceAfter=6
+    )
+    
+    # Split commitment text into sections
+    intro_text = """I, <b>Dolores Montesines</b>, of the College of Computer Studies will voluntarily accompany my students during the activity. I understand my responsibilities and role as the Dean in-charge and will diligently follow all protocols needed for the safety of the participating students. I am committed to do the following to ensure the safety of the students during the activity."""
+
+    list_items = [
+        "Remind the students about the ground rules of activity during the preparation stage. I will implement whatever the safety measures necessary (checking of attendance online, monitoring the behaviors of the students online) so that students will always be accounted for.",
+        "Rules and regulations of the school on liquors, drugs will be strictly implemented and will report incidents when students will not adhere to the said policies.",
+        "Makes sure that the schedule is followed and will guide the students in all activities to be conducted.",
+        "Submit the activity report form two weeks after the conduct of the activity or even earlier at the office of the SPS Head."
+    ]
+
+    closing_text = """I will be accompanying the students during the activity and can be contacted on the following contact number as indicated below:"""
+
+    # Add text sections to story
+    story.append(Paragraph(intro_text, normal_style))
+
+    # Add lettered list items
+    for i, item in enumerate(list_items):
+        story.append(Paragraph(f"{ascii_lowercase[i]}. {item}", list_style))
+
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(closing_text, normal_style))
+    story.append(Spacer(1, 20))
+    
+    # Create signature section
+    signature_data = [
+        ["By:", Paragraph("<b>Dolores Montesines</b>", normal_style), "____________________"],
+        ["", "Name of Personnel-in-charge/Signature", "Date/Time"],
+        ["", "", ""],
+        ["Noted by:", Paragraph("<b>Ms. Maribel Sandagon</b>", normal_style), "____________________"],
+        ["", "OIC Dean of the College/Signature", "Date/Time"],
+        ["", "", ""],
+        ["", Paragraph("<b>Ms. Kristina Rose G. Carlos</b>", normal_style), "____________________"],
+        ["", "Head, Student Affairs & Services", "Date/Time"]
+    ]
+    
+    signature_table = Table(signature_data, colWidths=[available_width * 0.2, available_width * 0.5, available_width * 0.3])
+    signature_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    story.append(signature_table)
     
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
