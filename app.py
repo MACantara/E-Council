@@ -3565,7 +3565,14 @@ def generate_concept_paper_pdf(concept_paper_id):
         spaceAfter=0
     )
     
-    # Create signatories data
+    # Function to get organization acronym
+    def get_org_acronym(org_name):
+        acronyms = {
+            'Junior Philippine Computer Society': 'JPCS',
+            'College of Computer Studies - Student Council': 'CCS-SC'
+        }
+        return acronyms.get(org_name, org_name)
+    
     signatories_data = [
         # Prepared by and Reviewed by
         [Paragraph("PREPARED BY:", centered_signature_style), 
@@ -3575,29 +3582,29 @@ def generate_concept_paper_pdf(concept_paper_id):
                 centered_signature_style),
         Paragraph(f"<b>{concept_paper.signed_and_reviewed_by_user.users_first_name} {concept_paper.signed_and_reviewed_by_user.users_last_name}</b>", 
                 centered_signature_style)],
-        [Paragraph(concept_paper.prepared_by_user.users_student_organization_position, centered_signature_style),
-        Paragraph(concept_paper.signed_and_reviewed_by_user.users_student_organization_position, centered_signature_style)],
+        [Paragraph(f"{concept_paper.prepared_by_user.users_student_organization_position}, {get_org_acronym(StudentOrganizations.query.get(concept_paper.prepared_by_user.users_student_organization).student_organizations_name) if concept_paper.prepared_by_user.users_student_organization else ''}", centered_signature_style),
+        Paragraph(f"{concept_paper.signed_and_reviewed_by_user.users_student_organization_position}, {get_org_acronym(StudentOrganizations.query.get(concept_paper.signed_and_reviewed_by_user.users_student_organization).student_organizations_name) if concept_paper.signed_and_reviewed_by_user.users_student_organization else ''}", centered_signature_style)],
         ["", ""],
         
         # Endorsed by
         [Paragraph("NOTED AND ENDORSED BY:", centered_signature_style), ""],
         [Spacer(1, 30), ""],
         [Paragraph(f"<b>{concept_paper.endorsed_by_signatory.signatory_first_name} {concept_paper.endorsed_by_signatory.signatory_last_name}</b>", 
-                centered_signature_style), ""],
-        [Paragraph(f"{concept_paper.endorsed_by_signatory.signatory_position}, {concept_paper.endorsed_by_signatory.signatory_department}", 
-                centered_signature_style), ""],
+                  centered_signature_style), ""],
+        [Paragraph(f"{concept_paper.endorsed_by_signatory.signatory_position}{', ' + concept_paper.endorsed_by_signatory.signatory_department if concept_paper.endorsed_by_signatory.signatory_department else ''}", 
+                  centered_signature_style), ""],
         ["", ""],
         
         # Recommending and Final Approval
         [Paragraph("RECOMMENDING APPROVAL BY:", centered_signature_style), 
-        Paragraph("APPROVED BY:", centered_signature_style)],
+         Paragraph("APPROVED BY:", centered_signature_style)],
         [Spacer(1, 30), Spacer(1, 30)],
         [Paragraph(f"<b>{concept_paper.recommending_approval_by_signatory.signatory_first_name} {concept_paper.recommending_approval_by_signatory.signatory_last_name}</b>", 
-                centered_signature_style),
-        Paragraph(f"<b>{concept_paper.approved_by_signatory.signatory_first_name} {concept_paper.approved_by_signatory.signatory_last_name}</b>", 
-                centered_signature_style)],
-        [Paragraph(f"{concept_paper.recommending_approval_by_signatory.signatory_position}", centered_signature_style),
-        Paragraph(f"{concept_paper.approved_by_signatory.signatory_position}", centered_signature_style)]
+                  centered_signature_style),
+         Paragraph(f"<b>{concept_paper.approved_by_signatory.signatory_first_name} {concept_paper.approved_by_signatory.signatory_last_name}</b>", 
+                  centered_signature_style)],
+        [Paragraph(f"{concept_paper.recommending_approval_by_signatory.signatory_position}{', ' + concept_paper.recommending_approval_by_signatory.signatory_department if concept_paper.recommending_approval_by_signatory.signatory_department else ''}", centered_signature_style),
+         Paragraph(f"{concept_paper.approved_by_signatory.signatory_position}{', ' + concept_paper.approved_by_signatory.signatory_department if concept_paper.approved_by_signatory.signatory_department else ''}", centered_signature_style)]
     ]
     
     signatories_table = Table(signatories_data, colWidths=[available_width/1.5] * 2)
