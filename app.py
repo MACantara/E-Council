@@ -3303,9 +3303,6 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(routing_table)
     story.append(Spacer(1, 20))
     
-    story.append(Paragraph("Greetings!", normal_style))
-    story.append(Spacer(1, 12))
-    
     # Update normal style with justified alignment
     normal_style = ParagraphStyle(
         'NormalStyle',
@@ -3316,12 +3313,15 @@ def generate_concept_paper_pdf(concept_paper_id):
         alignment=4  # 4 = justify alignment
     )
     
-    # Add main content with justified text
-    main_text = """<para firstLineIndent="36">The College of Computer Studies will conduct a 2nd Semester Onsite Orientation for S.Y. 2024-2025. The purpose of this event is to address concerns and orient students/participants as well as to discuss upcoming events and activities.</para>"""
-    story.append(Paragraph(main_text, normal_style))
-    
-    second_para = """<para firstLineIndent="36">All students in the College of Computer Studies are required to attend the 1st Semester Onsite Orientation that will be held in the New Gymnasium of UPHSD-Molino. We invited Mr. Reymart Castillo to discuss the CompTIA Certification programs and CCS alumni speaker Mr. Keith Bugayong. Also, our Council President, Mhartin Derez will be discuss the calendar of activities and the benefits of being a leader.</para>"""
-    story.append(Paragraph(second_para, normal_style))
+    # Split text into paragraphs and format each
+    paragraphs = concept_paper.concept_paper_forms_body.split('\n')
+    for i, paragraph in enumerate(paragraphs):
+        if paragraph.strip():  # Skip empty paragraphs
+            if i == 0:  # First paragraph - no indent
+                story.append(Paragraph(paragraph.strip(), normal_style))
+            else:  # All other paragraphs - add indent
+                main_text = f"""<para firstLineIndent="36">{paragraph.strip()}</para>"""
+                story.append(Paragraph(main_text, normal_style))
     
     # Create bullet style
     bullet_style = ParagraphStyle(
