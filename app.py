@@ -3906,21 +3906,32 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Spacer(1, 20))
     story.append(Paragraph("III. <b>EVALUATION</b>: (Make sure to have three answers for the strengths and weakness.) Weaknesses must have corresponding recommendations.", section_header_style))
     
-    # After getting the concept_paper_forms_id, add this:
-    documentation_data = None
-
-    if event:
-        # Get documentation information using events_id
-        documentation_data = db.session.query(Documentation).filter(
-            Documentation.documentation_events_id == event.events_id
-        ).first()
-
-    # Fetch evaluation data from database
+    # Initialize empty lists for evaluation data
     strengths = []
     weaknesses = []
     recommendations = []
+
+    # Query activity data if activity report exists
+    if activity_report:
+        # Get strengths from database
+        strengths_query = ActivityStrengths.query.filter_by(
+            activity_strengths_documentation_id=activity_report.activity_report_forms_id
+        ).all()
+        strengths = [s.activity_strengths_content for s in strengths_query if s.activity_strengths_content]
+
+        # Get weaknesses from database
+        weaknesses_query = ActivityWeaknesses.query.filter_by(
+            activity_weaknesses_documentation_id=activity_report.activity_report_forms_id
+        ).all()
+        weaknesses = [w.activity_weaknesses_content for w in weaknesses_query if w.activity_weaknesses_content]
+
+        # Get recommendations from database
+        recommendations_query = ActivityRecommendations.query.filter_by(
+            activity_recommendations_documentation_id=activity_report.activity_report_forms_id
+        ).all()
+        recommendations = [r.activity_recommendations_content for r in recommendations_query if r.activity_recommendations_content]
     
-    # Create the evaluation table data
+    # Create base evaluation table structure
     evaluation_data = [
         # Headers row
         [
@@ -3930,28 +3941,36 @@ def generate_concept_paper_pdf(concept_paper_id):
         ]
     ]
     
-    # Calculate maximum length of the lists
-    max_length = max(len(strengths), len(weaknesses), len(recommendations))
-    
-    # Add content rows with numbering
-    for i in range(max_length):
-        strength = f"{i+1}. {strengths[i]}" if i < len(strengths) else f"{i+1}. N/A"
-        weakness = f"{i+1}. {weaknesses[i]}" if i < len(weaknesses) else f"{i+1}. N/A"
-        recommendation = f"{i+1}. {recommendations[i]}" if i < len(recommendations) else f"{i+1}. N/A"
+    # Check if there's evaluation data
+    if not strengths and not weaknesses and not recommendations:
+        # Add 3 empty rows with N/A
+        for i in range(3):
+            evaluation_data.append([
+                Paragraph(f"", cell_style),
+                Paragraph(f"", cell_style),
+                Paragraph(f"", cell_style)
+            ])
+    else:
+        # Calculate maximum length of the lists
+        max_length = max(len(strengths), len(weaknesses), len(recommendations))
         
-        evaluation_data.append([
-            Paragraph(strength, cell_style),
-            Paragraph(weakness, cell_style),
-            Paragraph(recommendation, cell_style)
-        ])
+        # Add content rows with numbering
+        for i in range(max_length):
+            strength = f"{i+1}. {strengths[i]}" if i < len(strengths) else f""
+            weakness = f"{i+1}. {weaknesses[i]}" if i < len(weaknesses) else f""
+            recommendation = f"{i+1}. {recommendations[i]}" if i < len(recommendations) else f""
+            
+            evaluation_data.append([
+                Paragraph(strength, cell_style),
+                Paragraph(weakness, cell_style),
+                Paragraph(recommendation, cell_style)
+            ])
     
-    # Create the evaluation table
-    evaluation_table = Table(evaluation_data, colWidths=[157, 157, 157])  # Adjusted widths to fit the page
-    
-    # Style for the evaluation table
-    evaluation_table_style = TableStyle([
+    # Create and style the evaluation table
+    evaluation_table = Table(evaluation_data, colWidths=[157, 157, 157])
+    evaluation_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),  # Center align the header row
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
@@ -3960,11 +3979,8 @@ def generate_concept_paper_pdf(concept_paper_id):
         ('LEFTPADDING', (0, 0), (-1, -1), 6),
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-    ])
+    ]))
     
-    evaluation_table.setStyle(evaluation_table_style)
-    
-    # Add some space before the evaluation table
     story.append(Spacer(1, 10))
     story.append(evaluation_table)
 
