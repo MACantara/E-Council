@@ -3834,23 +3834,17 @@ def generate_concept_paper_pdf(concept_paper_id):
     objectives = []
     learning_outcomes = []
 
-    # Get concept_paper_forms_id from the event
-    concept_paper_forms_id = event.events_concept_paper_forms_id if event else None
-
-    if concept_paper_forms_id:
-        # Get objectives
-        objectives_query = db.session.query(ObjectivesOfTheActivity).filter(
-            ObjectivesOfTheActivity.objectives_of_the_activity_concept_paper_forms_id == concept_paper_forms_id
-        ).all()
-        objectives = [obj.objectives_of_the_activity_content for obj in objectives_query if obj.objectives_of_the_activity_content]
-        objectives = [f"{i+1}. {obj}" for i, obj in enumerate(objectives)]
-
-        # Get learning outcomes
-        outcomes_query = db.session.query(LearningOutcomes).filter(
-            LearningOutcomes.learning_outcomes_concept_paper_forms_id == concept_paper_forms_id
-        ).all()
-        learning_outcomes = [outcome.learning_outcomes_content for outcome in outcomes_query if outcome.learning_outcomes_content]
-        learning_outcomes = [f"{i+1}. {outcome}" for i, outcome in enumerate(learning_outcomes)]
+    concept_paper = ConceptPaperForms.query.get_or_404(concept_paper_id)
+    
+    # Get objectives from relationship
+    objectives_query = concept_paper.objectives.all()
+    objectives = [obj.objectives_of_the_activity_content for obj in objectives_query if obj.objectives_of_the_activity_content]
+    objectives = [f"{i+1}. {obj}" for i, obj in enumerate(objectives)]
+    
+    # Get learning outcomes from relationship
+    outcomes_query = concept_paper.learning_outcomes.all()
+    learning_outcomes = [outcome.learning_outcomes_content for outcome in outcomes_query if outcome.learning_outcomes_content]
+    learning_outcomes = [f"{i+1}. {outcome}" for i, outcome in enumerate(learning_outcomes)]
     
     # Create header style for the columns
     header_style = ParagraphStyle(
