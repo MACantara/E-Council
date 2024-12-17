@@ -4088,6 +4088,256 @@ def generate_concept_paper_pdf(concept_paper_id):
         story.append(Spacer(1, 20))
         story.append(Paragraph(f"Date of Submission: {formatted_date}", position_style))
     
+    # Create red text style for form number
+    red_text_style = ParagraphStyle(
+        'RedText',
+        parent=styles['Normal'],
+        fontSize=12,
+        textColor=colors.red,
+        alignment=0  # Left alignment
+    )
+    
+    # Add form number and main header
+    story.append(PageBreak())  # Start on a new page
+    story.append(Paragraph("Form 13", red_text_style))
+    story.append(Paragraph("LEARNING JOURNAL FORM", title_style))
+    
+    story.append(Paragraph("I. Activity Details:", section_header_style))
+    story.append(Spacer(1, 10))
+    
+    # After getting documentation_data, add this:
+    learning_journal_form = None
+    if concept_paper:
+        learning_journal_form = db.session.query(LearningJournalForms).filter(
+            LearningJournalForms.learning_journal_forms_concept_paper_forms_id == concept_paper.concept_paper_forms_id
+        ).first()
+
+    # Format the period covered from event start and end times
+    period_covered = ""
+    if event and event.events_start_date_and_time and event.events_end_date_and_time:
+        start_time = event.events_start_date_and_time.strftime("%I:%M %p")
+        end_time = event.events_end_date_and_time.strftime("%I:%M %p")
+        period_covered = f"{start_time} – {end_time}"
+
+    learning_journal_data = [
+        # First row - 3 columns
+        [
+            Paragraph(f"<b>Name of Student:</b><br/><br/>", cell_style),
+            Paragraph(f"<b>Course/Year level:</b><br/><br/>", cell_style),
+            Paragraph(f"<b>ID Number:</b><br/><br/>", cell_style)
+        ],
+        # Second row - 2 columns (2nd and 3rd merged)
+        [
+            Paragraph(f"<b>College/Department:</b><br/>College of Computer Studies", cell_style),
+            Paragraph(f"<b>Faculty in-charge:</b><br/>{personnel_in_charge if learning_journal_form else ''}", cell_style),
+        ],
+        # Third row - 3 columns
+        [
+            Paragraph(f"<b>Period Covered:</b><br/>{period_covered}", cell_style),
+            Paragraph(f"<b>Day:</b><br/>{learning_journal_form.learning_journal_forms_date.strftime('%A, %B %d, %Y') if learning_journal_form and learning_journal_form.learning_journal_forms_date else ''}", cell_style),
+            Paragraph(f"<b>Venue:</b><br/>{event.events_venue if event else ''}", cell_style)
+        ],
+        # Fourth row - 3 columns merged
+        [Paragraph(f"<b>Title of the Activity:</b><br/>{event.events_name if event else ''}", cell_style)]
+    ]
+    
+    # Create table for learning journal details with 3 columns
+    learning_journal_table = Table(learning_journal_data, colWidths=[157, 157, 157])
+    
+    # Style for learning journal table with merged cells
+    learning_journal_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # Changed from 'MIDDLE' to 'TOP'
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('SPAN', (1, 1), (2, 1)),  # Merge 2nd and 3rd columns in row 2
+        ('SPAN', (0, 3), (2, 3)),  # Merge all columns in row 4
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),  
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+    ])
+    
+    learning_journal_table.setStyle(learning_journal_style)
+    story.append(learning_journal_table)
+
+    # Add Activity Progress Notes section
+    story.append(Spacer(1, 10))
+    story.append(Paragraph("II. Activity Progress Notes:", section_header_style))
+    story.append(Spacer(1, 10))
+
+    # Format the date string
+    if learning_journal_form and learning_journal_form.learning_journal_forms_date:
+        date_str = learning_journal_form.learning_journal_forms_date.strftime("%A, %B %d, %Y")
+    else:
+        date_str = ""
+    
+    # Create empty numbered list template
+    empty_list = "1.<br/><br/>2.<br/><br/>3.<br/><br/>"
+    
+    progress_notes_data = [
+        # Header row with three columns
+        [
+            Paragraph("Date: <b>" + date_str + "</b>", cell_style),
+            Paragraph("<b>Observations</b><br/>(not less than 3)", header_style),
+            Paragraph("<b>Learnings</b><br/>(not less than 3)", header_style),
+        ],
+        # Content row
+        [
+            Paragraph("", cell_style),
+            Paragraph(empty_list, cell_style),
+            Paragraph(empty_list, cell_style),
+        ]
+    ]
+    
+    progress_notes_table = Table(progress_notes_data, colWidths=[115, 180, 180])
+    progress_notes_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ])
+
+    progress_notes_table.setStyle(progress_notes_style)
+    story.append(progress_notes_table)
+
+    # Add Overall Reflection section
+    story.append(Spacer(1, 10))
+    story.append(Paragraph("III. Over-all Reflection (The reflection must be written in a narrative form not less than 5 sentences.)", section_header_style))
+    story.append(Spacer(1, 10))
+    
+    # Create reflection paragraph with justified alignment and line breaks
+    reflection_style = ParagraphStyle(
+        'ReflectionStyle',
+        parent=cell_style,
+        alignment=4,  # 4 is for justified alignment
+        spaceBefore=6,
+        spaceAfter=6,
+        leading=16  # Increase line spacing for better readability
+    )
+    
+    # Add empty reflection table with border and line breaks
+    reflection_table = Table([[Paragraph("<br/><br/><br/>", reflection_style)]], colWidths=[475])
+    reflection_table_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ])
+    
+    reflection_table.setStyle(reflection_table_style)
+    story.append(reflection_table)
+
+    # Add signature section
+    story.append(Spacer(1, 10))
+    
+    # Create styles for signature text
+    signature_style = ParagraphStyle(
+        'SignatureStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+    )
+    position_style = ParagraphStyle(
+        'PositionStyle',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=12,
+    )
+    
+    # Get user objects for signatures
+    prepared_by_user = None
+    seen_and_read_by_user = None
+    checked_by_signatory = None
+    if learning_journal_form:
+        if learning_journal_form.learning_journal_forms_prepared_by:
+            prepared_by_user = db.session.query(Users).filter(
+                Users.users_id == learning_journal_form.learning_journal_forms_prepared_by
+            ).first()
+        if learning_journal_form.learning_journal_forms_seen_and_read_by:
+            seen_and_read_by_user = db.session.query(Users).filter(
+                Users.users_id == learning_journal_form.learning_journal_forms_seen_and_read_by
+            ).first()
+
+    # Get the checked by signatory from concept paper
+    checked_by_signatory = None
+    if concept_paper and concept_paper.concept_paper_forms_approved_by:
+        checked_by_signatory = db.session.query(Signatories).filter(
+            Signatories.signatory_id == concept_paper.concept_paper_forms_approved_by
+        ).first()
+
+    # Create signature table data
+    signature_data = [
+        # First row - Labels
+        [
+            Paragraph("Prepared by:", signature_style),
+            Paragraph("Seen and read by:", signature_style),
+        ],
+        # Second row - Signatures
+        [
+            Image(prepared_by_user.users_signature_cloudinary_url, width=100, height=40) if prepared_by_user and prepared_by_user.users_signature_cloudinary_url else Paragraph("___________________", signature_style),
+            Image(seen_and_read_by_user.users_signature_cloudinary_url, width=100, height=40) if seen_and_read_by_user and seen_and_read_by_user.users_signature_cloudinary_url else Paragraph("__________________________", signature_style),
+        ],
+        # Third row - Titles
+        [
+            Paragraph("Signature of Student", position_style),
+            Paragraph("Signature over Name of Parent/Guardian", position_style),
+        ],
+        # Fourth row - Empty space
+        ["", ""],
+        # Fifth row - Checked by label
+        [
+            Paragraph("Checked by:", signature_style),
+            "",
+        ],
+        # Sixth row - Dean's signature
+        [
+            Paragraph("_____________________________", signature_style),
+            "",
+        ],
+        # Seventh row - Dean's name and position
+        [
+            Paragraph("<b>" + (checked_by_signatory.signatory_first_name.upper() if checked_by_signatory else "") + " " + (checked_by_signatory.signatory_last_name.upper() if checked_by_signatory else "") + "</b><br/>" + (checked_by_signatory.signatory_position if checked_by_signatory else "") + ", " + (checked_by_signatory.signatory_department if checked_by_signatory else ""), position_style),
+            "",
+        ],
+    ]
+
+    # Create signature table with two columns
+    signature_table = Table(signature_data, colWidths=[237, 238])  # Adjusted widths to fill the page
+    signature_style = TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ])
+    
+    signature_table.setStyle(signature_style)
+    story.append(signature_table)
+
+    # Create centered style for title and date
+    centered_header_style = ParagraphStyle(
+        'CenteredHeader',
+        parent=section_header_style,
+        alignment=1,  # 1 is for center alignment
+    )
+
+    centered_cell_style = ParagraphStyle(
+        'CenteredCell',
+        parent=cell_style,
+        alignment=1,  # 1 is for center alignment
+    )
+    
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
