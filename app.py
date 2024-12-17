@@ -3764,7 +3764,7 @@ def generate_concept_paper_pdf(concept_paper_id):
 
     # Add title and section header to the story list
     story.append(Paragraph("ACTIVITY REPORT FORM", title_style))
-    story.append(Paragraph("I. ACTIVITY DETAILS", section_header_style))
+    story.append(Paragraph("<b>I. ACTIVITY DETAILS</b>", section_header_style))
 
     # Create a custom style for the cells without padding
     cell_style = ParagraphStyle(
@@ -3828,7 +3828,7 @@ def generate_concept_paper_pdf(concept_paper_id):
 
     # After the first table, add a section header for Objectives
     story.append(Spacer(1, 20))
-    story.append(Paragraph("II. OBJECTIVES", section_header_style))
+    story.append(Paragraph("<b>II. OBJECTIVES</b>", section_header_style))
 
     # Fetch objectives and learning outcomes
     objectives = []
@@ -3904,7 +3904,7 @@ def generate_concept_paper_pdf(concept_paper_id):
 
     # After the objectives table, add the Evaluation section
     story.append(Spacer(1, 20))
-    story.append(Paragraph("III. EVALUATION: (Make sure to have three answers for the strengths and weakness.) Weaknesses must have corresponding recommendations.", section_header_style))
+    story.append(Paragraph("III. <b>EVALUATION</b>: (Make sure to have three answers for the strengths and weakness.) Weaknesses must have corresponding recommendations.", section_header_style))
     
     # After getting the concept_paper_forms_id, add this:
     documentation_data = None
