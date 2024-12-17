@@ -3269,20 +3269,21 @@ def generate_concept_paper_pdf(concept_paper_id):
         spaceAfter=0
     )
     
-    # Create table with wrapped text
+    concept_paper = ConceptPaperForms.query.get_or_404(concept_paper_id)
+    
     routing_data = [
-        ["FOR:", Paragraph("<b>RENO R. RAYEL, DBA</b>", wrapped_style)],
-        ["", Paragraph("School Director", wrapped_style)],
+        ["FOR:", Paragraph(f"<b>{concept_paper.approved_by_signatory.signatory_first_name} {concept_paper.approved_by_signatory.signatory_last_name}</b>", wrapped_style)],
+        ["", Paragraph(f"{concept_paper.approved_by_signatory.signatory_position}{', ' + concept_paper.approved_by_signatory.signatory_department if concept_paper.approved_by_signatory.signatory_department else ''}", wrapped_style)],
         ["", ""],
-        ["THRU:", Paragraph("<b>MS. KRISTINA ROSE G. CARLOS, RGC, RPm</b>", wrapped_style)],
-        ["", Paragraph("Head, Student Affairs & Services", wrapped_style)],
+        ["THRU:", Paragraph(f"<b>{concept_paper.recommending_approval_by_signatory.signatory_first_name} {concept_paper.recommending_approval_by_signatory.signatory_last_name}</b>", wrapped_style)],
+        ["", Paragraph(f"{concept_paper.recommending_approval_by_signatory.signatory_position}{', ' + concept_paper.recommending_approval_by_signatory.signatory_department if concept_paper.recommending_approval_by_signatory.signatory_department else ''}", wrapped_style)],
         ["", ""],
-        ["FROM:", Paragraph("<b>MS. MARIBEL SANDAGON</b>", wrapped_style)],
-        ["", Paragraph("OIC, College of Computer Studies", wrapped_style)],
+        ["FROM:", Paragraph(f"<b>{concept_paper.endorsed_by_signatory.signatory_first_name} {concept_paper.endorsed_by_signatory.signatory_last_name}</b>", wrapped_style)],
+        ["", Paragraph(f"{concept_paper.endorsed_by_signatory.signatory_position}{', ' + concept_paper.endorsed_by_signatory.signatory_department if concept_paper.endorsed_by_signatory.signatory_department else ''}", wrapped_style)],
         ["", ""],
-        ["SUBJECT:", Paragraph("College of Computer Studies 1st Semester General Assembly S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", wrapped_style)],
+        ["SUBJECT:", Paragraph(f"{concept_paper.concept_paper_forms_subject}", wrapped_style)],
         ["", ""],
-        ["DATE:", Paragraph("September 30, 2024", wrapped_style)]
+        ["DATE:", Paragraph(f"{concept_paper.concept_paper_forms_date.strftime('%B %d, %Y')}" if concept_paper.concept_paper_forms_date else "", wrapped_style)]
     ]
     
     # Create table with automatic wrapping
@@ -3336,17 +3337,17 @@ def generate_concept_paper_pdf(concept_paper_id):
     # Create details table data with wrapped text
     details_data = [
         [Paragraph("<b>DURATION OF THE EVENT</b>", normal_style), 
-         ":", 
-         Paragraph("Monday, September 30, 2024 (Tentative), 1:00 PM - 4:00 PM", wrapped_style)],
+        ":", 
+        Paragraph(f"{concept_paper.concept_paper_forms_event_start_date_and_time.strftime('%A, %B %d, %Y')} (Tentative), {concept_paper.concept_paper_forms_event_start_date_and_time.strftime('%I:%M %p')} - {concept_paper.concept_paper_forms_event_end_date_and_time.strftime('%I:%M %p')}", wrapped_style)],
         [Paragraph("<b>LOCATION</b>", normal_style), 
-         ":", 
-         Paragraph("UPHSD-Molino Gym 2", wrapped_style)],
+        ":", 
+        Paragraph(f"{concept_paper.concept_paper_forms_location}", wrapped_style)],
         [Paragraph("<b>PARTICIPANTS</b>", normal_style), 
-         ":", 
-         Paragraph("College of Computer Studies Students", wrapped_style)],
+        ":", 
+        Paragraph(f"{concept_paper.concept_paper_forms_participants}", wrapped_style)],
         [Paragraph("<b>BUDGET</b>", normal_style), 
-         ":", 
-         Paragraph("c/o School Canteen PM food snack – Guest & CCS personnel", wrapped_style)]
+        ":", 
+        Paragraph(f"{concept_paper.concept_paper_forms_budget}", wrapped_style)]
     ]
     
     # Create table with aligned columns and text wrapping
@@ -3389,22 +3390,19 @@ def generate_concept_paper_pdf(concept_paper_id):
         spaceAfter=0
     )
     
-    # First row - two columns with left-aligned names
     row1_table = Table([
         [
-            # Column 1
             [
                 Paragraph("Endorsed by:", normal_style),
                 Spacer(1, 30),
-                Paragraph("<b>MS. MARIBEL SANDAGON</b>", left_signature_style),
-                Paragraph("OIC, College of Computer Studies", left_signature_style)
+                Paragraph(f"<b>{concept_paper.endorsed_by_signatory.signatory_first_name} {concept_paper.endorsed_by_signatory.signatory_last_name}</b>", left_signature_style),
+                Paragraph(f"{concept_paper.endorsed_by_signatory.signatory_position}{', ' + concept_paper.endorsed_by_signatory.signatory_department if concept_paper.endorsed_by_signatory.signatory_department else ''}", left_signature_style)
             ],
-            # Column 2
             [
                 Paragraph("Recommending Approval by:", normal_style),
                 Spacer(1, 30),
-                Paragraph("<b>MS. KRISTINA ROSE G. CARLOS, RGC, RPm</b>", left_signature_style),
-                Paragraph("Head, Student Affairs & Services", left_signature_style)
+                Paragraph(f"<b>{concept_paper.recommending_approval_by_signatory.signatory_first_name} {concept_paper.recommending_approval_by_signatory.signatory_last_name}</b>", left_signature_style),
+                Paragraph(f"{concept_paper.recommending_approval_by_signatory.signatory_position}{', ' + concept_paper.recommending_approval_by_signatory.signatory_department if concept_paper.recommending_approval_by_signatory.signatory_department else ''}", left_signature_style)
             ]
         ]
     ], colWidths=[available_width/2, available_width/1.8])
@@ -3437,13 +3435,13 @@ def generate_concept_paper_pdf(concept_paper_id):
         [Spacer(1, 30)],
         [
             Table(
-                [[Paragraph("<b>RENO R. RAYEL, DBA</b>", left_signature_style)]],
+                [[Paragraph(f"<b>{concept_paper.approved_by_signatory.signatory_first_name} {concept_paper.approved_by_signatory.signatory_last_name}</b>", centered_header_style)]],
                 colWidths=[inner_width]
             )
         ],
         [
             Table(
-                [[Paragraph("School Director", centered_header_style)]],
+                [[Paragraph(f"{concept_paper.approved_by_signatory.signatory_position}{', ' + concept_paper.approved_by_signatory.signatory_department if concept_paper.approved_by_signatory.signatory_department else ''}", centered_header_style)]],
                 colWidths=[inner_width]
             )
         ]
