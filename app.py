@@ -4079,6 +4079,15 @@ def generate_concept_paper_pdf(concept_paper_id):
     # Add signature table to story
     story.append(signature_table)
     
+    # Add date submission if activity report exists
+    if activity_report and activity_report.activity_report_date_submission:
+        # Format date
+        formatted_date = activity_report.activity_report_date_submission.strftime("%B %d, %Y")
+        
+        # Add spacer and date
+        story.append(Spacer(1, 20))
+        story.append(Paragraph(f"Date of Submission: {formatted_date}", position_style))
+    
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
     buffer.seek(0)
