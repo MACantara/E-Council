@@ -4581,11 +4581,15 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Spacer(1, 30))
     story.append(Table([[
         Paragraph("__________________________________", normal_style),
-        Paragraph("_______________", normal_style)
+        Paragraph("___________________", normal_style)
     ]], colWidths=[available_width * 0.7, available_width * 0.3]))
     story.append(Table([[
         Paragraph("Signature over Name of Parent/ Guardian", normal_style),
-        Paragraph("Date", normal_style)
+        Paragraph("Date", ParagraphStyle(
+            'CenteredStyle',
+            parent=normal_style,
+            alignment=1  # Center alignment
+        ))
     ]], colWidths=[available_width * 0.7, available_width * 0.3]))
     
     doc.build(story, onFirstPage=header, onLaterPages=header)
