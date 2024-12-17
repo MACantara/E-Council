@@ -3517,24 +3517,23 @@ def generate_concept_paper_pdf(concept_paper_id):
         [
             Paragraph("EXPECTED NO. OF PARTICIPANTS", bold_centered_header_style),
             Paragraph(str(concept_paper.concept_paper_forms_expected_number_of_participants or ""), normal_style),
-            ""
+            None
         ],
         [
             Paragraph("BUDGET", bold_centered_header_style),
             Paragraph(str(concept_paper.concept_paper_forms_budget or ""), normal_style),
-            ""
+            None
         ]
     ]
     
-    # Create table with minimum row heights and splitByRow
     structure_table = Table(
         structure_data, 
         colWidths=[available_width * 0.3, available_width * 0.35, available_width * 0.35],
         splitByRow=True,
         repeatRows=2,
-        minRowHeights=[30] * len(structure_data)  # Set minimum height for all rows
+        minRowHeights=[30] * len(structure_data)
     )
-
+    
     structure_table.setStyle(TableStyle([
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ('ALIGN', (0, 0), (0, -1), 'CENTER'),
@@ -3543,8 +3542,10 @@ def generate_concept_paper_pdf(concept_paper_id):
         ('VALIGN', (1, 0), (-1, -1), 'TOP'),
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 12),
-        ('SPAN', (1, 0), (2, 0)),
-        ('SPAN', (0, 1), (0, 2)),
+        ('SPAN', (1, 0), (2, 0)),  # Description spans
+        ('SPAN', (0, 1), (0, 2)),  # Objectives header spans
+        ('SPAN', (1, 3), (2, 3)),  # Expected participants spans
+        ('SPAN', (1, 4), (2, 4)),  # Budget spans
         ('PADDING', (0, 0), (-1, -1), 6),
         ('LEFTPADDING', (0, 0), (-1, -1), 3),
         ('RIGHTPADDING', (0, 0), (-1, -1), 3),
