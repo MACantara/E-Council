@@ -28,6 +28,9 @@ from reportlab.lib.enums import TA_RIGHT
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import inch
+from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.fonts import addMapping
 
 import cloudinary
 import cloudinary.uploader
@@ -4426,6 +4429,164 @@ def generate_concept_paper_pdf(concept_paper_id):
     ]))
     
     story.append(signature_table)
+    
+    # Add Parent/Guardian Consent Form
+    story.append(PageBreak())
+    story.append(Paragraph("Form 8", red_text_style))
+    story.append(Paragraph("PARENT/GUARDIAN CONSENT FORM", title_style))
+    story.append(Spacer(1, 20))
+    
+    # Student Details Table
+    student_details = [
+        [Paragraph("<b>Name of Student:</b><br/><br/>", normal_style), 
+         Paragraph("<b>Course/Year level:</b><br/><br/>", normal_style),
+         Paragraph("<b>ID Number:</b><br/><br/>", normal_style)],
+        [Paragraph("<b>Day/Date:</b><br/>Monday, September 30, 2024 (Tentative)", normal_style),
+         Paragraph("<b>Time:</b><br/>1:00 PM to 4:00 PM", normal_style),
+         ""],
+        [Paragraph("<b>Venue:</b><br/>UPHSD Molino - New Gymnasium", normal_style),
+         Paragraph("<b>Title of the Activity:</b><br/>College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", normal_style),
+         ""]
+    ]
+    
+    student_table = Table(student_details, colWidths=[available_width/3] * 3)
+    student_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('SPAN', (1, 2), (2, 2)),  # Span title across two columns
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    story.append(student_table)
+    story.append(Spacer(1, 20))
+    
+    # Department Info Table
+    dept_info = [
+        [Paragraph("<b>RESPONSIBLE DEPARTMENT</b>", header_style)],
+        [Paragraph("<b>Department/Office Unit:</b><br/>College of Computer Studies", normal_style),
+         Paragraph("<b>Landline:</b><br/>", normal_style)],
+        [Paragraph("<b>Faculty In-Charge:</b><br/>Dolores Montesines", normal_style),
+         Paragraph("<b>Mobile Number:</b><br/>", normal_style)],
+        [Paragraph("<b>Dean/Immediate Supervisor:</b><br/>Maribel Sandagon", normal_style),
+         Paragraph("<b>Mobile Number:</b><br/>", normal_style)]
+    ]
+    
+    dept_table = Table(dept_info, colWidths=[available_width/2] * 2)
+    dept_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('SPAN', (0, 0), (1, 0)),  # Span header across columns
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    story.append(dept_table)
+    story.append(Spacer(1, 20))
+    
+    # Consent Section
+    story.append(Paragraph("<b>CONSENT</b>", header_style))
+    story.append(Spacer(1, 10))
+    
+    consent_items = [
+        "I understand that UPH-Molino together with this administrators, faculty and staff did everything with due diligence to ensure the safety by of my son/daughter during the conduct of the activity.",
+        "I understand that the duration of the activity is on Friday, March 15, 2024 (Tentative) from 1:00 PM - 4:00 PM and I expect my son/daughter to participate at student orientation.",
+        "The activity is for enhancement of skills of my son/daughter and we need not to pay for a certain amount to cover registration fee, food, seminar kits, certificates, and transportation expenses.",
+        "We understand that the activity is not compulsory/mandatory and an alternative activity can be done if ever my son/daughter will not join the activity.",
+        "We voluntary allow our son/daughter to join the activity and needs to adhere to all the safety measures being done by the administration, faculty and staff of UPH-Molino."
+    ]
+    
+    for item in consent_items:
+        story.append(Paragraph(f"• {item}", normal_style))
+        story.append(Spacer(1, 6))
+    
+    # Signature Section
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("Seen and read by:", normal_style))
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("________________________________", normal_style))
+    story.append(Paragraph("Signature over Name of Parent/ Guardian", normal_style))
+    
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("Checked by:", normal_style))
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("_____________________________________", normal_style))
+    story.append(Paragraph("<b>MS. MARIBEL SANDAGON</b>", normal_style))
+    story.append(Paragraph("OIC Dean, College of Computer Studies", normal_style))
+    
+    # Letter to Parents
+    story.append(PageBreak())
+    story.append(Paragraph("<b>College of Computer Studies</b>", ParagraphStyle(
+        'CenteredStyle',
+        parent=normal_style,
+        alignment=1  # 1 = center alignment
+    )))
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("Dear Parents,", normal_style))
+    story.append(Paragraph("Greetings!", normal_style))
+    story.append(Spacer(1, 12))
+    
+    letter_text = """           The College of Computer Studies will be having an onsite Student Orientation for 1st Semester with the theme "Future Proofing Your Career: Navigating the A.I. Revolution" this coming Monday, September 30, 2024, from 1:00 PM to 4:00 PM at New Gymnasium of UPHSD-Molino. We are hoping for your full participation in this event. Your presence is much appreciated. Your knowledge and opinions on our upcoming activities will aid us in making decisions and taking the appropriate action. Thank you!"""
+    
+    story.append(Paragraph(letter_text, normal_style))
+    story.append(Spacer(1, 20))
+    
+    # Signature Section for Letter
+    story.append(Paragraph("Prepared By:", normal_style))
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("<b>ALEXANDER JON S. SOLIS</b>", normal_style))
+    story.append(Paragraph("Secretary, CCS Council", normal_style))
+    story.append(Spacer(1, 20))
+    
+    story.append(Paragraph("Noted By:", normal_style))
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("<b>MS. MARIBEL SANDAGON</b>", normal_style))
+    story.append(Paragraph("OIC Dean, College of Computer Studies", normal_style))
+    
+    # Reply Slip with full-width line
+    story.append(Spacer(1, 20))
+    story.append(HRFlowable(
+        width="100%",
+        thickness=1,
+        lineCap='round',
+        color=colors.black,
+        spaceBefore=1,
+        spaceAfter=1,
+        hAlign='CENTER',
+    ))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph("Reply Slip", ParagraphStyle(
+        'CenteredStyle',
+        parent=normal_style,
+        alignment=1
+    )))
+    story.append(Spacer(1, 12))
+    
+    # Create checkbox style with ZapfDingbats
+    checkbox_style = ParagraphStyle(
+        'CheckboxStyle',
+        parent=normal_style,
+        leftIndent=20
+    )
+
+    reply_options = [
+        "I allow my son/daughter to attend the College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"",
+        "I do not allow my son/daughter to attend the College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\""
+    ]
+
+    for option in reply_options:
+        story.append(Paragraph("<font face='ZapfDingbats' size='16'>❏</font> " + option, checkbox_style))
+        story.append(Spacer(1, 12))
+    
+    story.append(Spacer(1, 30))
+    story.append(Table([[
+        Paragraph("__________________________________", normal_style),
+        Paragraph("_______________", normal_style)
+    ]], colWidths=[available_width * 0.7, available_width * 0.3]))
+    story.append(Table([[
+        Paragraph("Signature over Name of Parent/ Guardian", normal_style),
+        Paragraph("Date", normal_style)
+    ]], colWidths=[available_width * 0.7, available_width * 0.3]))
     
     doc.build(story, onFirstPage=header, onLaterPages=header)
     
