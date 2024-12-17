@@ -3862,8 +3862,8 @@ def generate_concept_paper_pdf(concept_paper_id):
     objectives_data = [
         # Headers row
         [
-            Paragraph("<b>Objective/s</b>", header_style),
-            Paragraph("<b>Outcomes (Benefits of Clients)</b>", header_style)
+            Paragraph("<b>OBJECTIVES OF THE ACTIVITY</b>", header_style),
+            Paragraph("<b>LEARNING OUTCOMES</b>", header_style)
         ]
     ]
     
