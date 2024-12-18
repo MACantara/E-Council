@@ -3727,7 +3727,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Spacer(1, 12))
     
     # Letter Content
-    letter_content = """<para>Please excuse the following students to your class for they will be attending an activity sponsored by our college. Rest assured that they will be responsible in studying the lesson they had missed during their absence. Kindly see the attached list of the students.<br/><br/>Thank you!</para>"""
+    letter_content = """<para firstLineIndent='32'>Please excuse the following students to your class for they will be attending an activity sponsored by our college. Rest assured that they will be responsible in studying the lesson they had missed during their absence. Kindly see the attached list of the students.<br/><br/>Thank you!</para>"""
     story.append(Paragraph(letter_content, normal_style))
     story.append(Spacer(1, 20))
     
