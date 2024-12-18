@@ -4412,18 +4412,26 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Paragraph("PERSONNEL IN-CHARGE FORM (PICF)", title_style))
     story.append(Spacer(1, 20))
     
+    # Format period covered
+    semester = concept_paper.concept_paper_forms_semester
+    academic_year = concept_paper.concept_paper_forms_academic_year
+    period_covered = f"{semester}, {concept_paper.concept_paper_forms_date.strftime('%B %d, %Y')} (Tentative)"
+    
+    # Format time
+    time_str = f"{concept_paper.concept_paper_forms_event_start_date_and_time.strftime('%I:%M %p')} to {concept_paper.concept_paper_forms_event_end_date_and_time.strftime('%I:%M %p')}"
+    
     picf_details = [
         # Row 1: Title spans 2 columns, Period Covered in last column
         [
-            Paragraph("<b>Title of the Activity:</b><br/>College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", normal_style),
+            Paragraph(f"<b>Title of the Activity:</b><br/>{concept_paper.concept_paper_forms_subject}", normal_style),
             "",  # Empty cell for spanning
-            Paragraph("<b>Period Covered:</b><br/>1st Semester, September 30, 2024 (Tentative)", normal_style)
+            Paragraph(f"<b>Period Covered:</b><br/>{period_covered}", normal_style)
         ],
         # Row 2: Three separate cells
         [
-            Paragraph("<b>Time:</b><br/>1:00 PM to 4:00 PM", normal_style),
-            Paragraph("<b>Venue:</b><br/>UPHSD Molino – New Gymnasium", normal_style),
-            Paragraph("<b>College/Department:</b><br/>College of Computer Studies", normal_style)
+            Paragraph(f"<b>Time:</b><br/>{time_str}", normal_style),
+            Paragraph(f"<b>Venue:</b><br/>{concept_paper.concept_paper_forms_location}", normal_style),
+            Paragraph(f"<b>College/Department:</b><br/>{concept_paper.department.departments_name if concept_paper.department else ''}", normal_style)
         ]
     ]
     
