@@ -4513,8 +4513,8 @@ def generate_concept_paper_pdf(concept_paper_id):
     ]))
 
     story.append(signature_table)
-    
-        # Add Parent/Guardian Consent Form
+
+    # Add Parent/Guardian Consent Form
     story.append(PageBreak())
     story.append(Paragraph("Form 8", red_text_style))
     story.append(Paragraph("PARENT/GUARDIAN CONSENT FORM", title_style))
@@ -4623,34 +4623,43 @@ def generate_concept_paper_pdf(concept_paper_id):
         story.append(Paragraph(f"<b>{dean_name.upper()}</b>", normal_style))
         story.append(Paragraph(pg_form.parent_guardian_consent_forms_department_office_unit or "OIC Dean, College of Computer Studies", normal_style))
     
-    # Letter to Parents
+        # Letter to Parents
     story.append(PageBreak())
-    story.append(Paragraph("<b>College of Computer Studies</b>", ParagraphStyle(
+    story.append(Paragraph(f"<b>{department}</b>", ParagraphStyle(
         'CenteredStyle',
         parent=normal_style,
-        alignment=1  # 1 = center alignment
+        alignment=1
     )))
     story.append(Spacer(1, 20))
     story.append(Paragraph("Dear Parents,", normal_style))
     story.append(Paragraph("Greetings!", normal_style))
     story.append(Spacer(1, 12))
     
-    letter_text = """           The College of Computer Studies will be having an onsite Student Orientation for 1st Semester with the theme "Future Proofing Your Career: Navigating the A.I. Revolution" this coming Monday, September 30, 2024, from 1:00 PM to 4:00 PM at New Gymnasium of UPHSD-Molino. We are hoping for your full participation in this event. Your presence is much appreciated. Your knowledge and opinions on our upcoming activities will aid us in making decisions and taking the appropriate action. Thank you!"""
+    # Dynamic letter content using parent guardian consent form content if available
+    if pg_form and pg_form.parent_guardian_consent_forms_content:
+        letter_text = f"""<para firstLineIndent='32'>{pg_form.parent_guardian_consent_forms_content}</para>"""
+    else:
+        # Fallback to default template
+        letter_text = f"""<para firstLineIndent='32'></para>"""
     
     story.append(Paragraph(letter_text, normal_style))
     story.append(Spacer(1, 20))
     
-    # Signature Section for Letter
+    # Signature Section with dynamic signatories
     story.append(Paragraph("Prepared By:", normal_style))
     story.append(Spacer(1, 20))
-    story.append(Paragraph("<b>ALEXANDER JON S. SOLIS</b>", normal_style))
-    story.append(Paragraph("Secretary, CCS Council", normal_style))
+    if pg_form and pg_form.prepared_by_user:
+        prepared_by_name = f"{pg_form.prepared_by_user.users_first_name} {pg_form.prepared_by_user.users_last_name}"
+        story.append(Paragraph(f"<b>{prepared_by_name.upper()}</b>", normal_style))
+        story.append(Paragraph("Secretary, CCS Council", normal_style))
     story.append(Spacer(1, 20))
     
     story.append(Paragraph("Noted By:", normal_style))
     story.append(Spacer(1, 20))
-    story.append(Paragraph("<b>MS. MARIBEL SANDAGON</b>", normal_style))
-    story.append(Paragraph("OIC Dean, College of Computer Studies", normal_style))
+    if pg_form and pg_form.noted_by_signatory:
+        noted_by_name = f"{pg_form.noted_by_signatory.signatory_first_name} {pg_form.noted_by_signatory.signatory_last_name}"
+        story.append(Paragraph(f"<b>{noted_by_name.upper()}</b>", normal_style))
+        story.append(Paragraph(pg_form.parent_guardian_consent_forms_department_office_unit or "OIC Dean, College of Computer Studies", normal_style))
     
     # Reply Slip with full-width line
     story.append(Spacer(1, 20))
@@ -4677,12 +4686,13 @@ def generate_concept_paper_pdf(concept_paper_id):
         parent=normal_style,
         leftIndent=20
     )
-
+    
+    # Dynamic reply options using concept paper subject
     reply_options = [
-        "I allow my son/daughter to attend the College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"",
-        "I do not allow my son/daughter to attend the College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\""
+        f"I allow my son/daughter to attend the {concept_paper.concept_paper_forms_subject}",
+        f"I do not allow my son/daughter to attend the {concept_paper.concept_paper_forms_subject}"
     ]
-
+    
     for option in reply_options:
         story.append(Paragraph("<font face='ZapfDingbats' size='16'>❏</font> " + option, checkbox_style))
         story.append(Spacer(1, 12))
