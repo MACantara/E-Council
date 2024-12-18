@@ -4514,23 +4514,41 @@ def generate_concept_paper_pdf(concept_paper_id):
 
     story.append(signature_table)
     
-    # Add Parent/Guardian Consent Form
+        # Add Parent/Guardian Consent Form
     story.append(PageBreak())
     story.append(Paragraph("Form 8", red_text_style))
     story.append(Paragraph("PARENT/GUARDIAN CONSENT FORM", title_style))
-    story.append(Spacer(1, 20))
+    
+    # Query parent guardian consent form
+    pg_form = ParentGuardianConsentForms.query.filter_by(parent_guardian_consent_forms_concept_paper_forms_id=concept_paper.concept_paper_forms_id).first()
+    
+    # Format date and time
+    event_date = concept_paper.concept_paper_forms_event_start_date_and_time.strftime("%A, %B %d, %Y")
+    event_time = f"{concept_paper.concept_paper_forms_event_start_date_and_time.strftime('%I:%M %p')} to {concept_paper.concept_paper_forms_event_end_date_and_time.strftime('%I:%M %p')}"
+    
+    if pg_form:
+        student_name = pg_form.parent_guardian_consent_forms_name_of_student or ""
+        course_year = pg_form.parent_guardian_consent_forms_course_year_level or ""
+        id_number = pg_form.parent_guardian_consent_forms_id_number or ""
+        department = pg_form.parent_guardian_consent_forms_department_office_unit or ""
+        dean_name = f"{pg_form.dean_immediate_supervisor_signatory.signatory_first_name} {pg_form.dean_immediate_supervisor_signatory.signatory_last_name}" if pg_form.dean_immediate_supervisor_signatory else ""
+    else:
+        student_name = ""
+        course_year = ""
+        id_number = ""
+        department = concept_paper.department.departments_name if concept_paper.department else ""
+        dean_name = ""
     
     # Student Details Table
     student_details = [
-        [Paragraph("<b>Name of Student:</b><br/><br/>", normal_style), 
-         Paragraph("<b>Course/Year level:</b><br/><br/>", normal_style),
-         Paragraph("<b>ID Number:</b><br/><br/>", normal_style)],
-        [Paragraph("<b>Day/Date:</b><br/>Monday, September 30, 2024 (Tentative)", normal_style),
-         Paragraph("<b>Time:</b><br/>1:00 PM to 4:00 PM", normal_style),
-         ""],
-        [Paragraph("<b>Venue:</b><br/>UPHSD Molino - New Gymnasium", normal_style),
-         Paragraph("<b>Title of the Activity:</b><br/>College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", normal_style),
-         ""]
+        [Paragraph(f"<b>Name of Student:</b><br/><br/>{student_name}", normal_style), 
+         Paragraph(f"<b>Course/Year level:</b><br/><br/>{course_year}", normal_style),
+         Paragraph(f"<b>ID Number:</b><br/><br/>{id_number}", normal_style)],
+        [Paragraph(f"<b>Day/Date:</b><br/>{event_date} (Tentative)", normal_style),
+         Paragraph(f"<b>Time:</b><br/>{event_time}", normal_style),
+         Paragraph(f"<b>Venue:</b><br/>{concept_paper.concept_paper_forms_location}", normal_style)],
+        [Paragraph(f"<b>Title of the Activity:</b><br/>{concept_paper.concept_paper_forms_subject}", normal_style),
+         "", ""]  # Empty cells for spanning
     ]
     
     student_table = Table(student_details, colWidths=[available_width/3] * 3)
@@ -4538,7 +4556,7 @@ def generate_concept_paper_pdf(concept_paper_id):
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('SPAN', (1, 2), (2, 2)),  # Span title across two columns
+        ('SPAN', (0, 2), (2, 2)),  # Span title across all three columns
         ('PADDING', (0, 0), (-1, -1), 6),
     ]))
     
@@ -4548,11 +4566,11 @@ def generate_concept_paper_pdf(concept_paper_id):
     # Department Info Table
     dept_info = [
         [Paragraph("<b>RESPONSIBLE DEPARTMENT</b>", header_style)],
-        [Paragraph("<b>Department/Office Unit:</b><br/>College of Computer Studies", normal_style),
+        [Paragraph(f"<b>Department/Office Unit:</b><br/>{department}", normal_style),
          Paragraph("<b>Landline:</b><br/>", normal_style)],
-        [Paragraph("<b>Faculty In-Charge:</b><br/>Dolores Montesines", normal_style),
+        [Paragraph(f"<b>Faculty In-Charge:</b><br/>{personnel_name if 'personnel_name' in locals() else ''}", normal_style),
          Paragraph("<b>Mobile Number:</b><br/>", normal_style)],
-        [Paragraph("<b>Dean/Immediate Supervisor:</b><br/>Maribel Sandagon", normal_style),
+        [Paragraph(f"<b>Dean/Immediate Supervisor:</b><br/>{dean_name}", normal_style),
          Paragraph("<b>Mobile Number:</b><br/>", normal_style)]
     ]
     
