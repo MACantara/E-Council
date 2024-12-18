@@ -4586,13 +4586,17 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(dept_table)
     story.append(Spacer(1, 20))
     
-    # Consent Section
+        # Consent Section
     story.append(Paragraph("<b>CONSENT</b>", header_style))
     story.append(Spacer(1, 10))
     
+    # Format event details
+    event_date = concept_paper.concept_paper_forms_event_start_date_and_time.strftime("%A, %B %d, %Y")
+    event_time = f"{concept_paper.concept_paper_forms_event_start_date_and_time.strftime('%I:%M %p')} - {concept_paper.concept_paper_forms_event_end_date_and_time.strftime('%I:%M %p')}"
+    
     consent_items = [
-        "I understand that UPH-Molino together with this administrators, faculty and staff did everything with due diligence to ensure the safety by of my son/daughter during the conduct of the activity.",
-        "I understand that the duration of the activity is on Friday, March 15, 2024 (Tentative) from 1:00 PM - 4:00 PM and I expect my son/daughter to participate at student orientation.",
+        f"I understand that UPH-Molino together with this administrators, faculty and staff did everything with due diligence to ensure the safety by of my son/daughter during the conduct of the activity.",
+        f"I understand that the duration of the activity is on {event_date} (Tentative) from {event_time} and I expect my son/daughter to participate at {concept_paper.concept_paper_forms_subject}.",
         "The activity is for enhancement of skills of my son/daughter and we need not to pay for a certain amount to cover registration fee, food, seminar kits, certificates, and transportation expenses.",
         "We understand that the activity is not compulsory/mandatory and an alternative activity can be done if ever my son/daughter will not join the activity.",
         "We voluntary allow our son/daughter to join the activity and needs to adhere to all the safety measures being done by the administration, faculty and staff of UPH-Molino."
@@ -4600,7 +4604,6 @@ def generate_concept_paper_pdf(concept_paper_id):
     
     for item in consent_items:
         story.append(Paragraph(f"• {item}", normal_style))
-        story.append(Spacer(1, 6))
     
     # Signature Section
     story.append(Spacer(1, 20))
@@ -4613,8 +4616,12 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Paragraph("Checked by:", normal_style))
     story.append(Spacer(1, 20))
     story.append(Paragraph("_____________________________________", normal_style))
-    story.append(Paragraph("<b>MS. MARIBEL SANDAGON</b>", normal_style))
-    story.append(Paragraph("OIC Dean, College of Computer Studies", normal_style))
+    
+    # Get dean name from parent guardian form
+    if pg_form and pg_form.dean_immediate_supervisor_signatory:
+        dean_name = f"{pg_form.dean_immediate_supervisor_signatory.signatory_first_name} {pg_form.dean_immediate_supervisor_signatory.signatory_last_name}"
+        story.append(Paragraph(f"<b>{dean_name.upper()}</b>", normal_style))
+        story.append(Paragraph(pg_form.parent_guardian_consent_forms_department_office_unit or "OIC Dean, College of Computer Studies", normal_style))
     
     # Letter to Parents
     story.append(PageBreak())
