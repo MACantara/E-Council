@@ -4650,8 +4650,10 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Spacer(1, 20))
     if pg_form and pg_form.prepared_by_user:
         prepared_by_name = f"{pg_form.prepared_by_user.users_first_name} {pg_form.prepared_by_user.users_last_name}"
+        org_name = StudentOrganizations.query.get(pg_form.prepared_by_user.users_student_organization).student_organizations_name if pg_form.prepared_by_user.users_student_organization else ''
+        org_acronym = get_org_acronym(org_name)
         story.append(Paragraph(f"<b>{prepared_by_name.upper()}</b>", normal_style))
-        story.append(Paragraph("Secretary, CCS Council", normal_style))
+        story.append(Paragraph(f"{pg_form.prepared_by_user.users_student_organization_position}, {org_acronym}", normal_style))
     story.append(Spacer(1, 20))
     
     story.append(Paragraph("Noted By:", normal_style))
@@ -4659,7 +4661,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     if pg_form and pg_form.noted_by_signatory:
         noted_by_name = f"{pg_form.noted_by_signatory.signatory_first_name} {pg_form.noted_by_signatory.signatory_last_name}"
         story.append(Paragraph(f"<b>{noted_by_name.upper()}</b>", normal_style))
-        story.append(Paragraph(pg_form.parent_guardian_consent_forms_department_office_unit or "OIC Dean, College of Computer Studies", normal_style))
+        story.append(Paragraph(f"{pg_form.noted_by_signatory.signatory_position}, {pg_form.parent_guardian_consent_forms_department_office_unit}", normal_style))
     
     # Reply Slip with full-width line
     story.append(Spacer(1, 20))
