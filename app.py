@@ -4457,14 +4457,27 @@ def generate_concept_paper_pdf(concept_paper_id):
         spaceAfter=6
     )
     
-    # Split commitment text into sections
-    intro_text = """<para firstLineIndent='32'>I, <b>Dolores Montesines</b>, of the College of Computer Studies will voluntarily accompany my students during the activity. I understand my responsibilities and role as the Dean in-charge and will diligently follow all protocols needed for the safety of the participating students. I am committed to do the following to ensure the safety of the students during the activity.</para>"""
+    # Query personnel in charge form
+    pic_form = PersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_concept_paper_forms_id=concept_paper.concept_paper_forms_id).first()
 
+    if pic_form:
+        personnel_name = f"{pic_form.personnel_in_charge_signatory.signatory_first_name} {pic_form.personnel_in_charge_signatory.signatory_last_name}" if pic_form.personnel_in_charge_signatory else ""
+        dean_name = f"{pic_form.noted_by_dean_signatory.signatory_first_name} {pic_form.noted_by_dean_signatory.signatory_last_name}" if pic_form.noted_by_dean_signatory else ""
+        sas_name = f"{pic_form.noted_by_sas_signatory.signatory_first_name} {pic_form.noted_by_sas_signatory.signatory_last_name}" if pic_form.noted_by_sas_signatory else ""
+    else:
+        personnel_name = ""
+        dean_name = ""
+        sas_name = ""
+
+    # Update intro text with dynamic name
+    intro_text = f"""<para firstLineIndent='32'>I, <b>{personnel_name}</b>, of the College of Computer Studies will voluntarily accompany my students during the activity. I understand my responsibilities and role as the Dean in-charge and will diligently follow all protocols needed for the safety of the participating students. I am committed to do the following to ensure the safety of the students during the activity.</para>"""
+
+    # List items remain the same
     list_items = [
-        "Remind the students about the ground rules of activity during the preparation stage. I will implement whatever the safety measures necessary (checking of attendance online, monitoring the behaviors of the students online) so that students will always be accounted for.",
-        "Rules and regulations of the school on liquors, drugs will be strictly implemented and will report incidents when students will not adhere to the said policies.",
-        "Makes sure that the schedule is followed and will guide the students in all activities to be conducted.",
-        "Submit the activity report form two weeks after the conduct of the activity or even earlier at the office of the SPS Head."
+        "Remind the students about the ground rules of activity during the preparation stage...",
+        "Rules and regulations of the school on liquors, drugs will be strictly implemented...",
+        "Makes sure that the schedule is followed and will guide the students in all activities...",
+        "Submit the activity report form two weeks after the conduct of the activity..."
     ]
 
     closing_text = """<para firstLineIndent='32'>I will be accompanying the students during the activity and can be contacted on the following contact number as indicated below:</para>"""
@@ -4472,26 +4485,25 @@ def generate_concept_paper_pdf(concept_paper_id):
     # Add text sections to story
     story.append(Paragraph(intro_text, normal_style))
 
-    # Add lettered list items
     for i, item in enumerate(list_items):
         story.append(Paragraph(f"{ascii_lowercase[i]}. {item}", list_style))
 
     story.append(Spacer(1, 12))
     story.append(Paragraph(closing_text, normal_style))
     story.append(Spacer(1, 20))
-    
-    # Create signature section
+
+    # Update signature section with dynamic names
     signature_data = [
-        ["By:", Paragraph("<b>Dolores Montesines</b>", normal_style), "____________________"],
+        ["By:", Paragraph(f"<b>{personnel_name}</b>", normal_style), "____________________"],
         ["", "Name of Personnel-in-charge/Signature", "Date/Time"],
         ["", "", ""],
-        ["Noted by:", Paragraph("<b>Ms. Maribel Sandagon</b>", normal_style), "____________________"],
+        ["Noted by:", Paragraph(f"<b>{dean_name}</b>", normal_style), "____________________"],
         ["", "OIC Dean of the College/Signature", "Date/Time"],
         ["", "", ""],
-        ["", Paragraph("<b>Ms. Kristina Rose G. Carlos</b>", normal_style), "____________________"],
+        ["", Paragraph(f"<b>{sas_name}</b>", normal_style), "____________________"],
         ["", "Head, Student Affairs & Services", "Date/Time"]
     ]
-    
+
     signature_table = Table(signature_data, colWidths=[available_width * 0.2, available_width * 0.5, available_width * 0.3])
     signature_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -4499,7 +4511,7 @@ def generate_concept_paper_pdf(concept_paper_id):
         ('FONTSIZE', (0, 0), (-1, -1), 12),
         ('PADDING', (0, 0), (-1, -1), 6),
     ]))
-    
+
     story.append(signature_table)
     
     # Add Parent/Guardian Consent Form
