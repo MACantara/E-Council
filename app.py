@@ -3662,15 +3662,28 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Spacer(1, 20))
     
     # Department Info Table
+    excuse_letter = ExcuseLetterForms.query.filter_by(excuse_letter_forms_concept_paper_forms_id=concept_paper.concept_paper_forms_id).first()
+
+    if not excuse_letter:
+        # Create default values if no excuse letter exists
+        personnel_name = ""
+        dean_name = ""
+        department_unit = concept_paper.department.departments_name if concept_paper.department else ""
+    else:
+        # Get related signatory names
+        personnel_name = excuse_letter.personnel_in_charge_signatory.signatory_first_name + " " + excuse_letter.personnel_in_charge_signatory.signatory_last_name if excuse_letter.personnel_in_charge_signatory else ""
+        dean_name = excuse_letter.dean_signatory.signatory_first_name + " " + excuse_letter.dean_signatory.signatory_last_name if excuse_letter.dean_signatory else ""
+        department_unit = excuse_letter.excuse_letter_forms_department_office_unit
+
     story.append(Paragraph("RESPONSIBLE DEPARTMENT", header_style))
     story.append(Spacer(1, 12))
     
     dept_info = [
-        [Paragraph("<b>Department/Office Unit:</b><br/>College of Computer Studies", normal_style),
+        [Paragraph(f"<b>Department/Office Unit:</b><br/>{excuse_letter.excuse_letter_forms_department_office_unit}", normal_style),
          Paragraph("<b>Landline:</b><br/>", normal_style)],
-        [Paragraph("<b>Faculty In-Charge:</b><br/>Dolores Montesines", normal_style),
+        [Paragraph(f"<b>Faculty In-Charge:</b><br/>{personnel_name}", normal_style),
          ""],
-        [Paragraph("<b>Dean:</b><br/>Ms. Maribel Sandagon", normal_style),
+        [Paragraph(f"<b>Dean:</b><br/>{dean_name}", normal_style),
          ""]
     ]
     
@@ -3697,10 +3710,10 @@ def generate_concept_paper_pdf(concept_paper_id):
     ]
     
     letter_table = Table(letter_data, colWidths=[
-        available_width * 0.20,  # Dear
-        available_width * 0.40,  # Professor Name
-        available_width * 0.20,  # Subject
-        available_width * 0.20   # Room Number
+        available_width * 0.20,
+        available_width * 0.40,
+        available_width * 0.20,
+        available_width * 0.20
     ])
     
     letter_table.setStyle(TableStyle([
@@ -3728,7 +3741,7 @@ def generate_concept_paper_pdf(concept_paper_id):
         ["Noted by:", ""],
         [Spacer(1, 30), ""],
         ["____________________________", ""],
-        [Paragraph("<b>MS. MARIBEL SANDAGON</b>", normal_style), ""],
+        [Paragraph(f"<b>{dean_name.upper()}</b>", normal_style), ""],
         ["Dean, College of Computer Studies", ""]
     ]
     
