@@ -4450,7 +4450,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     )
     
     # Split commitment text into sections
-    intro_text = """I, <b>Dolores Montesines</b>, of the College of Computer Studies will voluntarily accompany my students during the activity. I understand my responsibilities and role as the Dean in-charge and will diligently follow all protocols needed for the safety of the participating students. I am committed to do the following to ensure the safety of the students during the activity."""
+    intro_text = """<para firstLineIndent='32'>I, <b>Dolores Montesines</b>, of the College of Computer Studies will voluntarily accompany my students during the activity. I understand my responsibilities and role as the Dean in-charge and will diligently follow all protocols needed for the safety of the participating students. I am committed to do the following to ensure the safety of the students during the activity.</para>"""
 
     list_items = [
         "Remind the students about the ground rules of activity during the preparation stage. I will implement whatever the safety measures necessary (checking of attendance online, monitoring the behaviors of the students online) so that students will always be accounted for.",
@@ -4459,7 +4459,7 @@ def generate_concept_paper_pdf(concept_paper_id):
         "Submit the activity report form two weeks after the conduct of the activity or even earlier at the office of the SPS Head."
     ]
 
-    closing_text = """I will be accompanying the students during the activity and can be contacted on the following contact number as indicated below:"""
+    closing_text = """<para firstLineIndent='32'>I will be accompanying the students during the activity and can be contacted on the following contact number as indicated below:</para>"""
 
     # Add text sections to story
     story.append(Paragraph(intro_text, normal_style))
