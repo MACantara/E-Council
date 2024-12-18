@@ -3381,7 +3381,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     
     story.append(Spacer(1, 20))
     
-        # Create signature styling for left-aligned text
+    # Create signature styling for left-aligned text
     left_signature_style = ParagraphStyle(
         'LeftSignatureStyle',
         parent=styles['Normal'],
@@ -3628,23 +3628,29 @@ def generate_concept_paper_pdf(concept_paper_id):
     story.append(Paragraph("<b>EXCUSE LETTER FORM</b>", centered_header_style))
     story.append(Spacer(1, 20))
     
-    # I. Activity Details Section
+    # I. Activity Details Section 
     story.append(Paragraph("I. Activity Details:", header_style))
     story.append(Spacer(1, 12))
     
+    # Format date and time
+    start_datetime = concept_paper.concept_paper_forms_event_start_date_and_time
+    end_datetime = concept_paper.concept_paper_forms_event_end_date_and_time
+    
+    date_str = start_datetime.strftime("%A, %B %d, %Y")
+    time_str = f"{start_datetime.strftime('%I:%M %p')} to {end_datetime.strftime('%I:%M %p')}"
+    
     activity_details = [
-        [Paragraph("<b>Title of Activity:</b><br/>" + 
-                  "College of Computer Studies 1st Semester Student Orientation S.Y 2024-2025: \"Future Proofing Your Career: Navigating the A.I. Revolution\"", normal_style),
+        [Paragraph(f"<b>Title of Activity:</b><br/>{concept_paper.concept_paper_forms_subject}", normal_style),
          "", ""],  # Empty cells for spanning
-        [Paragraph("<b>Day/Date:</b><br/>Monday, September 30, 2024 (Tentative)", normal_style),
-         Paragraph("<b>Time:</b><br/>1:00 PM to 4:00 PM", normal_style),
-         Paragraph("<b>Venue:</b><br/>UPHSD Molino – New Gymnasium", normal_style)]
+        [Paragraph(f"<b>Day/Date:</b><br/>{date_str}", normal_style),
+         Paragraph(f"<b>Time:</b><br/>{time_str}", normal_style),
+         Paragraph(f"<b>Venue:</b><br/>{concept_paper.concept_paper_forms_location}", normal_style)]
     ]
     
     activity_table = Table(activity_details, colWidths=[available_width * 0.4, available_width * 0.3, available_width * 0.3])
     activity_table.setStyle(TableStyle([
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black), 
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('FONTSIZE', (0, 0), (-1, -1), 12),
