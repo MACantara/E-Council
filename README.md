@@ -1,15 +1,21 @@
-# E-Council — AI-Powered Student Council Management
+# E-Council — Integrated Student Council Management System Powered by AI
 
-> Experience the future of student council leadership with AI-driven insights that make managing events, resources, and student engagement smarter, faster, and better.
+> An AI-powered central hub for student council operations — managing events, documents, finances, and reports smarter, faster, and with less administrative overhead.
 
 E-Council is a Flask-based web application that digitizes and centralizes the administrative work of a student council — from event planning and concept papers to post-event documentation, financial tracking, board resolutions, and meeting minutes — in a single, authenticated platform with AI-assisted drafting and one-click PDF generation.
+
+It was designed and developed for the **Junior Philippine Computer Society (JPCS) council** and the **College of Computer Studies Student Council (CCS-SC)** at the **University of Perpetual Help System Dalta (UPHSD) — Molino Campus**.
 
 ---
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [The Problem It Solves](#the-problem-it-solves)
+- [Background of the Study](#background-of-the-study)
+- [Problem Statement](#problem-statement)
+- [Objectives of the Study](#objectives-of-the-study)
+- [Scope and Limitations](#scope-and-limitations)
+- [Significance of the Study](#significance-of-the-study)
+- [System Overview](#system-overview)
 - [Key Features & Modules](#key-features--modules)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -21,11 +27,75 @@ E-Council is a Flask-based web application that digitizes and centralizes the ad
 
 ---
 
-## Overview
+## Background of the Study
 
-E-Council is a web portal built for the student councils of a multi-college institution. It supports the colleges commonly found in the partner school — College of Computer Studies, Engineering, Architecture, Criminology, Nursing, Arts/Sciences/Education, Business Administration & Accountancy, Physical & Occupational Therapy, and International Tourism & Hospitality Management.
+The **Junior Philippine Computer Society (JPCS)** council and the **College of Computer Studies Student Council (CCS-SC)** are the two student councils representing the students of the College of Computer Studies at the University of Perpetual Help System Dalta, Molino Campus. They are responsible for handling and organizing events for the enrichment and enjoyment of the students.
 
-Users sign up under a specific college department and are assigned one of four roles:
+The current setup for managing such events revolves around cloud-based tools such as **Google Drive, Google Docs, Google Sheets, and Google Forms**. For communication within the student councils, **Microsoft Teams** and **Facebook Messenger** are used.
+
+While there are strengths to utilizing these digital services — such as real-time collaboration and centralized file storage — there are notable weaknesses in the current setup:
+
+- **No central hub** for an overview of the student council's activities, financial bank book, data analytics for event evaluation results, and other information that can aid in the council's decision-making.
+- **Manual generation of documents** such as concept papers, after-documentation/activity reports, end-of-semester reports, and Society Accomplishment and Compliance (SOAC) reports. These manual processes take significant time while also being prone to human errors, leading to inefficiencies in the operations of the student councils.
+
+To address these issues, this project proposes the development of **E-Council: an Integrated Student Council Management System Powered by AI**. The system is designed as a central hub for all of the operations of the student council. By utilizing the generative capabilities of AI, it aims to improve the operational efficiency and effectiveness of the student council while reducing the time and administrative workload for student council officers.
+
+## Problem Statement
+
+The manual handling of student council activities by the JPCS and CCS-SC within the College of Computer Studies at the University of Perpetual Help System Dalta, Molino Campus results in significant administrative inefficiencies and an increased potential for human errors. The current reliance on manual processes for managing events, generating reports, and maintaining records creates challenges in accuracy, timeliness, and overall effectiveness. These issues hinder the council's ability to operate efficiently and manage its responsibilities effectively.
+
+This study aims to address these problems by developing a comprehensive, AI-powered student council management system that automates and streamlines these processes, improving efficiency and reducing administrative burdens.
+
+## Objectives of the Study
+
+### General Objective
+
+To design and develop **E-Council: an Integrated Student Council Management System Powered by Artificial Intelligence** for the JPCS council and CCS-SC at the University of Perpetual Help System Dalta, Molino Campus, benefiting the student council officers, faculty, and staff.
+
+### Specific Objectives
+
+1. **Login Module** — secure login for student council officers, staff, and faculty.
+2. **Accounts Module** — managing account details and settings for changing password and email.
+3. **Password Reset Module** — secure password recovery for forgotten credentials.
+4. **Council Overview Module** — a centralized dashboard providing:
+   - *Event Management Overview* — a summary of ongoing, completed, and upcoming council events with their respective dates, statuses, and organizers.
+   - *Financial Bank Book Tracking* — a real-time view of the council's financial transactions, including deposits, withdrawals, and current balance.
+   - *Activity Completion Rate Graph* — a visual representation of completed versus planned activities for a specific period (monthly, quarterly, or annually).
+   - *Event Evaluation Metrics* — a graphical summary of event evaluation results, including participant feedback, attendance, satisfaction ratings, and impact assessments.
+5. **Events Management Module** — managing, creating, and updating of event details and tracking of event status.
+6. **Event Management Invitation Module** — enabling users to collaborate on event management.
+7. **Event Dashboard Module** — displaying key financial insights such as the top 5 expenses and income, remaining budget, transaction history, and evaluation results.
+8. **Event Transaction Module** — for council officers to log event-related transactions with receipts as proof of payment.
+9. **Concept Paper Module** — utilizes AI to assist in generating concept papers for council activities.
+10. **Documentation Module** — enabling council officers to generate after-documentation or post-activity reports of an event.
+11. **Financial Reports** — including the title of activity, date, nature of activity, time, college/department, venue, source of fund, less expense, total remaining funds, and receipts for proof of payment.
+12. **Board Resolutions Module** — to generate a board resolution document with AI.
+
+> **Note:** The implemented system also includes a **Minutes of the Meeting** module (see [Key Features & Modules](#key-features--modules)) beyond the objectives listed above.
+
+## Scope and Limitations
+
+### Scope
+
+This study is confined to the development of the E-Council system powered by AI for the JPCS council and CCS-SC of the College of Computer Studies at the University of Perpetual Help System Dalta, Molino Campus. The system addresses the management needs of the student councils by automating various administrative tasks and providing tools for efficient event and document management.
+
+### Limitations
+
+- The study does **not** include functionalities related to **payment systems** or **merchandise management**.
+- **AI capabilities are limited to text analysis and generation**, excluding images and videos.
+- The system is **exclusive to the student council officers, faculty, and staff of the College of Computer Studies** at the University of Perpetual Help System Dalta, Molino Campus, and does not extend to other departments or campuses.
+
+## Significance of the Study
+
+- **For student council officers** — the system provides an efficient and user-friendly platform to manage their responsibilities, reducing administrative burdens and enhancing productivity.
+- **For faculty and staff** — streamlined processing and improved documentation accuracy.
+- **For future researchers** — the system serves as a reference and foundation for future research and development, offering a basis upon which enhancements and expansions can be built.
+
+---
+
+## System Overview
+
+E-Council is a web portal built for the student councils of the College of Computer Studies at UPHSD Molino. Users sign up under a specific college department and are assigned one of four roles:
 
 | Role | Description |
 | --- | --- |
@@ -36,64 +106,71 @@ Users sign up under a specific college department and are assigned one of four r
 
 Once authenticated, users land on the **E-Council Overview**, a dashboard that summarizes the council's activities for a selected school year, including a financial bank-book chart, an activity completion-rate chart, and an activity evaluation graph.
 
-## The Problem It Solves
-
-Student council operations are traditionally paper-based and fragmented across disconnected tools — word processors for concept papers, spreadsheets for finances, separate files for meeting minutes, and manual photo documentation. This creates several pain points:
-
-- **Scattered records** — events, papers, and reports live in different places, making it hard to track what is pending, approved, or completed.
-- **Repetitive paperwork** — concept papers, board resolutions, and post-event documentation require drafting large amounts of formal text from scratch each time.
-- **Manual financial tracking** — income and expenses are tracked by hand with no consolidated ledger per event.
-- **No audit trail** — document status (draft, pending, approved, rejected) and signatories are difficult to verify.
-- **Slow PDF generation** — formal documents must be manually formatted and exported for submission.
-
-E-Council addresses these by providing a single platform where every council document type has a structured form, a status workflow, AI-assisted text generation for the most writing-heavy documents, and built-in PDF export.
-
 ## Key Features & Modules
 
-The application is organized around seven core modules, accessible from the council overview sidebar:
+The application is organized around the modules defined in the study's specific objectives, accessible from the council overview sidebar:
 
-### 1. E-Council Overview
-A dashboard summarizing the council's activities for a selected school year, with charts for the financial bank book, activity completion rate, and activity evaluation.
+### 1. Login & Authentication
+- Signup with email verification (token-based, via itsdangerous)
+- Login with login-attempt tracking
+- Forgot-password / reset-password flows (token-based email links)
 
-### 2. Events
+### 2. Accounts & Settings
+- Account details and profile picture management (hosted on Cloudinary)
+- Email-change settings with verification
+- Password and security settings
+
+### 3. Council Overview
+A centralized dashboard for a selected school year, featuring:
+- **Event Management Overview** — summary of ongoing, completed, and upcoming events with dates, statuses, and organizers
+- **Financial Bank Book Tracking** — real-time view of the council's financial transactions (deposits, withdrawals, current balance)
+- **Activity Completion Rate Graph** — completed versus planned activities
+- **Event Evaluation Metrics** — graphical summary of evaluation results, feedback, attendance, and satisfaction ratings
+
+### 4. Events Management
 Full event lifecycle management:
 - Create, update, and delete events with status tracking (e.g., Done, Postponed, Canceled)
-- Per-event transaction history (income/expense tracking)
-- Email-based event invitations with accept/reject token links
-- Event dashboard aggregating an event's related documents
+- Track event status throughout its lifecycle
 
-### 3. Concept Papers
+### 5. Event Invitations
+- Email-based event invitations with accept/reject token links, enabling users to collaborate on event management
+
+### 6. Event Dashboard
+A per-event dashboard displaying key financial insights:
+- Top 5 expenses and income
+- Remaining budget
+- Transaction history
+- Evaluation results
+
+### 7. Event Transactions
+- Log event-related transactions (income/expenses) with receipts as proof of payment
+- Receipts uploaded and stored via Cloudinary
+
+### 8. Concept Papers
 - Structured concept paper forms (objectives, learning outcomes, participants, consent, etc.)
 - **AI-assisted generation** of the paper body, descriptions, objectives, learning outcomes, participants, and consent text via Google Gemini
 - Status workflow and one-click **PDF export**
 
-### 4. Documentation
-- Post-event documentation with evaluation forms and tally items
+### 9. Documentation
+- Post-event documentation / post-activity reports with evaluation forms and tally items
 - Photo documentation (uploaded to Cloudinary)
 - Excel import of student lists (via pandas/openpyxl)
 - Status workflow and **PDF export**
 
-### 5. Financial Reports
-- Create, update, and delete financial reports linked to events
+### 10. Financial Reports
+- Generate financial reports including title of activity, date, nature of activity, time, college/department, venue, source of fund, less expense, total remaining funds, and receipts for proof of payment
 - Transaction history per report
 - Status workflow and **PDF export**
 
-### 6. Board Resolutions
+### 11. Board Resolutions
 - Structured board resolution forms with student signatories
 - **AI-assisted description generation** via Google Gemini
 - Status workflow and **PDF export**
 
-### 7. Minutes of the Meeting
+### 12. Minutes of the Meeting *(beyond the stated objectives)*
 - Meeting minutes with signatories and attendees
 - Photo documentation (Cloudinary-hosted)
 - Status workflow and **PDF export**
-
-### Accounts & Authentication
-- Signup with email verification (token-based, via itsdangerous)
-- Login with login-attempt tracking
-- Forgot-password / reset-password flows (token-based email links)
-- Account settings, email-change settings, and password/security settings
-- Profile picture upload (hosted on Cloudinary)
 
 ## Tech Stack
 
