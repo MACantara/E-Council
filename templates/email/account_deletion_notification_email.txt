@@ -1,0 +1,6 @@
+Account Deletion Notification
+
+Your account has been successfully deleted. If you did not request this deletion, please contact support immediately.
+
+Sincerely,
+E-Council Team

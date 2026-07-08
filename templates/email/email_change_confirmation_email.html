@@ -1,0 +1,8 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Email Change Confirmation{% endblock %}
+
+{% block content %}
+<h1 style="color: #00578a;">Email Change Confirmation</h1>
+<p>Your email has been successfully changed from {{ old_email }} to {{ new_email }}. If you did not make this change, please contact support immediately.</p>
+{% endblock %}

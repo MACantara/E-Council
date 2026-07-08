@@ -1,0 +1,11 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Email Change Verification{% endblock %}
+
+{% block content %}
+<h1 style="color: #00578a;">Email Change Verification</h1>
+<p>To verify your new email address, click the button below:</p>
+<a href="{{ link }}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Verify Email</a>
+<p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{{ link }}" style="color: #00578a;">{{ link }}</a></p>
+<p>If you didn't request this change, you can safely ignore this email.</p>
+{% endblock %}

@@ -1,0 +1,12 @@
+Email Change Verification
+
+To verify your new email address, click the link below:
+{{ link }}
+
+Or copy and paste this link into your browser:
+{{ link }}
+
+If you didn't request this change, you can safely ignore this email.
+
+Sincerely,
+E-Council Team

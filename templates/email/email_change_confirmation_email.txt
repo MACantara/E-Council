@@ -1,0 +1,6 @@
+Email Change Confirmation
+
+Your email has been successfully changed to {{ new_email }}. If you did not make this change, please contact support immediately.
+
+Sincerely,
+E-Council Team

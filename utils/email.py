@@ -5,7 +5,7 @@ Handles all email sending functionality including verification, password reset, 
 
 from datetime import datetime, timedelta
 import os
-from flask import url_for, flash
+from flask import url_for, flash, render_template
 from flask_login import current_user
 from flask_mail import Message
 
@@ -34,36 +34,8 @@ def send_verification_email(users_email):
     token = s.dumps(users_email, salt='email-confirm')
     link = url_for('auth.confirm_email', token=token, _external=True)
     msg = Message('New Account Email Verification', recipients=[users_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Welcome to E-Council!</h1>
-        <p>You have successfully created an account. Please click the button below to verify your email:</p>
-        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Verify Email</a>
-        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
-        <p>If you didn't create this account, you can safely ignore this email.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Welcome to our website!
-
-    You have successfully created an account. Please click the link below to verify your email:
-    {link}
-
-    Or copy and paste this link into your browser:
-    {link}
-
-    If you didn't create this account, you can safely ignore this email.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/verification_email.html', link=link)
+    msg.body = render_template('email/verification_email.txt', link=link)
     
     # Check for existing email verification records
     existing_verification = EmailVerification.query.filter_by(
@@ -105,36 +77,8 @@ def send_reset_password_email(users_email):
     # Create the password reset link
     link = url_for('auth.reset_password', selector=selector, token=token, _external=True)
     msg = Message('Password Reset Request', recipients=[users_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Password Reset Request</h1>
-        <p>To reset your password, click the button below:</p>
-        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Reset Password</a>
-        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
-        <p>If you didn't request a password reset, you can safely ignore this email.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Password Reset Request
-
-    To reset your password, click the link below:
-    {link}
-
-    Or copy and paste this link into your browser:
-    {link}
-
-    If you didn't request a password reset, you can safely ignore this email.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/reset_password_email.html', link=link)
+    msg.body = render_template('email/reset_password_email.txt', link=link)
     
     # Check for existing password reset records
     existing_reset = PasswordReset.query.filter_by(
@@ -168,27 +112,8 @@ def send_password_change_notification_email(users_email):
     from extensions import mail
     
     msg = Message('Password Change Notification', recipients=[users_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Password Change Notification</h1>
-        <p>Your password has been successfully changed. If you did not make this change, please contact support immediately.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Password Change Notification
-
-    Your password has been successfully changed. If you did not make this change, please contact support immediately.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/password_change_notification_email.html')
+    msg.body = render_template('email/password_change_notification_email.txt')
     
     mail.send(msg)
 
@@ -204,27 +129,8 @@ def send_email_change_notification(users_old_email, users_new_email):
     from extensions import mail
     
     msg = Message('Email Change Notification', recipients=[users_old_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Email Change Notification</h1>
-        <p>Your email has been successfully changed from {users_old_email} to {users_new_email}. If you did not make this change, please contact support immediately.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Email Change Notification
-
-    Your email has been successfully changed from {users_old_email} to {users_new_email}. If you did not make this change, please contact support immediately.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/email_change_notification_email.html', old_email=users_old_email, new_email=users_new_email)
+    msg.body = render_template('email/email_change_notification_email.txt', old_email=users_old_email, new_email=users_new_email)
     
     mail.send(msg)
 
@@ -240,27 +146,8 @@ def send_email_change_confirmation(users_old_email, users_new_email):
     from extensions import mail
     
     msg = Message('Email Change Confirmation', recipients=[users_new_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Email Change Confirmation</h1>
-        <p>Your email has been successfully changed from {users_old_email} to {users_new_email}. If you did not make this change, please contact support immediately.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Email Change Confirmation
-
-    Your email has been successfully changed to {users_new_email}. If you did not make this change, please contact support immediately.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/email_change_confirmation_email.html', old_email=users_old_email, new_email=users_new_email)
+    msg.body = render_template('email/email_change_confirmation_email.txt', new_email=users_new_email)
     
     mail.send(msg)
 
@@ -280,36 +167,8 @@ def send_new_email_verification(users_new_email):
     token = s.dumps(users_new_email, salt='email-change')
     link = url_for('account.confirm_new_email', token=token, _external=True)
     msg = Message('Email Change Verification', recipients=[users_new_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Email Change Verification</h1>
-        <p>To verify your new email address, click the button below:</p>
-        <a href="{link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Verify Email</a>
-        <p style="font-size: 0.8em; color: gray;">Or copy and paste this link into your browser: <br><a href="{link}" style="color: #00578a;">{link}</a></p>
-        <p>If you didn't request this change, you can safely ignore this email.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Email Change Verification
-
-    To verify your new email address, click the link below:
-    {link}
-
-    Or copy and paste this link into your browser:
-    {link}
-
-    If you didn't request this change, you can safely ignore this email.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/new_email_verification_email.html', link=link)
+    msg.body = render_template('email/new_email_verification_email.txt', link=link)
     
     mail.send(msg)
 
@@ -333,27 +192,8 @@ def send_account_deletion_notification_email(users_email):
     from extensions import mail
     
     msg = Message('Account Deletion Notification', recipients=[users_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Account Deletion Notification</h1>
-        <p>Your account has been successfully deleted. If you did not request this deletion, please contact support immediately.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    Account Deletion Notification
-
-    Your account has been successfully deleted. If you did not request this deletion, please contact support immediately.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/account_deletion_notification_email.html')
+    msg.body = render_template('email/account_deletion_notification_email.txt')
     
     mail.send(msg)
 
@@ -381,40 +221,8 @@ def send_invite_email(users_email, event_name, event_id):
     accept_link = url_for('events.accept_invite', token=token, _external=True)
     reject_link = url_for('events.reject_invite', token=token, _external=True)
     msg = Message('Invitation to Manage Event', recipients=[users_email])
-    
-    # HTML email body
-    msg.html = f"""
-    <html>
-    <body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-        <h1 style="color: #00578a;">Invitation to Manage Event</h1>
-        <p>You have been invited by {inviter_first_name} {inviter_last_name} from the {inviter_department} department to help manage the event "{event_name}". Please click the button below to accept the invitation:</p>
-        <a href="{accept_link}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Accept Invitation</a>
-        <p>If you do not wish to manage this event, you can reject the invitation by clicking the link below:</p>
-        <a href="{reject_link}" style="background-color: #d9534f; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Reject Invitation</a>
-        <p style="font-size: 0.8em; color: gray;">Or copy and paste these links into your browser: <br>Accept: <a href="{accept_link}" style="color: #00578a;">{accept_link}</a><br>Reject: <a href="{reject_link}" style="color: #d9534f;">{reject_link}</a></p>
-        <p>If you didn't expect this invitation, you can safely ignore this email.</p>
-        <p>Sincerely,<br>E-Council Team</p>
-    </body>
-    </html>
-    """
-    
-    # Plain text email body as a fallback
-    msg.body = f"""
-    You have been invited by {inviter_first_name} {inviter_last_name} from the {inviter_department} department to help manage the event "{event_name}". Please click the link below to accept the invitation:
-    {accept_link}
-
-    If you do not wish to manage this event, you can reject the invitation by clicking the link below:
-    {reject_link}
-
-    Or copy and paste these links into your browser:
-    Accept: {accept_link}
-    Reject: {reject_link}
-
-    If you didn't expect this invitation, you can safely ignore this email.
-
-    Sincerely,
-    E-Council Team
-    """
+    msg.html = render_template('email/invite_email.html', event_name=event_name, inviter_first_name=inviter_first_name, inviter_last_name=inviter_last_name, inviter_department=inviter_department, accept_link=accept_link, reject_link=reject_link)
+    msg.body = render_template('email/invite_email.txt', event_name=event_name, inviter_first_name=inviter_first_name, inviter_last_name=inviter_last_name, inviter_department=inviter_department, accept_link=accept_link, reject_link=reject_link)
     
     mail.send(msg)
 

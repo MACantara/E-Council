@@ -1,0 +1,14 @@
+You have been invited by {{ inviter_first_name }} {{ inviter_last_name }} from the {{ inviter_department }} department to help manage the event "{{ event_name }}". Please click the link below to accept the invitation:
+{{ accept_link }}
+
+If you do not wish to manage this event, you can reject the invitation by clicking the link below:
+{{ reject_link }}
+
+Or copy and paste these links into your browser:
+Accept: {{ accept_link }}
+Reject: {{ reject_link }}
+
+If you didn't expect this invitation, you can safely ignore this email.
+
+Sincerely,
+E-Council Team

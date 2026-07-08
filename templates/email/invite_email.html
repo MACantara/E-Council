@@ -1,0 +1,13 @@
+{% extends "email/base_email.html" %}
+
+{% block title %}Invitation to Manage Event{% endblock %}
+
+{% block content %}
+<h1 style="color: #00578a;">Invitation to Manage Event</h1>
+<p>You have been invited by {{ inviter_first_name }} {{ inviter_last_name }} from the {{ inviter_department }} department to help manage the event "{{ event_name }}". Please click the button below to accept the invitation:</p>
+<a href="{{ accept_link }}" style="background-color: #00578a; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Accept Invitation</a>
+<p>If you do not wish to manage this event, you can reject the invitation by clicking the link below:</p>
+<a href="{{ reject_link }}" style="background-color: #d9534f; color: #ffffff; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 8px;">Reject Invitation</a>
+<p style="font-size: 0.8em; color: gray;">Or copy and paste these links into your browser: <br>Accept: <a href="{{ accept_link }}" style="color: #00578a;">{{ accept_link }}</a><br>Reject: <a href="{{ reject_link }}" style="color: #d9534f;">{{ reject_link }}</a></p>
+<p>If you didn't expect this invitation, you can safely ignore this email.</p>
+{% endblock %}
