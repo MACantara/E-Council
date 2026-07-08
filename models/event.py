@@ -24,6 +24,7 @@ class Events(db.Model):
     events_status = db.Column(db.String(50), nullable=True)
     events_description = db.Column(db.Text, nullable=True)
     events_remarks = db.Column(db.String(255), nullable=True)
+    transactions = db.Column(db.JSON, nullable=False, default=list)
 
     # Relationships will be added after all models are created
     # board_resolutions = db.relationship('BoardResolutions', back_populates='events')
@@ -63,22 +64,3 @@ class EventInvitations(db.Model):
 
     def __repr__(self):
         return f"EventInvitations({self.event_invitations_id}, {self.event_invitations_events_id}, {self.event_invitations_email}, {self.event_invitations_token}, {self.event_invitations_created_at})"
-
-
-class TransactionHistory(db.Model):
-    __tablename__ = 'transaction_history'
-
-    transaction_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    transaction_events_id = db.Column(db.Integer, db.ForeignKey('events.events_id'), index=True, nullable=True)
-    transaction_name = db.Column(db.String(255), nullable=True)
-    transaction_date = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
-    transaction_unit_amount = db.Column(db.Numeric(10, 2), nullable=True)
-    transaction_unit_price = db.Column(db.Numeric(10, 2), nullable=True)
-    transaction_total = db.column_property(transaction_unit_amount * transaction_unit_price)
-    transaction_category = db.Column(db.String(255), nullable=True)
-    transaction_type = db.Column(db.Enum('Expense', 'Income', name='transaction_type_enum'), nullable=True)
-    transaction_receipt_cloudinary_url = db.Column(db.String(255), nullable=True)
-    transaction_receipt_cloudinary_public_id = db.Column(db.String(255), nullable=True)
-
-    def __repr__(self):
-        return f'<TransactionHistory {self.transaction_name}>'

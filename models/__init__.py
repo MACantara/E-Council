@@ -8,100 +8,57 @@ from models.base import db
 # Import all models for easy access
 from models.department import Departments, StudentOrganizations
 from models.user import Users, EmailVerification, PasswordReset, LoginAttempts
-from models.event import Events, DepartmentsEvents, EventInvitations, TransactionHistory
+from models.event import Events, DepartmentsEvents, EventInvitations
 from models.concept_paper import (
     ConceptPaperForms,
-    ObjectivesOfTheActivity,
-    LearningOutcomes,
     ExcuseLetterForms,
     ActivityReportForms,
     PersonnelInChargeForms,
     LearningJournalForms,
-    Observations,
-    Learnings,
-    ParentGuardianConsentForms,
-    ActivityReportFormsActivityStrengths,
-    ActivityReportFormsActivityWeaknesses,
-    ActivityReportFormsActivityRecommendations
+    ParentGuardianConsentForms
 )
-from models.documentation import (
-    Documentation,
-    TallyItems,
-    ResultsOfTheEvaluationImages,
-    EvaluationForm,
-    SummaryOfAttendanceImages,
-    EvaluationListOfStudentNames,
-    EventPhotoDocumentationImages,
-    ActivityStrengths,
-    ActivityWeaknesses,
-    ActivityRecommendations
-)
+from models.documentation import Documentation
 from models.financial import FinancialReports
-from models.board_resolution import BoardResolutions, BoardResolutionsStudentSignatories
-from models.meeting import (
-    MinutesOfTheMeeting,
-    Signatories,
-    MinutesOfTheMeetingPhotoDocumentation,
-    MinutesOfTheMeetingAttendees
-)
+from models.board_resolution import BoardResolutions
+from models.meeting import MinutesOfTheMeeting, Signatories
 
 __all__ = [
     # Base
     'db',
-    
+
     # Department models
     'Departments',
     'StudentOrganizations',
-    
+
     # User models
     'Users',
     'EmailVerification',
     'PasswordReset',
     'LoginAttempts',
-    
+
     # Event models
     'Events',
     'DepartmentsEvents',
     'EventInvitations',
-    'TransactionHistory',
-    
+
     # Concept paper models
     'ConceptPaperForms',
-    'ObjectivesOfTheActivity',
-    'LearningOutcomes',
     'ExcuseLetterForms',
     'ActivityReportForms',
     'PersonnelInChargeForms',
     'LearningJournalForms',
-    'Observations',
-    'Learnings',
     'ParentGuardianConsentForms',
-    'ActivityReportFormsActivityStrengths',
-    'ActivityReportFormsActivityWeaknesses',
-    'ActivityReportFormsActivityRecommendations',
-    
+
     # Documentation models
     'Documentation',
-    'TallyItems',
-    'ResultsOfTheEvaluationImages',
-    'EvaluationForm',
-    'SummaryOfAttendanceImages',
-    'EvaluationListOfStudentNames',
-    'EventPhotoDocumentationImages',
-    'ActivityStrengths',
-    'ActivityWeaknesses',
-    'ActivityRecommendations',
-    
+
     # Financial models
     'FinancialReports',
-    
+
     # Board resolution models
     'BoardResolutions',
-    'BoardResolutionsStudentSignatories',
-    
+
     # Meeting models
     'MinutesOfTheMeeting',
     'Signatories',
-    'MinutesOfTheMeetingPhotoDocumentation',
-    'MinutesOfTheMeetingAttendees',
 ]

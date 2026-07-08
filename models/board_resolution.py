@@ -21,6 +21,7 @@ class BoardResolutions(db.Model):
     board_resolutions_description = db.Column(db.Text, nullable=True)
     board_resolutions_prepared_by = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=True)
     board_resolutions_approved_by = db.Column(db.Integer, db.ForeignKey('signatories.signatory_id'), nullable=True)
+    student_signatory_ids = db.Column(db.JSON, nullable=False, default=list)
 
     # Relationships - using string references to avoid circular imports
     events = db.relationship('Events', back_populates='board_resolutions')
@@ -30,16 +31,3 @@ class BoardResolutions(db.Model):
 
     def __repr__(self):
         return f'<BoardResolution {self.board_resolutions_id}: {self.board_resolutions_description}>'
-
-
-class BoardResolutionsStudentSignatories(db.Model):
-    __tablename__ = 'board_resolutions_student_signatories'
-
-    board_resolutions_id = db.Column(db.Integer, db.ForeignKey('board_resolutions.board_resolutions_id'), primary_key=True, nullable=False)
-    board_resolutions_users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), primary_key=True, nullable=False)
-
-    board_resolution = db.relationship('BoardResolutions', backref='student_signatories')
-    user = db.relationship('Users', backref='board_resolutions_signatories')
-
-    def __repr__(self):
-        return f'<BoardResolutionsStudentSignatories(board_resolutions_id={self.board_resolutions_id}, board_resolutions_users_id={self.board_resolutions_users_id})>'

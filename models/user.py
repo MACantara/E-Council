@@ -14,8 +14,7 @@ class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
     users_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    users_profile_picture_cloudinary_url = db.Column(db.String(255), nullable=True)
-    users_profile_picture_cloudinary_public_id = db.Column(db.String(255), nullable=True)
+    profile_picture = db.Column(db.JSON, nullable=False, default=dict)
     users_title = db.Column(db.String(50), nullable=True)
     users_first_name = db.Column(db.String(50), nullable=False)
     users_middle_name = db.Column(db.String(50), nullable=True)
@@ -23,10 +22,10 @@ class Users(db.Model, UserMixin):
     users_suffix = db.Column(db.String(50), nullable=True)
     users_username = db.Column(db.String(50), unique=True, nullable=False)
     users_email = db.Column(db.String(100), unique=True, nullable=False)
-    
+
     # Changed users_department to reference the Departments model
     users_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=False)
-    
+
     users_role = db.Column(db.Enum(
         'Student Council Officer',
         'Faculty',
@@ -58,14 +57,13 @@ class Users(db.Model, UserMixin):
 
     users_home_address = db.Column(db.String(255), nullable=True)
     users_contact_number = db.Column(db.String(20), nullable=True)
-    users_signature_cloudinary_url = db.Column(db.String(255), nullable=True)
-    users_signature_cloudinary_public_id = db.Column(db.String(255), nullable=True)
+    signature = db.Column(db.JSON, nullable=False, default=dict)
     users_password = db.Column(db.String(255), nullable=False)
     users_email_verified = db.Column(db.Integer, nullable=False)
 
     # Relationship to Departments
     department = db.relationship('Departments', backref='users')
-    
+
     student_organization = db.relationship("StudentOrganizations", backref="users")
 
     def set_password(self, password):
@@ -78,7 +76,7 @@ class Users(db.Model, UserMixin):
         return str(self.users_id)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.users_profile_picture_cloudinary_url}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_departments_id}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.users_signature})"
+        return f"Users({self.users_id}, {self.profile_picture}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_departments_id}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.signature})"
 
 
 class EmailVerification(db.Model):
