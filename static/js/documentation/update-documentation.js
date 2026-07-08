@@ -10,19 +10,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize add field buttons
     document.getElementById('add-strength-btn')?.addEventListener('click', function () {
-        addNewField('strengths', 'strength');
+        addNewField('strengths', 'activity-strengths', 'strength');
     });
     document.getElementById('add-weakness-btn')?.addEventListener('click', function () {
-        addNewField('weaknesses', 'weakness');
+        addNewField('weaknesses', 'activity-weaknesses', 'weakness');
     });
     document.getElementById('add-recommendation-btn')?.addEventListener('click', function () {
-        addNewField('recommendations', 'recommendation');
+        addNewField('recommendations', 'activity-recommendations', 'recommendation');
     });
     document.getElementById('add-learning-btn')?.addEventListener('click', function () {
-        addNewField('learnings', 'learning');
+        addNewField('learnings', 'learnings', 'learning');
     });
     document.getElementById('add-observation-btn')?.addEventListener('click', function () {
-        addNewField('observations', 'observation');
+        addNewField('observations', 'observations', 'observation');
     });
     document.getElementById('add-tally-item-btn')?.addEventListener('click', addNewTallyItem);
     document.getElementById('add-student-btn')?.addEventListener('click', addNewStudent);
@@ -83,12 +83,12 @@ function updateSelectOptions(selectId, data, valueField, textField, defaultText)
     });
 }
 
-function addNewField(containerId, placeholder) {
+function addNewField(containerId, name, placeholder) {
     const container = document.getElementById(containerId + '-list');
     const newItem = document.createElement('div');
     newItem.className = 'dynamic-item';
     newItem.innerHTML = `
-        <input type="text" name="${containerId}[]" class="form-input" placeholder="Enter ${placeholder}" required>
+        <input type="text" name="${name}[]" class="form-input" placeholder="Enter ${placeholder}" required>
         <button type="button" class="remove-item-btn secondary-button">&times;</button>
     `;
     container.appendChild(newItem);
@@ -182,9 +182,10 @@ function addNewTallyItem() {
 }
 
 function addNewStudent() {
-    const studentList = document.getElementById('student-list');
+    const studentList = document.getElementById('evaluation-student-list');
+    if (!studentList) return;
     const newStudent = document.createElement('div');
-    newStudent.className = 'input-group';
+    newStudent.className = 'dynamic-item';
     newStudent.innerHTML = `
         <input type="text" name="student-names[]" placeholder="Enter student name" required>
         <button type="button" class="remove-item-btn secondary-button">×</button>
@@ -330,9 +331,13 @@ function calculateOverallRating() {
     });
 
     const average = (total / ratingInputs.length).toFixed(2);
-    const overallRatingInput = document.getElementById('overall-rating');
-    if (overallRatingInput) {
-        overallRatingInput.value = average;
+    const ratingInput = document.getElementById('documentation-rating');
+    const ratingValue = document.getElementById('calculated-rating-value');
+    if (ratingInput) {
+        ratingInput.value = average;
+    }
+    if (ratingValue) {
+        ratingValue.textContent = average;
     }
 }
 

@@ -15,8 +15,8 @@ function initializeEventDashboardCharts() {
     let eventsBudget = window.eventsBudget || 0;
 
     // Extract data for charts
-    let top5ExpensesData = top5Expenses.map(transaction => transaction.transaction_total);
-    let top5IncomeData = top5Income.map(transaction => transaction.transaction_total);
+    let top5ExpensesData = top5Expenses.map(transaction => transaction.total);
+    let top5IncomeData = top5Income.map(transaction => transaction.total);
 
     // Initialize the top 5 expenses chart
     const ctx1 = document.getElementById('top-5-expenses-chart');
@@ -24,7 +24,7 @@ function initializeEventDashboardCharts() {
         let top5ExpensesChart = new Chart(ctx1.getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: top5Expenses.map(transaction => transaction.transaction_category),
+                labels: top5Expenses.map(transaction => transaction.category),
                 datasets: [
                     {
                         data: top5ExpensesData,
@@ -72,7 +72,7 @@ function initializeEventDashboardCharts() {
         let top5IncomeChart = new Chart(ctx2.getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: top5Income.map(transaction => transaction.transaction_category),
+                labels: top5Income.map(transaction => transaction.category),
                 datasets: [
                     {
                         data: top5IncomeData,
