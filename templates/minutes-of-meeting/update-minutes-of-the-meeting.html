@@ -91,7 +91,7 @@
                             <legend>{{ organization.student_organizations_name }}</legend>
                             {% for user in organization.users %}
                             <div>
-                                <label><input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" {% if user.users_id in meeting_attendees %}checked{% endif %}>
+                                <label><input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" {% if user.users_id in meeting.attendees %}checked{% endif %}>
                                 {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
                             </div>
                             {% endfor %}
@@ -191,9 +191,9 @@
                 <div class="input-pair">
                     <label>Current Photo Documentation</label>
                     <div class="current-photos">
-                        {% for photo in photo_documentations %}
+                        {% for photo in meeting.photo_documentation %}
                         <div class="photo-item">
-                            <img src="{{ photo.minutes_of_the_meeting_photo_documentation_cloudinary_url }}" alt="Photo Documentation" class="photo-thumbnail">
+                            <img src="{{ photo.url }}" alt="Photo Documentation" class="photo-thumbnail">
                         </div>
                         {% endfor %}
                     </div>

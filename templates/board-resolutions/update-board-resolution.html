@@ -89,7 +89,7 @@
                             <legend>{{ organization.student_organizations_name }}</legend>
                             {% for user in organization.users %}
                             <div>
-                                <input type="checkbox" name="board-resolutions-student-signatories" value="{{ user.users_id }}" id="user-{{ user.users_id }}" {% if user.users_id in existing_signatories %}checked{% endif %}>
+                                <input type="checkbox" name="board-resolutions-student-signatories" value="{{ user.users_id }}" id="user-{{ user.users_id }}" {% if user.users_id in resolution.student_signatory_ids %}checked{% endif %}>
                                 <label for="user-{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
                             </div>
                             {% endfor %}

@@ -20,7 +20,7 @@
     <div class="container">
         <span id="close-upload-change-account-profile-picture-modal-button" class="close-button">&times;</span>
         <h2>
-            {% if current_user.users_profile_picture_cloudinary_url is none or current_user.users_profile_picture_cloudinary_url|lower in ['none', 'null'] %}
+            {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
                 Upload Profile Picture
             {% else %}
                 Change Profile Picture
@@ -40,7 +40,7 @@
         
             <div class="horizontal-button-pair-positioned-right">
                 <button class="primary-button fit-content-button" type="submit">
-                    {% if current_user.users_profile_picture_cloudinary_url is none or current_user.users_profile_picture_cloudinary_url|lower in ['none', 'null'] %}
+                    {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
                         Upload
                     {% else %}
                         Change
@@ -54,10 +54,10 @@
 
 <div class="container">
     <div class="account-container">
-        <img class="account-picture" src="{{ current_user.users_profile_picture_cloudinary_url or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
+        <img class="account-picture" src="{{ (current_user.profile_picture or {}).url or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
 
         <button id="open-upload-change-account-profile-picture-modal-button" class="secondary-button fit-content-button center">
-            {% if current_user.users_profile_picture_cloudinary_url is none or current_user.users_profile_picture_cloudinary_url|lower in ['none', 'null'] %}
+            {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
                 Upload Profile Picture
             {% else %}
                 Change Profile Picture

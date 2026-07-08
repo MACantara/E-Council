@@ -144,21 +144,21 @@
                 <div class="input-pair">
                     <label for="concept-paper-objectives">Objectives of the Activity</label>
                     <div id="concept-paper-objectives">
-                        {% for objective in objectives_of_the_activity %}
+                        {% for objective in concept_paper.objectives %}
                         <input type="text" name="concept-paper-objectives" value="{{ objective }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button">Add Objective</button>
+                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
                 </div>
 
                 <div class="input-pair">
                     <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
                     <div id="concept-paper-learning-outcomes">
-                        {% for outcome in learning_outcomes %}
+                        {% for outcome in concept_paper.learning_outcomes %}
                         <input type="text" name="concept-paper-learning-outcomes" value="{{ outcome }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button">Add Learning Outcome</button>
+                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning Outcome</button>
                 </div>
 
                 <div class="input-pair">
@@ -310,48 +310,45 @@
                     <label>Strengths</label>
                     <div id="activity-strengths">
                         {% if concept_paper.activity_report_forms %}
-                        {% for strength in concept_paper.activity_report_forms[0].activity_strengths %}
-                        <input type="text" name="activity-strengths"
-                            value="{{ strength.activity_strength.activity_strengths_content }}"
+                        {% for strength in concept_paper.activity_report_forms[0].strengths %}
+                        <input type="text" name="activity-strengths" value="{{ strength }}"
                             placeholder="Enter Strength" required>
                         {% endfor %}
                         {% else %}
                         <input type="text" name="activity-strengths" placeholder="Enter Strength" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button">Add Strength</button>
+                    <button class="primary-button" type="button" onclick="addStrength()">Add Strength</button>
                 </div>
 
                 <div class="input-pair">
                     <label>Weaknesses</label>
                     <div id="activity-weaknesses">
                         {% if concept_paper.activity_report_forms %}
-                        {% for weakness in concept_paper.activity_report_forms[0].activity_weaknesses %}
-                        <input type="text" name="activity-weaknesses"
-                            value="{{ weakness.activity_weakness.activity_weaknesses_content }}"
+                        {% for weakness in concept_paper.activity_report_forms[0].weaknesses %}
+                        <input type="text" name="activity-weaknesses" value="{{ weakness }}"
                             placeholder="Enter Weakness" required>
                         {% endfor %}
                         {% else %}
                         <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button">Add Weakness</button>
+                    <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
                 </div>
 
                 <div class="input-pair">
                     <label>Recommendations</label>
                     <div id="activity-recommendations">
                         {% if concept_paper.activity_report_forms %}
-                        {% for recommendation in concept_paper.activity_report_forms[0].activity_recommendations %}
-                        <input type="text" name="activity-recommendations"
-                            value="{{ recommendation.activity_recommendation.activity_recommendations_content }}"
+                        {% for recommendation in concept_paper.activity_report_forms[0].recommendations %}
+                        <input type="text" name="activity-recommendations" value="{{ recommendation }}"
                             placeholder="Enter Recommendation" required>
                         {% endfor %}
                         {% else %}
                         <input type="text" name="activity-recommendations" placeholder="Enter Recommendation" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button">Add Recommendation</button>
+                    <button class="primary-button" type="button" onclick="addRecommendation()">Add Recommendation</button>
                 </div>
 
                 <h3>Learning Journal Form</h3>
@@ -388,22 +385,20 @@
                     <label for="learning-journal-observations">Observations</label>
                     <div id="learning-journal-observations">
                         {% for observation in learning_journal.observations %}
-                        <input type="text" name="learning-journal-observations"
-                            value="{{ observation.observation.observations_content }}" required>
+                        <input type="text" name="learning-journal-observations" value="{{ observation }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button">Add Observation</button>
+                    <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
                 </div>
 
                 <div class="input-pair">
                     <label for="learning-journal-learnings">Learnings</label>
                     <div id="learning-journal-learnings">
                         {% for learning in learning_journal.learnings %}
-                        <input type="text" name="learning-journal-learnings"
-                            value="{{ learning.learning.learnings_content }}" required>
+                        <input type="text" name="learning-journal-learnings" value="{{ learning }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button">Add Learning</button>
+                    <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
                 </div>
 
                 <div class="input-pair">

@@ -58,7 +58,7 @@
                     <select name="transaction-category" id="transaction-category" required>
                         <option value="" disabled selected>Select a Category</option>
                         {% for category in transaction_categories %}
-                        <option value="{{ category.transaction_category }}">{{ category.transaction_category }}</option>
+                        <option value="{{ category }}">{{ category }}</option>
                         {% endfor %}
                         <option value="Other">Other</option>
                     </select>

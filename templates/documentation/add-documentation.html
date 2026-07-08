@@ -195,7 +195,7 @@
                     <select name="learning-journal-forms-checked-by" id="learning-journal-forms-checked-by" required>
                         <option value="" disabled selected>Select Signatory</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatories_id }}">{{ signatory.signatory_first_name }} {{
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
                             signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
                         {% endfor %}
                     </select>

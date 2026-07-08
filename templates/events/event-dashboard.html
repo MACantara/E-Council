@@ -89,23 +89,23 @@
                     <tbody>
                         {% for transaction in transactions %}
                         <tr>
-                            <td>{{ transaction.transaction_date.strftime('%Y-%m-%d %I:%M %p') }}</td>
-                            <td>{{ transaction.transaction_name }}</td>
-                            <td>{{ transaction.transaction_unit_amount }}</td>
-                            <td>₱ {{ "{:,.2f}".format(transaction.transaction_unit_price) }}</td>
-                            <td>₱ {{ "{:,.2f}".format(transaction.transaction_total) }}</td>
-                            <td>{{ transaction.transaction_category }}</td>
-                            <td>{{ transaction.transaction_type }}</td>
+                            <td>{{ transaction.date }}</td>
+                            <td>{{ transaction.name }}</td>
+                            <td>{{ transaction.unit_amount }}</td>
+                            <td>₱ {{ "{:,.2f}".format(transaction.unit_price) }}</td>
+                            <td>₱ {{ "{:,.2f}".format(transaction.total) }}</td>
+                            <td>{{ transaction.category }}</td>
+                            <td>{{ transaction.type }}</td>
                             <td>
-                                {% if transaction.transaction_receipt_cloudinary_url %}
-                                <a href="{{ transaction.transaction_receipt_cloudinary_url }}" target="_blank"
+                                {% if transaction.receipt_url %}
+                                <a href="{{ transaction.receipt_url }}" target="_blank"
                                     class="primary-button fit-content-button">View Receipt</a>
                                 {% else %}
                                 No Receipt
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.transaction_id) }}"
+                                <a href="{{ url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.id) }}"
                                     class="secondary-button fit-content-button">Update</a>
                             </td>
                         </tr>

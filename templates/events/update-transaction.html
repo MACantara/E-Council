@@ -30,27 +30,27 @@
                 <div class="input-pair">
                     <label for="transaction-name">Transaction Name</label>
                     <input type="text" name="transaction-name" id="transaction-name" placeholder="Transaction Name"
-                        value="{{ transaction.transaction_name }}" required>
+                        value="{{ transaction.name }}" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="transaction-date">Date</label>
-                    <input type="datetime-local" name="transaction-date" id="transaction-date" value="{{ transaction.transaction_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+                    <input type="datetime-local" name="transaction-date" id="transaction-date" value="{{ transaction.date }}" required>
                 </div>
 
                 <div class="input-pair">
                     <label for="transaction-unit-amount">Unit Amount</label>
-                    <input type="number" name="transaction-unit-amount" id="transaction-unit-amount" placeholder="Unit Amount" value="{{ transaction.transaction_unit_amount }}" required>
+                    <input type="number" name="transaction-unit-amount" id="transaction-unit-amount" placeholder="Unit Amount" value="{{ transaction.unit_amount }}" required>
                 </div>
                 
                 <div class="input-pair">
                     <label for="transaction-unit-price">Unit Price</label>
-                    <input type="number" name="transaction-unit-price" id="transaction-unit-price" placeholder="Unit Price" value="{{ transaction.transaction_unit_price }}" required>
+                    <input type="number" name="transaction-unit-price" id="transaction-unit-price" placeholder="Unit Price" value="{{ transaction.unit_price }}" required>
                 </div>
                 
                 <div class="input-pair">
                     <label for="transaction-total">Total</label>
-                    <input type="number" name="transaction-total" id="transaction-total" placeholder="Total" value="{{ transaction.transaction_total }}" readonly>
+                    <input type="number" name="transaction-total" id="transaction-total" placeholder="Total" value="{{ transaction.total }}" readonly>
                 </div>
 
                 <div class="input-pair">
@@ -58,26 +58,26 @@
                     <select name="transaction-category" id="transaction-category" required>
                         <option value="" disabled>Select a Category</option>
                         {% for category in transaction_categories %}
-                        <option value="{{ category }}" {% if category == transaction.transaction_category %}selected{% endif %}>{{ category }}</option>
+                        <option value="{{ category }}" {% if category == transaction.category %}selected{% endif %}>{{ category }}</option>
                         {% endfor %}
-                        {% if transaction.transaction_category not in transaction_categories %}
-                        <option value="{{ transaction.transaction_category }}" selected>{{ transaction.transaction_category }}</option>
+                        {% if transaction.category not in transaction_categories %}
+                        <option value="{{ transaction.category }}" selected>{{ transaction.category }}</option>
                         {% endif %}
                         <option value="Other">Other</option>
                     </select>
                 </div>
 
-                <div class="input-pair" id="other-transaction-category-container" style="display: {% if transaction.transaction_category == 'Other' %}block{% else %}none{% endif %};">
+                <div class="input-pair" id="other-transaction-category-container" style="display: {% if transaction.category == 'Other' %}block{% else %}none{% endif %};">
                     <label for="other-transaction-category">Other Category</label>
                     <input type="text" name="other-transaction-category" id="other-transaction-category"
-                        placeholder="Enter Category" value="{% if transaction.transaction_category == 'Other' %}{{ transaction.transaction_category }}{% endif %}">
+                        placeholder="Enter Category" value="{% if transaction.category == 'Other' %}{{ transaction.category }}{% endif %}">
                 </div>
 
                 <div class="input-pair">
                     <label for="transaction-type">Transaction Type</label>
                     <select name="transaction-type" id="transaction-type" required>
-                        <option value="Expense" {% if transaction.transaction_type == 'Expense' %}selected{% endif %}>Expense</option>
-                        <option value="Income" {% if transaction.transaction_type == 'Income' %}selected{% endif %}>Income</option>
+                        <option value="Expense" {% if transaction.type == 'Expense' %}selected{% endif %}>Expense</option>
+                        <option value="Income" {% if transaction.type == 'Income' %}selected{% endif %}>Income</option>
                     </select>
                 </div>
 
@@ -86,15 +86,15 @@
                     <input type="file" name="transaction-receipt" id="transaction-receipt" hidden>
                     <label for="transaction-receipt" class="custom-file-upload-input">
                         <span class="choose-file-text">Choose File</span>
-                        <span id="file-name" class="file-name">{{ transaction.transaction_receipt_cloudinary_url or 'No file chosen' }}</span>
+                        <span id="file-name" class="file-name">{{ transaction.receipt_url or 'No file chosen' }}</span>
                     </label>
                 </div>
 
                 <!-- Display receipt preview if available -->
-                {% if transaction.transaction_receipt_cloudinary_url %}
+                {% if transaction.receipt_url %}
                 <div class="input-pair">
                     <label>Receipt Preview</label>
-                    <img src="{{ transaction.transaction_receipt_cloudinary_url }}" alt="Receipt Preview" class="receipt-preview">
+                    <img src="{{ transaction.receipt_url }}" alt="Receipt Preview" class="receipt-preview">
                 </div>
                 {% endif %}
 

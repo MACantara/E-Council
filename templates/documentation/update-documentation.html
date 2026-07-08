@@ -116,11 +116,11 @@
                 <div class="input-pair">
                     <label>Activity Strengths</label>
                     <div class="dynamic-list" id="strengths-list">
-                        {% if strengths %}
-                        {% for strength in strengths %}
+                        {% if documentation.activity_strengths %}
+                        {% for strength in documentation.activity_strengths %}
                         <div class="dynamic-item">
                             <input type="text" name="activity-strengths[]" class="form-input"
-                                value="{{ strength.activity_strengths_content }}" placeholder="Enter strength" required>
+                                value="{{ strength }}" placeholder="Enter strength" required>
                             <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
@@ -134,12 +134,11 @@
                 <div class="input-pair">
                     <label>Activity Weaknesses</label>
                     <div class="dynamic-list" id="weaknesses-list">
-                        {% if weaknesses %}
-                        {% for weakness in weaknesses %}
+                        {% if documentation.activity_weaknesses %}
+                        {% for weakness in documentation.activity_weaknesses %}
                         <div class="dynamic-item">
                             <input type="text" name="activity-weaknesses[]" class="form-input"
-                                value="{{ weakness.activity_weaknesses_content }}" placeholder="Enter weakness"
-                                required>
+                                value="{{ weakness }}" placeholder="Enter weakness" required>
                             <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
@@ -153,12 +152,11 @@
                 <div class="input-pair">
                     <label>Activity Recommendations</label>
                     <div class="dynamic-list" id="recommendations-list">
-                        {% if recommendations %}
-                        {% for recommendation in recommendations %}
+                        {% if documentation.activity_recommendations %}
+                        {% for recommendation in documentation.activity_recommendations %}
                         <div class="dynamic-item">
                             <input type="text" name="activity-recommendations[]" class="form-input"
-                                value="{{ recommendation.activity_recommendations_content }}"
-                                placeholder="Enter recommendation" required>
+                                value="{{ recommendation }}" placeholder="Enter recommendation" required>
                             <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
@@ -224,7 +222,7 @@
                         {% for learning in learnings %}
                         <div class="dynamic-item">
                             <input type="text" name="learnings[]" class="form-input"
-                                value="{{ learning.learnings_content }}" placeholder="Enter learning" required>
+                                value="{{ learning }}" placeholder="Enter learning" required>
                             <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
@@ -241,7 +239,7 @@
                         {% for observation in observations %}
                         <div class="dynamic-item">
                             <input type="text" name="observations[]" class="form-input"
-                                value="{{ observation.observations_content }}" placeholder="Enter observation" required>
+                                value="{{ observation }}" placeholder="Enter observation" required>
                             <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
@@ -295,18 +293,18 @@
                         <thead>
                             <tr>
                                 <th>Item Name</th>
-                                <th>Extremely Dissatisfied (1)</th>
-                                <th>Dissatisfied (2)</th>
-                                <th>Neutral (3)</th>
-                                <th>Satisfied (4)</th>
                                 <th>Extremely Satisfied (5)</th>
+                                <th>Satisfied (4)</th>
+                                <th>Neutral (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for form in evaluation_forms %}
+                            {% for form in tally_items %}
                             <tr class="tally-item-name">
                                 <td>
-                                    <input type="text" name="tally-items-name[]" value="{{ form.evaluation_forms_item_name }}"
+                                    <input type="text" name="tally-items-name[]" value="{{ form.name }}"
                                         placeholder="Enter item name" required>
                                 </td>
                                 <td colspan="5"></td>
@@ -314,24 +312,24 @@
                             <tr class="tally-item-ratings">
                                 <td></td>
                                 <td>
-                                    <input type="number" name="tally-items-extremely-dissatisfied-rating[]"
-                                        value="{{ form.evaluation_forms_extremely_dissatisfied_rating }}" min="0" required>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]"
+                                        value="{{ form.extremely_satisfied }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-dissatisfied-rating[]"
-                                        value="{{ form.evaluation_forms_dissatisfied_rating }}" min="0" required>
+                                    <input type="number" name="tally-items-satisfied-rating-total[]"
+                                        value="{{ form.satisfied }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-neutral-rating[]"
-                                        value="{{ form.evaluation_forms_neutral_rating }}" min="0" required>
+                                    <input type="number" name="tally-items-neutral-rating-total[]"
+                                        value="{{ form.neutral }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-satisfied-rating[]"
-                                        value="{{ form.evaluation_forms_satisfied_rating }}" min="0" required>
+                                    <input type="number" name="tally-items-dissatisfied-rating-total[]"
+                                        value="{{ form.dissatisfied }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-extremely-satisfied-rating[]"
-                                        value="{{ form.evaluation_forms_extremely_satisfied_rating }}" min="0" required>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
+                                        value="{{ form.extremely_dissatisfied }}" min="0" required>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -361,16 +359,15 @@
                     <div id="evaluation-files-list" class="selected-files-list"></div>
                 </div>
 
-                {% if documentation.results_of_the_evaluation_images %}
+                {% if documentation.evaluation_images %}
                 <div class="existing-images">
                     <h5>Current Evaluation Images</h5>
                     <div class="selected-files-list">
-                        {% for image in documentation.results_of_the_evaluation_images %}
-                        <div class="selected-file-item" data-image-id="{{ image.results_of_the_evaluation_images_id }}">
+                        {% for image in documentation.evaluation_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.public_id }}">
                             <button type="button" class="remove-file-button" title="Remove image">×</button>
                             <div class="file-preview-container">
-                                <img src="{{ image.results_of_the_evaluation_images_cloudinary_url }}"
-                                    class="file-preview" alt="Evaluation Image">
+                                <img src="{{ image.url }}" class="file-preview" alt="Evaluation Image">
                             </div>
                             <span class="file-item-name">Current Image {{ loop.index }}</span>
                         </div>
@@ -400,17 +397,17 @@
                         <tbody>
                             {% for form in evaluation_forms %}
                             <tr>
-                                <td>{{ form.evaluation_forms_item_name }}</td>
+                                <td>{{ form.name }}</td>
                                 <td><input type="radio" name="rating-{{ loop.index0 }}" value="1" {% if
-                                    form.evaluation_forms_rating==1 %}checked{% endif %} required></td>
+                                    form.rating==1 %}checked{% endif %} required></td>
                                 <td><input type="radio" name="rating-{{ loop.index0 }}" value="2" {% if
-                                    form.evaluation_forms_rating==2 %}checked{% endif %}></td>
+                                    form.rating==2 %}checked{% endif %}></td>
                                 <td><input type="radio" name="rating-{{ loop.index0 }}" value="3" {% if
-                                    form.evaluation_forms_rating==3 %}checked{% endif %}></td>
+                                    form.rating==3 %}checked{% endif %}></td>
                                 <td><input type="radio" name="rating-{{ loop.index0 }}" value="4" {% if
-                                    form.evaluation_forms_rating==4 %}checked{% endif %}></td>
+                                    form.rating==4 %}checked{% endif %}></td>
                                 <td><input type="radio" name="rating-{{ loop.index0 }}" value="5" {% if
-                                    form.evaluation_forms_rating==5 %}checked{% endif %}></td>
+                                    form.rating==5 %}checked{% endif %}></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -444,16 +441,15 @@
                     <div id="attendance-files-list" class="selected-files-list"></div>
                 </div>
 
-                {% if documentation.summary_of_attendance_images %}
+                {% if documentation.attendance_images %}
                 <div class="existing-images">
                     <h5>Current Attendance Images</h5>
                     <div class="selected-files-list">
-                        {% for image in documentation.summary_of_attendance_images %}
-                        <div class="selected-file-item" data-image-id="{{ image.summary_of_attendance_images_id }}">
+                        {% for image in documentation.attendance_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.public_id }}">
                             <button type="button" class="remove-file-button" title="Remove image">×</button>
                             <div class="file-preview-container">
-                                <img src="{{ image.summary_of_attendance_images_cloudinary_url }}" class="file-preview"
-                                    alt="Attendance Image">
+                                <img src="{{ image.url }}" class="file-preview" alt="Attendance Image">
                             </div>
                             <span class="file-item-name">Current Image {{ loop.index }}</span>
                         </div>
@@ -469,26 +465,25 @@
                 <div class="input-pair">
                     <label>Student Names</label>
                     <div id="evaluation-student-list" class="dynamic-list scrollable-list">
-                        {% if evaluation_student_list %}
-                        {% for student in evaluation_student_list %}
+                        {% if documentation.evaluation_student_names %}
+                        {% for student in documentation.evaluation_student_names %}
                         <div class="dynamic-item">
-                            <input type="text" name="evaluation-student-names[]"
-                                value="{{ student.evaluation_list_of_student_names_student }}"
+                            <input type="text" name="student-names[]" value="{{ student }}"
                                 placeholder="Enter student name">
                             <button type="button" class="remove-item-btn">×</button>
                         </div>
                         {% endfor %}
                         {# Add additional empty entries to make it 10 #}
-                        {% for _ in range(10 - evaluation_student_list|length) %}
+                        {% for _ in range(10 - documentation.evaluation_student_names|length) %}
                         <div class="dynamic-item">
-                            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+                            <input type="text" name="student-names[]" placeholder="Enter student name">
                             <button type="button" class="remove-item-btn">×</button>
                         </div>
                         {% endfor %}
                         {% else %}
                         {% for _ in range(10) %}
                         <div class="dynamic-item">
-                            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+                            <input type="text" name="student-names[]" placeholder="Enter student name">
                             <button type="button" class="remove-item-btn">×</button>
                         </div>
                         {% endfor %}
@@ -512,16 +507,15 @@
                     <div id="event-photo-doc-files-list" class="selected-files-list"></div>
                 </div>
 
-                {% if documentation.event_photo_documentation_images %}
+                {% if documentation.event_photo_images %}
                 <div class="existing-images">
                     <h5>Current Event Photo Documentation</h5>
                     <div class="selected-files-list">
-                        {% for image in documentation.event_photo_documentation_images %}
-                        <div class="selected-file-item" data-image-id="{{ image.event_photo_documentation_images_id }}">
+                        {% for image in documentation.event_photo_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.public_id }}">
                             <button type="button" class="remove-file-button" title="Remove image">×</button>
                             <div class="file-preview-container">
-                                <img src="{{ image.event_photo_documentation_images_cloudinary_url }}"
-                                    class="file-preview" alt="Event Photo Documentation">
+                                <img src="{{ image.url }}" class="file-preview" alt="Event Photo Documentation">
                             </div>
                             <span class="file-item-name">Current Image {{ loop.index }}</span>
                         </div>

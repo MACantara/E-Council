@@ -169,8 +169,8 @@
                     <span id="file-name" class="file-name">No file chosen</span>
                 </label>
                 <p>Supported file types: .jpeg, .jpg, .png</p>
-                {% if current_user.users_signature is not none and current_user.users_signature|lower != 'none' %}
-                    <img id="signature-preview" src="{{ current_user.users_signature }}" alt="User's Signature"
+                {% if current_user.signature is not none and current_user.signature.url is not none and current_user.signature.url|lower != 'none' %}
+                    <img id="signature-preview" src="{{ current_user.signature.url }}" alt="User's Signature"
                     class="image-preview">
                 {% endif %}
             </div>
