@@ -21,7 +21,7 @@
 
         <h2>Financial Reports Overview</h2>
 
-        <a href="{{ url_for('add_financial_report') }}" class="primary-button create-button">Create New Financial Report</a>
+        <a href="{{ url_for('financial.add_financial_report') }}" class="primary-button create-button">Create New Financial Report</a>
 
         <div class="overview-content-container-group">
             {% if financial_reports %}
@@ -63,9 +63,9 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('generate_financial_report_pdf', financial_report_id=report.financial_reports_id) }}" class="primary-button">View</a>
-                    <a href="{{ url_for('update_financial_report', report_id=report.financial_reports_id) }}" class="secondary-button">Update</a>
-                    <a href="{{ url_for('delete_financial_report', report_id=report.financial_reports_id) }}" class="secondary-button">Delete</a>
+                    <a href="{{ url_for('financial.generate_financial_report_pdf', financial_report_id=report.financial_reports_id) }}" class="primary-button">View</a>
+                    <a href="{{ url_for('financial.update_financial_report', report_id=report.financial_reports_id) }}" class="secondary-button">Update</a>
+                    <a href="{{ url_for('financial.delete_financial_report', report_id=report.financial_reports_id) }}" class="secondary-button">Delete</a>
                 </div>
             </div>
             {% endif %}

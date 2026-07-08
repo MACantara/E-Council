@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to
+        <a href="{{ url_for('documentation.documentation_overview') }}" class="primary-button fit-content-button">Back to
             Documentation Overview</a>
 
         <!-- Flash messages section for the modal -->
@@ -23,7 +23,7 @@
         {% endif %}
         {% endwith %}
 
-        <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('documentation.add_documentation') }}">
             <div class="form-container">
                 <h2>Add Documentation</h2>
                 <h3>Documentation Details</h3>
@@ -361,7 +361,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
                 <div class="horizontal-input-pair">
-                    <a href="{{ url_for('documentation_overview') }}"
+                    <a href="{{ url_for('documentation.documentation_overview') }}"
                         class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Add Documentation</button>
                 </div>

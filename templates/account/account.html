@@ -26,7 +26,7 @@
                 Change Profile Picture
             {% endif %}
         </h2>
-        <form method="POST" action="{{ url_for('upload_profile_picture') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ url_for('account.upload_profile_picture') }}" enctype="multipart/form-data">
             <div class="input-pair">
                 <label for="profile-picture">Choose a profile picture</label>
                 <input type="file" name="profile-picture" id="profile-picture" accept="image/*" hidden required>

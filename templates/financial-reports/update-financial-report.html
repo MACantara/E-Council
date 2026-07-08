@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('financial_reports_overview') }}" class="primary-button fit-content-button">Back to Financial Reports Overview</a>
+        <a href="{{ url_for('financial.financial_reports_overview') }}" class="primary-button fit-content-button">Back to Financial Reports Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -24,7 +24,7 @@
         <div class="container">
             <h2>Update Financial Report</h2>
 
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('update_financial_report', report_id=report.financial_reports_id) }}">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('financial.update_financial_report', report_id=report.financial_reports_id) }}">
                 <div class="input-pair">
                     <label for="financial-reports-date">Date</label>
                     <input type="datetime-local" name="financial-reports-date" id="financial-reports-date" value="{{ report.financial_reports_date.strftime('%Y-%m-%dT%H:%M') }}" required>
@@ -133,7 +133,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
-                    <a href="{{ url_for('financial_reports_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <a href="{{ url_for('financial.financial_reports_overview') }}" class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Update Financial Report</button>
                 </div>
             </form>

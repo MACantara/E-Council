@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('generate_concept_paper_pdf', concept_paper_id=paper.concept_paper_forms_id) }}" class="primary-button">View</a>
+                    <a href="{{ url_for('concept_papers.generate_concept_paper_pdf', concept_paper_id=paper.concept_paper_forms_id) }}" class="primary-button">View</a>
                     <a href="{{ url_for('concept_papers.update_concept_paper', paper_id=paper.concept_paper_forms_id) }}" class="secondary-button">Update</a>
                     <a href="{{ url_for('concept_papers.delete_concept_paper', paper_id=paper.concept_paper_forms_id) }}" class="secondary-button">Delete</a>
                 </div>

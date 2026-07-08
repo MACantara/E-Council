@@ -21,7 +21,7 @@
 
         <h2>Documentation Overview</h2>
 
-        <a href="{{ url_for('add_documentation') }}" class="primary-button create-button">Create New Documentation</a>
+        <a href="{{ url_for('documentation.add_documentation') }}" class="primary-button create-button">Create New Documentation</a>
 
         <div class="overview-content-container-group">
             {% if documentations %}
@@ -82,10 +82,10 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('generate_documentation_pdf', documentation_id=documentation[0].documentation_id) }}" class="primary-button">View</a>
-                    <a href="{{ url_for('update_documentation', documentation_id=documentation[0].documentation_id) }}"
+                    <a href="{{ url_for('documentation.generate_documentation_pdf', documentation_id=documentation[0].documentation_id) }}" class="primary-button">View</a>
+                    <a href="{{ url_for('documentation.update_documentation', documentation_id=documentation[0].documentation_id) }}"
                         class="secondary-button">Update</a>
-                    <a href="{{ url_for('delete_documentation', documentation_id=documentation[0].documentation_id) }}"
+                    <a href="{{ url_for('documentation.delete_documentation', documentation_id=documentation[0].documentation_id) }}"
                         class="secondary-button">Delete</a>
                 </div>
             </div>
