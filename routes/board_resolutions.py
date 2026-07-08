@@ -20,7 +20,6 @@ from config import AIConfig
 from models import (
     db,
     BoardResolutions,
-    BoardResolutionsStudentSignatories,
     Events,
     Departments,
     Users,
@@ -117,17 +116,11 @@ def add_board_resolution():
             board_resolutions_approved_by=approved_by
         )
 
+        # Add student signatories as a JSON list of user IDs
+        new_resolution.student_signatory_ids = student_signatories
+
         # Add the new resolution to the database
         db.session.add(new_resolution)
-        db.session.commit()
-
-        # Add student signatories to the board_resolutions_student_signatories table
-        for signatory_id in student_signatories:
-            new_signatory = BoardResolutionsStudentSignatories(
-                board_resolutions_id=new_resolution.board_resolutions_id,
-                board_resolutions_users_id=signatory_id
-            )
-            db.session.add(new_signatory)
         db.session.commit()
 
         flash('Board resolution added successfully!', 'success')
@@ -154,11 +147,6 @@ def delete_board_resolution(resolution_id):
     resolution = BoardResolutions.query.get_or_404(resolution_id)
 
     if request.method == "POST":
-        # Retrieve and delete related BoardResolutionsStudentSignatories entries
-        related_signatories = BoardResolutionsStudentSignatories.query.filter_by(board_resolutions_id=resolution_id).all()
-        for signatory in related_signatories:
-            db.session.delete(signatory)
-
         # Delete related records in the departments_events table
         DepartmentsEvents.query.filter_by(events_id=resolution.board_resolutions_events_id).delete()
 
@@ -233,16 +221,9 @@ def update_board_resolution(resolution_id):
         resolution.board_resolutions_prepared_by = prepared_by
         resolution.board_resolutions_approved_by = approved_by
 
-        db.session.commit()
+        # Update student signatories as a JSON list of user IDs
+        resolution.student_signatory_ids = student_signatories
 
-        # Update student signatories in the board_resolutions_student_signatories table
-        BoardResolutionsStudentSignatories.query.filter_by(board_resolutions_id=resolution_id).delete()
-        for signatory_id in student_signatories:
-            new_signatory = BoardResolutionsStudentSignatories(
-                board_resolutions_id=resolution_id,
-                board_resolutions_users_id=signatory_id
-            )
-            db.session.add(new_signatory)
         db.session.commit()
 
         flash('Board resolution updated successfully!', 'success')
@@ -260,7 +241,7 @@ def update_board_resolution(resolution_id):
     signatories = Signatories.query.all()
 
     # Query for existing student signatories
-    existing_signatories = [signatory.board_resolutions_users_id for signatory in resolution.student_signatories]
+    existing_signatories = resolution.student_signatory_ids or []
 
     return render_template('board-resolutions/update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories, existing_signatories=existing_signatories)
 
@@ -377,17 +358,18 @@ def generate_board_resolution_pdf(resolution_id):
     prepared_by = Users.query.get(resolution.board_resolutions_prepared_by)
     approved_by = Signatories.query.get(resolution.board_resolutions_approved_by)
 
-    # Get student signatories
-    student_signatories = db.session.query(
-        BoardResolutionsStudentSignatories,
+    # Get student signatories from the JSON list of user IDs
+    signatory_users = db.session.query(
         Users,
         StudentOrganizations
     )\
-        .join(Users, BoardResolutionsStudentSignatories.board_resolutions_users_id == Users.users_id)\
         .join(StudentOrganizations, Users.users_student_organization == StudentOrganizations.student_organizations_id)\
-        .filter(BoardResolutionsStudentSignatories.board_resolutions_id == resolution_id)\
+        .filter(Users.users_id.in_(resolution.student_signatory_ids or []))\
         .order_by(StudentOrganizations.student_organizations_name)\
         .all()
+
+    # Maintain tuple structure (signatory_placeholder, user, org) for downstream code
+    student_signatories = [(None, user, org) for user, org in signatory_users]
 
     # Create BytesIO buffer for PDF
     buffer = BytesIO()

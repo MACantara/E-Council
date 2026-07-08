@@ -26,26 +26,8 @@ from models import (
     Events,
     Users,
     Signatories,
-    ActivityStrengths,
-    ActivityWeaknesses,
-    ActivityRecommendations,
-    TallyItems,
-    ResultsOfTheEvaluationImages,
-    SummaryOfAttendanceImages,
-    EventPhotoDocumentationImages,
-    EvaluationForm,
-    EvaluationListOfStudentNames,
-    DepartmentsEvents,
-    ObjectivesOfTheActivity,
-    LearningOutcomes,
     StudentOrganizations,
-    LearningJournalForms,
-    Learnings,
-    Observations,
-    PersonnelInChargeForms,
-    ActivityReportFormsActivityStrengths,
-    ActivityReportFormsActivityWeaknesses,
-    ActivityReportFormsActivityRecommendations
+    LearningJournalForms
 )
 
 # Import helper function from utils
@@ -138,7 +120,105 @@ def add_documentation():
             concept_paper_learning_journal.learning_journal_forms_seen_and_read_by = learning_journal_forms_seen_and_read_by
             learning_journal_forms_id = concept_paper_learning_journal.learning_journal_forms_id
 
-        # Create a new documentation entry
+        # Build JSON lists from form data
+        activity_strengths = [s for s in activity_strengths if s]
+        activity_weaknesses = [w for w in activity_weaknesses if w]
+        activity_recommendations = [r for r in activity_recommendations if r]
+
+        # Update learning journal observations and learnings as JSON lists
+        if concept_paper_learning_journal:
+            concept_paper_learning_journal.learnings = [l for l in request.form.getlist('learnings') if l.strip()]
+            concept_paper_learning_journal.observations = [o for o in request.form.getlist('observations') if o.strip()]
+
+        # Build tally items JSON list
+        tally_items_names = request.form.getlist('tally-items-name[]')
+        tally_items_extremely_satisfied = request.form.getlist('tally-items-extremely-satisfied-rating-total[]')
+        tally_items_satisfied = request.form.getlist('tally-items-satisfied-rating-total[]')
+        tally_items_neutral = request.form.getlist('tally-items-neutral-rating-total[]')
+        tally_items_dissatisfied = request.form.getlist('tally-items-dissatisfied-rating-total[]')
+        tally_items_extremely_dissatisfied = request.form.getlist('tally-items-extremely-dissatisfied-rating-total[]')
+        tally_items = []
+        for i in range(len(tally_items_names)):
+            if tally_items_names[i].strip():
+                tally_items.append({
+                    'name': tally_items_names[i],
+                    'extremely_satisfied': int(tally_items_extremely_satisfied[i]),
+                    'satisfied': int(tally_items_satisfied[i]),
+                    'neutral': int(tally_items_neutral[i]),
+                    'dissatisfied': int(tally_items_dissatisfied[i]),
+                    'extremely_dissatisfied': int(tally_items_extremely_dissatisfied[i])
+                })
+
+        # Build evaluation images JSON list
+        evaluation_images = []
+        for image in request.files.getlist('evaluation-images[]'):
+            if image and allowed_image_file(image.filename):
+                try:
+                    upload_result = cloudinary.uploader.upload(
+                        image,
+                        folder="results_of_the_evaluation_images",
+                        resource_type="auto"
+                    )
+                    evaluation_images.append({
+                        'url': upload_result['secure_url'],
+                        'public_id': upload_result['public_id']
+                    })
+                except Exception as e:
+                    flash(f"Failed to upload evaluation image: {str(e)}", "error")
+
+        # Build attendance images JSON list
+        attendance_images = []
+        for image in request.files.getlist('attendance-images[]'):
+            if image and allowed_image_file(image.filename):
+                try:
+                    upload_result = cloudinary.uploader.upload(
+                        image,
+                        folder="summary_of_attendance_images",
+                        resource_type="auto"
+                    )
+                    attendance_images.append({
+                        'url': upload_result['secure_url'],
+                        'public_id': upload_result['public_id']
+                    })
+                except Exception as e:
+                    flash(f"Failed to upload attendance image: {str(e)}", "error")
+
+        # Build event photo documentation images JSON list
+        event_photo_images = []
+        for image in request.files.getlist('photo-documentation-images[]'):
+            if image and allowed_image_file(image.filename):
+                try:
+                    upload_result = cloudinary.uploader.upload(
+                        image,
+                        folder="event_photo_documentation_images",
+                        resource_type="auto"
+                    )
+                    event_photo_images.append({
+                        'url': upload_result['secure_url'],
+                        'public_id': upload_result['public_id']
+                    })
+                except Exception as e:
+                    flash(f"Failed to upload event photo documentation image: {str(e)}", "error")
+
+        # Build evaluation student names JSON list from Excel file
+        evaluation_student_names = []
+        if 'student-list-excel' in request.files:
+            file = request.files['student-list-excel']
+            if file and file.filename.endswith('.xlsx'):
+                try:
+                    df = pd.read_excel(file)
+                    name_column = None
+                    for col in df.columns:
+                        if 'full name' in col.lower():
+                            name_column = col
+                            break
+
+                    if name_column:
+                        evaluation_student_names = df[name_column].dropna().tolist()
+                except Exception as e:
+                    flash(f"Failed to process student list: {str(e)}", "error")
+
+        # Create a new documentation entry with JSON fields
         new_documentation = Documentation(
             documentation_events_id=documentation_events_id,
             documentation_academic_year=documentation_academic_year,
@@ -152,174 +232,19 @@ def add_documentation():
             documentation_noted_by=documentation_noted_by,
             documentation_date_of_submission=documentation_date_of_submission,
             documentation_rating=documentation_rating,
-            documentation_comments_suggestions=documentation_comments_suggestions
+            documentation_comments_suggestions=documentation_comments_suggestions,
+            activity_strengths=activity_strengths,
+            activity_weaknesses=activity_weaknesses,
+            activity_recommendations=activity_recommendations,
+            tally_items=tally_items,
+            evaluation_images=evaluation_images,
+            attendance_images=attendance_images,
+            event_photo_images=event_photo_images,
+            evaluation_student_names=evaluation_student_names,
+            evaluation_forms=[]
         )
 
-        # Add the new documentation to the database
         db.session.add(new_documentation)
-        db.session.flush()  # Ensure the documentation ID is available
-        documentation_id = new_documentation.documentation_id  # Get the documentation ID
-
-        # Add activity strengths
-        for strength_content in activity_strengths:
-            if strength_content:
-                strength = ActivityStrengths(
-                    activity_strengths_documentation_id=documentation_id,
-                    activity_strengths_content=strength_content
-                )
-                db.session.add(strength)
-
-        # Add activity weaknesses
-        for weakness_content in activity_weaknesses:
-            if weakness_content:
-                weakness = ActivityWeaknesses(
-                    activity_weaknesses_documentation_id=documentation_id,
-                    activity_weaknesses_content=weakness_content
-                )
-                db.session.add(weakness)
-
-        # Add activity recommendations
-        for recommendation_content in activity_recommendations:
-            if recommendation_content:
-                recommendation = ActivityRecommendations(
-                    activity_recommendations_documentation_id=documentation_id,
-                    activity_recommendations_content=recommendation_content
-                )
-                db.session.add(recommendation)
-
-        # Get learnings and observations
-        learnings = request.form.getlist('learnings')
-        observations = request.form.getlist('observations')
-
-        # Add learnings
-        for learning_content in learnings:
-            if learning_content.strip():  # Only add non-empty learnings
-                new_learning = Learnings(
-                    learnings_learning_journal_forms_id=learning_journal_forms_id,
-                    learnings_content=learning_content
-                )
-                db.session.add(new_learning)
-
-        # Add observations
-        for observation_content in observations:
-            if observation_content.strip():  # Only add non-empty observations
-                new_observation = Observations(
-                    observations_learning_journal_forms_id=learning_journal_forms_id,
-                    observations_content=observation_content
-                )
-                db.session.add(new_observation)
-
-        # Get tally items data
-        tally_items_names = request.form.getlist('tally-items-name[]')
-        tally_items_extremely_satisfied = request.form.getlist('tally-items-extremely-satisfied-rating-total[]')
-        tally_items_satisfied = request.form.getlist('tally-items-satisfied-rating-total[]')
-        tally_items_neutral = request.form.getlist('tally-items-neutral-rating-total[]')
-        tally_items_dissatisfied = request.form.getlist('tally-items-dissatisfied-rating-total[]')
-        tally_items_extremely_dissatisfied = request.form.getlist('tally-items-extremely-dissatisfied-rating-total[]')
-
-        # Add tally items
-        for i in range(len(tally_items_names)):
-            if tally_items_names[i].strip():  # Only add if name is not empty
-                new_tally_item = TallyItems(
-                    tally_items_documentation_id=documentation_id,
-                    tally_items_name=tally_items_names[i],
-                    tally_items_extremely_satisfied_rating_total=int(tally_items_extremely_satisfied[i]),
-                    tally_items_satisfied_rating_total=int(tally_items_satisfied[i]),
-                    tally_items_neutral_rating_total=int(tally_items_neutral[i]),
-                    tally_items_dissatisfied_rating_total=int(tally_items_dissatisfied[i]),
-                    tally_items_extremely_dissatisfied_rating_total=int(tally_items_extremely_dissatisfied[i])
-                )
-                db.session.add(new_tally_item)
-
-        # Handle evaluation images upload
-        evaluation_images = request.files.getlist('evaluation-images[]')
-        for image in evaluation_images:
-            if image and allowed_image_file(image.filename):
-                try:
-                    # Upload to Cloudinary
-                    upload_result = cloudinary.uploader.upload(
-                        image,
-                        folder="results_of_the_evaluation_images",
-                        resource_type="auto"
-                    )
-
-                    # Create database entry for the image
-                    new_image = ResultsOfTheEvaluationImages(
-                        results_of_the_evaluation_images_documentation_id=documentation_id,
-                        results_of_the_evaluation_images_cloudinary_url=upload_result['secure_url'],
-                        results_of_the_evaluation_images_cloudinary_public_id=upload_result['public_id']
-                    )
-                    db.session.add(new_image)
-                except Exception as e:
-                    flash(f"Failed to upload evaluation image: {str(e)}", "error")
-
-        # Handle summary of attendance images upload
-        attendance_images = request.files.getlist('attendance-images[]')
-        for image in attendance_images:
-            if image and allowed_image_file(image.filename):
-                try:
-                    # Upload to Cloudinary
-                    upload_result = cloudinary.uploader.upload(
-                        image,
-                        folder="summary_of_attendance_images",
-                        resource_type="auto"
-                    )
-
-                    # Create database entry for the image
-                    new_image = SummaryOfAttendanceImages(
-                        summary_of_attendance_images_documentation_id=documentation_id,
-                        summary_of_attendance_images_cloudinary_url=upload_result['secure_url'],
-                        summary_of_attendance_images_cloudinary_public_id=upload_result['public_id']
-                    )
-                    db.session.add(new_image)
-                except Exception as e:
-                    flash(f"Failed to upload attendance image: {str(e)}", "error")
-
-        # Process student list Excel file
-        if 'student-list-excel' in request.files:
-            file = request.files['student-list-excel']
-            if file and file.filename.endswith('.xlsx'):
-                try:
-                    df = pd.read_excel(file)
-                    name_column = None
-                    for col in df.columns:
-                        if 'full name' in col.lower():
-                            name_column = col
-                            break
-
-                    if name_column:
-                        student_names = df[name_column].dropna().tolist()
-                        for student_name in student_names:
-                            new_student = EvaluationListOfStudentNames(
-                                evaluation_list_of_student_names_documentation_id=documentation_id,
-                                evaluation_list_of_student_names_student=student_name
-                            )
-                            db.session.add(new_student)
-                except Exception as e:
-                    flash(f"Failed to process student list: {str(e)}", "error")
-
-        # Handle photo documentation images upload
-        photo_doc_images = request.files.getlist('photo-documentation-images[]')
-        for image in photo_doc_images:
-            if image and allowed_image_file(image.filename):
-                try:
-                    # Upload to Cloudinary
-                    upload_result = cloudinary.uploader.upload(
-                        image,
-                        folder="event_photo_documentation_images",
-                        resource_type="auto"
-                    )
-
-                    # Create database entry for the image
-                    new_image = EventPhotoDocumentationImages(
-                        event_photo_documentation_images_documentation_id=documentation_id,
-                        event_photo_documentation_images_cloudinary_url=upload_result['secure_url'],
-                        event_photo_documentation_images_cloudinary_public_id=upload_result['public_id']
-                    )
-                    db.session.add(new_image)
-                except Exception as e:
-                    flash(f"Failed to upload event photo documentation image: {str(e)}", "error")
-
         db.session.commit()
         flash("Documentation added successfully!", "success")
         return redirect(url_for('documentation.documentation_overview'))
@@ -410,49 +335,10 @@ def update_documentation(documentation_id):
         documentation.documentation_noted_by = documentation_noted_by
         documentation.documentation_date_of_submission = documentation_date_of_submission
 
-        # Update strengths
-        # First, delete existing strengths
-        ActivityStrengths.query.filter_by(
-            activity_strengths_documentation_id=documentation_id
-        ).delete()
-
-        # Add new strengths
-        strengths = request.form.getlist('activity-strengths[]')
-        for strength in strengths:
-            if strength.strip():  # Only add non-empty strengths
-                new_strength = ActivityStrengths(
-                    activity_strengths_documentation_id=documentation_id,
-                    activity_strengths_content=strength.strip()
-                )
-                db.session.add(new_strength)
-
-        # Update weaknesses
-        ActivityWeaknesses.query.filter_by(
-            activity_weaknesses_documentation_id=documentation_id
-        ).delete()
-
-        weaknesses = request.form.getlist('activity-weaknesses[]')
-        for weakness in weaknesses:
-            if weakness.strip():
-                new_weakness = ActivityWeaknesses(
-                    activity_weaknesses_documentation_id=documentation_id,
-                    activity_weaknesses_content=weakness.strip()
-                )
-                db.session.add(new_weakness)
-
-        # Update recommendations
-        ActivityRecommendations.query.filter_by(
-            activity_recommendations_documentation_id=documentation_id
-        ).delete()
-
-        recommendations = request.form.getlist('activity-recommendations[]')
-        for recommendation in recommendations:
-            if recommendation.strip():
-                new_recommendation = ActivityRecommendations(
-                    activity_recommendations_documentation_id=documentation_id,
-                    activity_recommendations_content=recommendation.strip()
-                )
-                db.session.add(new_recommendation)
+        # Update strengths, weaknesses, and recommendations as JSON lists
+        documentation.activity_strengths = [s.strip() for s in request.form.getlist('activity-strengths[]') if s.strip()]
+        documentation.activity_weaknesses = [w.strip() for w in request.form.getlist('activity-weaknesses[]') if w.strip()]
+        documentation.activity_recommendations = [r.strip() for r in request.form.getlist('activity-recommendations[]') if r.strip()]
 
         # Update Learning Journal fields
         learning_journal.learning_journal_forms_name_of_student = request.form.get('student-name')
@@ -463,135 +349,95 @@ def update_documentation(documentation_id):
         learning_journal.learning_journal_forms_prepared_by = request.form.get('documentation-prepared-by')
         learning_journal.learning_journal_forms_checked_by = request.form.get('documentation-checked-by')
 
-        # Update learnings
-        Learnings.query.filter_by(
-            learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id
-        ).delete()
+        # Update learnings and observations as JSON lists
+        learning_journal.learnings = [l.strip() for l in request.form.getlist('learnings[]') if l.strip()]
+        learning_journal.observations = [o.strip() for o in request.form.getlist('observations[]') if o.strip()]
 
-        learnings = request.form.getlist('learnings[]')
-        for learning in learnings:
-            if learning.strip():
-                new_learning = Learnings(
-                    learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
-                    learnings_content=learning.strip()
-                )
-                db.session.add(new_learning)
-
-        # Update observations
-        Observations.query.filter_by(
-            observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id
-        ).delete()
-
-        observations = request.form.getlist('observations[]')
-        for observation in observations:
-            if observation.strip():
-                new_observation = Observations(
-                    observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
-                    observations_content=observation.strip()
-                )
-                db.session.add(new_observation)
-
-        # Get the list of images to delete
+        # Handle evaluation images (delete removed, then append new uploads)
+        evaluation_images = documentation.evaluation_images or []
         deleted_image_ids = request.form.get('deleted_evaluation_images', '').split(',')
-        if deleted_image_ids and deleted_image_ids[0]:  # Check if there are any deleted images
-            for image_id in deleted_image_ids:
-                image = ResultsOfTheEvaluationImages.query.get(int(image_id))
-                if image:
+        if deleted_image_ids and deleted_image_ids[0]:
+            deleted_ids = {img_id.strip() for img_id in deleted_image_ids if img_id.strip()}
+            filtered_images = []
+            for image in evaluation_images:
+                if image.get('public_id') in deleted_ids or image.get('url') in deleted_ids:
                     try:
-                        # Delete from Cloudinary
-                        if image.results_of_the_evaluation_images_cloudinary_public_id:
-                            cloudinary.uploader.destroy(
-                                image.results_of_the_evaluation_images_cloudinary_public_id
-                            )
-                        # Delete from database
-                        db.session.delete(image)
+                        cloudinary.uploader.destroy(image['public_id'])
                     except Exception as e:
                         flash('Error deleting some evaluation images', 'error')
+                else:
+                    filtered_images.append(image)
+            evaluation_images = filtered_images
 
-        # Handle new evaluation image uploads
-        evaluation_images = request.files.getlist('evaluation-images[]')
-        if evaluation_images:
-            for image in evaluation_images:
-                if image and allowed_image_file(image.filename):
-                    try:
-                        # Upload to Cloudinary
-                        upload_result = cloudinary.uploader.upload(image)
-
-                        # Create new evaluation image record
-                        new_image = ResultsOfTheEvaluationImages(
-                            results_of_the_evaluation_images_documentation_id=documentation_id,
-                            results_of_the_evaluation_images_cloudinary_url=upload_result['secure_url'],
-                            results_of_the_evaluation_images_cloudinary_public_id=upload_result['public_id']
-                        )
-                        db.session.add(new_image)
-                    except Exception as e:
-                        flash('Error uploading some evaluation images', 'error')
+        for image in request.files.getlist('evaluation-images[]'):
+            if image and allowed_image_file(image.filename):
+                try:
+                    upload_result = cloudinary.uploader.upload(image)
+                    evaluation_images.append({
+                        'url': upload_result['secure_url'],
+                        'public_id': upload_result['public_id']
+                    })
+                except Exception as e:
+                    flash('Error uploading some evaluation images', 'error')
+        documentation.evaluation_images = evaluation_images
 
         # Handle attendance images
+        attendance_images = documentation.attendance_images or []
         deleted_attendance_image_ids = request.form.get('deleted_attendance_images', '').split(',')
         if deleted_attendance_image_ids and deleted_attendance_image_ids[0]:
-            for image_id in deleted_attendance_image_ids:
-                image = SummaryOfAttendanceImages.query.get(int(image_id))
-                if image:
+            deleted_ids = {img_id.strip() for img_id in deleted_attendance_image_ids if img_id.strip()}
+            filtered_images = []
+            for image in attendance_images:
+                if image.get('public_id') in deleted_ids or image.get('url') in deleted_ids:
                     try:
-                        if image.summary_of_attendance_images_cloudinary_public_id:
-                            cloudinary.uploader.destroy(
-                                image.summary_of_attendance_images_cloudinary_public_id,
-                                resource_type="image"
-                            )
-                        db.session.delete(image)
+                        cloudinary.uploader.destroy(image['public_id'])
                     except Exception as e:
                         flash('Error deleting some attendance images', 'error')
+                else:
+                    filtered_images.append(image)
+            attendance_images = filtered_images
 
-        attendance_images = request.files.getlist('attendance-images[]')
-        if attendance_images:
-            for image in attendance_images:
-                if image and allowed_image_file(image.filename):
-                    try:
-                        upload_result = cloudinary.uploader.upload(image)
-                        new_image = SummaryOfAttendanceImages(
-                            summary_of_attendance_images_documentation_id=documentation_id,
-                            summary_of_attendance_images_cloudinary_url=upload_result['secure_url'],
-                            summary_of_attendance_images_cloudinary_public_id=upload_result['public_id']
-                        )
-                        db.session.add(new_image)
-                    except Exception as e:
-                        flash('Error uploading some attendance images', 'error')
+        for image in request.files.getlist('attendance-images[]'):
+            if image and allowed_image_file(image.filename):
+                try:
+                    upload_result = cloudinary.uploader.upload(image)
+                    attendance_images.append({
+                        'url': upload_result['secure_url'],
+                        'public_id': upload_result['public_id']
+                    })
+                except Exception as e:
+                    flash('Error uploading some attendance images', 'error')
+        documentation.attendance_images = attendance_images
 
         # Handle photo documentation images
+        event_photo_images = documentation.event_photo_images or []
         deleted_photo_doc_image_ids = request.form.get('deleted_photo_doc_images', '').split(',')
         if deleted_photo_doc_image_ids and deleted_photo_doc_image_ids[0]:
-            for image_id in deleted_photo_doc_image_ids:
-                image = EventPhotoDocumentationImages.query.get(int(image_id))
-                if image:
+            deleted_ids = {img_id.strip() for img_id in deleted_photo_doc_image_ids if img_id.strip()}
+            filtered_images = []
+            for image in event_photo_images:
+                if image.get('public_id') in deleted_ids or image.get('url') in deleted_ids:
                     try:
-                        if image.event_photo_documentation_images_cloudinary_public_id:
-                            cloudinary.uploader.destroy(
-                                image.event_photo_documentation_images_cloudinary_public_id,
-                                resource_type="image"
-                            )
-                        db.session.delete(image)
+                        cloudinary.uploader.destroy(image['public_id'])
                     except Exception as e:
                         flash('Error deleting some photo documentation images', 'error')
+                else:
+                    filtered_images.append(image)
+            event_photo_images = filtered_images
 
-        photo_doc_images = request.files.getlist('photo-documentation-images[]')
-        if photo_doc_images:
-            for image in photo_doc_images:
-                if image and allowed_image_file(image.filename):
-                    try:
-                        upload_result = cloudinary.uploader.upload(image)
-                        new_image = EventPhotoDocumentationImages(
-                            event_photo_documentation_images_documentation_id=documentation_id,
-                            event_photo_documentation_images_cloudinary_url=upload_result['secure_url'],
-                            event_photo_documentation_images_cloudinary_public_id=upload_result['public_id']
-                        )
-                        db.session.add(new_image)
-                    except Exception as e:
-                        flash('Error uploading some photo documentation images', 'error')
+        for image in request.files.getlist('photo-documentation-images[]'):
+            if image and allowed_image_file(image.filename):
+                try:
+                    upload_result = cloudinary.uploader.upload(image)
+                    event_photo_images.append({
+                        'url': upload_result['secure_url'],
+                        'public_id': upload_result['public_id']
+                    })
+                except Exception as e:
+                    flash('Error uploading some photo documentation images', 'error')
+        documentation.event_photo_images = event_photo_images
 
-        # Update tally items
-        TallyItems.query.filter_by(tally_items_documentation_id=documentation_id).delete()
-
+        # Update tally items as a JSON list
         tally_items_names = request.form.getlist('tally-items-name[]')
         tally_items_extremely_satisfied = request.form.getlist('tally-items-extremely-satisfied-rating-total[]')
         tally_items_satisfied = request.form.getlist('tally-items-satisfied-rating-total[]')
@@ -599,57 +445,35 @@ def update_documentation(documentation_id):
         tally_items_dissatisfied = request.form.getlist('tally-items-dissatisfied-rating-total[]')
         tally_items_extremely_dissatisfied = request.form.getlist('tally-items-extremely-dissatisfied-rating-total[]')
 
+        tally_items = []
         for i in range(len(tally_items_names)):
             if tally_items_names[i].strip():
-                new_tally_item = TallyItems(
-                    tally_items_documentation_id=documentation_id,
-                    tally_items_name=tally_items_names[i],
-                    tally_items_extremely_satisfied_rating_total=int(tally_items_extremely_satisfied[i]),
-                    tally_items_satisfied_rating_total=int(tally_items_satisfied[i]),
-                    tally_items_neutral_rating_total=int(tally_items_neutral[i]),
-                    tally_items_dissatisfied_rating_total=int(tally_items_dissatisfied[i]),
-                    tally_items_extremely_dissatisfied_rating_total=int(tally_items_extremely_dissatisfied[i])
-                )
-                db.session.add(new_tally_item)
+                tally_items.append({
+                    'name': tally_items_names[i],
+                    'extremely_satisfied': int(tally_items_extremely_satisfied[i]),
+                    'satisfied': int(tally_items_satisfied[i]),
+                    'neutral': int(tally_items_neutral[i]),
+                    'dissatisfied': int(tally_items_dissatisfied[i]),
+                    'extremely_dissatisfied': int(tally_items_extremely_dissatisfied[i])
+                })
+        documentation.tally_items = tally_items
 
-        # Update evaluation forms
-        EvaluationForm.query.filter_by(evaluation_form_documentation_id=documentation_id).delete()
-
+        # Update evaluation forms as a JSON list
         evaluation_form_names = request.form.getlist('evaluation-form-name[]')
         evaluation_form_ratings = request.form.getlist('evaluation-form-rating[]')
 
+        evaluation_forms = []
         for i in range(len(evaluation_form_names)):
             if evaluation_form_names[i].strip():
                 rating = evaluation_form_ratings[i] if i < len(evaluation_form_ratings) else None
-                new_evaluation_form = EvaluationForm(
-                    evaluation_form_documentation_id=documentation_id,
-                    evaluation_form_name=evaluation_form_names[i]
-                )
-                if rating == '5':
-                    new_evaluation_form.evaluation_form_extremely_satisfied_rating = 1
-                elif rating == '4':
-                    new_evaluation_form.evaluation_form_satisfied_rating = 1
-                elif rating == '3':
-                    new_evaluation_form.evaluation_form_neutral_rating = 1
-                elif rating == '2':
-                    new_evaluation_form.evaluation_form_dissatisfied_rating = 1
-                elif rating == '1':
-                    new_evaluation_form.evaluation_form_extremely_dissatisfied_rating = 1
-                db.session.add(new_evaluation_form)
+                evaluation_forms.append({
+                    'name': evaluation_form_names[i],
+                    'rating': rating
+                })
+        documentation.evaluation_forms = evaluation_forms
 
-        # Update student list
-        EvaluationListOfStudentNames.query.filter_by(
-            evaluation_list_of_student_names_documentation_id=documentation_id
-        ).delete()
-
-        student_names = request.form.getlist('student-names[]')
-        for student_name in student_names:
-            if student_name.strip():
-                new_student = EvaluationListOfStudentNames(
-                    evaluation_list_of_student_names_documentation_id=documentation_id,
-                    evaluation_list_of_student_names_student=student_name.strip()
-                )
-                db.session.add(new_student)
+        # Update student list as a JSON list
+        documentation.evaluation_student_names = [s.strip() for s in request.form.getlist('student-names[]') if s.strip()]
 
         db.session.commit()
         flash('Documentation updated successfully!', 'success')
@@ -704,64 +528,23 @@ def update_documentation(documentation_id):
         'learning_journal_forms_checked_by': journal.LearningJournalForms.learning_journal_forms_checked_by
     } for journal in learning_journals]
 
-    # Get tally items
-    tally_items = TallyItems.query.filter_by(tally_items_documentation_id=documentation_id).all()
-
-    # Get evaluation images
-    evaluation_images = ResultsOfTheEvaluationImages.query.filter_by(
-        results_of_the_evaluation_images_documentation_id=documentation_id
-    ).all()
-
-    # Get attendance images
-    attendance_images = SummaryOfAttendanceImages.query.filter_by(
-        summary_of_attendance_images_documentation_id=documentation_id
-    ).all()
-
-    # Get photo documentation images
-    photo_doc_images = EventPhotoDocumentationImages.query.filter_by(
-        event_photo_documentation_images_documentation_id=documentation_id
-    ).all()
-
-    # Get evaluation forms
-    evaluation_forms = EvaluationForm.query.filter_by(
-        evaluation_form_documentation_id=documentation_id
-    ).all()
-
-    # Get student list
-    evaluation_student_list = EvaluationListOfStudentNames.query.filter_by(
-        evaluation_list_of_student_names_documentation_id=documentation_id
-    ).all()
-
-    # Get learnings and observations
-    learnings = []
-    observations = []
+    # Get learning journal for learnings and observations
+    learning_journal = None
     if documentation.documentation_learning_journal_forms_id:
         learning_journal = LearningJournalForms.query.get(documentation.documentation_learning_journal_forms_id)
-        if learning_journal:
-            learnings = Learnings.query.filter_by(
-                learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id
-            ).all()
-            observations = Observations.query.filter_by(
-                observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id
-            ).all()
 
-    # Create evaluation forms dictionary
-    evaluation_forms_dict = {}
-    for form in evaluation_forms:
-        evaluation_forms_dict[form.evaluation_form_id] = {
-            'name': form.evaluation_form_name,
-            'rating': None
-        }
-        if form.evaluation_form_extremely_satisfied_rating:
-            evaluation_forms_dict[form.evaluation_form_id]['rating'] = '5'
-        elif form.evaluation_form_satisfied_rating:
-            evaluation_forms_dict[form.evaluation_form_id]['rating'] = '4'
-        elif form.evaluation_form_neutral_rating:
-            evaluation_forms_dict[form.evaluation_form_id]['rating'] = '3'
-        elif form.evaluation_form_dissatisfied_rating:
-            evaluation_forms_dict[form.evaluation_form_id]['rating'] = '2'
-        elif form.evaluation_form_extremely_dissatisfied_rating:
-            evaluation_forms_dict[form.evaluation_form_id]['rating'] = '1'
+    # Use JSON fields directly
+    tally_items = documentation.tally_items or []
+    evaluation_images = documentation.evaluation_images or []
+    attendance_images = documentation.attendance_images or []
+    photo_doc_images = documentation.event_photo_images or []
+    evaluation_forms = documentation.evaluation_forms or []
+    evaluation_student_list = documentation.evaluation_student_names or []
+    learnings = learning_journal.learnings if learning_journal else []
+    observations = learning_journal.observations if learning_journal else []
+    strengths = documentation.activity_strengths or []
+    weaknesses = documentation.activity_weaknesses or []
+    recommendations = documentation.activity_recommendations or []
 
     return render_template('documentation/update-documentation.html',
                          documentation=documentation,
@@ -776,7 +559,12 @@ def update_documentation(documentation_id):
                          attendance_images=attendance_images,
                          photo_doc_images=photo_doc_images,
                          evaluation_student_list=evaluation_student_list,
-                         evaluation_forms=evaluation_forms_dict
+                         evaluation_forms=evaluation_forms,
+                         strengths=strengths,
+                         weaknesses=weaknesses,
+                         recommendations=recommendations,
+                         learnings=learnings,
+                         observations=observations
     )
 
 
@@ -787,62 +575,29 @@ def delete_documentation(documentation_id):
 
     if request.method == 'POST':
         try:
-            # Get the documentation and its associated images
-            documentation = Documentation.query.get_or_404(documentation_id)
-            evaluation_images = ResultsOfTheEvaluationImages.query.filter_by(
-                results_of_the_evaluation_images_documentation_id=documentation_id
-            ).all()
-
-            # Delete images from Cloudinary and database
-            for image in evaluation_images:
+            # Delete associated images from Cloudinary
+            for image in (documentation.evaluation_images or []):
                 try:
-                    # Delete from Cloudinary
-                    if image.results_of_the_evaluation_images_cloudinary_public_id:
-                        cloudinary.uploader.destroy(
-                            image.results_of_the_evaluation_images_cloudinary_public_id,
-                            resource_type="image"
-                        )
-                    # Delete database entry
-                    db.session.delete(image)
+                    if image.get('public_id'):
+                        cloudinary.uploader.destroy(image['public_id'], resource_type="image")
                 except Exception as e:
                     flash('Error deleting some evaluation images', 'error')
-                    # Continue with deletion even if one image fails
 
-            # Get and delete attendance images
-            attendance_images = SummaryOfAttendanceImages.query.filter_by(
-                summary_of_attendance_images_documentation_id=documentation_id
-            ).all()
-
-            # Delete attendance images from Cloudinary and database
-            for image in attendance_images:
+            for image in (documentation.attendance_images or []):
                 try:
-                    if image.summary_of_attendance_images_cloudinary_public_id:
-                        cloudinary.uploader.destroy(
-                            image.summary_of_attendance_images_cloudinary_public_id,
-                            resource_type="image"
-                        )
-                    db.session.delete(image)
+                    if image.get('public_id'):
+                        cloudinary.uploader.destroy(image['public_id'], resource_type="image")
                 except Exception as e:
                     flash('Error deleting some attendance images', 'error')
 
-            # Get and delete event photo documentation images
-            event_photos = EventPhotoDocumentationImages.query.filter_by(
-                event_photo_documentation_images_documentation_id=documentation_id
-            ).all()
-
-            # Delete event photo documentation images from Cloudinary and database
-            for image in event_photos:
+            for image in (documentation.event_photo_images or []):
                 try:
-                    if image.event_photo_documentation_images_cloudinary_public_id:
-                        cloudinary.uploader.destroy(
-                            image.event_photo_documentation_images_cloudinary_public_id,
-                            resource_type="image"
-                        )
-                    db.session.delete(image)
+                    if image.get('public_id'):
+                        cloudinary.uploader.destroy(image['public_id'], resource_type="image")
                 except Exception as e:
                     flash('Error deleting some event photo documentation images', 'error')
 
-            # Delete the documentation entry
+            # Delete the documentation entry (JSON data is removed automatically with the record)
             db.session.delete(documentation)
             db.session.commit()
 
@@ -899,19 +654,16 @@ def get_related_forms(event_id):
 @documentation_bp.route('/get-activity-report-details/<int:activity_report_id>', methods=['GET'])
 @login_required
 def get_activity_report_details(activity_report_id):
-    # Query for activity strengths related to the activity report form
-    strengths = db.session.query(ActivityStrengths).join(ActivityReportFormsActivityStrengths).filter(ActivityReportFormsActivityStrengths.activity_report_forms_id == activity_report_id).all()
-
-    # Query for activity weaknesses related to the activity report form
-    weaknesses = db.session.query(ActivityWeaknesses).join(ActivityReportFormsActivityWeaknesses).filter(ActivityReportFormsActivityWeaknesses.activity_report_forms_id == activity_report_id).all()
-
-    # Query for activity recommendations related to the activity report form
-    recommendations = db.session.query(ActivityRecommendations).join(ActivityReportFormsActivityRecommendations).filter(ActivityReportFormsActivityRecommendations.activity_report_forms_id == activity_report_id).all()
+    # Get the activity report JSON lists
+    activity_report = ActivityReportForms.query.get_or_404(activity_report_id)
+    strengths = activity_report.strengths or []
+    weaknesses = activity_report.weaknesses or []
+    recommendations = activity_report.recommendations or []
 
     # Prepare the data to be sent as JSON
-    strengths_data = [{'activity_strengths_content': strength.activity_strengths_content} for strength in strengths]
-    weaknesses_data = [{'activity_weaknesses_content': weakness.activity_weaknesses_content} for weakness in weaknesses]
-    recommendations_data = [{'activity_recommendations_content': recommendation.activity_recommendations_content} for recommendation in recommendations]
+    strengths_data = [{'activity_strengths_content': content} for content in strengths]
+    weaknesses_data = [{'activity_weaknesses_content': content} for content in weaknesses]
+    recommendations_data = [{'activity_recommendations_content': content} for content in recommendations]
 
     return jsonify(strengths=strengths_data, weaknesses=weaknesses_data, recommendations=recommendations_data)
 
@@ -977,18 +729,10 @@ def generate_documentation_pdf(documentation_id):
     - Photo documentation images
     - Multiple signature sections
     
-    IMPORTANT: This function requires the following models that are currently
-    missing from the models package and need to be created:
-    - LearningJournalForms
-    - Learnings
-    - Observations
-    - PersonnelInChargeForms
-    - ActivityReportFormsActivityStrengths (association table)
-    - ActivityReportFormsActivityWeaknesses (association table)
-    - ActivityReportFormsActivityRecommendations (association table)
+    NOTE: The function uses the JSON columns on the Documentation, LearningJournalForms
+    and ActivityReportForms models for tally items, evaluation data, images, etc.
     
     TODO: To complete this function:
-    1. Create the missing models in the models package
     2. Copy the complete implementation from app.py lines 4517-5787
     3. Update all url_for calls to use the blueprint prefix (e.g., url_for('documentation.documentation_overview'))
     4. Replace 'app.logger' with current_app.logger or import current_app

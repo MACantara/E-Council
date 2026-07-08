@@ -20,7 +20,6 @@ from models import (
     Users,
     Signatories,
     StudentOrganizations,
-    TransactionHistory,
     DepartmentsEvents,
     ActivityReportForms
 )
@@ -203,12 +202,6 @@ def generate_financial_report_pdf(financial_report_id):
         .filter(FinancialReports.financial_reports_id == financial_report_id)\
         .first_or_404()
 
-    # Get all transactions for this event
-    transactions = TransactionHistory.query\
-        .filter_by(transaction_events_id=report[0].financial_reports_events_id)\
-        .order_by(TransactionHistory.transaction_date)\
-        .all()
-
     buffer = BytesIO()
 
     def header(canvas, doc):
@@ -361,9 +354,9 @@ def generate_financial_report_pdf(financial_report_id):
     story.append(Paragraph("II. Collection and Expenses", section_header_style))
     story.append(Spacer(1, 10))
 
-    # Get transactions for this event
-    transactions = TransactionHistory.query.filter_by(transaction_events_id=event.events_id).all()
-    total_expenses = sum(float(t.transaction_total) for t in transactions)
+    # Get transactions for this event from the JSON list
+    transactions = sorted(event.transactions or [], key=lambda t: t.get('date', ''))
+    total_expenses = sum(float(t.get('total') or 0) for t in transactions)
     budget = float(event.events_budget)
     remaining_money = budget - total_expenses
 
@@ -400,9 +393,9 @@ def generate_financial_report_pdf(financial_report_id):
 
     # Add expenses
     for transaction in transactions:
-        transaction_total = float(transaction.transaction_total)
+        transaction_total = float(transaction.get('total') or 0)
         table_data.append([
-            Paragraph(transaction.transaction_name, styles['Normal']),
+            Paragraph(transaction.get('name', ''), styles['Normal']),
             Paragraph(f"₱{transaction_total:,.2f}", amount_style)
         ])
 
@@ -506,7 +499,7 @@ def generate_financial_report_pdf(financial_report_id):
     if transactions:
         # Add each receipt image
         for idx, transaction in enumerate(transactions, 1):
-            if transaction.transaction_receipt_cloudinary_url:
+            if transaction.get('receipt_url'):
                 # Add receipt number if there are multiple receipts
                 if len(transactions) > 1:
                     story.append(Paragraph(f"Receipt {idx}", ParagraphStyle(
@@ -518,7 +511,7 @@ def generate_financial_report_pdf(financial_report_id):
                     )))
 
                 # Get the image from Cloudinary URL
-                receipt_image = Image(transaction.transaction_receipt_cloudinary_url)
+                receipt_image = Image(transaction.get('receipt_url'))
 
                 # Calculate available space (leaving margins)
                 available_width = letter[0] - 2*inch

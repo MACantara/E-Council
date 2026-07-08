@@ -24,13 +24,9 @@ from config import AIConfig
 from models import (
     db,
     ConceptPaperForms,
-    ObjectivesOfTheActivity,
-    LearningOutcomes,
     ExcuseLetterForms,
     ActivityReportForms,
     LearningJournalForms,
-    Observations,
-    Learnings,
     ParentGuardianConsentForms,
     PersonnelInChargeForms,
     Departments,
@@ -39,10 +35,7 @@ from models import (
     StudentOrganizations,
     Events,
     DepartmentsEvents,
-    Documentation,
-    ActivityStrengths,
-    ActivityWeaknesses,
-    ActivityRecommendations
+    Documentation
 )
 from utils.helpers import get_distinct_academic_years, get_concept_papers
 
@@ -132,30 +125,14 @@ def add_concept_paper():
             concept_paper_forms_signed_and_reviewed_by=concept_paper_signed_and_reviewed_by,
             concept_paper_forms_endorsed_by=concept_paper_endorsed_by,
             concept_paper_forms_recommending_approval_by=concept_paper_recommending_approval_by,
-            concept_paper_forms_approved_by=concept_paper_approved_by
+            concept_paper_forms_approved_by=concept_paper_approved_by,
+            objectives=concept_paper_objectives,
+            learning_outcomes=concept_paper_learning_outcomes
         )
 
         # Add the new concept paper to the database
         db.session.add(new_concept_paper)
         db.session.commit()
-
-        # Add objectives of the activity to the objectives_of_the_activity table
-        for objective_content in concept_paper_objectives:
-            new_objective = ObjectivesOfTheActivity(
-                objectives_of_the_activity_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                objectives_of_the_activity_content=objective_content,
-            )
-            db.session.add(new_objective)
-            db.session.commit()
-
-        # Add learning outcomes to the learning_outcomes table
-        for outcome_content in concept_paper_learning_outcomes:
-            new_outcome = LearningOutcomes(
-                learning_outcomes_concept_paper_forms_id=new_concept_paper.concept_paper_forms_id,
-                learning_outcomes_content=outcome_content
-            )
-            db.session.add(new_outcome)
-            db.session.commit()
 
         # Excuse Letter Form data
         excuse_letter_department_office_unit = request.form.get('excuse-letter-department-office-unit')
@@ -351,59 +328,17 @@ def update_concept_paper(paper_id):
         concept_paper.concept_paper_forms_recommending_approval_by = concept_paper_recommending_approval_by
         concept_paper.concept_paper_forms_approved_by = concept_paper_approved_by
 
-        # Update objectives of the activity
-        # First, delete existing objectives
-        ObjectivesOfTheActivity.query.filter_by(
-            objectives_of_the_activity_concept_paper_forms_id=concept_paper.concept_paper_forms_id
-        ).delete()
+        # Update objectives of the activity as a JSON list
+        concept_paper.objectives = [obj for obj in concept_paper_objectives if obj]
 
-        # Then add new objectives
-        for objective in concept_paper_objectives:
-            new_objective = ObjectivesOfTheActivity(
-                objectives_of_the_activity_concept_paper_forms_id=concept_paper.concept_paper_forms_id,
-                objectives_of_the_activity_content=objective
-            )
-            db.session.add(new_objective)
+        # Update learning outcomes as a JSON list
+        concept_paper.learning_outcomes = [outcome for outcome in concept_paper_learning_outcomes if outcome]
 
-        # Update learning outcomes
-        # First delete existing learning outcomes
-        LearningOutcomes.query.filter_by(
-            learning_outcomes_concept_paper_forms_id=concept_paper.concept_paper_forms_id
-        ).delete()
+        # Update observations as a JSON list
+        learning_journal.observations = [obs for obs in concept_paper_observations if obs]
 
-        # Then add new learning outcomes
-        for outcome in concept_paper_learning_outcomes:
-            new_outcome = LearningOutcomes(
-                learning_outcomes_concept_paper_forms_id=concept_paper.concept_paper_forms_id,
-                learning_outcomes_content=outcome
-            )
-            db.session.add(new_outcome)
-
-        # Update observations in the observations table
-        Observations.query.filter_by(observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
-        for observation_content in concept_paper_observations:
-            observation = Observations(observations_content=observation_content)
-            db.session.add(observation)
-            db.session.commit()
-            learning_journal_observation = Observations(
-                observations_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
-                observations_id=observation.observations_id
-            )
-            db.session.add(learning_journal_observation)
-            db.session.commit()
-
-        # Update learnings in the learnings table
-        Learnings.query.filter_by(learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id).delete()
-        for learning_content in concept_paper_learnings:
-            learning = Learnings(learnings_content=learning_content)
-            db.session.add(learning)
-            db.session.commit()
-            learning_journal_learning = Learnings(
-                learnings_learning_journal_forms_id=learning_journal.learning_journal_forms_id,
-                learnings_id=learning.learnings_id
-            )
-            db.session.add(learning_journal_learning)
-            db.session.commit()
+        # Update learnings as a JSON list
+        learning_journal.learnings = [learning for learning in concept_paper_learnings if learning]
 
         # Update Excuse Letter Form
         if concept_paper.excuse_letter_forms:
@@ -447,43 +382,9 @@ def update_concept_paper(paper_id):
             activity_report.activity_report_forms_contact_numbers = activity_report_contact_numbers
             activity_report.activity_report_forms_prepared_by = activity_report_prepared_by
             activity_report.activity_report_forms_noted_by = activity_report_noted_by
-            db.session.commit()
-
-            # Update strengths
-            ActivityStrengths.query.filter_by(
-                activity_strengths_documentation_id=activity_report.activity_report_forms_id
-            ).delete()
-
-            for strength in activity_strengths:
-                new_strength = ActivityStrengths(
-                    activity_strengths_documentation_id=activity_report.activity_report_forms_id,
-                    activity_strengths_content=strength
-                )
-                db.session.add(new_strength)
-
-            # Update weaknesses
-            ActivityWeaknesses.query.filter_by(
-                activity_weaknesses_documentation_id=activity_report.activity_report_forms_id
-            ).delete()
-
-            for weakness in activity_weaknesses:
-                new_weakness = ActivityWeaknesses(
-                    activity_weaknesses_documentation_id=activity_report.activity_report_forms_id,
-                    activity_weaknesses_content=weakness
-                )
-                db.session.add(new_weakness)
-
-            # Update recommendations
-            ActivityRecommendations.query.filter_by(
-                activity_recommendations_documentation_id=activity_report.activity_report_forms_id
-            ).delete()
-
-            for recommendation in activity_recommendations:
-                new_recommendation = ActivityRecommendations(
-                    activity_recommendations_documentation_id=activity_report.activity_report_forms_id,
-                    activity_recommendations_content=recommendation
-                )
-                db.session.add(new_recommendation)
+            activity_report.strengths = [s for s in activity_strengths if s]
+            activity_report.weaknesses = [w for w in activity_weaknesses if w]
+            activity_report.recommendations = [r for r in activity_recommendations if r]
 
             # Single commit at the end for better performance
             db.session.commit()
@@ -592,15 +493,9 @@ def update_concept_paper(paper_id):
     # Query for signatories
     signatories = Signatories.query.all()
 
-    # Fetch objectives of the activity and learning outcomes
-    objectives_of_the_activity = [
-        obj.objectives_of_the_activity_content
-        for obj in ObjectivesOfTheActivity.query.filter_by(objectives_of_the_activity_concept_paper_forms_id=paper_id).all()
-    ]
-    learning_outcomes = [
-        outcome.learning_outcomes_content
-        for outcome in LearningOutcomes.query.filter_by(learning_outcomes_concept_paper_forms_id=paper_id).all()
-    ]
+    # Fetch objectives of the activity and learning outcomes as JSON lists
+    objectives_of_the_activity = concept_paper.objectives or []
+    learning_outcomes = concept_paper.learning_outcomes or []
 
     # Fetch noted by college dean and noted by head of sas for the personnel in charge form
     noted_by_college_dean = personnel_in_charge_form.personnel_in_charge_forms_noted_by_college_dean if personnel_in_charge_form else None
@@ -614,13 +509,7 @@ def delete_concept_paper(paper_id):
     concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
 
     if request.method == 'POST':
-        # Delete associated learning outcomes
-        LearningOutcomes.query.filter_by(learning_outcomes_concept_paper_forms_id=paper_id).delete()
-        
-        # Delete associated objectives of the activity
-        ObjectivesOfTheActivity.query.filter_by(objectives_of_the_activity_concept_paper_forms_id=paper_id).delete()
-        
-        # Delete the concept paper
+        # Delete the concept paper (JSON data is removed automatically with the record)
         db.session.delete(concept_paper)
         db.session.commit()
 
@@ -1178,13 +1067,8 @@ def generate_concept_paper_pdf(concept_paper_id):
     )
     
     # Create main structure table with null checks and defaults
-    objectives = ObjectivesOfTheActivity.query.filter_by(
-        objectives_of_the_activity_concept_paper_forms_id=concept_paper.concept_paper_forms_id
-    ).order_by(ObjectivesOfTheActivity.objectives_of_the_activity_id).all() or []
-    
-    learning_outcomes = LearningOutcomes.query.filter_by(
-        learning_outcomes_concept_paper_forms_id=concept_paper.concept_paper_forms_id
-    ).order_by(LearningOutcomes.learning_outcomes_id).all() or []
+    objectives = concept_paper.objectives or []
+    learning_outcomes = concept_paper.learning_outcomes or []
     
     structure_data = [
         [
@@ -1199,9 +1083,9 @@ def generate_concept_paper_pdf(concept_paper_id):
         ],
         [
             "",
-            Paragraph("<br/>".join([f"{i+1}. {str(obj.objectives_of_the_activity_content or '')}" 
+            Paragraph("<br/>".join([f"{i+1}. {str(obj or '')}"
                       for i, obj in enumerate(objectives)]) or "No objectives listed", cell_style),
-            Paragraph("<br/>".join([f"{i+1}. {str(outcome.learning_outcomes_content or '')}" 
+            Paragraph("<br/>".join([f"{i+1}. {str(outcome or '')}"
                       for i, outcome in enumerate(learning_outcomes)]) or "No learning outcomes listed", cell_style)
         ],
         [
@@ -1594,15 +1478,9 @@ def generate_concept_paper_pdf(concept_paper_id):
 
     concept_paper = ConceptPaperForms.query.get_or_404(concept_paper_id)
     
-    # Get objectives from relationship
-    objectives_query = concept_paper.objectives.all()
-    objectives = [obj.objectives_of_the_activity_content for obj in objectives_query if obj.objectives_of_the_activity_content]
-    objectives = [f"{i+1}. {obj}" for i, obj in enumerate(objectives)]
-    
-    # Get learning outcomes from relationship
-    outcomes_query = concept_paper.learning_outcomes.all()
-    learning_outcomes = [outcome.learning_outcomes_content for outcome in outcomes_query if outcome.learning_outcomes_content]
-    learning_outcomes = [f"{i+1}. {outcome}" for i, outcome in enumerate(learning_outcomes)]
+    # Get objectives and learning outcomes as JSON lists
+    objectives = [f"{i+1}. {obj}" for i, obj in enumerate(concept_paper.objectives) if obj]
+    learning_outcomes = [f"{i+1}. {outcome}" for i, outcome in enumerate(concept_paper.learning_outcomes) if outcome]
     
     # Create header style for the columns
     header_style = ParagraphStyle(
@@ -1671,23 +1549,9 @@ def generate_concept_paper_pdf(concept_paper_id):
 
     # Query activity data if activity report exists
     if activity_report:
-        # Get strengths from database
-        strengths_query = ActivityStrengths.query.filter_by(
-            activity_strengths_documentation_id=activity_report.activity_report_forms_id
-        ).all()
-        strengths = [s.activity_strengths_content for s in strengths_query if s.activity_strengths_content]
-
-        # Get weaknesses from database
-        weaknesses_query = ActivityWeaknesses.query.filter_by(
-            activity_weaknesses_documentation_id=activity_report.activity_report_forms_id
-        ).all()
-        weaknesses = [w.activity_weaknesses_content for w in weaknesses_query if w.activity_weaknesses_content]
-
-        # Get recommendations from database
-        recommendations_query = ActivityRecommendations.query.filter_by(
-            activity_recommendations_documentation_id=activity_report.activity_report_forms_id
-        ).all()
-        recommendations = [r.activity_recommendations_content for r in recommendations_query if r.activity_recommendations_content]
+        strengths = activity_report.strengths or []
+        weaknesses = activity_report.weaknesses or []
+        recommendations = activity_report.recommendations or []
     
     # Create base evaluation table structure
     evaluation_data = [
@@ -2042,8 +1906,8 @@ def generate_concept_paper_pdf(concept_paper_id):
         ],
         # Second row - Signatures
         [
-            Image(prepared_by_user.users_signature_cloudinary_url, width=100, height=40) if prepared_by_user and prepared_by_user.users_signature_cloudinary_url else Paragraph("___________________", signature_style),
-            Image(seen_and_read_by_user.users_signature_cloudinary_url, width=100, height=40) if seen_and_read_by_user and seen_and_read_by_user.users_signature_cloudinary_url else Paragraph("__________________________", signature_style),
+            Image(prepared_by_user.signature.get('url'), width=100, height=40) if prepared_by_user and prepared_by_user.signature and prepared_by_user.signature.get('url') else Paragraph("___________________", signature_style),
+            Image(seen_and_read_by_user.signature.get('url'), width=100, height=40) if seen_and_read_by_user and seen_and_read_by_user.signature and seen_and_read_by_user.signature.get('url') else Paragraph("__________________________", signature_style),
         ],
         # Third row - Titles
         [

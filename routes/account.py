@@ -47,19 +47,17 @@ def upload_profile_picture():
             return redirect(url_for("account.account"))
 
         # Delete the previous profile picture from Cloudinary if it exists
-        if (current_user.users_profile_picture_cloudinary_url):
-            public_id = current_user.users_profile_picture_cloudinary_public_id
-            if (public_id):
-                cloudinary.uploader.destroy(public_id)
+        existing_profile = current_user.profile_picture or {}
+        if existing_profile.get('public_id'):
+            cloudinary.uploader.destroy(existing_profile['public_id'])
 
         # Upload the new profile picture to Cloudinary
         upload_result = cloudinary.uploader.upload(profile_picture)
         profile_picture_url = upload_result["secure_url"]
         profile_picture_public_id = upload_result["public_id"]
 
-        # Update the user's profile picture URL and public ID
-        current_user.users_profile_picture_cloudinary_url = profile_picture_url
-        current_user.users_profile_picture_cloudinary_public_id = profile_picture_public_id
+        # Update the user's profile picture as a JSON dict
+        current_user.profile_picture = {'url': profile_picture_url, 'public_id': profile_picture_public_id}
 
         db.session.commit()
 
@@ -113,28 +111,26 @@ def account_settings():
             users_student_organization_position = None
 
         # Handle file upload for the user's signature using Cloudinary
-        users_signature = request.files.get("users-signature")
-        if users_signature:
+        signature_file = request.files.get("users-signature")
+        if signature_file:
             # Server-side validation for image file types
             valid_image_types = ['image/jpeg', 'image/jpg', 'image/png']
-            if users_signature.mimetype not in valid_image_types:
+            if signature_file.mimetype not in valid_image_types:
                 flash("Invalid file type. Please upload an image file.", "error")
                 return redirect(url_for("account.account_settings"))
 
             # Delete the previous image from Cloudinary if it exists
-            if current_user.users_signature:
-                public_id = current_user.users_signature_cloudinary_public_id
-                if public_id:
-                    cloudinary.uploader.destroy(public_id)
+            existing_signature = current_user.signature or {}
+            if existing_signature.get('public_id'):
+                cloudinary.uploader.destroy(existing_signature['public_id'])
 
             # Upload the new image to Cloudinary
-            upload_result = cloudinary.uploader.upload(users_signature)
+            upload_result = cloudinary.uploader.upload(signature_file)
             signature_url = upload_result["secure_url"]
             signature_public_id = upload_result["public_id"]
 
-            # Update the user's signature URL and public ID
-            current_user.users_signature = signature_url
-            current_user.users_signature_cloudinary_public_id = signature_public_id
+            # Update the user's signature as a JSON dict
+            current_user.signature = {'url': signature_url, 'public_id': signature_public_id}
 
         # Update the user's information in the database
         user = Users.query.filter_by(users_id=current_user.users_id).first()
@@ -173,16 +169,14 @@ def delete_user_account():
     send_account_deletion_notification_email(current_user.users_email)
 
     # Delete the user's signature image from Cloudinary if it exists
-    if current_user.users_signature:
-        public_id = current_user.users_signature_cloudinary_public_id
-        if public_id:
-            cloudinary.uploader.destroy(public_id)
+    existing_signature = current_user.signature or {}
+    if existing_signature.get('public_id'):
+        cloudinary.uploader.destroy(existing_signature['public_id'])
 
     # Delete the user's profile picture from Cloudinary if it exists
-    if current_user.users_profile_picture_cloudinary_url:
-        profile_picture_public_id = current_user.users_profile_picture_cloudinary_public_id
-        if profile_picture_public_id:
-            cloudinary.uploader.destroy(profile_picture_public_id)
+    existing_profile = current_user.profile_picture or {}
+    if existing_profile.get('public_id'):
+        cloudinary.uploader.destroy(existing_profile['public_id'])
 
     # Delete the user account from the database
     user = Users.query.filter_by(users_id=current_user.users_id).first()

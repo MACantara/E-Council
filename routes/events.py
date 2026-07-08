@@ -1,12 +1,13 @@
 import os
-from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify
+from types import SimpleNamespace
+from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, abort
 from flask_login import login_required, current_user
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from datetime import datetime, timedelta
 import cloudinary
 import cloudinary.uploader
 
-from models import db, Events, ConceptPaperForms, TransactionHistory, EventInvitations, DepartmentsEvents, Departments, Users
+from models import db, Events, ConceptPaperForms, EventInvitations, DepartmentsEvents, Departments, Users
 from utils.helpers import get_distinct_academic_years, get_concept_papers, safe_decimal_conversion
 from utils.email import send_invite_email
 
@@ -197,6 +198,14 @@ def delete_event(event_id):
         # Delete related records in the event_invitations table
         EventInvitations.query.filter_by(event_invitations_events_id=event_id).delete()
 
+        # Delete transaction receipts from Cloudinary
+        for transaction in event.transactions or []:
+            if transaction.get('receipt_public_id'):
+                try:
+                    cloudinary.uploader.destroy(transaction['receipt_public_id'])
+                except Exception as e:
+                    pass
+
         # Delete the event
         db.session.delete(event)
         db.session.commit()
@@ -237,29 +246,37 @@ def add_transaction(event_id):
             receipt_url = upload_result.get('secure_url')
             receipt_public_id = upload_result.get('public_id')
 
-        # Create a new transaction
-        new_transaction = TransactionHistory(
-            transaction_events_id=event_id,
-            transaction_name=transaction_name,
-            transaction_date=datetime.strptime(transaction_date, '%Y-%m-%dT%H:%M'),
-            transaction_unit_amount=unit_amount,
-            transaction_unit_price=unit_price,
-            transaction_total=transaction_total,
-            transaction_category=transaction_category,
-            transaction_type=transaction_type,
-            transaction_receipt_cloudinary_url=receipt_url,
-            transaction_receipt_cloudinary_public_id=receipt_public_id
-        )
+        # Build the transaction list with a unique integer id
+        transactions = event.transactions or []
+        new_id = max([t.get('id', 0) for t in transactions], default=0) + 1
 
-        # Add the transaction to the database
-        db.session.add(new_transaction)
+        new_transaction = {
+            'id': new_id,
+            'name': transaction_name,
+            'date': datetime.strptime(transaction_date, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%dT%H:%M'),
+            'unit_amount': float(unit_amount) if unit_amount else 0.0,
+            'unit_price': float(unit_price) if unit_price else 0.0,
+            'total': float(transaction_total) if transaction_total else 0.0,
+            'category': transaction_category,
+            'type': transaction_type,
+            'receipt_url': receipt_url,
+            'receipt_public_id': receipt_public_id
+        }
+
+        transactions.append(new_transaction)
+        event.transactions = transactions
         db.session.commit()
 
         flash("Transaction added successfully.", "success")
         return redirect(url_for("dashboard.event_dashboard", event_id=event_id))
 
-    # Query distinct transaction categories
-    transaction_categories = db.session.query(TransactionHistory.transaction_category).distinct().order_by(TransactionHistory.transaction_category).all()
+    # Build distinct transaction categories from all event JSON lists
+    transaction_categories = sorted({
+        t.get('category')
+        for ev in Events.query.all()
+        for t in (ev.transactions or [])
+        if t.get('category')
+    })
 
     return render_template("events/add-transaction.html", event=event, transaction_categories=transaction_categories)
 
@@ -269,7 +286,10 @@ def add_transaction(event_id):
 def update_transaction(event_id, transaction_id):
     # Fetch the event details based on the event_id
     event = Events.query.get_or_404(event_id)
-    transaction = TransactionHistory.query.get_or_404(transaction_id)
+    transactions = event.transactions or []
+    transaction = next((t for t in transactions if t.get('id') == transaction_id), None)
+    if not transaction:
+        abort(404)
 
     if request.method == "POST":
         # Get form data
@@ -288,8 +308,8 @@ def update_transaction(event_id, transaction_id):
             transaction_category = other_transaction_category
 
         # Handle file upload to Cloudinary
-        receipt_url = transaction.transaction_receipt_cloudinary_url
-        receipt_public_id = transaction.transaction_receipt_cloudinary_public_id
+        receipt_url = transaction.get('receipt_url')
+        receipt_public_id = transaction.get('receipt_public_id')
         if transaction_receipt:
             if receipt_public_id:
                 cloudinary.uploader.destroy(receipt_public_id)
@@ -297,16 +317,17 @@ def update_transaction(event_id, transaction_id):
             receipt_url = upload_result.get('secure_url')
             receipt_public_id = upload_result.get('public_id')
 
-        # Update the transaction details
-        transaction.transaction_name = transaction_name
-        transaction.transaction_date = datetime.strptime(transaction_date, '%Y-%m-%dT%H:%M')
-        transaction.transaction_unit_amount = unit_amount
-        transaction.transaction_unit_price = unit_price
-        transaction.transaction_total = transaction_total
-        transaction.transaction_category = transaction_category
-        transaction.transaction_type = transaction_type
-        transaction.transaction_receipt_cloudinary_url = receipt_url
-        transaction.transaction_receipt_cloudinary_public_id = receipt_public_id
+        # Update the transaction dict and reassign the JSON list
+        transaction['name'] = transaction_name
+        transaction['date'] = datetime.strptime(transaction_date, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%dT%H:%M')
+        transaction['unit_amount'] = float(unit_amount) if unit_amount else 0.0
+        transaction['unit_price'] = float(unit_price) if unit_price else 0.0
+        transaction['total'] = float(transaction_total) if transaction_total else 0.0
+        transaction['category'] = transaction_category
+        transaction['type'] = transaction_type
+        transaction['receipt_url'] = receipt_url
+        transaction['receipt_public_id'] = receipt_public_id
+        event.transactions = transactions
 
         # Commit the changes to the database
         db.session.commit()
@@ -314,10 +335,29 @@ def update_transaction(event_id, transaction_id):
         flash("Transaction updated successfully.", "success")
         return redirect(url_for("dashboard.event_dashboard", event_id=event_id))
 
-    # Query distinct transaction categories
-    transaction_categories = [category[0] for category in db.session.query(TransactionHistory.transaction_category).distinct().all()]
+    # Build distinct transaction categories from all event JSON lists
+    transaction_categories = sorted({
+        t.get('category')
+        for ev in Events.query.all()
+        for t in (ev.transactions or [])
+        if t.get('category')
+    })
 
-    return render_template("events/update-transaction.html", event=event, transaction=transaction, transaction_categories=transaction_categories)
+    # Provide a template-compatible object with old TransactionHistory attribute names
+    transaction_obj = SimpleNamespace(
+        transaction_id=transaction.get('id'),
+        transaction_name=transaction.get('name'),
+        transaction_date=transaction.get('date'),
+        transaction_unit_amount=transaction.get('unit_amount'),
+        transaction_unit_price=transaction.get('unit_price'),
+        transaction_total=transaction.get('total'),
+        transaction_category=transaction.get('category'),
+        transaction_type=transaction.get('type'),
+        transaction_receipt_cloudinary_url=transaction.get('receipt_url'),
+        transaction_receipt_cloudinary_public_id=transaction.get('receipt_public_id')
+    )
+
+    return render_template("events/update-transaction.html", event=event, transaction=transaction_obj, transaction_categories=transaction_categories)
 
 
 @events_bp.route("/invite-user/<int:event_id>", methods=["GET", "POST"])

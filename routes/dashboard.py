@@ -1,7 +1,8 @@
 from flask import Blueprint, request, flash, redirect, url_for, render_template
 from flask_login import login_required, current_user
 from decimal import Decimal
-from models import db, Events, DepartmentsEvents, TransactionHistory
+from collections import defaultdict
+from models import db, Events, DepartmentsEvents
 from utils.helpers import safe_decimal_conversion
 
 # Create blueprint with url_prefix='/dashboard'
@@ -35,13 +36,13 @@ def events_overview():
     # Execute the query
     events = query.all()
 
-    # Fetch transaction history and calculate expenses, income, and remaining budget
+    # Fetch transactions and calculate expenses, income, and remaining budget from JSON lists
     event_data = []
 
     for event in events:
-        transactions = TransactionHistory.query.filter_by(transaction_events_id=event.events_id).all()
-        total_income = sum(safe_decimal_conversion(t.transaction_total) for t in transactions if t.transaction_type == 'Income')
-        total_expense = sum(safe_decimal_conversion(t.transaction_total) for t in transactions if t.transaction_type == 'Expense')
+        transactions = event.transactions or []
+        total_income = sum(safe_decimal_conversion(t.get('total') or 0) for t in transactions if t.get('type') == 'Income')
+        total_expense = sum(safe_decimal_conversion(t.get('total') or 0) for t in transactions if t.get('type') == 'Expense')
         events_budget = safe_decimal_conversion(event.events_budget) if event.events_budget else Decimal('0.00')
         if isinstance(events_budget, Decimal):
             remaining_budget = total_income - total_expense + events_budget
@@ -65,32 +66,55 @@ def event_dashboard(event_id):
     # Fetch the event details based on the event_id
     event = Events.query.get_or_404(event_id)
 
-    # Fetch the transaction history for the given event_id, sorted by most recent
-    transactions = TransactionHistory.query.filter_by(transaction_events_id=event_id).order_by(TransactionHistory.transaction_date.desc()).all()
+    # Fetch the transactions for the given event from the JSON list, sorted by most recent
+    transactions = sorted(
+        (event.transactions or []),
+        key=lambda t: t.get('date', ''),
+        reverse=True
+    )
 
-    # Query top 5 income transactions grouped by category
-    top5_income = db.session.query(
-        TransactionHistory.transaction_category,
-        db.func.sum(TransactionHistory.transaction_total).label('transaction_total')
-    ).filter_by(transaction_events_id=event_id, transaction_type='Income').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
-
-    # Query top 5 expense transactions grouped by category
-    top5_expense = db.session.query(
-        TransactionHistory.transaction_category,
-        db.func.sum(TransactionHistory.transaction_total).label('transaction_total')
-    ).filter_by(transaction_events_id=event_id, transaction_type='Expense').group_by(TransactionHistory.transaction_category).order_by(db.func.sum(TransactionHistory.transaction_total).desc()).limit(5).all()
-
-    # Convert TransactionHistory objects to dictionaries
-    def transaction_to_dict(transaction):
-        return {
-            'transaction_category': transaction.transaction_category,
-            'transaction_total': float(transaction.transaction_total)
+    # Convert JSON transactions to dictionaries with the old attribute names for template compatibility
+    transactions = [
+        {
+            'transaction_id': t.get('id'),
+            'transaction_name': t.get('name'),
+            'transaction_date': t.get('date'),
+            'transaction_unit_amount': t.get('unit_amount'),
+            'transaction_unit_price': t.get('unit_price'),
+            'transaction_total': t.get('total'),
+            'transaction_category': t.get('category'),
+            'transaction_type': t.get('type'),
+            'transaction_receipt_cloudinary_url': t.get('receipt_url')
         }
+        for t in transactions
+    ]
 
-    top5_income_dicts = [transaction_to_dict(transaction) for transaction in top5_income]
-    top5_expense_dicts = [transaction_to_dict(transaction) for transaction in top5_expense]
+    # Aggregate top 5 income transactions grouped by category
+    income_by_category = defaultdict(float)
+    expense_by_category = defaultdict(float)
+    for t in event.transactions or []:
+        try:
+            total = float(t.get('total') or 0)
+        except (TypeError, ValueError):
+            total = 0.0
+        if t.get('type') == 'Income':
+            income_by_category[t.get('category')] += total
+        elif t.get('type') == 'Expense':
+            expense_by_category[t.get('category')] += total
 
-    # Calculate total income and total expense
+    top5_income = sorted(income_by_category.items(), key=lambda x: x[1], reverse=True)[:5]
+    top5_expense = sorted(expense_by_category.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    top5_income_dicts = [
+        {'transaction_category': category, 'transaction_total': float(total)}
+        for category, total in top5_income
+    ]
+    top5_expense_dicts = [
+        {'transaction_category': category, 'transaction_total': float(total)}
+        for category, total in top5_expense
+    ]
+
+    # Calculate total income and total expense (from top 5 for consistency with previous logic)
     total_income = sum(transaction['transaction_total'] for transaction in top5_income_dicts) or 0
     total_expense = sum(transaction['transaction_total'] for transaction in top5_expense_dicts) or 0
 

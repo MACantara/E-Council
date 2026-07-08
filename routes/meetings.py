@@ -5,7 +5,7 @@ import tempfile
 import time
 
 from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file
-from flask_login import login_required
+from flask_login import login_required, current_user
 from io import BytesIO
 from datetime import datetime
 
@@ -23,8 +23,6 @@ import google.generativeai as genai
 from models import (
     db,
     MinutesOfTheMeeting,
-    MinutesOfTheMeetingPhotoDocumentation,
-    MinutesOfTheMeetingAttendees,
     Departments,
     Users,
     Signatories,
@@ -69,16 +67,12 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         .filter(MinutesOfTheMeeting.minutes_of_the_meeting_id == minutes_of_the_meeting_id)\
         .first_or_404()
     
-    # Get attendees
-    attendees = db.session.query(MinutesOfTheMeetingAttendees, Users)\
-        .join(Users, MinutesOfTheMeetingAttendees.users_id == Users.users_id)\
-        .filter(MinutesOfTheMeetingAttendees.minutes_of_the_meeting_id == minutes_of_the_meeting_id)\
-        .all()
+    # Get attendees from the JSON list of user IDs
+    attendees = [Users.query.get(user_id) for user_id in meeting[0].attendees or []]
+    attendees = [a for a in attendees if a]
     
-    # Get photo documentation
-    photos = MinutesOfTheMeetingPhotoDocumentation.query\
-        .filter_by(minutes_of_the_meeting_id=minutes_of_the_meeting_id)\
-        .all()
+    # Get photo documentation from the JSON list
+    photos = meeting[0].photo_documentation or []
     
     # Get prepared by, approved by, and noted by users
     prepared_by = Users.query.get(meeting[0].minutes_of_the_meeting_prepared_by)
@@ -239,7 +233,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     elements.append(Paragraph('Attendees', heading_style))
     for attendee in attendees:
         elements.append(Paragraph(
-            f'• {attendee[1].users_first_name} {attendee[1].users_last_name} - {attendee[1].users_student_organization_position}',
+            f'• {attendee.users_first_name} {attendee.users_last_name} - {attendee.users_student_organization_position}',
             section_style
         ))
     elements.append(Spacer(1, 12))
@@ -412,7 +406,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         for photo in photos:
             try:
                 # Download image from Cloudinary URL
-                response = requests.get(photo.minutes_of_the_meeting_photo_documentation_cloudinary_url)
+                response = requests.get(photo['url'])
                 if response.status_code == 200:
                     # Use BytesIO instead of temporary file
                     image_data = BytesIO(response.content)
@@ -423,7 +417,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
             except Exception as e:
                 # If image fails to load, fall back to URL
                 elements.append(Paragraph(
-                    f'• {photo.minutes_of_the_meeting_photo_documentation_cloudinary_url}',
+                    f'• {photo["url"]}',
                     section_style
                 ))
         elements.append(Spacer(1, 12))
@@ -532,36 +526,21 @@ def add_minutes_of_the_meeting():
             minutes_of_the_meeting_noted_by=noted_by
         )
 
-        # Add the new meeting to the database
-        db.session.add(new_meeting)
-        db.session.commit()
-
-        # Add attendees to the minutes_of_the_meeting_attendees table
-        for attendee_id in attendees:
-            new_attendee = MinutesOfTheMeetingAttendees(
-                minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
-                users_id=attendee_id
-            )
-            db.session.add(new_attendee)
-        db.session.commit()
-
-        # Handle multiple file uploads to Cloudinary
+        # Set JSON fields for attendees and photo documentation
+        new_meeting.attendees = attendees
+        photo_documentation_list = []
         for photo_documentation in photo_documentations:
             if photo_documentation:
                 upload_result = cloudinary.uploader.upload(photo_documentation)
-                photo_url = upload_result.get('secure_url')
-                photo_public_id = upload_result.get('public_id')
+                photo_documentation_list.append({
+                    'url': upload_result.get('secure_url'),
+                    'public_id': upload_result.get('public_id')
+                })
+        new_meeting.photo_documentation = photo_documentation_list
 
-                # Create a new photo documentation record
-                new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
-                    minutes_of_the_meeting_id=new_meeting.minutes_of_the_meeting_id,
-                    minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
-                    minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
-                )
-
-                # Add the new photo documentation to the database
-                db.session.add(new_photo_documentation)
-                db.session.commit()
+        # Add the new meeting to the database
+        db.session.add(new_meeting)
+        db.session.commit()
 
         flash('Minutes of the meeting added successfully!', 'success')
         return redirect(url_for('meetings.minutes_of_the_meeting_overview'))
@@ -628,45 +607,31 @@ def update_minutes_of_the_meeting(meeting_id):
         meeting.minutes_of_the_meeting_prepared_by = prepared_by
         meeting.minutes_of_the_meeting_noted_by = noted_by
 
-        db.session.commit()
-
-        # Update attendees in the minutes_of_the_meeting_attendees table
-        MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).delete()
-        for attendee_id in attendees:
-            new_attendee = MinutesOfTheMeetingAttendees(
-                minutes_of_the_meeting_id=meeting_id,
-                users_id=attendee_id
-            )
-            db.session.add(new_attendee)
-        db.session.commit()
+        # Update attendees as a JSON list of user IDs
+        meeting.attendees = attendees
 
         # Handle multiple file uploads to Cloudinary
         if photo_documentations:
-            # Delete existing photo documentation records and photos from Cloudinary
-            existing_photos = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+            # Delete existing photos from Cloudinary
+            existing_photos = meeting.photo_documentation or []
             for photo in existing_photos:
-                cloudinary.uploader.destroy(photo.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
-                db.session.delete(photo)
-            db.session.commit()
+                try:
+                    cloudinary.uploader.destroy(photo['public_id'])
+                except Exception as e:
+                    flash('Error deleting existing photo from Cloudinary', 'error')
 
-            # Upload new photos to Cloudinary
+            # Upload new photos and store as JSON
+            new_photo_documentation = []
             for photo_documentation in photo_documentations:
                 if photo_documentation:
                     upload_result = cloudinary.uploader.upload(photo_documentation)
-                    photo_url = upload_result.get('secure_url')
-                    photo_public_id = upload_result.get('public_id')
+                    new_photo_documentation.append({
+                        'url': upload_result.get('secure_url'),
+                        'public_id': upload_result.get('public_id')
+                    })
+            meeting.photo_documentation = new_photo_documentation
 
-                    # Create a new photo documentation record
-                    new_photo_documentation = MinutesOfTheMeetingPhotoDocumentation(
-                        minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id,
-                        minutes_of_the_meeting_photo_documentation_cloudinary_url=photo_url,
-                        minutes_of_the_meeting_photo_documentation_cloudinary_public_id=photo_public_id
-                    )
-
-                    # Add the new photo documentation to the database
-                    db.session.add(new_photo_documentation)
-                    db.session.commit()
-
+        db.session.commit()
         flash('Minutes of the meeting updated successfully!', 'success')
         return redirect(url_for('meetings.minutes_of_the_meeting_overview'))
 
@@ -674,8 +639,8 @@ def update_minutes_of_the_meeting(meeting_id):
     academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    # Query for existing photo documentations
-    photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
+    # Query for existing photo documentations and attendees from JSON fields
+    photo_documentations = meeting.photo_documentation or []
 
     # Query for users to populate the approved by and prepared by fields
     users = Users.query.all()
@@ -683,8 +648,8 @@ def update_minutes_of_the_meeting(meeting_id):
     # Query for signatories to populate the presiding officer and noted by fields
     signatories = Signatories.query.all()
 
-    # Query for existing attendees
-    meeting_attendees = [attendee.users_id for attendee in MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()]
+    # Existing attendees is the JSON list
+    meeting_attendees = meeting.attendees or []
 
     # Query for student organizations and their members
     student_organizations = StudentOrganizations.query.all()
@@ -714,19 +679,14 @@ def delete_minutes_of_the_meeting(meeting_id):
     meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
 
     if request.method == 'POST':
-        # First, delete related attendees records (many-to-many relation)
-        attendees = MinutesOfTheMeetingAttendees.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
-        for attendee in attendees:
-            db.session.delete(attendee)
+        # Delete related photo documentation from Cloudinary
+        for photo in meeting.photo_documentation or []:
+            try:
+                cloudinary.uploader.destroy(photo['public_id'])
+            except Exception as e:
+                flash('Error deleting photo from Cloudinary', 'error')
 
-        # Delete related photo documentation records
-        photo_documentations = MinutesOfTheMeetingPhotoDocumentation.query.filter_by(minutes_of_the_meeting_id=meeting_id).all()
-        for photo_documentation in photo_documentations:
-            # Delete the photo from Cloudinary
-            cloudinary.uploader.destroy(photo_documentation.minutes_of_the_meeting_photo_documentation_cloudinary_public_id)
-            db.session.delete(photo_documentation)
-
-        # Finally, delete the meeting
+        # Finally, delete the meeting (attendees are JSON and removed automatically)
         db.session.delete(meeting)
         db.session.commit()
 
