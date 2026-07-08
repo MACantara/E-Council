@@ -2,9 +2,8 @@
 Base model configuration and shared imports for E-Council database models.
 """
 
-from flask_sqlalchemy import SQLAlchemy
+from extensions import db
 
-db = SQLAlchemy()
 
 class BaseModel:
     """Base model with common functionality for all models."""

@@ -37,7 +37,7 @@ class Documentation(db.Model):
     activity_recommendations = db.Column(db.JSON, nullable=False, default=list)
 
     # Relationships - using string references to avoid circular imports
-    events = db.relationship('Events', foreign_keys=[documentation_events_id])
+    events = db.relationship('Events', back_populates='documentation')
     prepared_by_user = db.relationship('Users', foreign_keys=[documentation_prepared_by])
     checked_by_signatory = db.relationship('Signatories', foreign_keys=[documentation_checked_by])
     noted_by_signatory = db.relationship('Signatories', foreign_keys=[documentation_noted_by])
