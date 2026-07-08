@@ -1,87 +1,87 @@
 {% extends "base.html" %}
+{% from 'macros.forms.html' import select %}
+{% from 'macros.ui.html' import button_link, card %}
 
 {% block title %}Council Overview{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
-        <h2>E-Council Overview</h2>
-
-        <select name="council-overview-school-year" id="council-overview-school-year" aria-label="Select a School Year"
-            required>
-            <option value="" disabled selected>Select a School Year</option>
-            <option value="2024-2025">S.Y 2024-2025</option>
-        </select>
-
-        <div class="council-overview-content-container-group">
-            <div class="council-overview-content-subcontainer">
-                <h3>Events</h3>
-
-                <table class="council-overview-content-table">
-                    <tr>
-                        <th>Event Name</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                    <tr>
-                        <td>CompTIA and IC3 Certification Examination</td>
-                        <td>July 8, 2024</td>
-                        <td>Postponed</td>
-                    </tr>
-                    
-                    <tr>
-                        <td>Onsite Seminar: Data Mining</td>
-                        <td>June 14, 2024</td>
-                        <td>Canceled</td>
-                    </tr>
-                    <tr>
-                        <td>TechTutor: Empowering Communities with AI...</td>
-                        <td>May 24, 2024</td>
-                        <td>Done</td>
-                    </tr>
-                    <tr>
-                        <td>CompTIA and IC3 Certification Examination</td>
-                        <td>September 8, 2024</td>
-                        <td>Postponed</td>
-                    </tr>
-                    <!-- <tr>
-                        <td>Hackin’ ka na lang 2024: “Unveiling Future...</td>
-                        <td>April 27, 2024</td>
-                        <td>Canceled</td>
-                    </tr> -->
-                    <!-- <tr>
-                        <td>College of Computer Studies 2nd Semester...</td>
-                        <td>March 14, 2024</td>
-                        <td>Done</td>
-                    </tr> -->
-                </table>
-
-                <a href="{{ url_for('events.events_overview') }}" class="primary-button">View More Events on Events Overview</a>
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-7xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">E-Council Overview</h1>
             </div>
-            <div class="council-overview-content-subcontainer">
-                <h3>Financial Bank Book</h3>
 
-                <canvas id="financial-bank-book-chart"></canvas>
-
-                <p>Remaining Budget: ₱ 4,000.00</p>
+            <div class="w-full sm:w-64">
+                {% call select('council-overview-school-year', 'council-overview-school-year', label='School Year', required=true) %}
+                    <option value="" disabled selected>Select a School Year</option>
+                    <option value="2024-2025">S.Y 2024-2025</option>
+                {% endcall %}
             </div>
-            <div class="council-overview-content-subcontainer">
-                <h3>Activity Completion Rate</h3>
 
-                <canvas id="activity-completion-rate-chart"></canvas>
+            <div class="grid gap-6 lg:grid-cols-2">
+                {% call card(title='Events') %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm text-ink-2">
+                        <thead class="border-b border-edge text-xs font-semibold uppercase tracking-wide text-ink-3">
+                            <tr>
+                                <th class="pb-2 pr-4">Event Name</th>
+                                <th class="pb-2 pr-4">Date</th>
+                                <th class="pb-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-edge">
+                            <tr>
+                                <td class="py-2 pr-4">CompTIA and IC3 Certification Examination</td>
+                                <td class="py-2 pr-4">July 8, 2024</td>
+                                <td class="py-2 text-warning">Postponed</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 pr-4">Onsite Seminar: Data Mining</td>
+                                <td class="py-2 pr-4">June 14, 2024</td>
+                                <td class="py-2 text-danger">Canceled</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 pr-4">TechTutor: Empowering Communities with AI...</td>
+                                <td class="py-2 pr-4">May 24, 2024</td>
+                                <td class="py-2 text-success">Done</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 pr-4">CompTIA and IC3 Certification Examination</td>
+                                <td class="py-2 pr-4">September 8, 2024</td>
+                                <td class="py-2 text-warning">Postponed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {{ button_link('View More Events', url_for('events.events_overview'), variant='primary', class='mt-4 w-full sm:w-auto', icon='arrow-right') }}
+                {% endcall %}
 
-                <p>Activity Completion Rate: 80%</p>
-            </div>
-            <div class="council-overview-content-subcontainer">
-                <h3>Activity Evaluation Graph</h3>
+                {% call card(title='Financial Bank Book') %}
+                <div class="relative h-48 w-full">
+                    <canvas id="financial-bank-book-chart" class="absolute inset-0"></canvas>
+                </div>
+                <p class="mt-4 text-sm font-medium text-ink">Remaining Budget: ₱ 4,000.00</p>
+                {% endcall %}
 
-                <canvas id="activity-evaluation-graph-chart"></canvas>
+                {% call card(title='Activity Completion Rate') %}
+                <div class="relative h-48 w-full">
+                    <canvas id="activity-completion-rate-chart" class="absolute inset-0"></canvas>
+                </div>
+                <p class="mt-4 text-sm font-medium text-ink">Activity Completion Rate: 80%</p>
+                {% endcall %}
+
+                {% call card(title='Activity Evaluation Graph') %}
+                <div class="relative h-48 w-full">
+                    <canvas id="activity-evaluation-graph-chart" class="absolute inset-0"></canvas>
+                </div>
+                {% endcall %}
             </div>
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}

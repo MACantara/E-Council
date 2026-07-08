@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from 'macros/ui.html' import button, button_link, card %}
 
 {% block title %}Account{% endblock %}
 
@@ -7,106 +8,112 @@
 <!-- Flash messages section -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        <div class="flash-messages">
+    <div class="mx-auto max-w-4xl px-4 pt-4">
+        <div class="space-y-3">
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
+            <div class="rounded-lg border-l-4 border-l-{{ 'danger' if category in ['error','danger'] else category }} bg-surface-lowered px-4 py-3 text-sm font-medium text-ink-2 shadow-sm" role="status">{{ message }}</div>
             {% endfor %}
         </div>
+    </div>
     {% endif %}
 {% endwith %}
 
 <!-- Upload/Change Account Profile Picture Modal -->
-<div id="upload-change-account-profile-picture-modal-content" class="modal">
-    <div class="container">
-        <span id="close-upload-change-account-profile-picture-modal-button" class="close-button">&times;</span>
-        <h2>
-            {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
-                Upload Profile Picture
-            {% else %}
-                Change Profile Picture
-            {% endif %}
-        </h2>
-        <form method="POST" action="{{ url_for('account.upload_profile_picture') }}" enctype="multipart/form-data">
-            <div class="input-pair">
-                <label for="profile-picture">Choose a profile picture</label>
-                <input type="file" name="profile-picture" id="profile-picture" accept="image/*" hidden required>
-                <label for="profile-picture" class="custom-file-upload-input">
-                    <span class="choose-file-text">Choose File</span>
-                    <span id="file-name" class="file-name">No file chosen</span>
-                </label>
-            </div>
-
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        
-            <div class="horizontal-button-pair-positioned-right">
-                <button class="primary-button fit-content-button" type="submit">
+<div id="upload-change-account-profile-picture-modal-content" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="upload-change-account-profile-picture-modal-title">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="relative z-10 flex min-h-full items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-2xl border border-edge bg-surface p-6 shadow-xl">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 id="upload-change-account-profile-picture-modal-title" class="text-xl font-semibold text-ink">
                     {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
-                        Upload
+                        Upload Profile Picture
                     {% else %}
-                        Change
+                        Change Profile Picture
+                    {% endif %}
+                </h2>
+                <button type="button" id="close-upload-change-account-profile-picture-modal-button" class="rounded-lg p-1 text-ink-2 hover:bg-surface-lowered" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form method="POST" action="{{ url_for('account.upload_profile_picture') }}" enctype="multipart/form-data" class="space-y-5">
+                <div class="w-full">
+                    <label for="profile-picture" class="mb-1.5 block text-sm font-medium text-ink-2">Choose a profile picture</label>
+                    <input type="file" name="profile-picture" id="profile-picture" accept="image/*" class="hidden" required>
+                    <label for="profile-picture" class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm transition-colors hover:bg-surface-lowered">
+                        <span class="font-medium text-ink-2">Choose File</span>
+                        <span id="file-name" class="truncate text-ink-3">No file chosen</span>
+                    </label>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button" id="cancel-upload-profile-picture" class="inline-flex items-center justify-center gap-2 rounded-lg border border-edge bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-surface-lowered focus:outline-none focus:ring-2 focus:ring-accent">Cancel</button>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent">
+                        {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
+                            Upload
+                        {% else %}
+                            Change
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="mx-auto max-w-4xl space-y-6 p-4 lg:p-8">
+    <div class="flex flex-col items-center gap-6 rounded-xl border border-edge bg-surface p-6 shadow-sm sm:flex-row sm:items-start">
+        <img class="h-24 w-24 rounded-full border-4 border-edge object-cover shadow-sm" src="{{ (current_user.profile_picture or {}).url or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
+
+        <div class="flex-1 space-y-2 text-center sm:text-left">
+            <h1 class="text-2xl font-bold text-ink">{{ current_user.users_first_name }} {{ current_user.users_last_name }}</h1>
+            <p class="text-sm text-ink-2">@{{ current_user.users_username }}</p>
+            <p class="text-sm text-ink-2">{{ current_user.users_email }}</p>
+
+            <div class="flex flex-wrap items-center justify-center gap-2 pt-2 sm:justify-start">
+                <button type="button" id="open-upload-change-account-profile-picture-modal-button" class="inline-flex items-center justify-center gap-2 rounded-lg border border-edge bg-surface px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-surface-lowered focus:outline-none focus:ring-2 focus:ring-accent">
+                    {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
+                        Upload Profile Picture
+                    {% else %}
+                        Change Profile Picture
                     {% endif %}
                 </button>
-                <button type="button" class="secondary-button fit-content-button" id="cancel-upload-profile-picture">Cancel</button>
+                {{ button_link('Edit Account Settings', url_for('account.account_settings'), variant='primary', class='w-full sm:w-auto') }}
             </div>
-        </form>
-    </div>
-</div>
-
-<div class="container">
-    <div class="account-container">
-        <img class="account-picture" src="{{ (current_user.profile_picture or {}).url or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Account Picture">
-
-        <button id="open-upload-change-account-profile-picture-modal-button" class="secondary-button fit-content-button center">
-            {% if current_user.profile_picture is none or current_user.profile_picture.url is none or current_user.profile_picture.url|lower in ['none', 'null'] %}
-                Upload Profile Picture
-            {% else %}
-                Change Profile Picture
-            {% endif %}
-        </button>
-
-        <div class="account-details-container">
-            <h2>{{ current_user.users_first_name }} {{ current_user.users_last_name }}</h2>
-            <p>@{{ current_user.users_username }}</p>
-            <p>Contact me through e-mail: {{ current_user.users_email }}</p>
         </div>
-
-        <a class="primary-button" href="{{ url_for('account.account_settings') }}">Edit Account Settings</a>
     </div>
-</div>
 
-<div class="about-me-container">
-    <div class="account-details-container">
-        <h2>About Me</h2>
-
-        <div class="horizontal-grid-input-pair">
-            <p>Department:</p>
-            <p>{{ current_user.department.departments_name }}</p>
+    {% call card(title='About Me') %}
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div class="flex items-center justify-between border-b border-edge pb-2 text-sm">
+            <span class="text-ink-3">Department</span>
+            <span class="font-medium text-ink">{{ current_user.department.departments_name }}</span>
         </div>
 
         {% if current_user.users_role == "Student Council Officer" %}
-            <div class="horizontal-grid-input-pair">
-                <p>Student Organization:</p>
-                <p>{{ current_user.student_organization.student_organizations_name }}</p>
-            </div>
+        <div class="flex items-center justify-between border-b border-edge pb-2 text-sm">
+            <span class="text-ink-3">Student Organization</span>
+            <span class="font-medium text-ink">{{ current_user.student_organization.student_organizations_name }}</span>
+        </div>
 
-            <div class="horizontal-grid-input-pair">
-                <p>Student Organization Position:</p>
-                <p>{{ current_user.users_student_organization_position }}</p>
-            </div>
+        <div class="flex items-center justify-between border-b border-edge pb-2 text-sm">
+            <span class="text-ink-3">Student Organization Position</span>
+            <span class="font-medium text-ink">{{ current_user.users_student_organization_position }}</span>
+        </div>
         {% endif %}
 
-        <div class="horizontal-grid-input-pair">
-            <p>Role:</p>
-            <p>{{ current_user.users_role }}</p>
+        <div class="flex items-center justify-between border-b border-edge pb-2 text-sm">
+            <span class="text-ink-3">Role</span>
+            <span class="font-medium text-ink">{{ current_user.users_role }}</span>
         </div>
     </div>
+    {% endcall %}
 </div>
 
 {% endblock %}
 
 {% block script %}
-
 <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script src="{{ url_for('static', filename='js/account/account.js') }}"></script>
-
 {% endblock %}

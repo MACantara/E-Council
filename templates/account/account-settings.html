@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% from 'macros.forms.html' import input, select, file_input %}
+{% from 'macros.ui.html' import button, button_link, card %}
 
 {% block title %}Edit Account{% endblock %}
 
@@ -6,84 +8,69 @@
 
 <!-- Flash messages section -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages">
+    {% if messages %}
+    <div class="mx-auto max-w-3xl px-4 pt-4">
+        <div class="space-y-3">
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
+            <div class="rounded-lg border-l-4 border-l-{{ 'danger' if category in ['error','danger'] else category }} bg-surface-lowered px-4 py-3 text-sm font-medium text-ink-2 shadow-sm" role="status">{{ message }}</div>
             {% endfor %}
         </div>
+    </div>
     {% endif %}
 {% endwith %}
 
-<div class="account-settings-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "account/account-settings-sidebar.html" %}
 
-    <div class="account-settings-content-container">
-        <h2>Account Settings</h2>
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-3xl space-y-6">
+            <h1 class="text-2xl font-bold text-ink">Account Settings</h1>
 
-        <!-- Delete User Account Modal -->
-        <div id="delete-user-account-modal-content" class="modal">
-            <div class="container">
-                <span id="close-delete-user-account-modal-button" class="close-button">&times;</span>
-                <h2>Delete Account</h2>
-                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-
-                <form method="POST" action="{{ url_for('account.delete_user_account') }}">
-                    <div class="input-pair">
-                        <label for="users-current-password-account-deletion">Current Password</label>
-                        <input type="password" name="users-current-password-account-deletion" id="users-current-password-account-deletion" placeholder="Current Password" required>
+            <!-- Delete User Account Modal -->
+            <div id="delete-user-account-modal-content" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="delete-user-account-modal-title">
+                <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+                <div class="relative z-10 flex min-h-full items-center justify-center p-4">
+                    <div class="w-full max-w-md rounded-2xl border border-edge bg-surface p-6 shadow-xl">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 id="delete-user-account-modal-title" class="text-xl font-semibold text-ink">Delete Account</h2>
+                            <button type="button" id="close-delete-user-account-modal-button" class="rounded-lg p-1 text-ink-2 hover:bg-surface-lowered" aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                        <p class="mb-5 text-sm text-ink-2">Are you sure you want to delete your account? This action cannot be undone.</p>
+                        <form method="POST" action="{{ url_for('account.delete_user_account') }}" class="space-y-5">
+                            {{ input('users-current-password-account-deletion', 'users-current-password-account-deletion', label='Current Password', type='password', placeholder='Current Password', required=true) }}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="flex items-center justify-end gap-3">
+                                <button type="button" id="cancel-delete-user-account-button" class="inline-flex items-center justify-center gap-2 rounded-lg border border-edge bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-surface-lowered focus:outline-none focus:ring-2 focus:ring-accent">Cancel</button>
+                                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-danger px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-danger-hover focus:outline-none focus:ring-2 focus:ring-danger">Delete Account</button>
+                            </div>
+                        </form>
                     </div>
-
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                    <div class="horizontal-button-pair-positioned-right">
-                        <button class="secondary-button fit-content-button" type="submit">Delete Account</button>
-                        <button id="cancel-delete-user-account-modal-button" class="primary-button fit-content-button">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <form method="POST" enctype="multipart/form-data">
-            <div class="horizontal-input-pair">
-                <div class="input-pair">
-                    <label for="users-first-name">First Name</label>
-                    <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name"
-                        value="{{ current_user.users_first_name }}" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="users-last-name">Last Name</label>
-                    <input type="text" name="users-last-name" id="users-last-name" placeholder="Last Name"
-                        value="{{ current_user.users_last_name }}" required>
                 </div>
             </div>
 
-            <div class="input-pair">
-                <label for="users-username">Username</label>
-                <input type="text" name="users-username" id="users-username" placeholder="Username"
-                    value="{{ current_user.users_username }}" required>
-            </div>
+            {% call card(title='Edit Profile', class='overflow-hidden') %}
+            <form method="POST" enctype="multipart/form-data" class="space-y-5">
+                <div class="grid gap-5 md:grid-cols-2">
+                    {{ input('users-first-name', 'users-first-name', label='First Name', placeholder='First Name', value=current_user.users_first_name, required=true) }}
+                    {{ input('users-last-name', 'users-last-name', label='Last Name', placeholder='Last Name', value=current_user.users_last_name, required=true) }}
+                </div>
 
-            <div class="input-pair">
-                <label for="users-department">Department</label>
-                <select name="users-department" id="users-department" required>
+                {{ input('users-username', 'users-username', label='Username', placeholder='Username', value=current_user.users_username, required=true) }}
+
+                {% call select('users-department', 'users-department', label='Department', required=true) %}
                     <option value="" disabled>Select a Department</option>
                     {% for department in departments %}
                         {% if current_user.users_departments_id == department.departments_id and department.departments_name == "Admin" %}
                             <option value="{{ department.departments_id }}" selected>{{ department.departments_name }}</option>
                         {% elif department.departments_name != "Admin" %}
-                            <option value="{{ department.departments_id }}" {% if current_user.users_departments_id == department.departments_id %}selected{% endif %}>
-                                {{ department.departments_name }}
-                            </option>
+                            <option value="{{ department.departments_id }}" {% if current_user.users_departments_id == department.departments_id %}selected{% endif %}>{{ department.departments_name }}</option>
                         {% endif %}
                     {% endfor %}
-                </select>
-            </div>
+                {% endcall %}
 
-            <div class="input-pair">
-                <label for="users-role">Role</label>
-                <select name="users-role" id="users-role" required>
+                {% call select('users-role', 'users-role', label='Role', required=true) %}
                     <option value="" disabled>Select a Role</option>
                     {% if current_user.users_role == "Admin" %}
                     <option value="Admin" {% if current_user.users_role == "Admin" %}selected{% endif %}>Admin</option>
@@ -92,111 +79,67 @@
                     <option value="Faculty" {% if current_user.users_role == "Faculty" %}selected{% endif %}>Faculty</option>
                     <option value="Staff" {% if current_user.users_role == "Staff" %}selected{% endif %}>Staff</option>
                     {% endif %}
-                </select>
-            </div>
+                {% endcall %}
 
-            <div class="input-pair" id="users-student-organization-container">
-                <label for="users-student-organization">Student Organization</label>
-                <select name="users-student-organization" id="users-student-organization">
-                    <option value="" disabled>Select a Student Organization</option>
-                    {% for organization in student_organizations %}
-                    <option value="{{ organization.student_organizations_id }}" {% if current_user.users_student_organization == organization.student_organizations_id %}selected{% endif %}>
-                        {{ organization.student_organizations_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+                <div id="users-student-organization-container">
+                    {% call select('users-student-organization', 'users-student-organization', label='Student Organization') %}
+                        <option value="" disabled>Select a Student Organization</option>
+                        {% for organization in student_organizations %}
+                        <option value="{{ organization.student_organizations_id }}" {% if current_user.users_student_organization == organization.student_organizations_id %}selected{% endif %}>{{ organization.student_organizations_name }}</option>
+                        {% endfor %}
+                    {% endcall %}
+                </div>
 
-            <div class="input-pair" id="users-student-organization-position-container">
-                <label for="users-student-organization-position">Student Organization Position</label>
-                <select name="users-student-organization-position" id="users-student-organization-position">
-                    <option value="" disabled selected>Select a Student Organization Position</option>
-                    <option value="President" {% if current_user.users_student_organization_position=="President"
-                        %}selected{% endif %}>President</option>
-                    <option value="Vice President" {% if
-                        current_user.users_student_organization_position=="Vice President" %}selected{% endif %}>Vice
-                        President</option>
-                    <option value="Secretary" {% if current_user.users_student_organization_position=="Secretary"
-                        %}selected{% endif %}>Secretary</option>
-                    <option value="Treasurer" {% if current_user.users_student_organization_position=="Treasurer"
-                        %}selected{% endif %}>Treasurer</option>
-                    <option value="Auditor" {% if current_user.users_student_organization_position=="Auditor"
-                        %}selected{% endif %}>Auditor</option>
-                    <option value="Business Manager" {% if
-                        current_user.users_student_organization_position=="Business Manager" %}selected{% endif %}>
-                        Business Manager</option>
-                    <option value="Public Relations Officer" {% if
-                        current_user.users_student_organization_position=="Public Relations Officer" %}selected{% endif
-                        %}>Public Relations Officer (P.R.O)</option>
-                    <option value="1st Year Representative" {% if
-                        current_user.users_student_organization_position=="1st Year Representative" %}selected{% endif
-                        %}>1st Year Representative</option>
-                    <option value="2nd Year Representative" {% if
-                        current_user.users_student_organization_position=="2nd Year Representative" %}selected{% endif
-                        %}>2nd Year Representative</option>
-                    <option value="3rd Year Representative" {% if
-                        current_user.users_student_organization_position=="3rd Year Representative" %}selected{% endif
-                        %}>3rd Year Representative</option>
-                    <option value="4th Year Representative" {% if
-                        current_user.users_student_organization_position=="4th Year Representative" %}selected{% endif
-                        %}>4th Year Representative</option>
-                </select>
-            </div>
+                <div id="users-student-organization-position-container">
+                    {% call select('users-student-organization-position', 'users-student-organization-position', label='Student Organization Position') %}
+                        <option value="" disabled selected>Select a Student Organization Position</option>
+                        <option value="President" {% if current_user.users_student_organization_position=="President" %}selected{% endif %}>President</option>
+                        <option value="Vice President" {% if current_user.users_student_organization_position=="Vice President" %}selected{% endif %}>Vice President</option>
+                        <option value="Secretary" {% if current_user.users_student_organization_position=="Secretary" %}selected{% endif %}>Secretary</option>
+                        <option value="Treasurer" {% if current_user.users_student_organization_position=="Treasurer" %}selected{% endif %}>Treasurer</option>
+                        <option value="Auditor" {% if current_user.users_student_organization_position=="Auditor" %}selected{% endif %}>Auditor</option>
+                        <option value="Business Manager" {% if current_user.users_student_organization_position=="Business Manager" %}selected{% endif %}>Business Manager</option>
+                        <option value="Public Relations Officer" {% if current_user.users_student_organization_position=="Public Relations Officer" %}selected{% endif %}>Public Relations Officer (P.R.O)</option>
+                        <option value="1st Year Representative" {% if current_user.users_student_organization_position=="1st Year Representative" %}selected{% endif %}>1st Year Representative</option>
+                        <option value="2nd Year Representative" {% if current_user.users_student_organization_position=="2nd Year Representative" %}selected{% endif %}>2nd Year Representative</option>
+                        <option value="3rd Year Representative" {% if current_user.users_student_organization_position=="3rd Year Representative" %}selected{% endif %}>3rd Year Representative</option>
+                        <option value="4th Year Representative" {% if current_user.users_student_organization_position=="4th Year Representative" %}selected{% endif %}>4th Year Representative</option>
+                    {% endcall %}
+                </div>
 
-            <div class="input-pair">
-                <label for="users-home-address">Home Address</label>
-                <input type="text" name="users-home-address" id="users-home-address" placeholder="Home Address"
-                    {% if current_user.users_home_address is not none and current_user.users_home_address|lower != 'none' %}
-                    value="{{ current_user.users_home_address }}"
-                    {% endif %}>
-            </div>
-            
-            <div class="input-pair">
-                <label for="users-contact-number">Contact Number</label>
-                <input type="text" name="users-contact-number" id="users-contact-number" placeholder="Contact Number"
-                    {% if current_user.users_contact_number is not none and current_user.users_contact_number|lower != 'none' %}
-                    value="{{ current_user.users_contact_number }}"
-                    {% endif %}>
-                <small class="form-text text-muted">Format: +639123456789</small>
-            </div>
+                {{ input('users-home-address', 'users-home-address', label='Home Address', placeholder='Home Address', value=(current_user.users_home_address if current_user.users_home_address is not none and current_user.users_home_address|lower != 'none' else '')) }}
+                {{ input('users-contact-number', 'users-contact-number', label='Contact Number', placeholder='Contact Number', value=(current_user.users_contact_number if current_user.users_contact_number is not none and current_user.users_contact_number|lower != 'none' else '')) }}
+                <p class="-mt-3 text-xs text-ink-3">Format: +639123456789</p>
 
-            <div class="input-pair">
-                <label for="users-signature">Signature</label>
-                <input type="file" name="users-signature" id="users-signature" hidden
-                    accept="image/jpeg, image/jpg, image/png">
-                <label for="users-signature" class="custom-file-upload-input">
-                    <span class="choose-file-text">Choose File</span>
-                    <span id="file-name" class="file-name">No file chosen</span>
-                </label>
-                <p>Supported file types: .jpeg, .jpg, .png</p>
+                {{ file_input('users-signature', 'users-signature', label='Signature', accept='image/jpeg, image/jpg, image/png', file_name_id='file-name') }}
+                <p class="-mt-3 text-xs text-ink-3">Supported file types: .jpeg, .jpg, .png</p>
                 {% if current_user.signature is not none and current_user.signature.url is not none and current_user.signature.url|lower != 'none' %}
-                    <img id="signature-preview" src="{{ current_user.signature.url }}" alt="User's Signature"
-                    class="image-preview">
+                    <img id="signature-preview" src="{{ current_user.signature.url }}" alt="User's Signature" class="max-h-32 w-auto rounded-lg border border-edge object-contain">
                 {% endif %}
+
+                {{ input('users-current-password', 'users-current-password', label='Current Password', type='password', placeholder='Current Password', required=true) }}
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    {{ button('Save Changes', type='submit') }}
+                </div>
+            </form>
+            {% endcall %}
+
+            {% call card(title='Delete Account') %}
+            <p class="text-sm text-ink-2">Once deleted, your account and all associated data cannot be recovered.</p>
+            <div class="mt-4">
+                <button id="open-delete-user-account-modal-button" type="button" class="inline-flex items-center justify-center gap-2 rounded-lg bg-danger px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-danger-hover focus:outline-none focus:ring-2 focus:ring-danger">Delete Account</button>
             </div>
-
-            <div class="input-pair">
-                <label for="users-current-password">Current Password</label>
-                <input type="password" name="users-current-password" id="users-current-password"
-                    placeholder="Current Password" required>
-            </div>
-
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-            <button class="primary-button" type="submit">Save Changes</button>
-        </form>
-
-        <h3>Delete Account</h3>
-
-        <button id="open-delete-user-account-modal-button" class="secondary-button" type="submit">Delete Account</button>
-    </div>
+            {% endcall %}
+        </div>
+    </main>
 </div>
 
 {% endblock %}
 
 {% block script %}
-
 <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script src="{{ url_for('static', filename='js/account/account-settings.js') }}"></script>
-
 {% endblock %}

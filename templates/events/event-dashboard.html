@@ -1,126 +1,106 @@
 {% extends "base.html" %}
+{% from 'macros.ui.html' import button_link, card %}
+{% from 'macros.icons.html' import lucide %}
 
-{% block title %}Council Overview{% endblock %}
+{% block title %}Event Dashboard{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
-
-        <!-- Flash messages section for the main page -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin">
-            {% for category, message in messages %}
-            {% if category != 'modal-error' %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endif %}
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
-
-        <div class="horizontal-button-group">
-            <a href="{{ url_for('events.events_overview') }}" class="primary-button">Back to Events Overview</a>
-            <a href="{{ url_for('events.add_transaction', event_id=event.events_id) }}" class="secondary-button">Add
-                Transaction</a>
-            <a href="{{ url_for('events.invite_user', event_id=event.events_id, source='event_dashboard') }}"
-                class="secondary-button">Invite User</a>
-            <a class="secondary-button">Generate Financial Report</a>
-        </div>
-        <h2>{{ event.events_name }}</h2>
-
-        <div class="council-overview-content-container-group">
-            <div class="council-overview-content-grid-item">
-                <h3>Top 5 Expenses</h3>
-
-                <div class="event-dashboard-chart-container">
-                    <canvas id="top-5-expenses-chart"></canvas>
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-7xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">{{ event.events_name }}</h1>
+                <div class="flex flex-wrap gap-2">
+                    {{ button_link('Back', url_for('events.events_overview'), variant='secondary', icon='arrow-left', class='justify-center') }}
+                    {{ button_link('Add Transaction', url_for('events.add_transaction', event_id=event.events_id), variant='primary', icon='plus', class='justify-center') }}
+                    {{ button_link('Invite User', url_for('events.invite_user', event_id=event.events_id, source='event_dashboard'), variant='secondary', icon='user-plus', class='justify-center') }}
+                    {{ button_link('Generate Financial Report', '#', variant='ghost', icon='file-bar-chart', class='justify-center') }}
                 </div>
-
-                <p>Total expenses: ₱ {{ "{:,.2f}".format(total_expense) }}</p>
             </div>
 
-            <div class="council-overview-content-grid-item">
-                <h3>Top 5 Income</h3>
-
-                <div class="event-dashboard-chart-container">
-                    <canvas id="top-5-income-chart"></canvas>
+            <div class="grid gap-6 lg:grid-cols-3">
+                {% call card(title='Top 5 Expenses') %}
+                <div class="relative h-48 w-full">
+                    <canvas id="top-5-expenses-chart" class="absolute inset-0"></canvas>
                 </div>
+                <p class="mt-4 text-sm font-medium text-ink">Total expenses: ₱ {{ "{:,.2f}".format(total_expense) }}</p>
+                {% endcall %}
 
-                <p>Total Income: ₱ {{ "{:,.2f}".format(total_income) }}</p>
-            </div>
-
-            <div class="council-overview-content-grid-item">
-                <h3>Remaining Budget</h3>
-
-                <div class="event-dashboard-chart-container">
-                    <canvas id="remaining-budget-chart"></canvas>
+                {% call card(title='Top 5 Income') %}
+                <div class="relative h-48 w-full">
+                    <canvas id="top-5-income-chart" class="absolute inset-0"></canvas>
                 </div>
+                <p class="mt-4 text-sm font-medium text-ink">Total Income: ₱ {{ "{:,.2f}".format(total_income) }}</p>
+                {% endcall %}
 
+                {% call card(title='Remaining Budget') %}
+                <div class="relative h-48 w-full">
+                    <canvas id="remaining-budget-chart" class="absolute inset-0"></canvas>
+                </div>
                 {% if remaining_budget is string %}
-                    <p>Remaining Budget: {{ remaining_budget }}</p>
+                <p class="mt-4 text-sm font-medium text-ink">Remaining Budget: {{ remaining_budget }}</p>
                 {% else %}
-                    <p>Remaining Budget: ₱ {{ "{:,.2f}".format(remaining_budget) }}</p>
+                <p class="mt-4 text-sm font-medium text-ink">Remaining Budget: ₱ {{ "{:,.2f}".format(remaining_budget) }}</p>
                 {% endif %}
+                {% endcall %}
             </div>
-        </div>
 
-        <div class="council-overview-content-grid-item">
-            <h3>Transaction History</h3>
-
-            <div class="transaction-history-table-container">
-                <table class="transaction-history-table">
-                    <thead>
+            {% call card(title='Transaction History', class='overflow-hidden') %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-left text-sm text-ink-2">
+                    <thead class="border-b border-edge text-xs font-semibold uppercase tracking-wide text-ink-3">
                         <tr>
-                            <th>Date</th>
-                            <th>Name</th>
-                            <th>Unit Amount</th>
-                            <th>Unit Price</th>
-                            <th>Total</th>
-                            <th>Category</th>
-                            <th>Transaction Type</th>
-                            <th>Receipt</th>
-                            <th>Actions</th>
+                            <th class="pb-2 pr-4">Date</th>
+                            <th class="pb-2 pr-4">Name</th>
+                            <th class="pb-2 pr-4 text-right">Unit Amount</th>
+                            <th class="pb-2 pr-4 text-right">Unit Price</th>
+                            <th class="pb-2 pr-4 text-right">Total</th>
+                            <th class="pb-2 pr-4">Category</th>
+                            <th class="pb-2 pr-4">Type</th>
+                            <th class="pb-2 pr-4">Receipt</th>
+                            <th class="pb-2">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-edge">
                         {% for transaction in transactions %}
                         <tr>
-                            <td>{{ transaction.date }}</td>
-                            <td>{{ transaction.name }}</td>
-                            <td>{{ transaction.unit_amount }}</td>
-                            <td>₱ {{ "{:,.2f}".format(transaction.unit_price) }}</td>
-                            <td>₱ {{ "{:,.2f}".format(transaction.total) }}</td>
-                            <td>{{ transaction.category }}</td>
-                            <td>{{ transaction.type }}</td>
-                            <td>
+                            <td class="py-2 pr-4">{{ transaction.date }}</td>
+                            <td class="py-2 pr-4">{{ transaction.name }}</td>
+                            <td class="py-2 pr-4 text-right">{{ transaction.unit_amount }}</td>
+                            <td class="py-2 pr-4 text-right">₱ {{ "{:,.2f}".format(transaction.unit_price) }}</td>
+                            <td class="py-2 pr-4 text-right">₱ {{ "{:,.2f}".format(transaction.total) }}</td>
+                            <td class="py-2 pr-4">{{ transaction.category }}</td>
+                            <td class="py-2 pr-4">{{ transaction.type }}</td>
+                            <td class="py-2 pr-4">
                                 {% if transaction.receipt_url %}
-                                <a href="{{ transaction.receipt_url }}" target="_blank"
-                                    class="primary-button fit-content-button">View Receipt</a>
+                                {{ button_link('View Receipt', transaction.receipt_url, variant='secondary', class='py-1.5 px-3 text-xs justify-center', attrs='target="_blank"') }}
                                 {% else %}
-                                No Receipt
+                                <span class="text-ink-3">No Receipt</span>
                                 {% endif %}
                             </td>
-                            <td>
-                                <a href="{{ url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.id) }}"
-                                    class="secondary-button fit-content-button">Update</a>
+                            <td class="py-2 pr-4">
+                                {{ button_link('Update', url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.id), variant='ghost', class='py-1.5 px-3 text-xs justify-center') }}
                             </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="py-8 text-center text-ink-3">No transactions yet.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% endcall %}
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}
 
 {% block script %}
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Pass data from template to JavaScript

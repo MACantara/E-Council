@@ -1,131 +1,84 @@
 {% extends "base.html" %}
+{% from 'macros.forms.html' import input, select, textarea %}
+{% from 'macros.ui.html' import button, button_link %}
 
 {% block title %}Add Event{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-2xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">Add Event</h1>
+                {{ button_link('Back to Events Overview', url_for('events.events_overview'), variant='secondary', icon='arrow-left') }}
+            </div>
 
-        <a href="{{ url_for('dashboard.events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
-
-        <!-- Flash messages section for the modal -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin bottom-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
-        <div class="container">
-            <h2>Add Event</h2>
-
-            <form method="POST" action="{{ url_for('events.add_event') }}">
+            <form method="POST" action="{{ url_for('events.add_event') }}" class="space-y-5 rounded-xl border border-edge bg-surface p-6 shadow-sm">
                 <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
 
-                <div class="input-pair">
-                    <label for="creation-method">Creation Method</label>
-                    <select name="creation-method" id="creation-method" required>
-                        <option value="" disabled selected>Select Creation Method</option>
-                        <option value="scratch">Create from Scratch</option>
-                        <option value="existing">Create from Existing Concept Paper</option>
-                    </select>
-                </div>
+                {% call select('creation-method', 'creation-method', label='Creation Method', required=true, class='input-pair') %}
+                    <option value="" disabled selected>Select Creation Method</option>
+                    <option value="scratch">Create from Scratch</option>
+                    <option value="existing">Create from Existing Concept Paper</option>
+                {% endcall %}
 
-                <div class="input-pair" id="concept-paper-container" style="display: none;">
-                    <label for="concept-paper-forms-id">Concept Paper</label>
-                    <select name="concept-paper-forms-id" id="concept-paper-forms-id">
+                <div id="concept-paper-container" style="display: none;">
+                    {% call select('concept-paper-forms-id', 'concept-paper-forms-id', label='Concept Paper', class='input-pair') %}
                         <option value="" disabled selected>Select Concept Paper</option>
                         {% for concept_paper in concept_papers %}
                         <option value="{{ concept_paper.concept_paper_forms_id }}">{{ concept_paper.concept_paper_forms_subject }}</option>
                         {% endfor %}
-                    </select>
+                    {% endcall %}
                 </div>
 
-                <div class="input-pair">
-                    <label for="events-name">Event Name</label>
-                    <input type="text" name="events-name" id="events-name" placeholder="Event Name" required>
+                {{ input('events-name', 'events-name', label='Event Name', placeholder='Event Name', required=true, class='input-pair') }}
+
+                {% call select('events-semester', 'events-semester', label='Semester', required=true, class='input-pair') %}
+                    <option value="" disabled selected>Select a Semester</option>
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                {% endcall %}
+
+                {% call select('events-academic-year', 'events-academic-year', label='Academic Year', required=true, class='input-pair') %}
+                    <option value="" disabled selected>Select an Academic Year</option>
+                    {% for year in academic_years %}
+                    <option value="{{ year.events_academic_year }}">A.Y. {{ year.events_academic_year }}</option>
+                    {% endfor %}
+                    <option value="Other">Other A.Y.</option>
+                {% endcall %}
+
+                <div id="other-academic-year-container" style="display: none;">
+                    {{ input('other-academic-year', 'other-academic-year', label='Other Academic Year', placeholder='Enter Academic Year', class='input-pair') }}
                 </div>
 
-                <div class="input-pair">
-                    <label for="events-semester">Semester</label>
-                    <select name="events-semester" id="events-semester" required>
-                        <option value="" disabled selected>Select a Semester</option>
-                        <option value="1st Semester">1st Semester</option>
-                        <option value="2nd Semester">2nd Semester</option>
-                    </select>
-                </div>
+                {{ input('events-start-date-and-time', 'events-start-date-and-time', label='Start Date and Time', type='datetime-local', required=true, class='input-pair') }}
+                {{ input('events-end-date-and-time', 'events-end-date-and-time', label='End Date and Time', type='datetime-local', required=true, class='input-pair') }}
+                {{ input('events-venue', 'events-venue', label='Venue', placeholder='Venue', required=true, class='input-pair') }}
+                {{ input('events-budget', 'events-budget', label='Budget', type='number', placeholder='Budget', required=true, class='input-pair') }}
 
-                <div class="input-pair">
-                    <label for="events-academic-year">Academic Year</label>
-                    <select name="events-academic-year" id="events-academic-year" required>
-                        <option value="" disabled selected>Select an Academic Year</option>
-                        {% for year in academic_years %}
-                        <option value="{{ year.events_academic_year }}">A.Y. {{ year.events_academic_year }}</option>
-                        {% endfor %}
-                        <option value="Other">Other A.Y.</option>
-                    </select>
-                </div>
+                {% call select('events-status', 'events-status', label='Event Status', required=true, class='input-pair') %}
+                    <option value="" disabled selected>Select an Event Status</option>
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Postponed">Postponed</option>
+                    <option value="Done">Done</option>
+                    <option value="Cancelled">Cancelled</option>
+                {% endcall %}
 
-                <div class="input-pair" id="other-academic-year-container" style="display: none;">
-                    <label for="other-academic-year">Other Academic Year</label>
-                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-start-date-and-time">Start Date and Time</label>
-                    <input type="datetime-local" name="events-start-date-and-time" id="events-start-date-and-time" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-end-date-and-time">End Date and Time</label>
-                    <input type="datetime-local" name="events-end-date-and-time" id="events-end-date-and-time" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-venue">Venue</label>
-                    <input type="text" name="events-venue" id="events-venue" placeholder="Venue" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-budget">Budget</label>
-                    <input type="number" name="events-budget" id="events-budget" placeholder="Budget" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-status">Event Status</label>
-                    <select name="events-status" id="events-status" required>
-                        <option value="" disabled selected>Select an Event Status</option>
-                        <option value="Upcoming">Upcoming</option>
-                        <option value="Postponed">Postponed</option>
-                        <option value="Done">Done</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-description">Description</label>
-                    <textarea name="events-description" id="events-description" placeholder="Description" required></textarea>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-remarks">Remarks</label>
-                    <input type="text" name="events-remarks" id="events-remarks" placeholder="Remarks (Optional)">
-                </div>
+                {{ textarea('events-description', 'events-description', label='Description', placeholder='Description', required=true, class='input-pair') }}
+                {{ input('events-remarks', 'events-remarks', label='Remarks', placeholder='Remarks (Optional)', class='input-pair') }}
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <div class="horizontal-button-pair-positioned-right">
-                    <a href="{{ url_for('dashboard.events_overview') }}" class="secondary-button fit-content-button">Cancel</a>
-                    <button class="primary-button" type="submit">Add Event</button>
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    {{ button_link('Cancel', url_for('events.events_overview'), variant='secondary') }}
+                    {{ button('Add Event', type='submit') }}
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}

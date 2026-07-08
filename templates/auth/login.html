@@ -1,44 +1,46 @@
 {% extends "base.html" %}
+{% from 'macros/forms.html' import input %}
+{% from 'macros/icons.html' import lucide %}
+{% from 'macros/ui.html' import button, button_link, card %}
 
 {% block title %}Log In{% endblock %}
 
 {% block content %}
 
-<!-- Flash messages section -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="flash-messages">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
-
-<div class="container">
-    <h2>Log In</h2>
-
-    <form method="POST">
-        <div class="input-pair">
-            <label for="users-username-email">Username/Email</label>
-            <input type="text" name="users-username-email" id="users-username-email" placeholder="Username/Email" required>
+<div class="flex min-h-[60vh] items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+        <div class="mb-8 text-center">
+            <h1 class="text-2xl font-bold text-ink">Welcome back</h1>
+            <p class="mt-1 text-sm text-ink-2">Log in to your E-Council account</p>
         </div>
 
-        <div class="input-pair">
-            <label for="users-password">Password</label>
-            <input type="password" name="users-password" id="users-password" placeholder="Password" required>
-        </div>
+        {% call card(body_class='p-6 sm:p-8') %}
+        <form method="POST" class="space-y-5">
+            {{ input('users-username-email', 'users-username-email', label='Username / Email', placeholder='Username or email', required=true) }}
+            {{ input('users-password', 'users-password', label='Password', type='password', placeholder='Password', required=true) }}
 
-        <div class="horizontal-input-pair">
-            <a href="{{ url_for('auth.forgot_password') }}">Forgot Password?</a>
-            <button class="show-password-button">Show Password</button>
-        </div>
+            <div class="flex items-center justify-between">
+                <button type="button" class="show-password-button inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-accent" data-target="users-password">
+                    {{ lucide('eye', 16, 'w-4 h-4') }} Show Password
+                </button>
+                <a href="{{ url_for('auth.forgot_password') }}" class="text-sm font-medium text-accent hover:text-accent-hover">Forgot password?</a>
+            </div>
 
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <button class="primary-button" type="submit">Log In</button>
+            {{ button('Log In', type='submit', variant='primary', class='w-full') }}
 
-        <p>Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign Up</a></p>
-    </form>
+            <p class="text-center text-sm text-ink-2">
+                Don't have an account?
+                <a href="{{ url_for('auth.signup') }}" class="font-medium text-accent hover:text-accent-hover">Sign up</a>
+            </p>
+        </form>
+        {% endcall %}
+    </div>
 </div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/auth/login.js') }}"></script>
 {% endblock %}

@@ -1,91 +1,62 @@
 {% extends "base.html" %}
+{% from 'macros/forms.html' import input, select %}
+{% from 'macros/icons.html' import lucide %}
+{% from 'macros/ui.html' import button, button_link, card %}
 
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
 
-<!-- Flash messages section -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-<div class="flash-messages">
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-{% endwith %}
-
-<div class="container">
-    <h2>Sign Up</h2>
-
-    <form id="signup-form" method="POST">
-        <div class="input-pair">
-            <label for="users-first-name">First Name</label>
-            <input type="text" name="users-first-name" id="users-first-name" placeholder="First Name" required>
+<div class="flex min-h-[60vh] items-start justify-center px-4 py-12">
+    <div class="w-full max-w-2xl">
+        <div class="mb-8 text-center">
+            <h1 class="text-2xl font-bold text-ink">Create your account</h1>
+            <p class="mt-1 text-sm text-ink-2">Sign up to start managing council work.</p>
         </div>
 
-        <div class="input-pair">
-            <label for="users-last-name">Last Name</label>
-            <input type="text" name="users-last-name" id="users-last-name" placeholder="Last Name" required>
-        </div>
+        {% call card(body_class='p-6 sm:p-8') %}
+        <form id="signup-form" method="POST" class="space-y-5">
+            <div class="grid gap-5 sm:grid-cols-2">
+                {{ input('users-first-name', 'users-first-name', label='First Name', placeholder='First Name', required=true) }}
+                {{ input('users-last-name', 'users-last-name', label='Last Name', placeholder='Last Name', required=true) }}
+            </div>
 
-        <div class="input-pair">
-            <label for="users-username">Username</label>
-            <input type="text" name="users-username" id="users-username" placeholder="Username" required>
-        </div>
+            {{ input('users-username', 'users-username', label='Username', placeholder='Username', required=true) }}
+            {{ input('users-email', 'users-email', label='Email', type='email', placeholder='Email', required=true) }}
 
-        <div class="input-pair">
-            <label for="users-email">Email</label>
-            <input type="email" name="users-email" id="users-email" placeholder="Email" required>
-        </div>
+            {% call select('users-department', 'users-department', label='Department', required=true) %}
+            <option value="" disabled selected>Select a Department</option>
+            <option value="College of Computer Studies">College of Computer Studies</option>
+            <option value="College of Engineering">College of Engineering</option>
+            <option value="College of Architecture">College of Architecture</option>
+            <option value="College of Criminology">College of Criminology</option>
+            <option value="College of Nursing">College of Nursing</option>
+            <option value="College of Arts, Sciences and Education">College of Arts, Sciences and Education</option>
+            <option value="College of Business Administration and Accountancy">College of Business Administration and Accountancy</option>
+            <option value="College of Physical and Occupational Therapy">College of Physical and Occupational Therapy</option>
+            <option value="College of International Tourism and Hospitality Management">College of International Tourism and Hospitality Management</option>
+            <option value="College of Pharmacy">College of Pharmacy</option>
+            <option value="College of Radiologic Technology">College of Radiologic Technology</option>
+            {% endcall %}
 
-        <div class="input-pair">
-            <label for="users-department">Department</label>
-            <select name="users-department" id="users-department" required>
-                <option value="" disabled selected>Select a Department</option>
-                <option value="College of Computer Studies">College of Computer Studies</option>
-                <option value="College of Engineering">College of Engineering</option>
-                <option value="College of Architecture">College of Architecture</option>
-                <option value="College of Criminology">College of Criminology</option>
-                <option value="College of Nursing">College of Nursing</option>
-                <option value="College of Arts, Sciences and Education">College of Arts, Sciences and Education</option>
-                <option value="College of Business Administration and Accountancy">College of Business Administration
-                    and
-                    Accountancy</option>
-                <option value="College of Physical and Occupational Therapy">College of Physical and Occupational
-                    Therapy
-                </option>
-                <option value="College of International Tourism and Hospitality Management">College of International
-                    Tourism
-                    and Hospitality Management</option>
-                <option value="College of Pharmacy">College of Pharmacy</option>
-                <option value="College of Radiologic Technology">College of Radiologic Technology</option>
-            </select>
-        </div>
+            {% call select('users-role', 'users-role', label='Role', required=true) %}
+            <option value="" disabled selected>Select a Role</option>
+            <option value="Student Council Officer">Student Council Officer</option>
+            <option value="Faculty">Faculty</option>
+            <option value="Staff">Staff</option>
+            {% endcall %}
 
-        <div class="input-pair">
-            <label for="users-role">Role</label>
-            <select name="users-role" id="users-role" required>
-                <option value="" disabled selected>Select a Role</option>
-                <option value="Student Council Officer">Student Council Officer</option>
-                <option value="Faculty">Faculty</option>
-                <option value="Staff">Staff</option>
-            </select>
-        </div>
-
-        <div class="input-pair" id="users-student-organization-container">
-            <label for="users-student-organization">Student Organization</label>
-            <select name="users-student-organization" id="users-student-organization">
+            <div id="users-student-organization-container" class="w-full" style="display: none;">
+                {% call select('users-student-organization', 'users-student-organization', label='Student Organization') %}
                 <option value="" disabled selected>Select a Student Organization</option>
                 {% for organization in student_organizations %}
                 <option value="{{ organization.student_organizations_id }}">{{ organization.student_organizations_name }}</option>
                 {% endfor %}
-            </select>
-        </div>
+                {% endcall %}
+            </div>
 
-        <div class="input-pair" id="users-student-organization-position-container">
-            <label for="users-student-organization-position">Student Organization Position</label>
-            <select name="users-student-organization-position" id="users-student-organization-position">
+            <div id="users-student-organization-position-container" class="w-full" style="display: none;">
+                {% call select('users-student-organization-position', 'users-student-organization-position', label='Student Organization Position') %}
                 <option value="" disabled selected>Select a Student Organization Position</option>
                 <option value="President">President</option>
                 <option value="Vice President">Vice President</option>
@@ -94,66 +65,73 @@
                 <option value="Auditor">Auditor</option>
                 <option value="Business Manager">Business Manager</option>
                 <option value="Public Relations Officer">Public Relations Officer (P.R.O)</option>
-                <option value="1st Year IT Representative">1st Year IT Representative</option>
-                <option value="1st Year CS Representative">1st Year CS Representative</option>
-                <option value="2nd Year IT Representative">2nd Year IT Representative</option>
-                <option value="2nd Year CS Representative">2nd Year CS Representative</option>
-                <option value="3rd Year IT Representative">3rd Year IT Representative</option>
-                <option value="3rd Year CS Representative">3rd Year CS Representative</option>
-                <option value="4th Year IT Representative">4th Year IT Representative</option>
-                <option value="4th Year CS Representative">4th Year CS Representative</option>
-            </select>
-        </div>
-
-        <div class="input-pair">
-            <label for="users-password">Password</label>
-            <input type="password" name="users-password" id="users-password" placeholder="Password" required>
-            <div id="password-strength">
-                <div id="password-strength-bar"></div>
+                <option value="1st Year Representative">1st Year Representative</option>
+                <option value="2nd Year Representative">2nd Year Representative</option>
+                <option value="3rd Year Representative">3rd Year Representative</option>
+                <option value="4th Year Representative">4th Year Representative</option>
+                {% endcall %}
             </div>
-            <p id="password-strength-text"></p>
-        </div>
 
-        <button class="show-password-button" type="button" data-target="users-password">Show
-            Password</button>
+            {{ input('users-password', 'users-password', label='Password', type='password', placeholder='Password', required=true) }}
 
-        <div class="password-requirements-container">
-            <p id="length-requirement"><i class="bi bi-x-circle" id="length-icon"></i> Must be at least 8 characters
-                long</p>
-            <p id="uppercase-requirement"><i class="bi bi-x-circle" id="uppercase-icon"></i> Must contain at least one
-                uppercase letter</p>
-            <p id="lowercase-requirement"><i class="bi bi-x-circle" id="lowercase-icon"></i> Must contain at least one
-                lowercase letter</p>
-            <p id="number-requirement"><i class="bi bi-x-circle" id="number-icon"></i> Must contain at least one number
+            <div id="password-strength" class="hidden">
+                <div class="h-2 rounded-full bg-surface-lowered overflow-hidden">
+                    <div id="password-strength-bar" class="h-full rounded-full transition-all duration-300"></div>
+                </div>
+                <p id="password-strength-text" class="mt-1 text-sm text-ink-2"></p>
+            </div>
+
+            <button type="button" class="show-password-button inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-accent" data-target="users-password">
+                {{ lucide('eye', 16, 'w-4 h-4') }} Show Password
+            </button>
+
+            <div class="space-y-2 text-sm text-ink-2">
+                <p id="length-requirement" class="flex items-center gap-2">
+                    <span id="length-icon" class="inline-flex w-4 h-4 shrink-0">{{ lucide('x', 16, 'text-danger') }}</span>
+                    At least 8 characters
+                </p>
+                <p id="uppercase-requirement" class="flex items-center gap-2">
+                    <span id="uppercase-icon" class="inline-flex w-4 h-4 shrink-0">{{ lucide('x', 16, 'text-danger') }}</span>
+                    One uppercase letter
+                </p>
+                <p id="lowercase-requirement" class="flex items-center gap-2">
+                    <span id="lowercase-icon" class="inline-flex w-4 h-4 shrink-0">{{ lucide('x', 16, 'text-danger') }}</span>
+                    One lowercase letter
+                </p>
+                <p id="number-requirement" class="flex items-center gap-2">
+                    <span id="number-icon" class="inline-flex w-4 h-4 shrink-0">{{ lucide('x', 16, 'text-danger') }}</span>
+                    One number
+                </p>
+                <p id="special-requirement" class="flex items-center gap-2">
+                    <span id="special-icon" class="inline-flex w-4 h-4 shrink-0">{{ lucide('x', 16, 'text-danger') }}</span>
+                    One special character
+                </p>
+            </div>
+
+            {{ input('users-repeat-password', 'users-repeat-password', label='Repeat Password', type='password', placeholder='Repeat Password', required=true) }}
+
+            <p id="password-match" class="hidden text-sm text-danger">Passwords do not match</p>
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            {{ button('Sign Up', type='submit', variant='primary', class='w-full') }}
+
+            <p class="text-center text-sm text-ink-2">
+                Already have an account?
+                <a href="{{ url_for('auth.login') }}" class="font-medium text-accent hover:text-accent-hover">Log In</a>
             </p>
-            <p id="special-requirement"><i class="bi bi-x-circle" id="special-icon"></i> Must contain at least one
-                special character</p>
-        </div>
-
-        <div class="input-pair">
-            <label for="users-repeat-password">Repeat Password</label>
-            <input type="password" name="users-repeat-password" id="users-repeat-password" placeholder="Repeat Password"
-                required>
-            <p id="password-match">Passwords do not match</p>
-        </div>
-
-        <button class="show-password-button" type="button"
-            data-target="users-repeat-password">Show Password</button>
-
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-        <button class="primary-button" type="submit">Sign Up</button>
-
-        <p>Already have an account? <a href="{{ url_for('auth.login') }}">Log In</a></p>
-    </form>
+        </form>
+        {% endcall %}
+    </div>
 </div>
+
 {% endblock %}
 
 {% block script %}
 
-<!-- Include zxcvbn library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth/password-helpers.js') }}"></script>
 <script src="{{ url_for('static', filename='js/auth/signup.js') }}"></script>
 
 {% endblock %}

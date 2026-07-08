@@ -1,0 +1,44 @@
+{% from 'macros/icons.html' import lucide %}
+{% from 'macros/ui.html' import button, button_link %}
+
+<nav class="sticky top-0 z-50 w-full border-b border-edge bg-surface-bg/95 backdrop-blur">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href="{{ url_for('index') }}" class="flex items-center gap-2 text-xl font-bold text-ink transition-colors hover:text-accent">
+            {{ lucide('hexagon', 28, 'text-accent') }}
+            <span>E-Council</span>
+        </a>
+
+        <div class="hidden md:flex md:items-center md:gap-6">
+            <a href="{{ url_for('index') }}" class="text-sm font-medium text-ink-2 transition-colors hover:text-ink">Home</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard.council_overview') }}" class="text-sm font-medium text-ink-2 transition-colors hover:text-ink">E-Council Overview</a>
+                <a href="{{ url_for('account.account') }}" class="flex items-center gap-2 text-sm font-medium text-ink-2 transition-colors hover:text-ink">
+                    <img class="h-8 w-8 rounded-full border border-edge object-cover" src="{{ (current_user.profile_picture or {}).url or 'https://api.dicebear.com/9.x/thumbs/svg?seed=Robert' }}" alt="Profile">
+                    <span>Account</span>
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="text-sm font-medium text-ink-2 transition-colors hover:text-ink">Log Out</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="text-sm font-medium text-ink-2 transition-colors hover:text-ink">Log In</a>
+                {{ button_link('Sign Up', url_for('auth.signup'), variant='primary') }}
+            {% endif %}
+            {% include "partials/theme_toggle.html" %}
+        </div>
+
+        <button type="button" id="mobile-menu-toggle" class="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-ink-2 hover:bg-surface-lowered" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            {{ lucide('menu', 24, 'w-6 h-6') }}
+        </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden flex-col gap-2 border-t border-edge bg-surface-bg px-4 py-4">
+        <a href="{{ url_for('index') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Home</a>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard.council_overview') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">E-Council Overview</a>
+            <a href="{{ url_for('account.account') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Account</a>
+            <a href="{{ url_for('auth.logout') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Log Out</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Log In</a>
+            {{ button_link('Sign Up', url_for('auth.signup'), variant='primary', class='w-full justify-center') }}
+        {% endif %}
+        {% include "partials/theme_toggle.html" %}
+    </div>
+</nav>

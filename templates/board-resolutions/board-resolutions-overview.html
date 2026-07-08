@@ -1,104 +1,68 @@
 {% extends "base.html" %}
+{% from 'macros.ui.html' import button_link, card, empty_state %}
 
 {% block title %}Board Resolutions Overview{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
-        <!-- Flash messages section for the main page -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-7xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">Board Resolutions Overview</h1>
+                {{ button_link('Create New Board Resolution', url_for('board_resolutions.add_board_resolution'), variant='primary', icon='plus') }}
+            </div>
 
-        <h2>Board Resolutions Overview</h2>
-
-        <a href="{{ url_for('board_resolutions.add_board_resolution') }}" class="primary-button create-button">Create New Board
-            Resolution</a>
-
-        <div class="overview-content-container-group">
             {% if board_resolutions %}
-            {% set sorted_resolutions = board_resolutions | sort(attribute='board_resolutions_academic_year',
-            reverse=(sort_by_date == 'recent-to-old')) %}
-            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester',
-            '2nd Semester'] %}
-            {% set academic_years = sorted_resolutions | map(attribute='board_resolutions_academic_year') | unique |
-            list %}
+            {% set sorted_resolutions = board_resolutions | sort(attribute='board_resolutions_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
+            {% set academic_years = sorted_resolutions | map(attribute='board_resolutions_academic_year') | unique | list %}
 
-            {% for academic_year in academic_years %}
-            {% for semester in semesters %}
-            {% if sorted_resolutions | has_resolutions(semester, academic_year) %}
-            <div class="grid-header">
-                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            <div class="space-y-8">
+                {% for academic_year in academic_years %}
+                {% for semester in semesters %}
+                {% if sorted_resolutions | has_resolutions(semester, academic_year) %}
+                <section class="space-y-4">
+                    <h2 class="text-lg font-semibold text-ink-2">{{ semester }} — A.Y. {{ academic_year }}</h2>
+                    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {% for resolution in sorted_resolutions %}
+                        {% if resolution.board_resolutions_semester == semester and resolution.board_resolutions_academic_year == academic_year %}
+                        {% call card(title=resolution.board_resolutions_title, class='flex flex-col') %}
+                        <div class="mb-3">
+                            <select name="resolution-status-select-button" id="resolution-status-select-button-{{ loop.index }}" aria-label="Select a Resolution Status" data-resolution-id="{{ resolution.board_resolutions_id }}" data-resolution-name="{{ resolution.board_resolutions_description }}" required class="w-fit appearance-none rounded-lg border border-edge bg-surface px-3 py-1.5 pr-8 text-sm font-medium text-ink focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
+                                <option value="Upcoming" {% if resolution.board_resolutions_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                                <option value="Postponed" {% if resolution.board_resolutions_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                                <option value="Done" {% if resolution.board_resolutions_status=='Done' %}selected{% endif %}>Done</option>
+                                <option value="Cancelled" {% if resolution.board_resolutions_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <p class="text-sm text-ink-2 line-clamp-3">{{ resolution.board_resolutions_description | truncate(100) }}</p>
+                        <div class="mt-4 space-y-1 text-sm text-ink-2">
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Date:</span> <span class="font-medium text-ink">{{ resolution.board_resolutions_date.strftime('%B %d, %Y') if resolution.board_resolutions_date else 'N/A' }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Time:</span> <span class="font-medium text-ink">{{ resolution.board_resolutions_date.strftime('%I:%M %p') if resolution.board_resolutions_date else 'N/A' }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Total Amount:</span> <span class="font-medium text-ink">₱ {{ "{:,.2f}".format(resolution.board_resolutions_total_amount) if resolution.board_resolutions_total_amount else '0.00' }}</span></p>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-2">
+                            {{ button_link('View', url_for('board_resolutions.generate_board_resolution_pdf', resolution_id=resolution.board_resolutions_id), variant='secondary', class='justify-center') }}
+                            {{ button_link('Update', url_for('board_resolutions.update_board_resolution', resolution_id=resolution.board_resolutions_id), variant='ghost', class='justify-center') }}
+                            {{ button_link('Delete', url_for('board_resolutions.delete_board_resolution', resolution_id=resolution.board_resolutions_id), variant='danger', class='justify-center') }}
+                        </div>
+                        {% endcall %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
             </div>
-
-            {% for resolution in sorted_resolutions %}
-            {% if resolution.board_resolutions_semester == semester and resolution.board_resolutions_academic_year ==
-            academic_year %}
-            <div class="overview-content-grid-item">
-                <select class="fit-content-button" name="resolution-status-select-button"
-                    id="resolution-status-select-button-{{ loop.index }}" aria-label="Select a Resolution Status"
-                    data-resolution-id="{{ resolution.board_resolutions_id }}"
-                    data-resolution-name="{{ resolution.board_resolutions_description }}" required>
-                    <option value="Upcoming" {% if resolution.board_resolutions_status=='Upcoming' %}selected{% endif
-                        %}>Upcoming</option>
-                    <option value="Postponed" {% if resolution.board_resolutions_status=='Postponed' %}selected{% endif
-                        %}>Postponed</option>
-                    <option value="Done" {% if resolution.board_resolutions_status=='Done' %}selected{% endif %}>Done
-                    </option>
-                    <option value="Cancelled" {% if resolution.board_resolutions_status=='Cancelled' %}selected{% endif
-                        %}>Cancelled</option>
-                </select>
-
-                <h3>{{ resolution.board_resolutions_title }}</h3>
-
-                <p class="resolutions-description">{{ resolution.board_resolutions_description | truncate(100) }}</p>
-
-                <div class="grid-item-details">
-                    <div class="grid-item-details-pair">
-                        <p>Date:</p>
-                        <p>{{ resolution.board_resolutions_date.strftime('%B %d, %Y') if
-                            resolution.board_resolutions_date else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Time:</p>
-                        <p>{{ resolution.board_resolutions_date.strftime('%I:%M %p') if
-                            resolution.board_resolutions_date else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Total Amount:</p>
-                        <p>₱ {{ "{:,.2f}".format(resolution.board_resolutions_total_amount) if
-                            resolution.board_resolutions_total_amount else '0.00' }}</p>
-                    </div>
-                </div>
-
-                <div class="grid-item-button-group">
-                    <a href="{{ url_for('board_resolutions.generate_board_resolution_pdf', resolution_id=resolution.board_resolutions_id) }}"
-                        class="primary-button">View</a>
-                    <a href="{{ url_for('board_resolutions.update_board_resolution', resolution_id=resolution.board_resolutions_id) }}"
-                        class="secondary-button">Update</a>
-                    <a href="{{ url_for('board_resolutions.delete_board_resolution', resolution_id=resolution.board_resolutions_id) }}"
-                        class="secondary-button">Delete</a>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
             {% else %}
-            <p>No board resolutions found for your department.</p>
+            {{ empty_state('file-text', 'No board resolutions found', 'There are no board resolutions for your department yet. Create one to get started.', button_link('Create New Board Resolution', url_for('board_resolutions.add_board_resolution'), variant='primary')) }}
             {% endif %}
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}

@@ -1,0 +1,13 @@
+{% from 'macros/ui.html' import alert %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="w-full border-b border-edge bg-surface-bg px-4 pt-4">
+    <div class="mx-auto max-w-7xl space-y-3">
+        {% for category, message in messages %}
+            {{ alert(message, category) }}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}

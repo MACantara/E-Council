@@ -1,96 +1,69 @@
 {% extends "base.html" %}
+{% from 'macros.ui.html' import button_link, card, empty_state %}
 
 {% block title %}Minutes of the Meeting Overview{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
-        <!-- Flash messages section for the main page -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-7xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">Minutes of the Meeting Overview</h1>
+                {{ button_link('Create New Minutes of the Meeting', url_for('meetings.add_minutes_of_the_meeting'), variant='primary', icon='plus') }}
+            </div>
 
-        <h2>Minutes of the Meeting Overview</h2>
-
-        <a href="{{ url_for('meetings.add_minutes_of_the_meeting') }}" class="primary-button create-button">Create New Minutes of the Meeting</a>
-
-        <div class="overview-content-container-group">
             {% if minutes_of_the_meeting %}
             {% set sorted_meetings = meetings_only | sort(attribute='minutes_of_the_meeting_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
             {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
             {% set academic_years = sorted_meetings | map(attribute='minutes_of_the_meeting_academic_year') | unique | list %}
 
-            {% for academic_year in academic_years %}
-            {% for semester in semesters %}
-            {% if sorted_meetings | has_meetings(semester, academic_year) %}
-            <div class="grid-header">
-                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            <div class="space-y-8">
+                {% for academic_year in academic_years %}
+                {% for semester in semesters %}
+                {% if sorted_meetings | has_meetings(semester, academic_year) %}
+                <section class="space-y-4">
+                    <h2 class="text-lg font-semibold text-ink-2">{{ semester }} — A.Y. {{ academic_year }}</h2>
+                    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {% for meeting, first_name, last_name in minutes_of_the_meeting %}
+                        {% if meeting.minutes_of_the_meeting_semester == semester and meeting.minutes_of_the_meeting_academic_year == academic_year %}
+                        {% call card(title=meeting.minutes_of_the_meeting_agenda, class='flex flex-col') %}
+                        <div class="mb-3">
+                            <select name="meeting-status-select-button" id="meeting-status-select-button-{{ loop.index }}" aria-label="Select a Meeting Status" data-meeting-id="{{ meeting.minutes_of_the_meeting_id }}" data-meeting-name="{{ meeting.minutes_of_the_meeting_agenda }}" required class="w-fit appearance-none rounded-lg border border-edge bg-surface px-3 py-1.5 pr-8 text-sm font-medium text-ink focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
+                                <option value="Upcoming" {% if meeting.minutes_of_the_meeting_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                                <option value="Postponed" {% if meeting.minutes_of_the_meeting_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                                <option value="Done" {% if meeting.minutes_of_the_meeting_status=='Done' %}selected{% endif %}>Done</option>
+                                <option value="Cancelled" {% if meeting.minutes_of_the_meeting_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <p class="text-sm text-ink-2 line-clamp-3">{{ meeting.minutes_of_the_meeting_notes | truncate(100) }}</p>
+                        <div class="mt-4 space-y-1 text-sm text-ink-2">
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Date:</span> <span class="font-medium text-ink">{{ meeting.minutes_of_the_meeting_date.strftime('%B %d, %Y') if meeting.minutes_of_the_meeting_date else 'N/A' }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Time:</span> <span class="font-medium text-ink">{{ meeting.minutes_of_the_meeting_date.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_date else 'N/A' }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Adjourned:</span> <span class="font-medium text-ink">{{ meeting.minutes_of_the_meeting_adjourned.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_adjourned else 'N/A' }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Presiding Officer:</span> <span class="font-medium text-ink">{{ first_name }} {{ last_name }}</span></p>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-2">
+                            {{ button_link('View', url_for('meetings.generate_mom_pdf', minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id), variant='secondary', class='justify-center') }}
+                            {{ button_link('Update', url_for('meetings.update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id), variant='ghost', class='justify-center') }}
+                            {{ button_link('Delete', url_for('meetings.delete_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id), variant='danger', class='justify-center') }}
+                        </div>
+                        {% endcall %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
             </div>
-
-            {% for meeting, first_name, last_name in minutes_of_the_meeting %}
-            {% if meeting.minutes_of_the_meeting_semester == semester and meeting.minutes_of_the_meeting_academic_year == academic_year %}
-            <div class="overview-content-grid-item">
-                <select class="fit-content-button" name="meeting-status-select-button"
-                    id="meeting-status-select-button-{{ loop.index }}" aria-label="Select a Meeting Status"
-                    data-meeting-id="{{ meeting.minutes_of_the_meeting_id }}"
-                    data-meeting-name="{{ meeting.minutes_of_the_meeting_agenda }}" required>
-                    <option value="Upcoming" {% if meeting.minutes_of_the_meeting_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
-                    <option value="Postponed" {% if meeting.minutes_of_the_meeting_status=='Postponed' %}selected{% endif %}>Postponed</option>
-                    <option value="Done" {% if meeting.minutes_of_the_meeting_status=='Done' %}selected{% endif %}>Done</option>
-                    <option value="Cancelled" {% if meeting.minutes_of_the_meeting_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
-                </select>
-
-                <h3>{{ meeting.minutes_of_the_meeting_agenda }}</h3>
-
-                <p class="meeting-description">{{ meeting.minutes_of_the_meeting_notes | truncate(100) }}</p>
-
-                <div class="grid-item-details">
-                    <div class="grid-item-details-pair">
-                        <p>Date:</p>
-                        <p>{{ meeting.minutes_of_the_meeting_date.strftime('%B %d, %Y') if meeting.minutes_of_the_meeting_date else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Time:</p>
-                        <p>{{ meeting.minutes_of_the_meeting_date.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_date else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Adjourned:</p>
-                        <p>{{ meeting.minutes_of_the_meeting_adjourned.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_adjourned else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Presiding Officer:</p>
-                        <p>{{ first_name }} {{ last_name }}</p>
-                    </div>
-                </div>
-
-                <div class="grid-item-button-group">
-                    <a href="{{ url_for('meetings.generate_mom_pdf', minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id) }}"
-                        class="primary-button">View</a>
-                    <a href="{{ url_for('meetings.update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
-                        class="secondary-button">Update</a>
-                    <a href="{{ url_for('meetings.delete_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
-                        class="secondary-button">Delete</a>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
             {% else %}
-            <p>No minutes of the meeting found for your department.</p>
+            {{ empty_state('clock', 'No minutes of the meeting found', 'There are no meeting minutes for your department yet. Create one to get started.', button_link('Create New Minutes of the Meeting', url_for('meetings.add_minutes_of_the_meeting'), variant='primary')) }}
             {% endif %}
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}

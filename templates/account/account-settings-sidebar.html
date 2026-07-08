@@ -1,7 +1,24 @@
-<div class="account-settings-sidebar-container">
-    <a href="{{ url_for('account.account_settings') }}">Account Settings</a>
-    <hr>
-    <a href="{{ url_for('account.email_settings') }}">Email Settings</a>
-    <hr>
-    <a href="{{ url_for('account.password_security_settings') }}">Password & Security Settings</a>
-</div>
+{% from 'macros/icons.html' import lucide %}
+
+<aside class="w-full flex-shrink-0 border-b border-edge bg-surface-bg lg:w-56 lg:border-b-0 lg:border-r">
+    <div class="p-4">
+        <details class="lg:hidden group">
+            <summary class="flex cursor-pointer list-none items-center justify-between rounded-lg bg-surface px-3 py-2 text-sm font-semibold text-ink transition-colors hover:bg-surface-lowered">
+                <span>Settings Menu</span>
+                {{ lucide('chevron-down', 18, 'w-4 h-4 text-ink-2 transition-transform group-open:rotate-180') }}
+            </summary>
+            <div class="mt-2 flex flex-col gap-1 border-t border-edge pt-2">
+                <a href="{{ url_for('account.account_settings') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Account Settings</a>
+                <a href="{{ url_for('account.email_settings') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Email Settings</a>
+                <a href="{{ url_for('account.password_security_settings') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Password &amp; Security</a>
+            </div>
+        </details>
+
+        <nav class="hidden lg:flex flex-col gap-1">
+            <h3 class="mb-2 px-3 text-xs font-bold uppercase tracking-wider text-ink-3">Settings</h3>
+            <a href="{{ url_for('account.account_settings') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Account Settings</a>
+            <a href="{{ url_for('account.email_settings') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Email Settings</a>
+            <a href="{{ url_for('account.password_security_settings') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">Password &amp; Security</a>
+        </nav>
+    </div>
+</aside>

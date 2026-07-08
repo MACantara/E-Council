@@ -1,113 +1,73 @@
 {% extends "base.html" %}
+{% from 'macros.forms.html' import input, select %}
+{% from 'macros.ui.html' import button, button_link %}
 
 {% block title %}Update Transaction{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-2xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">Update Transaction</h1>
+                {{ button_link('Back to Event Dashboard', url_for('events.event_dashboard', event_id=event.events_id), variant='secondary', icon='arrow-left') }}
+            </div>
 
-        <a href="{{ url_for('events.event_dashboard', event_id=event.events_id) }}"
-            class="primary-button fit-content-button">Back to Events Dashboard</a>
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.transaction_id) }}" class="space-y-5 rounded-xl border border-edge bg-surface p-6 shadow-sm">
+                {{ input('transaction-name', 'transaction-name', label='Transaction Name', placeholder='Transaction Name', value=transaction.transaction_name, required=true) }}
+                {{ input('transaction-date', 'transaction-date', label='Date', type='datetime-local', value=transaction.transaction_date, required=true) }}
+                {{ input('transaction-unit-amount', 'transaction-unit-amount', label='Unit Amount', type='number', placeholder='Unit Amount', value=transaction.transaction_unit_amount, required=true) }}
+                {{ input('transaction-unit-price', 'transaction-unit-price', label='Unit Price', type='number', placeholder='Unit Price', value=transaction.transaction_unit_price, required=true) }}
+                {{ input('transaction-total', 'transaction-total', label='Total', type='number', placeholder='Total', value=transaction.transaction_total, attrs='readonly') }}
 
-        <!-- Flash messages section for the modal -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin bottom-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
-        <div class="container">
-            <h2>Update Transaction</h2>
+                {% call select('transaction-category', 'transaction-category', label='Category', required=true) %}
+                    <option value="" disabled>Select a Category</option>
+                    {% for category in transaction_categories %}
+                    <option value="{{ category }}" {% if category == transaction.transaction_category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                    {% if transaction.transaction_category not in transaction_categories %}
+                    <option value="{{ transaction.transaction_category }}" selected>{{ transaction.transaction_category }}</option>
+                    {% endif %}
+                    <option value="Other">Other</option>
+                {% endcall %}
 
-            <form method="POST" enctype="multipart/form-data"
-                action="{{ url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.transaction_id) }}">
-                <div class="input-pair">
-                    <label for="transaction-name">Transaction Name</label>
-                    <input type="text" name="transaction-name" id="transaction-name" placeholder="Transaction Name"
-                        value="{{ transaction.transaction_name }}" required>
+                <div id="other-transaction-category-container" class="{% if transaction.transaction_category not in transaction_categories %}block{% else %}hidden{% endif %}">
+                    {{ input('other-transaction-category', 'other-transaction-category', label='Other Category', placeholder='Enter Category', value=(transaction.transaction_category if transaction.transaction_category not in transaction_categories else '')) }}
                 </div>
 
-                <div class="input-pair">
-                    <label for="transaction-date">Date</label>
-                    <input type="datetime-local" name="transaction-date" id="transaction-date" value="{{ transaction.transaction_date }}" required>
-                </div>
+                {% call select('transaction-type', 'transaction-type', label='Transaction Type', required=true) %}
+                    <option value="Expense" {% if transaction.transaction_type == 'Expense' %}selected{% endif %}>Expense</option>
+                    <option value="Income" {% if transaction.transaction_type == 'Income' %}selected{% endif %}>Income</option>
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="transaction-unit-amount">Unit Amount</label>
-                    <input type="number" name="transaction-unit-amount" id="transaction-unit-amount" placeholder="Unit Amount" value="{{ transaction.transaction_unit_amount }}" required>
-                </div>
-                
-                <div class="input-pair">
-                    <label for="transaction-unit-price">Unit Price</label>
-                    <input type="number" name="transaction-unit-price" id="transaction-unit-price" placeholder="Unit Price" value="{{ transaction.transaction_unit_price }}" required>
-                </div>
-                
-                <div class="input-pair">
-                    <label for="transaction-total">Total</label>
-                    <input type="number" name="transaction-total" id="transaction-total" placeholder="Total" value="{{ transaction.transaction_total }}" readonly>
-                </div>
-
-                <div class="input-pair">
-                    <label for="transaction-category">Category</label>
-                    <select name="transaction-category" id="transaction-category" required>
-                        <option value="" disabled>Select a Category</option>
-                        {% for category in transaction_categories %}
-                        <option value="{{ category }}" {% if category == transaction.transaction_category %}selected{% endif %}>{{ category }}</option>
-                        {% endfor %}
-                        {% if transaction.transaction_category not in transaction_categories %}
-                        <option value="{{ transaction.transaction_category }}" selected>{{ transaction.transaction_category }}</option>
-                        {% endif %}
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="input-pair" id="other-transaction-category-container" style="display: {{ 'block' if transaction.transaction_category not in transaction_categories else 'none' }};">
-                    <label for="other-transaction-category">Other Category</label>
-                    <input type="text" name="other-transaction-category" id="other-transaction-category"
-                        placeholder="Enter Category" value="{% if transaction.transaction_category not in transaction_categories %}{{ transaction.transaction_category }}{% endif %}">
-                </div>
-
-                <div class="input-pair">
-                    <label for="transaction-type">Transaction Type</label>
-                    <select name="transaction-type" id="transaction-type" required>
-                        <option value="Expense" {% if transaction.transaction_type == 'Expense' %}selected{% endif %}>Expense</option>
-                        <option value="Income" {% if transaction.transaction_type == 'Income' %}selected{% endif %}>Income</option>
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="transaction-receipt">Receipt</label>
-                    <input type="file" name="transaction-receipt" id="transaction-receipt" hidden>
-                    <label for="transaction-receipt" class="custom-file-upload-input">
-                        <span class="choose-file-text">Choose File</span>
-                        <span id="file-name" class="file-name">{{ transaction.transaction_receipt_cloudinary_url or 'No file chosen' }}</span>
+                <div class="w-full">
+                    <label for="transaction-receipt" class="mb-1.5 block text-sm font-medium text-ink-2">Receipt</label>
+                    <input type="file" name="transaction-receipt" id="transaction-receipt" accept="image/*" class="hidden" />
+                    <label for="transaction-receipt" class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm transition-colors hover:bg-surface-lowered">
+                        <span class="font-medium text-ink-2">Choose File</span>
+                        <span id="file-name" class="truncate text-ink-3">{{ transaction.transaction_receipt_cloudinary_url or 'No file chosen' }}</span>
                     </label>
                 </div>
 
-                <!-- Display receipt preview if available -->
                 {% if transaction.transaction_receipt_cloudinary_url %}
-                <div class="input-pair">
-                    <label>Receipt Preview</label>
-                    <img src="{{ transaction.transaction_receipt_cloudinary_url }}" alt="Receipt Preview" class="receipt-preview">
+                <div class="w-full">
+                    <label class="mb-1.5 block text-sm font-medium text-ink-2">Receipt Preview</label>
+                    <img src="{{ transaction.transaction_receipt_cloudinary_url }}" alt="Receipt Preview" class="max-h-64 w-full rounded-lg border border-edge object-contain">
                 </div>
                 {% endif %}
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <div class="horizontal-input-pair">
-                    <a href="{{ url_for('events.event_dashboard', event_id=event.events_id) }}"
-                        class="secondary-button fit-content-button">Cancel</a>
-                    <button class="primary-button" type="submit">Update Transaction</button>
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    {{ button_link('Cancel', url_for('events.event_dashboard', event_id=event.events_id), variant='secondary') }}
+                    {{ button('Update Transaction', type='submit') }}
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}

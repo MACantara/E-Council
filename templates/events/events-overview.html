@@ -1,115 +1,77 @@
 {% extends "base.html" %}
+{% from 'macros.ui.html' import button_link, card, empty_state %}
+{% from 'macros.icons.html' import lucide %}
 
 {% block title %}Events Overview{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
-        <!-- Flash messages section for the main page -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-7xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">Events Overview</h1>
+                {{ button_link('Create New Event', url_for('events.add_event'), variant='primary', icon='plus') }}
+            </div>
 
-        <h2>Events Overview</h2>
-
-        <a href="{{ url_for('events.add_event') }}" class="primary-button create-button">Create New Event</a>
-
-        <div class="overview-content-container-group">
             {% if events %}
-            {% set sorted_events = events | sort(attribute='events_academic_year', reverse=(sort_by_date ==
-            'recent-to-old')) %}
-            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester',
-            '2nd Semester']
-            %}
+            {% set sorted_events = events | sort(attribute='events_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
             {% set academic_years = sorted_events | map(attribute='events_academic_year') | unique | list %}
 
-            {% for academic_year in academic_years %}
-            {% for semester in semesters %}
-            {% if sorted_events | has_events(semester, academic_year) %}
-            <div class="grid-header">
-                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            <div class="space-y-8">
+                {% for academic_year in academic_years %}
+                {% for semester in semesters %}
+                {% if sorted_events | has_events(semester, academic_year) %}
+                <section class="space-y-4">
+                    <h2 class="text-lg font-semibold text-ink-2">{{ semester }} — A.Y. {{ academic_year }}</h2>
+                    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {% for event in sorted_events %}
+                        {% if event.events_semester == semester and event.events_academic_year == academic_year %}
+                        {% call card(title=event.events_name | truncate(41), class='flex flex-col') %}
+                        <div class="mb-3">
+                            <select name="event-status-select-button" id="event-status-select-button-{{ loop.index }}" aria-label="Select an Event Status" data-event-id="{{ event.events_id }}" data-event-name="{{ event.events_name }}" required class="w-fit appearance-none rounded-lg border border-edge bg-surface px-3 py-1.5 pr-8 text-sm font-medium text-ink focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
+                                <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                                <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                                <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
+                                <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <p class="text-sm text-ink-2 line-clamp-3">{{ event.events_description | truncate(100) }}</p>
+
+                        <div class="mt-4 space-y-1 text-sm text-ink-2">
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Date:</span> <span class="font-medium text-ink">{{ event.events_start_date_and_time.strftime('%B %d, %Y') if event.events_start_date_and_time else 'N/A' }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Time:</span> <span class="font-medium text-ink">{{ event.events_start_date_and_time.strftime('%I:%M %p') if event.events_start_date_and_time else 'N/A' }} - {{ event.events_end_date_and_time.strftime('%I:%M %p') if event.events_end_date_and_time else 'N/A' }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Venue:</span> <span class="font-medium text-ink">{{ event.events_venue }}</span></p>
+                            <p class="flex justify-between gap-4"><span class="text-ink-3">Initial Budget:</span> <span class="font-medium text-ink">₱ {% if event.events_budget is string %}{{ event.events_budget }}{% else %}{{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}{% endif %}</span></p>
+                        </div>
+
+                        <div class="relative mt-4 h-40 w-full">
+                            <canvas id="budget-chart-{{ event.events_id }}" data-event-id="{{ event.events_id }}" class="absolute inset-0"></canvas>
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                            {{ button_link('View', url_for('events.event_dashboard', event_id=event.events_id), variant='secondary', class='justify-center') }}
+                            {{ button_link('Update', url_for('events.update_event', event_id=event.events_id), variant='secondary', class='justify-center') }}
+                            {{ button_link('Invite', url_for('events.invite_user', event_id=event.events_id, source='events_overview'), variant='ghost', class='justify-center') }}
+                            {{ button_link('Delete', url_for('events.delete_event', event_id=event.events_id), variant='danger', class='justify-center') }}
+                        </div>
+                        {% endcall %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
             </div>
-
-            {% for event in sorted_events %}
-            {% if event.events_semester == semester and event.events_academic_year == academic_year %}
-            <div class="overview-content-grid-item">
-                <select class="fit-content-button" name="event-status-select-button"
-                    id="event-status-select-button-{{ loop.index }}" aria-label="Select an Event Status"
-                    data-event-id="{{ event.events_id }}" data-event-name="{{ event.events_name }}" required>
-                    <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming
-                    </option>
-                    <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed
-                    </option>
-                    <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
-                    <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled
-                    </option>
-                </select>
-
-                <h3>{{ event.events_name | truncate(41) }}</h3>
-
-                <p class="events-description">{{ event.events_description | truncate(100) }}</p>
-
-                <div class="grid-item-details">
-                    <div class="grid-item-details-pair">
-                        <p>Date:</p>
-                        <p>{{ event.events_start_date_and_time.strftime('%B %d, %Y') if event.events_start_date_and_time
-                            else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Time:</p>
-                        <p>{{ event.events_start_date_and_time.strftime('%I:%M %p') if event.events_start_date_and_time
-                            else 'N/A' }} - {{ event.events_end_date_and_time.strftime('%I:%M %p') if
-                            event.events_end_date_and_time else 'N/A' }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Venue:</p>
-                        <p>{{ event.events_venue }}</p>
-                    </div>
-                    <div class="grid-item-details-pair">
-                        <p>Initial Budget:</p>
-                        <p>₱ 
-                            {% if event.events_budget is string %}
-                                {{ event.events_budget }}
-                            {% else %}
-                                {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}
-                            {% endif %}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="events-overview-chart-container">
-                    <canvas id="budget-chart-{{ event.events_id }}" data-event-id="{{ event.events_id }}"></canvas>
-                </div>
-
-                <div class="grid-item-button-group">
-                    <a href="{{ url_for('events.event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
-                    <a href="{{ url_for('events.update_event', event_id=event.events_id) }}"
-                        class="secondary-button">Update</a>
-                    <a href="{{ url_for('events.invite_user', event_id=event.events_id, source='events_overview') }}"
-                        class="secondary-button">Invite</a>
-                    <a href="{{ url_for('events.delete_event', event_id=event.events_id) }}"
-                        class="secondary-button">Delete</a>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
             {% else %}
-            <p>No events found for your department.</p>
+            {{ empty_state('calendar-x', 'No events found', 'There are no events for your department yet. Create an event to get started.', button_link('Create New Event', url_for('events.add_event'), variant='primary')) }}
             {% endif %}
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}

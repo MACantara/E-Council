@@ -1,125 +1,62 @@
 {% extends "base.html" %}
+{% from 'macros.forms.html' import input, select, textarea %}
+{% from 'macros.ui.html' import button, button_link %}
 
 {% block title %}Update Event{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-2xl space-y-6">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <h1 class="text-2xl font-bold text-ink">Update Event</h1>
+                {{ button_link('Back to Events Overview', url_for('events.events_overview'), variant='secondary', icon='arrow-left') }}
+            </div>
 
-        <a href="{{ url_for('dashboard.events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
+            <form method="POST" action="{{ url_for('events.update_event', event_id=event.events_id) }}" class="space-y-5 rounded-xl border border-edge bg-surface p-6 shadow-sm">
+                {{ input('events-name', 'events-name', label='Event Name', placeholder='Event Name', value=event.events_name, required=true) }}
 
-        <!-- Flash messages section for the modal -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin bottom-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
+                {% call select('events-semester', 'events-semester', label='Semester', required=true) %}
+                    <option value="" disabled>Select a Semester</option>
+                    <option value="1st Semester" {% if event.events_semester=='1st Semester' %}selected{% endif %}>1st Semester</option>
+                    <option value="2nd Semester" {% if event.events_semester=='2nd Semester' %}selected{% endif %}>2nd Semester</option>
+                {% endcall %}
 
-        <div class="container">
-            <span id="close-update-event-modal-button" class="close-button">&times;</span>
-            <h2>Update Event</h2>
+                {% call select('events-academic-year', 'events-academic-year', label='Academic Year', required=true) %}
+                    <option value="" disabled>Select an Academic Year</option>
+                    {% for year in academic_years %}
+                    <option value="{{ year.events_academic_year }}" {% if event.events_academic_year == year.events_academic_year %}selected{% endif %}>A.Y {{ year.events_academic_year }}</option>
+                    {% endfor %}
+                {% endcall %}
 
-            <form method="POST" action="{{ url_for('events.update_event', event_id=event.events_id) }}">
-                <div class="input-pair">
-                    <label for="events-name">Event Name</label>
-                    <input type="text" name="events-name" id="events-name" placeholder="Event Name"
-                        value="{{ event.events_name }}" required>
-                </div>
+                {{ input('events-start-date-and-time', 'events-start-date-and-time', label='Start Date and Time', type='datetime-local', value=event.events_start_date_and_time.strftime('%Y-%m-%dT%H:%M'), required=true) }}
+                {{ input('events-end-date-and-time', 'events-end-date-and-time', label='End Date and Time', type='datetime-local', value=event.events_end_date_and_time.strftime('%Y-%m-%dT%H:%M'), required=true) }}
+                {{ input('events-venue', 'events-venue', label='Venue', placeholder='Venue', value=event.events_venue, required=true) }}
+                {{ input('events-budget', 'events-budget', label='Budget', type='number', placeholder='Budget', value=event.events_budget, required=true) }}
 
-                <div class="input-pair">
-                    <label for="events-semester">Semester</label>
-                    <select name="events-semester" id="events-semester" required>
-                        <option value="" disabled>Select a Semester</option>
-                        <option value="1st Semester" {% if event.events_semester=='1st Semester' %}selected{% endif %}>
-                            1st
-                            Semester</option>
-                        <option value="2nd Semester" {% if event.events_semester=='2nd Semester' %}selected{% endif %}>
-                            2nd
-                            Semester</option>
-                    </select>
-                </div>
+                {% call select('events-status', 'events-status', label='Event Status', required=true) %}
+                    <option value="" disabled>Select an Event Status</option>
+                    <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                    <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                    <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
+                    <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="events-academic-year">Academic Year</label>
-                    <select name="events-academic-year" id="events-academic-year" required>
-                        <option value="" disabled>Select an Academic Year</option>
-                        {% for year in academic_years %}
-                        <option value="{{ year.events_academic_year }}" {% if event.events_academic_year == year.events_academic_year %}selected{% endif %}>A.Y {{ year.events_academic_year }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-start-date-and-time">Start Date and Time</label>
-                    <input type="datetime-local" name="events-start-date-and-time"
-                        id="events-start-date-and-time"
-                        value="{{ event.events_start_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-end-date-and-time">End Date and Time</label>
-                    <input type="datetime-local" name="events-end-date-and-time"
-                        id="events-end-date-and-time"
-                        value="{{ event.events_end_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-venue">Venue</label>
-                    <input type="text" name="events-venue" id="events-venue" placeholder="Venue"
-                        value="{{ event.events_venue }}" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-budget">Budget</label>
-                    <input type="text" name="events-budget" id="events-budget" placeholder="Budget"
-                        value="{{ event.events_budget }}" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-status">Event Status</label>
-                    <select name="events-status" id="events-status" required>
-                        <option value="" disabled>Select an Event Status</option>
-                        <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>
-                            Upcoming</option>
-                        <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>
-                            Postponed</option>
-                        <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done
-                        </option>
-                        <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>
-                            Cancelled</option>
-                    </select>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-description">Description</label>
-                    <textarea name="events-description" id="events-description"
-                        placeholder="Description" required>{{ event.events_description }}</textarea>
-                </div>
-
-                <div class="input-pair">
-                    <label for="events-remarks">Remarks</label>
-                    <input type="text" name="events-remarks" id="events-remarks"
-                        placeholder="Remarks (Optional)" value="{{ event.events_remarks }}">
-                </div>
+                {{ textarea('events-description', 'events-description', label='Description', placeholder='Description', value=event.events_description, required=true) }}
+                {{ input('events-remarks', 'events-remarks', label='Remarks', placeholder='Remarks (Optional)', value=event.events_remarks) }}
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <div class="horizontal-button-pair-positioned-right">
-                    <a href="{{ url_for('dashboard.events_overview')}}"
-                        class="secondary-button fit-content-button" type="button">Cancel</a>
-                    <button class="primary-button"  type="submit">Update
-                        Event</button>
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    {{ button_link('Cancel', url_for('events.events_overview'), variant='secondary') }}
+                    {{ button('Update Event', type='submit') }}
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}
