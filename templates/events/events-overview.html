@@ -313,12 +313,12 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
-                    <a href="{{ url_for('update_event', event_id=event.events_id) }}"
+                    <a href="{{ url_for('events.event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
+                    <a href="{{ url_for('events.update_event', event_id=event.events_id) }}"
                         class="secondary-button">Update</a>
-                    <a href="{{ url_for('invite_user', event_id=event.events_id, source='events_overview') }}"
+                    <a href="{{ url_for('events.invite_user', event_id=event.events_id, source='events_overview') }}"
                         class="secondary-button">Invite</a>
-                    <a href="{{ url_for('delete_event', event_id=event.events_id) }}"
+                    <a href="{{ url_for('events.delete_event', event_id=event.events_id) }}"
                         class="secondary-button">Delete</a>
                 </div>
             </div>

@@ -21,7 +21,7 @@
 
         <h2>Concept Papers Overview</h2>
 
-        <a href="{{ url_for('add_concept_paper') }}" class="primary-button create-button">Create New Concept Paper</a>
+        <a href="{{ url_for('concept_papers.add_concept_paper') }}" class="primary-button create-button">Create New Concept Paper</a>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -32,7 +32,7 @@
                         const newStatus = this.value;
                         const paperName = this.getAttribute('data-paper-name');
 
-                        fetch(`/update-concept-paper-status/${paperId}`, {
+                        fetch(`/concept-papers/update-status/${paperId}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -104,8 +104,8 @@
 
                 <div class="grid-item-button-group">
                     <a href="{{ url_for('generate_concept_paper_pdf', concept_paper_id=paper.concept_paper_forms_id) }}" class="primary-button">View</a>
-                    <a href="{{ url_for('update_concept_paper', paper_id=paper.concept_paper_forms_id) }}" class="secondary-button">Update</a>
-                    <a href="{{ url_for('delete_concept_paper', paper_id=paper.concept_paper_forms_id) }}" class="secondary-button">Delete</a>
+                    <a href="{{ url_for('concept_papers.update_concept_paper', paper_id=paper.concept_paper_forms_id) }}" class="secondary-button">Update</a>
+                    <a href="{{ url_for('concept_papers.delete_concept_paper', paper_id=paper.concept_paper_forms_id) }}" class="secondary-button">Delete</a>
                 </div>
             </div>
             {% endif %}

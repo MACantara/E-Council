@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
+        <a href="{{ url_for('events.events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -27,7 +27,7 @@
             <p>Enter the email address of the user you would like to invite to help you manage "{{
                 event.events_name }}".</p>
 
-            <form method="POST" action="{{ url_for('invite_user', event_id=event.events_id) }}">
+            <form method="POST" action="{{ url_for('events.invite_user', event_id=event.events_id) }}">
                 <div class="input-pair">
                     <label for="users-email">User's Email</label>
                     <input type="email" name="users-email" id="users-email" placeholder="User's Email" required>

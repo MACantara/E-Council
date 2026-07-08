@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}"
+        <a href="{{ url_for('events.event_dashboard', event_id=event.events_id) }}"
             class="primary-button fit-content-button">Back to Events Dashboard</a>
 
         <!-- Flash messages section for the modal -->
@@ -26,7 +26,7 @@
             <h2>Add Transaction</h2>
 
             <form method="POST" enctype="multipart/form-data"
-                action="{{ url_for('add_transaction', event_id=event.events_id) }}">
+                action="{{ url_for('events.add_transaction', event_id=event.events_id) }}">
                 <div class="input-pair">
                     <label for="transaction-name">Transaction Name</label>
                     <input type="text" name="transaction-name" id="transaction-name" placeholder="Transaction Name"
@@ -90,7 +90,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
-                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}"
+                    <a href="{{ url_for('events.event_dashboard', event_id=event.events_id) }}"
                         class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Add Transaction</button>
                 </div>

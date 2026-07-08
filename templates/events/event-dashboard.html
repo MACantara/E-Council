@@ -23,10 +23,10 @@
         {% endwith %}
 
         <div class="horizontal-button-group">
-            <a href="{{ url_for('events_overview') }}" class="primary-button">Back to Events Overview</a>
-            <a href="{{ url_for('add_transaction', event_id=event.events_id) }}" class="secondary-button">Add
+            <a href="{{ url_for('events.events_overview') }}" class="primary-button">Back to Events Overview</a>
+            <a href="{{ url_for('events.add_transaction', event_id=event.events_id) }}" class="secondary-button">Add
                 Transaction</a>
-            <a href="{{ url_for('invite_user', event_id=event.events_id, source='event_dashboard') }}"
+            <a href="{{ url_for('events.invite_user', event_id=event.events_id, source='event_dashboard') }}"
                 class="secondary-button">Invite User</a>
             <a class="secondary-button">Generate Financial Report</a>
         </div>
@@ -105,7 +105,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('update_transaction', event_id=event.events_id, transaction_id=transaction.transaction_id) }}"
+                                <a href="{{ url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.transaction_id) }}"
                                     class="secondary-button fit-content-button">Update</a>
                             </td>
                         </tr>

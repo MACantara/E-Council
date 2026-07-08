@@ -30,7 +30,7 @@
                         <p class="email-verified-button fit-content-button" type="submit">Verified</p>
                     {% else %}
                         <p class="email-verified-button fit-content-button" type="submit">Not Verified</p>
-                        <a href="{{ url_for('auth.send_verification_email_route', users_email=current_user.users_email, next='email_settings') }}" class="primary-button fit-content-button">Verify Email</a>
+                        <a href="{{ url_for('auth.send_verification_email', users_email=current_user.users_email, next='email_settings') }}" class="primary-button fit-content-button">Verify Email</a>
                     {% endif %}
                 </div>
                 <input type="email" name="users-current-email" id="users-current-email" placeholder="Current Email" value="{{ current_user.users_email }}" disabled>
