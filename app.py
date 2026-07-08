@@ -4,17 +4,26 @@ Application factory pattern with modular structure
 """
 
 import os
+import sys
 from flask import Flask, render_template
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
+# Use PyMySQL as the MySQL driver if the native mysqlclient is not available
+# This ensures the application runs on Windows without requiring mysqlclient.
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
+
 # Import configuration
-from config import DatabaseConfig, EmailConfig, CloudinaryConfig, AIConfig
+from config import get_config, DatabaseConfig, EmailConfig, CloudinaryConfig, AIConfig
 
 # Import extensions
-from extensions import init_extensions
+from extensions import init_extensions, db
 
 # Import utilities
 from utils import register_filters, register_error_handlers
@@ -31,6 +40,9 @@ from routes.events import events_bp
 from routes.auth import auth_bp
 from routes.concept_papers import concept_papers_bp
 
+# Import models for backward compatibility
+from models import Users
+
 
 def create_app(config_name=None):
     """
@@ -46,13 +58,27 @@ def create_app(config_name=None):
     # Create Flask app
     app = Flask(__name__, template_folder="templates")
     
-    # Load configuration
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+    # Determine the configuration class
+    if config_name is None:
+        config_name = os.getenv('FLASK_ENV', 'development')
+    config_class = get_config(config_name)
     
-    # Database configuration
-    app.config["SQLALCHEMY_DATABASE_URI"] = DatabaseConfig.SQLALCHEMY_DATABASE_URI
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = DatabaseConfig.SQLALCHEMY_TRACK_MODIFICATIONS
-    app.config["SQLALCHEMY_ECHO"] = DatabaseConfig.SQLALCHEMY_ECHO
+    # Load configuration from the selected class
+    app.config.from_object(config_class)
+    
+    # Override SECRET_KEY with environment variable
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or app.config.get("SECRET_KEY")
+    
+    # Database configuration: use config class URI if defined, otherwise environment
+    app.config["SQLALCHEMY_DATABASE_URI"] = getattr(
+        config_class, "SQLALCHEMY_DATABASE_URI", DatabaseConfig.get_database_uri()
+    )
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = getattr(
+        config_class, "SQLALCHEMY_TRACK_MODIFICATIONS", DatabaseConfig.SQLALCHEMY_TRACK_MODIFICATIONS
+    )
+    app.config["SQLALCHEMY_ECHO"] = getattr(
+        config_class, "SQLALCHEMY_ECHO", DatabaseConfig.SQLALCHEMY_ECHO
+    )
     
     # Mail configuration
     app.config["MAIL_SERVER"] = EmailConfig.MAIL_SERVER
