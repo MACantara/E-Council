@@ -7,6 +7,7 @@ import os
 import sys
 from flask import Flask, render_template
 from dotenv import load_dotenv
+from sqlalchemy import text
 
 # Load environment variables from .env file
 load_dotenv()
@@ -146,8 +147,41 @@ def create_app(config_name=None):
     return app
 
 
+def init_database(app):
+    """
+    Test the database connection and create all tables if they don't exist.
+    
+    Args:
+        app: Flask application instance
+        
+    Returns:
+        bool: True if the database is reachable and tables are created/verified,
+              False otherwise.
+    """
+    with app.app_context():
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(text('SELECT 1'))
+            print('Database connection successful.')
+        except Exception as e:
+            print(f'Database connection failed: {e}')
+            return False
+
+        try:
+            # Import all models so db.create_all() registers every table
+            import models
+            db.create_all()
+            print('Database tables created/verified successfully.')
+            return True
+        except Exception as e:
+            print(f'Failed to create database tables: {e}')
+            return False
+
+
 # For backward compatibility - create app instance
 app = create_app()
 
 if __name__ == "__main__":
+    if not init_database(app):
+        sys.exit(1)
     app.run(host="0.0.0.0", debug=True)
