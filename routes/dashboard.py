@@ -73,22 +73,6 @@ def event_dashboard(event_id):
         reverse=True
     )
 
-    # Convert JSON transactions to dictionaries with the old attribute names for template compatibility
-    transactions = [
-        {
-            'transaction_id': t.get('id'),
-            'transaction_name': t.get('name'),
-            'transaction_date': t.get('date'),
-            'transaction_unit_amount': t.get('unit_amount'),
-            'transaction_unit_price': t.get('unit_price'),
-            'transaction_total': t.get('total'),
-            'transaction_category': t.get('category'),
-            'transaction_type': t.get('type'),
-            'transaction_receipt_cloudinary_url': t.get('receipt_url')
-        }
-        for t in transactions
-    ]
-
     # Aggregate top 5 income transactions grouped by category
     income_by_category = defaultdict(float)
     expense_by_category = defaultdict(float)
@@ -106,17 +90,17 @@ def event_dashboard(event_id):
     top5_expense = sorted(expense_by_category.items(), key=lambda x: x[1], reverse=True)[:5]
 
     top5_income_dicts = [
-        {'transaction_category': category, 'transaction_total': float(total)}
+        {'category': category, 'total': float(total)}
         for category, total in top5_income
     ]
     top5_expense_dicts = [
-        {'transaction_category': category, 'transaction_total': float(total)}
+        {'category': category, 'total': float(total)}
         for category, total in top5_expense
     ]
 
     # Calculate total income and total expense (from top 5 for consistency with previous logic)
-    total_income = sum(transaction['transaction_total'] for transaction in top5_income_dicts) or 0
-    total_expense = sum(transaction['transaction_total'] for transaction in top5_expense_dicts) or 0
+    total_income = sum(transaction['total'] for transaction in top5_income_dicts) or 0
+    total_expense = sum(transaction['total'] for transaction in top5_expense_dicts) or 0
 
     # Safely convert the event budget to a float if possible
     try:
