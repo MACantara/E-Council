@@ -5826,13 +5826,5 @@ def generate_documentation_pdf(documentation_id):
         mimetype='application/pdf'
     )
 
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
