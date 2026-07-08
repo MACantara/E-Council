@@ -1,23 +1,15 @@
-document.getElementById('profile-picture').addEventListener('change', function () {
-    const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-    document.getElementById('file-name').textContent = fileName;
-});
+// Account JavaScript - Profile Picture Modal Handling
+// Uses utilities from utils.js
 
-// Upload/Change Account Profile Picture Modal
-document.getElementById('open-upload-change-account-profile-picture-modal-button').addEventListener('click', function () {
-    document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'block';
-});
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize profile picture upload modal
+    initializeModal(
+        'open-upload-change-account-profile-picture-modal-button',
+        'close-upload-change-account-profile-picture-modal-button',
+        'cancel-upload-profile-picture',
+        'upload-change-account-profile-picture-modal-content'
+    );
 
-document.getElementById('close-upload-change-account-profile-picture-modal-button').addEventListener('click', function () {
-    document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'none';
-});
-
-document.getElementById('cancel-upload-profile-picture').addEventListener('click', function () {
-    document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'none';
-});
-
-window.addEventListener('click', function (event) {
-    if (event.target == document.getElementById('upload-change-account-profile-picture-modal-content')) {
-        document.getElementById('upload-change-account-profile-picture-modal-content').style.display = 'none';
-    }
+    // Set up file name display
+    setupFileNameDisplay('profile-picture', 'file-name');
 });

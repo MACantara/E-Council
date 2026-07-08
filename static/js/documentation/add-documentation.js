@@ -6,38 +6,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function initializeEventSelect() {
     const eventsSelect = document.getElementById('documentation-events-id');
-    const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
-    const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
-    const learningJournalCheckedBySelect = document.getElementById('learning-journal-forms-checked-by');
 
     eventsSelect.addEventListener('change', function () {
         const eventId = this.value;
-        fetchRelatedForms(eventId, activityReportSelect, learningJournalSelect, learningJournalCheckedBySelect);
+        fetchRelatedForms(
+            eventId,
+            'documentation-activity-report-forms-id',
+            'documentation-learning-journal-forms-id',
+            document.getElementById('learning-journal-forms-checked-by')
+        );
     });
 }
 
-async function fetchRelatedForms(eventId, activityReportSelect, learningJournalSelect, learningJournalCheckedBySelect) {
+async function fetchRelatedForms(eventId, activityReportSelectId, learningJournalSelectId, learningJournalCheckedBySelect) {
     try {
         const response = await fetch(`/get-related-forms/${eventId}`);
         const data = await response.json();
-        
-        updateSelectOptions(activityReportSelect, data.activity_reports, 'activity_report_forms_id', 'events_name');
-        updateSelectOptions(learningJournalSelect, data.learning_journals, 'learning_journal_forms_id', 'events_name');
+
+        // Use custom default text for each select
+        updateSelectOptions(activityReportSelectId, data.activity_reports, 'activity_report_forms_id', 'events_name', 'Select activity report forms');
+        updateSelectOptions(learningJournalSelectId, data.learning_journals, 'learning_journal_forms_id', 'events_name', 'Select learning journal forms');
         updateSignatoryOptions(learningJournalCheckedBySelect, data.signatories);
     } catch (error) {
         console.error('Error fetching related forms:', error);
     }
-}
-
-function updateSelectOptions(select, items, valueKey, textKey) {
-    select.innerHTML = `<option value="" disabled selected>Select ${select.id.split('-').slice(1).join(' ')}</option>`;
-    items.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item[valueKey];
-        option.textContent = item[textKey];
-        option.selected = true;
-        select.appendChild(option);
-    });
 }
 
 function updateSignatoryOptions(select, signatories) {
@@ -166,26 +158,26 @@ async function handleExcelUpload(e) {
     const fileNameSpan = document.getElementById('excel-file-name');
     const preview = document.getElementById('student-list-preview');
     const namesList = document.getElementById('student-names-list');
-    
+
     if (this.files.length > 0) {
         const file = this.files[0];
         fileNameSpan.textContent = file.name;
-        
+
         const formData = new FormData();
         formData.append('excel_file', file);
-        
+
         namesList.innerHTML = '<li>Loading...</li>';
         preview.style.display = 'block';
-        
+
         try {
             const response = await fetch('/process-student-excel', {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                    'X-CSRFToken': getCSRFToken()
                 }
             });
-            
+
             const data = await response.json();
             updateStudentList(data, namesList);
         } catch (error) {

@@ -29,8 +29,7 @@
 
                 <div class="input-pair">
                     <label for="concept-paper-academic-year">Academic Year</label>
-                    <select name="concept-paper-academic-year" id="concept-paper-academic-year" required
-                        onchange="toggleOtherAcademicYear()">
+                    <select name="concept-paper-academic-year" id="concept-paper-academic-year" required>
                         <option value="" disabled selected>Select Academic Year</option>
                         {% for year in academic_years %}
                         <option value="{{ year }}">{{ year }}</option>
@@ -441,6 +440,7 @@
 
 {% block script %}
 
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script src="{{ url_for('static', filename='js/concept-papers/add-concept-paper.js') }}"></script>
 
 {% endblock %}
