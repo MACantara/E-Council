@@ -24,21 +24,6 @@
         <div class="container">
             <h2>Update Minutes of the Meeting</h2>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
-                    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-
-                    academicYearSelect.addEventListener('change', function () {
-                        if (academicYearSelect.value === 'Other') {
-                            otherAcademicYearContainer.style.display = 'block';
-                        } else {
-                            otherAcademicYearContainer.style.display = 'none';
-                        }
-                    });
-                });
-            </script>
-
             <form method="POST" action="{{ url_for('meetings.update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}" enctype="multipart/form-data">
                 <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
                 <div class="input-pair">

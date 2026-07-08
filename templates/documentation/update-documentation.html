@@ -121,14 +121,13 @@
                         <div class="dynamic-item">
                             <input type="text" name="activity-strengths[]" class="form-input"
                                 value="{{ strength.activity_strengths_content }}" placeholder="Enter strength" required>
-                            <button type="button" class="remove-item-btn secondary-button"
-                                onclick="removeItem(this)">&times;</button>
+                            <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
                     <button type="button" class="add-item-btn secondary-button"
-                        onclick="addNewField('strengths', 'strength')">Add Strength</button>
+                        id="add-strength-btn">Add Strength</button>
                 </div>
 
                 <!-- Activity Weaknesses Section -->
@@ -141,14 +140,13 @@
                             <input type="text" name="activity-weaknesses[]" class="form-input"
                                 value="{{ weakness.activity_weaknesses_content }}" placeholder="Enter weakness"
                                 required>
-                            <button type="button" class="remove-item-btn secondary-button"
-                                onclick="removeItem(this)">&times;</button>
+                            <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
                     <button type="button" class="add-item-btn secondary-button"
-                        onclick="addNewField('weaknesses', 'weakness')">Add Weakness</button>
+                        id="add-weakness-btn">Add Weakness</button>
                 </div>
 
                 <!-- Activity Recommendations Section -->
@@ -161,14 +159,13 @@
                             <input type="text" name="activity-recommendations[]" class="form-input"
                                 value="{{ recommendation.activity_recommendations_content }}"
                                 placeholder="Enter recommendation" required>
-                            <button type="button" class="remove-item-btn secondary-button"
-                                onclick="removeItem(this)">&times;</button>
+                            <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
                     <button type="button" class="add-item-btn secondary-button"
-                        onclick="addNewField('recommendations', 'recommendation')">Add Recommendation</button>
+                        id="add-recommendation-btn">Add Recommendation</button>
                 </div>
 
                 <div class="input-pair">
@@ -176,8 +173,10 @@
                     <select name="documentation-prepared-by" id="documentation-prepared-by" required>
                         <option value="" disabled>Select Preparer</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}" {% if documentation.documentation_prepared_by==user.users_id
-                            %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        <option value="{{ user.users_id }}" {% if
+                            documentation.documentation_prepared_by==user.users_id %}selected{% endif %}>{{
+                            user.users_first_name }} {{ user.users_last_name }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -190,7 +189,8 @@
                         <option value="{{ signatory.signatory_id }}" {% if
                             documentation.documentation_noted_by==signatory.signatory_id %}selected{% endif %}>{{
                             signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
-                            signatory.signatory_position }}</option>
+                            signatory.signatory_position }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -200,7 +200,7 @@
                 <h3>Learning Journal Form</h3>
 
                 <div class="input-pair">
-                    <label for="documentation-learning-journal-forms-id">Linked Learning Journal Form</label>
+                    <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
                     <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id"
                         class="form-select">
                         <option value="" disabled {% if not documentation.documentation_learning_journal_forms_id
@@ -218,27 +218,6 @@
                 </div>
 
                 <div class="input-pair">
-                    <label for="student-name">Name of Student</label>
-                    <input type="text" name="student-name" id="student-name" class="form-input"
-                        value="{{ learning_journals[0].learning_journal_forms_name_of_student if learning_journals else '' }}"
-                        required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="course-year-level">Course & Year Level</label>
-                    <input type="text" name="course-year-level" id="course-year-level" class="form-input"
-                        value="{{ learning_journals[0].learning_journal_forms_course_year_level if learning_journals else '' }}"
-                        required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="id-number">ID Number</label>
-                    <input type="text" name="id-number" id="id-number" class="form-input"
-                        value="{{ learning_journals[0].learning_journal_forms_id_number if learning_journals else '' }}"
-                        required>
-                </div>
-
-                <div class="input-pair">
                     <label>Learnings</label>
                     <div class="dynamic-list" id="learnings-list">
                         {% if learnings %}
@@ -246,14 +225,13 @@
                         <div class="dynamic-item">
                             <input type="text" name="learnings[]" class="form-input"
                                 value="{{ learning.learnings_content }}" placeholder="Enter learning" required>
-                            <button type="button" class="remove-item-btn secondary-button"
-                                onclick="removeItem(this)">&times;</button>
+                            <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
                     <button type="button" class="add-item-btn secondary-button"
-                        onclick="addNewField('learnings', 'learning')">Add Learning</button>
+                        id="add-learning-btn">Add Learning</button>
                 </div>
 
                 <div class="input-pair">
@@ -264,51 +242,44 @@
                         <div class="dynamic-item">
                             <input type="text" name="observations[]" class="form-input"
                                 value="{{ observation.observations_content }}" placeholder="Enter observation" required>
-                            <button type="button" class="remove-item-btn secondary-button"
-                                onclick="removeItem(this)">&times;</button>
+                            <button type="button" class="remove-item-btn secondary-button">&times;</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
                     <button type="button" class="add-item-btn secondary-button"
-                        onclick="addNewField('observations', 'observation')">Add Observation</button>
+                        id="add-observation-btn">Add Observation</button>
                 </div>
 
                 <div class="input-pair">
-                    <label for="overall-reflection">Overall Reflection</label>
-                    <textarea name="overall-reflection" id="overall-reflection" class="form-input"
-                        required>{{ learning_journals[0].learning_journal_forms_overall_reflection if learning_journals else '' }}</textarea>
+                    <label for="learning-journal-forms-overall-reflection">Overall Reflection</label>
+                    <textarea name="learning-journal-forms-overall-reflection"
+                        id="learning-journal-forms-overall-reflection" rows="4"
+                        required>{{ documentation.learning_journal_form_overall_reflection }}</textarea>
                 </div>
 
                 <div class="input-pair">
-                    <label for="documentation-prepared-by">Prepared By</label>
-                    <select name="documentation-prepared-by" id="documentation-prepared-by" class="form-select"
-                        required>
-                        <option value="" disabled>Select Preparer</option>
+                    <label for="learning-journal-forms-prepared-by">Prepared By</label>
+                    <select name="learning-journal-forms-prepared-by" id="learning-journal-forms-prepared-by" required>
+                        <option value="" disabled>Select User</option>
                         {% for user in users %}
-                        <option value="{{ user.users_id }}" {% if documentation.documentation_prepared_by==user.users_id
-                            %}selected{% endif %}>
-                            {{ user.users_first_name }} {{ user.users_last_name }}
+                        <option value="{{ user.users_id }}" {% if
+                            documentation.learning_journal_form_prepared_by==user.users_id %}selected{% endif %}>{{
+                            user.users_first_name }} {{ user.users_last_name }}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
 
                 <div class="input-pair">
-                    <label for="seen-read-by">Seen and Read By</label>
-                    <input type="text" name="seen-read-by" id="seen-read-by" class="form-input"
-                        value="{{ learning_journals[0].learning_journal_forms_seen_and_read_by if learning_journals else '' }}"
-                        required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="documentation-checked-by">Checked By</label>
-                    <select name="documentation-checked-by" id="documentation-checked-by" class="form-select" required>
-                        <option value="" disabled>Select Checker</option>
+                    <label for="learning-journal-forms-checked-by">Checked By</label>
+                    <select name="learning-journal-forms-checked-by" id="learning-journal-forms-checked-by" required>
+                        <option value="" disabled>Select Signatory</option>
                         {% for signatory in signatories %}
                         <option value="{{ signatory.signatory_id }}" {% if
-                            documentation.documentation_checked_by==signatory.signatory_id %}selected{% endif %}>
-                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            documentation.learning_journal_form_checked_by==signatory.signatory_id %}selected{% endif
+                            %}>{{
+                            signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
                             signatory.signatory_position }}
                         </option>
                         {% endfor %}
@@ -317,97 +288,58 @@
             </div>
 
             <div class="form-container">
-                <h3>Tally</h3>
+                <h3>Results of the Evaluation</h3>
 
-                <div id="tally-items">
+                <div id="tally-items" class="tally-table-container">
                     <table class="tally-table">
                         <thead>
                             <tr>
-                                <th colspan="5">Total Ratings</th>
-                            </tr>
-                            <tr>
-                                <th>Extremely Satisfied (5)</th>
-                                <th>Satisfied (4)</th>
-                                <th>Neutral (3)</th>
-                                <th>Dissatisfied (2)</th>
+                                <th>Item Name</th>
                                 <th>Extremely Dissatisfied (1)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Neutral (3)</th>
+                                <th>Satisfied (4)</th>
+                                <th>Extremely Satisfied (5)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% if tally_items %}
-                            {% for item in tally_items %}
+                            {% for form in evaluation_forms %}
                             <tr class="tally-item-name">
-                                <td colspan="5">
-                                    <div class="tally-name-container">
-                                        <label for="tally-items-name">Tally Item Name</label>
-                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
-                                            value="{{ item.tally_items_name }}" placeholder="Enter tally item name"
-                                            required>
-                                    </div>
+                                <td>
+                                    <input type="text" name="tally-items-name[]" value="{{ form.evaluation_forms_item_name }}"
+                                        placeholder="Enter item name" required>
                                 </td>
+                                <td colspan="5"></td>
                             </tr>
                             <tr class="tally-item-ratings">
+                                <td></td>
                                 <td>
-                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
-                                        value="{{ item.tally_items_extremely_satisfied_rating_total }}" required>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating[]"
+                                        value="{{ form.evaluation_forms_extremely_dissatisfied_rating }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0"
-                                        value="{{ item.tally_items_satisfied_rating_total }}" required>
+                                    <input type="number" name="tally-items-dissatisfied-rating[]"
+                                        value="{{ form.evaluation_forms_dissatisfied_rating }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0"
-                                        value="{{ item.tally_items_neutral_rating_total }}" required>
+                                    <input type="number" name="tally-items-neutral-rating[]"
+                                        value="{{ form.evaluation_forms_neutral_rating }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
-                                        value="{{ item.tally_items_dissatisfied_rating_total }}" required>
+                                    <input type="number" name="tally-items-satisfied-rating[]"
+                                        value="{{ form.evaluation_forms_satisfied_rating }}" min="0" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
-                                        min="0" value="{{ item.tally_items_extremely_dissatisfied_rating_total }}"
-                                        required>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating[]"
+                                        value="{{ form.evaluation_forms_extremely_satisfied_rating }}" min="0" required>
                                 </td>
                             </tr>
                             {% endfor %}
-                            {% else %}
-                            <tr class="tally-item-name">
-                                <td colspan="5">
-                                    <div class="tally-name-container">
-                                        <label for="tally-items-name">Tally Item Name</label>
-                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
-                                            placeholder="Enter tally item name" required>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="tally-item-ratings">
-                                <td>
-                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
-                                        value="0" required>
-                                </td>
-                                <td>
-                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0" value="0"
-                                        required>
-                                </td>
-                                <td>
-                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0" value="0"
-                                        required>
-                                </td>
-                                <td>
-                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
-                                        value="0" required>
-                                </td>
-                                <td>
-                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
-                                        min="0" value="0" required>
-                                </td>
-                            </tr>
-                            {% endif %}
                         </tbody>
                     </table>
                 </div>
 
-                <button type="button" class="secondary-button" onclick="addNewTallyItem()">Add New Tally Item</button>
+                <button type="button" class="secondary-button" id="add-tally-item-btn">Add New Tally Item</button>
 
                 <div class="input-pair">
                     <label for="documentation-date-of-submission">Date of Submission</label>
@@ -435,8 +367,7 @@
                     <div class="selected-files-list">
                         {% for image in documentation.results_of_the_evaluation_images %}
                         <div class="selected-file-item" data-image-id="{{ image.results_of_the_evaluation_images_id }}">
-                            <button type="button" class="remove-file-button" onclick="removeExistingImage(this)"
-                                title="Remove image">×</button>
+                            <button type="button" class="remove-file-button" title="Remove image">×</button>
                             <div class="file-preview-container">
                                 <img src="{{ image.results_of_the_evaluation_images_cloudinary_url }}"
                                     class="file-preview" alt="Evaluation Image">
@@ -458,36 +389,48 @@
                     <table class="evaluation-tally-table">
                         <thead>
                             <tr>
-                                <th>Extremely Satisfied (5)</th>
-                                <th>Very Satisfied (4)</th>
-                                <th>Satisfied (3)</th>
-                                <th>Dissatisfied (2)</th>
-                                <th>Extremely Dissatisfied (1)</th>
+                                <th>Item</th>
+                                <th>1</th>
+                                <th>2</th>
+                                <th>3</th>
+                                <th>4</th>
+                                <th>5</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Items will be added here by JavaScript -->
+                            {% for form in evaluation_forms %}
+                            <tr>
+                                <td>{{ form.evaluation_forms_item_name }}</td>
+                                <td><input type="radio" name="rating-{{ loop.index0 }}" value="1" {% if
+                                    form.evaluation_forms_rating==1 %}checked{% endif %} required></td>
+                                <td><input type="radio" name="rating-{{ loop.index0 }}" value="2" {% if
+                                    form.evaluation_forms_rating==2 %}checked{% endif %}></td>
+                                <td><input type="radio" name="rating-{{ loop.index0 }}" value="3" {% if
+                                    form.evaluation_forms_rating==3 %}checked{% endif %}></td>
+                                <td><input type="radio" name="rating-{{ loop.index0 }}" value="4" {% if
+                                    form.evaluation_forms_rating==4 %}checked{% endif %}></td>
+                                <td><input type="radio" name="rating-{{ loop.index0 }}" value="5" {% if
+                                    form.evaluation_forms_rating==5 %}checked{% endif %}></td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
                 <div class="input-pair">
-                    <div class="calculated-rating">
-                        <span>Overall Rating: </span>
-                        <span id="calculated-rating-value">{{ documentation.documentation_rating|default(0) }}</span>
-                        <input type="hidden" name="documentation-rating" id="documentation-rating"
-                            value="{{ documentation.documentation_rating|default(0) }}">
+                    <label>Calculated Overall Rating</label>
+                    <div class="rating-display">
+                        <span id="calculated-rating-value">{{ documentation.documentation_rating }}</span>
                     </div>
                 </div>
 
                 <div class="input-pair">
-                    <label for="documentation-comments-suggestions">Comments/Suggestions</label>
-                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
-                        placeholder="Comments/Suggestions">{{ documentation.documentation_comments_suggestions }}</textarea>
+                    <label for="documentation-rating">Overall Rating</label>
+                    <input type="number" name="documentation-rating" id="documentation-rating"
+                        value="{{ documentation.documentation_rating }}" step="0.01" min="1" max="5" required>
                 </div>
             </div>
 
-            <!-- Summary of Attendance Images Section -->
             <div class="form-container">
                 <h3>Summary of Attendance Images</h3>
                 <div class="input-pair">
@@ -507,8 +450,7 @@
                     <div class="selected-files-list">
                         {% for image in documentation.summary_of_attendance_images %}
                         <div class="selected-file-item" data-image-id="{{ image.summary_of_attendance_images_id }}">
-                            <button type="button" class="remove-file-button"
-                                onclick="removeExistingAttendanceImage(this)" title="Remove image">×</button>
+                            <button type="button" class="remove-file-button" title="Remove image">×</button>
                             <div class="file-preview-container">
                                 <img src="{{ image.summary_of_attendance_images_cloudinary_url }}" class="file-preview"
                                     alt="Attendance Image">
@@ -533,26 +475,26 @@
                             <input type="text" name="evaluation-student-names[]"
                                 value="{{ student.evaluation_list_of_student_names_student }}"
                                 placeholder="Enter student name">
-                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                            <button type="button" class="remove-item-btn">×</button>
                         </div>
                         {% endfor %}
                         {# Add additional empty entries to make it 10 #}
                         {% for _ in range(10 - evaluation_student_list|length) %}
                         <div class="dynamic-item">
                             <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
-                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                            <button type="button" class="remove-item-btn">×</button>
                         </div>
                         {% endfor %}
                         {% else %}
                         {% for _ in range(10) %}
                         <div class="dynamic-item">
                             <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
-                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                            <button type="button" class="remove-item-btn">×</button>
                         </div>
                         {% endfor %}
                         {% endif %}
                     </div>
-                    <button type="button" class="secondary-button" onclick="addNewStudent()">Add Student</button>
+                    <button type="button" class="secondary-button" id="add-student-btn">Add Student</button>
                 </div>
             </div>
 
@@ -576,8 +518,7 @@
                     <div class="selected-files-list">
                         {% for image in documentation.event_photo_documentation_images %}
                         <div class="selected-file-item" data-image-id="{{ image.event_photo_documentation_images_id }}">
-                            <button type="button" class="remove-file-button"
-                                onclick="removeExistingEventPhotoDocImage(this)" title="Remove image">×</button>
+                            <button type="button" class="remove-file-button" title="Remove image">×</button>
                             <div class="file-preview-container">
                                 <img src="{{ image.event_photo_documentation_images_cloudinary_url }}"
                                     class="file-preview" alt="Event Photo Documentation">
@@ -605,13 +546,17 @@
 {% endblock %}
 
 {% block script %}
+
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/documentation/update-documentation.js') }}"></script>
 <script>
+    // Pass server-side data to JavaScript
+    const evaluationForms = {{ evaluation_forms| tojson | safe }};
+
+    // Initialize academic year toggle
     document.addEventListener('DOMContentLoaded', function () {
         const academicYearSelect = document.getElementById('documentation-academic-year');
         const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-        const eventsSelect = document.getElementById('documentation-events-id');
-        const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
-        const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
 
         academicYearSelect.addEventListener('change', function () {
             if (academicYearSelect.value === 'Other') {
@@ -621,454 +566,9 @@
             }
         });
 
-        eventsSelect.addEventListener('change', function () {
-            const eventId = this.value;
-
-            fetch(`/get-related-forms/${eventId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Update Activity Report Form options
-                    activityReportSelect.innerHTML = '<option value="" disabled selected>Select Activity Report Form</option>';
-                    data.activity_reports.forEach(report => {
-                        const option = document.createElement('option');
-                        option.value = report.activity_report_forms_id;
-                        option.textContent = report.events_name;
-                        activityReportSelect.appendChild(option);
-                    });
-
-                    // Update Learning Journal Form options
-                    learningJournalSelect.innerHTML = '<option value="" disabled selected>Select Learning Journal Form</option>';
-                    data.learning_journals.forEach(journal => {
-                        const option = document.createElement('option');
-                        option.value = journal.learning_journal_forms_id;
-                        option.textContent = journal.events_name;
-                        learningJournalSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error fetching related forms:', error));
-        });
-    });
-
-    function addNewField(type, placeholder) {
-        const config = {
-            strengths: {
-                listId: 'strengths-list',
-                inputName: 'activity-strengths[]',
-                placeholder: 'Enter strength'
-            },
-            weaknesses: {
-                listId: 'weaknesses-list',
-                inputName: 'activity-weaknesses[]',
-                placeholder: 'Enter weakness'
-            },
-            recommendations: {
-                listId: 'recommendations-list',
-                inputName: 'activity-recommendations[]',
-                placeholder: 'Enter recommendation'
-            },
-            learnings: {
-                listId: 'learnings-list',
-                inputName: 'learnings[]',
-                placeholder: 'Enter learning'
-            },
-            observations: {
-                listId: 'observations-list',
-                inputName: 'observations[]',
-                placeholder: 'Enter observation'
-            }
-        };
-
-        const settings = config[type];
-        if (!settings) return;
-
-        const list = document.getElementById(settings.listId);
-        const div = document.createElement('div');
-        div.className = 'dynamic-item';
-
-        div.innerHTML = `
-            <input type="text" 
-                   class="form-input"
-                   name="${settings.inputName}" 
-                   placeholder="${settings.placeholder}" 
-                   required>
-            <button type="button" 
-                    class="remove-item-btn secondary-button" 
-                    onclick="removeItem(this)">&times;</button>
-        `;
-
-        list.appendChild(div);
-    }
-
-    function removeItem(button) {
-        button.parentElement.remove();
-    }
-
-    // Evaluation Images file handling
-    document.getElementById('evaluation-images').addEventListener('change', function (e) {
-        const fileNameSpan = document.getElementById('evaluation-files-name');
-        const filesList = document.getElementById('evaluation-files-list');
-        const input = this;
-
-        if (this.files.length > 0) {
-            fileNameSpan.textContent = `${this.files.length} file(s) selected`;
-            filesList.innerHTML = '';
-
-            Array.from(this.files).forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'selected-file-item';
-                fileItem.dataset.index = index;
-
-                const fileName = document.createElement('span');
-                fileName.className = 'file-item-name';
-                fileName.textContent = file.name;
-
-                const previewContainer = document.createElement('div');
-                previewContainer.className = 'file-preview-container';
-
-                const preview = document.createElement('img');
-                preview.className = 'file-preview';
-                preview.src = URL.createObjectURL(file);
-
-                const removeButton = document.createElement('button');
-                removeButton.className = 'remove-file-button';
-                removeButton.innerHTML = '×';
-                removeButton.type = 'button';
-                removeButton.title = 'Remove image';
-
-                removeButton.addEventListener('click', function () {
-                    const dt = new DataTransfer();
-                    const files = Array.from(input.files);
-                    files.splice(index, 1);
-
-                    files.forEach(file => dt.items.add(file));
-                    input.files = dt.files;
-
-                    fileItem.remove();
-
-                    if (input.files.length > 0) {
-                        fileNameSpan.textContent = `${input.files.length} file(s) selected`;
-                    } else {
-                        fileNameSpan.textContent = 'No files chosen';
-                        filesList.innerHTML = '';
-                    }
-                });
-
-                previewContainer.appendChild(preview);
-                fileItem.appendChild(removeButton);
-                fileItem.appendChild(previewContainer);
-                fileItem.appendChild(fileName);
-                filesList.appendChild(fileItem);
-            });
-        } else {
-            fileNameSpan.textContent = 'No files chosen';
-            filesList.innerHTML = '';
-        }
-    });
-
-    // Function to remove existing evaluation images
-    function removeExistingImage(button) {
-        const imageContainer = button.closest('.selected-file-item');
-        const imageId = imageContainer.dataset.imageId;
-
-        // Add the image ID to the hidden input
-        const deletedImagesInput = document.getElementById('deleted-evaluation-images');
-        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
-        deletedImages.push(imageId);
-        deletedImagesInput.value = deletedImages.join(',');
-
-        // Remove the image container from the DOM
-        imageContainer.remove();
-    }
-
-    // Attendance Images file handling
-    document.getElementById('attendance-images').addEventListener('change', function (e) {
-        handleFileSelect(this, 'attendance-files-name', 'attendance-files-list');
-    });
-
-    // Event Photo Documentation file handling
-    document.getElementById('event-photo-documentation-images').addEventListener('change', function (e) {
-        handleFileSelect(this, 'event-photo-doc-files-name', 'event-photo-doc-files-list');
-    });
-
-    // Generic file handling function
-    function handleFileSelect(input, nameSpanId, filesListId) {
-        const fileNameSpan = document.getElementById(nameSpanId);
-        const filesList = document.getElementById(filesListId);
-
-        if (input.files.length > 0) {
-            fileNameSpan.textContent = `${input.files.length} file(s) selected`;
-            filesList.innerHTML = '';
-
-            Array.from(input.files).forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'selected-file-item';
-                fileItem.dataset.index = index;
-
-                const fileName = document.createElement('span');
-                fileName.className = 'file-item-name';
-                fileName.textContent = file.name;
-
-                const previewContainer = document.createElement('div');
-                previewContainer.className = 'file-preview-container';
-
-                const preview = document.createElement('img');
-                preview.className = 'file-preview';
-                preview.src = URL.createObjectURL(file);
-
-                const removeButton = document.createElement('button');
-                removeButton.className = 'remove-file-button';
-                removeButton.innerHTML = '×';
-                removeButton.type = 'button';
-                removeButton.title = 'Remove image';
-
-                removeButton.addEventListener('click', function () {
-                    const dt = new DataTransfer();
-                    const files = Array.from(input.files);
-                    files.splice(index, 1);
-
-                    files.forEach(file => dt.items.add(file));
-                    input.files = dt.files;
-
-                    fileItem.remove();
-
-                    if (input.files.length > 0) {
-                        fileNameSpan.textContent = `${input.files.length} file(s) selected`;
-                    } else {
-                        fileNameSpan.textContent = 'No files chosen';
-                        filesList.innerHTML = '';
-                    }
-                });
-
-                previewContainer.appendChild(preview);
-                fileItem.appendChild(removeButton);
-                fileItem.appendChild(previewContainer);
-                fileItem.appendChild(fileName);
-                filesList.appendChild(fileItem);
-            });
-        } else {
-            fileNameSpan.textContent = 'No files chosen';
-            filesList.innerHTML = '';
-        }
-    }
-
-    // Functions to remove existing images
-    function removeExistingAttendanceImage(button) {
-        const imageContainer = button.closest('.selected-file-item');
-        const imageId = imageContainer.dataset.imageId;
-
-        const deletedImagesInput = document.getElementById('deleted-attendance-images');
-        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
-        deletedImages.push(imageId);
-        deletedImagesInput.value = deletedImages.join(',');
-
-        imageContainer.remove();
-    }
-
-    // Function to remove existing event photo documentation images
-    function removeExistingEventPhotoDocImage(button) {
-        const imageContainer = button.closest('.selected-file-item');
-        const imageId = imageContainer.dataset.imageId;
-
-        const deletedImagesInput = document.getElementById('deleted-event-photo-doc-images');
-        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
-        deletedImages.push(imageId);
-        deletedImagesInput.value = deletedImages.join(',');
-
-        imageContainer.remove();
-    }
-
-    function addNewStudent() {
-        const container = document.getElementById('evaluation-student-list');
-        const newItem = document.createElement('div');
-        newItem.className = 'dynamic-item';
-
-        newItem.innerHTML = `
-            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
-            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
-        `;
-
-        container.appendChild(newItem);
-    }
-
-    const evaluationForms = {{ evaluation_forms| tojson | safe }};
-
-    function addNewTallyItem() {
-        const tallyItemsContainer = document.querySelector('#tally-items tbody');
-        const nameRow = document.createElement('tr');
-        const ratingsRow = document.createElement('tr');
-
-        nameRow.className = 'tally-item-name';
-        ratingsRow.className = 'tally-item-ratings';
-
-        // Get the current number of items to create unique indices
-        const currentItemCount = document.querySelectorAll('.tally-item-name').length;
-
-        // Create the name row
-        nameRow.innerHTML = `
-        <td colspan="5">
-            <div class="tally-name-container">
-                <label for="tally-items-name-${currentItemCount}">Tally Item Name</label>
-                <input type="text" id="tally-items-name-${currentItemCount}" 
-                       name="tally-items-name[]" 
-                       placeholder="Enter tally item name" required>
-            </div>
-        </td>
-    `;
-
-        // Create the ratings row
-        ratingsRow.innerHTML = `
-        <td>
-            <input type="number" name="tally-items-extremely-satisfied-rating-total[]" 
-                   min="0" value="0" required>
-        </td>
-        <td>
-            <input type="number" name="tally-items-satisfied-rating-total[]" 
-                   min="0" value="0" required>
-        </td>
-        <td>
-            <input type="number" name="tally-items-neutral-rating-total[]" 
-                   min="0" value="0" required>
-        </td>
-        <td>
-            <input type="number" name="tally-items-dissatisfied-rating-total[]" 
-                   min="0" value="0" required>
-        </td>
-        <td>
-            <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]" 
-                   min="0" value="0" required>
-        </td>
-    `;
-
-        // Add the new rows
-        tallyItemsContainer.appendChild(nameRow);
-        tallyItemsContainer.appendChild(ratingsRow);
-
-        // Sync the tally items to update the evaluation form
-        syncTallyItems();
-
-        // Add change event listeners to the new inputs
-        const newInputs = ratingsRow.querySelectorAll('input[type="number"]');
-        newInputs.forEach(input => {
-            input.addEventListener('change', () => {
-                syncTallyItems();
-                calculateOverallRating();
-            });
-        });
-    }
-
-    // Function to sync tally items to evaluation form
-    function syncTallyItems() {
-        const tallyRows = document.querySelectorAll('.tally-table tbody tr');
-        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
-        evaluationTallyContainer.innerHTML = '';
-
-        for (let i = 0; i < tallyRows.length; i += 2) {
-            const nameRow = tallyRows[i];
-            const nameInput = nameRow.querySelector('input[type="text"]');
-            if (nameInput) {
-                const itemName = nameInput.value || `Item ${(i / 2) + 1}`;
-
-                // Create name row that spans all columns
-                const nameRowEval = document.createElement('tr');
-                nameRowEval.innerHTML = `
-                <td colspan="6" class="tally-item-name">${itemName}</td>
-            `;
-
-                // Create ratings row
-                const ratingsRow = document.createElement('tr');
-
-                // Get existing evaluation form data for this item
-                const evaluationForm = evaluationForms.find(form => form.evaluation_form_name === itemName);
-                let selectedValue = '3'; // Default to neutral if no existing data
-
-                if (evaluationForm) {
-                    if (evaluationForm.evaluation_form_extremely_satisfied_rating === 1) selectedValue = '5';
-                    else if (evaluationForm.evaluation_form_satisfied_rating === 1) selectedValue = '4';
-                    else if (evaluationForm.evaluation_form_neutral_rating === 1) selectedValue = '3';
-                    else if (evaluationForm.evaluation_form_dissatisfied_rating === 1) selectedValue = '2';
-                    else if (evaluationForm.evaluation_form_extremely_dissatisfied_rating === 1) selectedValue = '1';
-                }
-
-                ratingsRow.innerHTML = `
-                <td><input type="radio" name="eval-tally-${i / 2}" value="5" ${selectedValue === '5' ? 'checked' : ''} required></td>
-                <td><input type="radio" name="eval-tally-${i / 2}" value="4" ${selectedValue === '4' ? 'checked' : ''}></td>
-                <td><input type="radio" name="eval-tally-${i / 2}" value="3" ${selectedValue === '3' ? 'checked' : ''}></td>
-                <td><input type="radio" name="eval-tally-${i / 2}" value="2" ${selectedValue === '2' ? 'checked' : ''}></td>
-                <td><input type="radio" name="eval-tally-${i / 2}" value="1" ${selectedValue === '1' ? 'checked' : ''}></td>
-            `;
-
-                evaluationTallyContainer.appendChild(nameRowEval);
-                evaluationTallyContainer.appendChild(ratingsRow);
-            }
-        }
-
-        calculateOverallRating();
-    }
-
-    // Add event listeners for tally item changes
-    document.addEventListener('DOMContentLoaded', function () {
-        const tallyTable = document.querySelector('.tally-table');
-
-        // Initial sync
-        syncTallyItems();
-
-        // Sync when tally items change
-        tallyTable.addEventListener('input', function (e) {
-            if (e.target.type === 'text') {
-                syncTallyItems();
-            }
-        });
-
-        // Sync when add button is clicked
-        document.querySelector('.add-tally-button').addEventListener('click', function () {
-            setTimeout(syncTallyItems, 100); // Give time for the new row to be added
-        });
-
-        // Sync when remove button is clicked
-        tallyTable.addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove-tally-button')) {
-                setTimeout(syncTallyItems, 100); // Give time for the row to be removed
-            }
-        });
-    });
-
-    // Function to calculate and update overall rating
-    function calculateOverallRating() {
-        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
-        const rows = evaluationTallyContainer.querySelectorAll('tr:not(.tally-item-name)');
-        let totalRating = 0;
-        let totalItems = 0;
-
-        rows.forEach(row => {
-            const selectedRadio = row.querySelector('input[type="radio"]:checked');
-            if (selectedRadio) {
-                totalRating += parseInt(selectedRadio.value);
-                totalItems++;
-            }
-        });
-
-        // Calculate average rating
-        let averageRating = totalItems > 0 ? totalRating / totalItems : 0;
-
-        // Round to nearest 0.01 (two decimal places)
-        averageRating = Math.round(averageRating * 100) / 100;
-
-        // Update the display and hidden input with two decimal places
-        document.getElementById('calculated-rating-value').textContent = averageRating.toFixed(2);
-        document.getElementById('documentation-rating').value = averageRating;
-
-        // Update radio buttons
-        const roundedRating = Math.round(averageRating);
-        const radioButton = document.getElementById(`documentation-rating-${roundedRating}`);
-        if (radioButton) {
-            radioButton.checked = true;
-        }
-    }
-
-    // Add event listener for radio button changes in evaluation form
-    document.querySelector('.evaluation-tally-table').addEventListener('change', function (e) {
-        if (e.target.type === 'radio') {
-            calculateOverallRating();
+        // Initialize academic year toggle
+        if (academicYearSelect.value === 'Other') {
+            otherAcademicYearContainer.style.display = 'flex';
         }
     });
 </script>

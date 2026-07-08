@@ -19,6 +19,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Set date to current time
     setDateTimeToNow('board-resolutions-date');
+
+    // Initialize generate description button
+    const generateDescriptionBtn = document.getElementById('generate-description-btn');
+    if (generateDescriptionBtn) {
+        generateDescriptionBtn.addEventListener('click', generateDescription);
+    }
+
+    // Add event listeners for dynamic title updates
+    const eventSelect = document.getElementById('board-resolutions-events-id');
+    const otherEventNameInput = document.getElementById('other-event-name-input');
+    
+    if (eventSelect) {
+        eventSelect.addEventListener('change', updateTitle);
+    }
+    
+    if (otherEventNameInput) {
+        otherEventNameInput.addEventListener('input', updateTitle);
+    }
 });
 
 function updateTitle() {
@@ -53,7 +71,7 @@ async function generateDescription() {
         return;
     }
 
-    const generateButton = document.querySelector('[onclick="generateDescription()"]');
+    const generateButton = document.getElementById('generate-description-btn');
     setButtonLoading(generateButton, 'Generating...');
 
     try {

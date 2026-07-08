@@ -1,12 +1,22 @@
 // Set the current date and time as the default value for the datetime-local input
 document.addEventListener('DOMContentLoaded', function () {
     setDateTimeToNow('concept-paper-date-of-submission');
-    
+
     // Initialize conditional field toggles
     toggleMultipleConditionalFields('concept-paper-academic-year', [
         { containerId: 'other-academic-year-input', inputId: 'other-academic-year-input' },
         { containerId: 'other-academic-year-label', inputId: 'other-academic-year-label' }
     ], 'Other');
+
+    // Initialize generate buttons
+    document.getElementById('generate-body-btn')?.addEventListener('click', generateBody);
+    document.getElementById('generate-descriptions-btn')?.addEventListener('click', generateDescriptions);
+    document.getElementById('generate-objectives-btn')?.addEventListener('click', generateObjectives);
+    document.getElementById('add-objective-btn')?.addEventListener('click', addObjective);
+    document.getElementById('generate-learning-outcomes-btn')?.addEventListener('click', generateLearningOutcomes);
+    document.getElementById('add-learning-outcome-btn')?.addEventListener('click', addLearningOutcome);
+    document.getElementById('generate-participants-btn')?.addEventListener('click', generateExpectedParticipants);
+    document.getElementById('generate-consent-content-btn')?.addEventListener('click', generateConsentContent);
 });
 
 async function generateBody() {
@@ -36,21 +46,27 @@ function addObjective() {
     div.className = 'input-group';
     div.innerHTML = `
     <input type="text" name="concept-paper-objectives" placeholder="Enter Objective" required>
-    <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
+    <button type="button" class="delete-btn">Delete</button>
 `;
     container.appendChild(div);
+
+    // Add event listener to the delete button
+    const deleteBtn = div.querySelector('.delete-btn');
+    deleteBtn.addEventListener('click', function () {
+        div.remove();
+    });
 }
 
 async function generateObjectives() {
     const subject = document.getElementById('concept-paper-subject').value;
-    const generateButton = event.target;
-    
+    const generateButton = document.getElementById('generate-objectives-btn');
+
     setButtonLoading(generateButton, 'Generating...', true);
 
     try {
         const response = await authenticatedFetch('/generate-concept-objectives', { subject });
         const responseData = await handleAPIResponse(response);
-        
+
         if (responseData.content) {
             const objectives = parseBulletPoints(responseData.content);
             populateFieldsFromBulletPoints('concept-paper-objectives', objectives, 'concept-paper-objectives');
@@ -65,14 +81,14 @@ async function generateObjectives() {
 
 async function generateLearningOutcomes() {
     const subject = document.getElementById('concept-paper-subject').value;
-    const generateButton = event.target;
-    
+    const generateButton = document.getElementById('generate-learning-outcomes-btn');
+
     setButtonLoading(generateButton, 'Generating...', true);
 
     try {
         const response = await authenticatedFetch('/generate-concept-learning-outcomes', { subject });
         const responseData = await handleAPIResponse(response);
-        
+
         if (responseData.content) {
             const outcomes = parseBulletPoints(responseData.content);
             populateFieldsFromBulletPoints('concept-paper-learning-outcomes', outcomes, 'concept-paper-learning-outcomes');
@@ -92,9 +108,15 @@ function addLearningOutcome() {
     div.className = 'input-group';
     div.innerHTML = `
     <input type="text" name="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome" required>
-    <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
+    <button type="button" class="delete-btn">Delete</button>
 `;
     container.appendChild(div);
+
+    // Add event listener to the delete button
+    const deleteBtn = div.querySelector('.delete-btn');
+    deleteBtn.addEventListener('click', function () {
+        div.remove();
+    });
 }
 
 async function generateExpectedParticipants() {

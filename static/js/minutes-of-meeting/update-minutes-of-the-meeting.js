@@ -20,6 +20,11 @@ function initializeUpdateMinutesOfMeetingForm() {
                 otherAcademicYearContainer.style.display = 'none';
             }
         });
+
+        // Initialize academic year toggle on page load
+        if (academicYearSelect.value === 'Other') {
+            otherAcademicYearContainer.style.display = 'block';
+        }
     }
 
     // File name display for photo documentation

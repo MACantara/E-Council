@@ -102,7 +102,7 @@
                     <div class="input-group description-group">
                         <textarea name="concept-paper-body" id="concept-paper-body" placeholder="Body"
                             required></textarea>
-                        <button type="button" class="secondary-button generate-btn" onclick="generateBody()">Generate
+                        <button type="button" class="secondary-button generate-btn" id="generate-body-btn">Generate
                             Body</button>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
                         <textarea name="concept-paper-descriptions" id="concept-paper-descriptions"
                             placeholder="Descriptions" required></textarea>
                         <button type="button" class="secondary-button generate-btn"
-                            onclick="generateDescriptions()">Generate Descriptions</button>
+                            id="generate-descriptions-btn">Generate Descriptions</button>
                     </div>
                 </div>
 
@@ -169,10 +169,10 @@
                         <div class="input-group">
                             <input type="text" name="concept-paper-objectives" placeholder="Enter Objective" required>
                             <button type="button" class="secondary-button generate-btn"
-                                onclick="generateObjectives()">Generate Objectives</button>
+                                id="generate-objectives-btn">Generate Objectives</button>
                         </div>
                     </div>
-                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
+                    <button class="primary-button" type="button" id="add-objective-btn">Add Objective</button>
                 </div>
 
                 <div class="input-pair">
@@ -182,10 +182,10 @@
                             <input type="text" name="concept-paper-learning-outcomes"
                                 placeholder="Enter Learning Outcome" required>
                             <button type="button" class="secondary-button generate-btn"
-                                onclick="generateLearningOutcomes()">Generate Learning Outcomes</button>
+                                id="generate-learning-outcomes-btn">Generate Learning Outcomes</button>
                         </div>
                     </div>
-                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning
+                    <button class="primary-button" type="button" id="add-learning-outcome-btn">Add Learning
                         Outcome</button>
                 </div>
 
@@ -196,7 +196,7 @@
                             id="concept-paper-expected-number-of-participants"
                             placeholder="Expected Number of Participants" required>
                         <button type="button" class="secondary-button generate-btn"
-                            onclick="generateExpectedParticipants()">Generate Number</button>
+                            id="generate-participants-btn">Generate Number</button>
                     </div>
                 </div>
 
@@ -396,7 +396,7 @@
                         <textarea name="parent-guardian-consent-content" id="parent-guardian-consent-content"
                             placeholder="Content" required></textarea>
                         <button type="button" class="secondary-button generate-btn"
-                            onclick="generateConsentContent()">Generate Content</button>
+                            id="generate-consent-content-btn">Generate Content</button>
                     </div>
                 </div>
 

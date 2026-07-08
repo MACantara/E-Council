@@ -34,8 +34,7 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-events-id">Event Name</label>
-                    <select name="board-resolutions-events-id" id="board-resolutions-events-id" required
-                        onchange="updateTitle()">
+                    <select name="board-resolutions-events-id" id="board-resolutions-events-id" required>
                         <option value="" disabled selected>Select Event</option>
                         <option value="None">None</option>
                         {% for event in events %}
@@ -47,7 +46,7 @@
                     <label for="other-event-name" id="other-event-name-label"
                         style="display: none; margin-top: 10px;">Other Event Name</label>
                     <input type="text" name="other-event-name" id="other-event-name-input"
-                        placeholder="Enter Event Name" style="display: none; margin-top: 10px;" oninput="updateTitle()">
+                        placeholder="Enter Event Name" style="display: none; margin-top: 10px;">
                 </div>
 
                 <div class="input-pair">
@@ -58,8 +57,7 @@
 
                 <div class="input-pair">
                     <label for="board-resolutions-academic-year">Academic Year</label>
-                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required
-                        onchange="toggleOtherAcademicYear()">
+                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required>
                         <option value="" disabled selected>Select Academic Year</option>
                         {% for year in academic_years %}
                         <option value="{{ year }}">{{ year }}</option>
@@ -106,7 +104,7 @@
                         <textarea name="board-resolutions-description" id="board-resolutions-description"
                             placeholder="Description" required></textarea>
                         <button type="button" class="secondary-button generate-description-btn"
-                            onclick="generateDescription()">Generate Description</button>
+                            id="generate-description-btn">Generate Description</button>
                     </div>
                 </div>
 
