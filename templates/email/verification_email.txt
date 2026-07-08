@@ -1,4 +1,4 @@
-Welcome to our website!
+Welcome to E-Council!
 
 You have successfully created an account. Please click the link below to verify your email:
 {{ link }}

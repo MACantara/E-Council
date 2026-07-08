@@ -5,8 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}E-Council{% endblock %}</title>
 </head>
-<body style="font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f5f5f5; color: #1e1e1e; padding: 20px;">
-    {% block content %}{% endblock %}
-    <p>Sincerely,<br>E-Council Team</p>
+<body style="margin:0; padding:0; background-color:#f8fafc; font-family:Arial, Helvetica, sans-serif; color:#0f172a;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" style="padding:24px 16px;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden;">
+                    <tr>
+                        <td style="padding:24px 32px; background-color:#0891b2; text-align:center;">
+                            <h2 style="margin:0; color:#ffffff; font-size:20px; font-weight:700;">E-Council</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:32px;">
+                            {% block content %}{% endblock %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:24px 32px; background-color:#f1f5f9; text-align:center; font-size:12px; color:#64748b;">
+                            Sincerely,<br>E-Council Team
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
