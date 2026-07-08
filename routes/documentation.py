@@ -341,13 +341,13 @@ def update_documentation(documentation_id):
         documentation.activity_recommendations = [r.strip() for r in request.form.getlist('activity-recommendations[]') if r.strip()]
 
         # Update Learning Journal fields
-        learning_journal.learning_journal_forms_name_of_student = request.form.get('student-name')
-        learning_journal.learning_journal_forms_course_year_level = request.form.get('course-year-level')
-        learning_journal.learning_journal_forms_id_number = request.form.get('id-number')
-        learning_journal.learning_journal_forms_overall_reflection = request.form.get('overall-reflection')
-        learning_journal.learning_journal_forms_seen_and_read_by = request.form.get('seen-read-by')
-        learning_journal.learning_journal_forms_prepared_by = request.form.get('documentation-prepared-by')
-        learning_journal.learning_journal_forms_checked_by = request.form.get('documentation-checked-by')
+        learning_journal.learning_journal_forms_name_of_student = request.form.get('learning-journal-forms-name-of-student')
+        learning_journal.learning_journal_forms_course_year_level = request.form.get('learning-journal-forms-course-year-level')
+        learning_journal.learning_journal_forms_id_number = request.form.get('learning-journal-forms-id-number')
+        learning_journal.learning_journal_forms_overall_reflection = request.form.get('learning-journal-forms-overall-reflection')
+        learning_journal.learning_journal_forms_seen_and_read_by = request.form.get('learning-journal-forms-seen-and-read-by')
+        learning_journal.learning_journal_forms_prepared_by = request.form.get('learning-journal-forms-prepared-by')
+        learning_journal.learning_journal_forms_checked_by = request.form.get('learning-journal-forms-checked-by')
 
         # Update learnings and observations as JSON lists
         learning_journal.learnings = [l.strip() for l in request.form.getlist('learnings[]') if l.strip()]
@@ -548,6 +548,7 @@ def update_documentation(documentation_id):
 
     return render_template('documentation/update-documentation.html',
                          documentation=documentation,
+                         learning_journal=learning_journal,
                          events=events,
                          academic_years=academic_years,
                          users=users,
