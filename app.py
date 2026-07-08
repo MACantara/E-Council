@@ -54,6 +54,16 @@ from utils import register_filters, register_error_handlers
 from utils.helpers import get_distinct_academic_years, get_concept_papers, safe_decimal_conversion, allowed_image_file
 from utils.processing import process_tally_items, process_evaluation_forms
 from utils.auth import load_user, unauthorized
+from utils.email import (
+    send_verification_email,
+    send_reset_password_email,
+    send_password_change_notification_email,
+    send_email_change_notification,
+    send_email_change_confirmation,
+    send_new_email_verification,
+    send_account_deletion_notification_email,
+    send_invite_email
+)
 
 # Flask Configuration using new config classes
 app = Flask(__name__, template_folder="templates")
