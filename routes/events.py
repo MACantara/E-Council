@@ -24,6 +24,10 @@ def init_serializer(secret_key):
     s = URLSafeTimedSerializer(secret_key)
 
 
+# Attach the serializer initializer to the blueprint for app registration
+events_bp.init_serializer = init_serializer
+
+
 @events_bp.route("/update-event/<int:event_id>", methods=["POST", "GET"])
 @login_required
 def update_event(event_id):
