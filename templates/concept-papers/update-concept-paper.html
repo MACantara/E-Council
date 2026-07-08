@@ -1,0 +1,689 @@
+{% extends "base.html" %}
+
+{% block title %}Update Concept Paper{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('concept_papers_overview') }}" class="primary-button fit-content-button">Back to Concept
+            Papers Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="container">
+            <h2>Update Concept Paper</h2>
+
+            <form method="POST" enctype="multipart/form-data"
+                action="{{ url_for('update_concept_paper', paper_id=concept_paper.concept_paper_forms_id) }}">
+                <h3>Concept Paper Form</h3>
+
+                <div class="input-pair">
+                    <label for="concept-paper-date">Date</label>
+                    <input type="datetime-local" name="concept-paper-date" id="concept-paper-date"
+                        value="{{ concept_paper.concept_paper_forms_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-subject">Subject</label>
+                    <input type="text" name="concept-paper-subject" id="concept-paper-subject"
+                        value="{{ concept_paper.concept_paper_forms_subject }}" placeholder="Subject" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-academic-year">Academic Year</label>
+                    <select name="concept-paper-academic-year" id="concept-paper-academic-year" required
+                        onchange="toggleOtherAcademicYear()">
+                        <option value="" disabled>Select Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}" {% if concept_paper.concept_paper_forms_academic_year==year
+                            %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="input-pair">
+                        <label for="other-academic-year" id="other-academic-year-label"
+                            style="display: none; margin-top: 10px;">Other Academic Year</label>
+                        <input type="text" name="other-academic-year" id="other-academic-year-input"
+                            placeholder="Enter Academic Year" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-semester">Semester</label>
+                    <select name="concept-paper-semester" id="concept-paper-semester" required>
+                        <option value="" disabled>Select Semester</option>
+                        <option value="1st Semester" {% if concept_paper.concept_paper_forms_semester=='1st Semester'
+                            %}selected{% endif %}>1st Semester</option>
+                        <option value="2nd Semester" {% if concept_paper.concept_paper_forms_semester=='2nd Semester'
+                            %}selected{% endif %}>2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-status">Status</label>
+                    <select name="concept-paper-status" id="concept-paper-status" required>
+                        <option value="" disabled>Select Status</option>
+                        <option value="Upcoming" {% if concept_paper.concept_paper_forms_status=='Upcoming' %}selected{%
+                            endif %}>Upcoming</option>
+                        <option value="Postponed" {% if concept_paper.concept_paper_forms_status=='Postponed'
+                            %}selected{% endif %}>Postponed</option>
+                        <option value="Done" {% if concept_paper.concept_paper_forms_status=='Done' %}selected{% endif
+                            %}>Done</option>
+                        <option value="Cancelled" {% if concept_paper.concept_paper_forms_status=='Cancelled'
+                            %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-event-start-date-and-time">Event Start Date and Time</label>
+                    <input type="datetime-local" name="concept-paper-event-start-date-and-time"
+                        id="concept-paper-event-start-date-and-time"
+                        value="{{ concept_paper.concept_paper_forms_event_start_date_and_time.strftime('%Y-%m-%dT%H:%M') }}"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-event-end-date-and-time">Event End Date and Time</label>
+                    <input type="datetime-local" name="concept-paper-event-end-date-and-time"
+                        id="concept-paper-event-end-date-and-time"
+                        value="{{ concept_paper.concept_paper_forms_event_end_date_and_time.strftime('%Y-%m-%dT%H:%M') }}"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-location">Location</label>
+                    <input type="text" name="concept-paper-location" id="concept-paper-location"
+                        value="{{ concept_paper.concept_paper_forms_location }}" placeholder="Location" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-participants">Participants</label>
+                    <input type="text" name="concept-paper-participants" id="concept-paper-participants"
+                        value="{{ concept_paper.concept_paper_forms_participants }}" placeholder="Participants"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-budget">Budget</label>
+                    <input type="text" name="concept-paper-budget" id="concept-paper-budget"
+                        value="{{ concept_paper.concept_paper_forms_budget }}" placeholder="Budget" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-descriptions">Descriptions</label>
+                    <textarea name="concept-paper-descriptions" id="concept-paper-descriptions"
+                        placeholder="Descriptions"
+                        required>{{ concept_paper.concept_paper_forms_descriptions }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-expected-number-of-participants">Expected Number of Participants</label>
+                    <textarea name="concept-paper-expected-number-of-participants"
+                        id="concept-paper-expected-number-of-participants" placeholder="Expected Number of Participants"
+                        required>{{ concept_paper.concept_paper_forms_expected_number_of_participants }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-body">Body</label>
+                    <textarea name="concept-paper-body" id="concept-paper-body" placeholder="Body"
+                        required>{{ concept_paper.concept_paper_forms_body }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-objectives">Objectives of the Activity</label>
+                    <div id="concept-paper-objectives">
+                        {% for objective in objectives_of_the_activity %}
+                        <input type="text" name="concept-paper-objectives" value="{{ objective }}" required>
+                        {% endfor %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-learning-outcomes">Learning Outcomes</label>
+                    <div id="concept-paper-learning-outcomes">
+                        {% for outcome in learning_outcomes %}
+                        <input type="text" name="concept-paper-learning-outcomes" value="{{ outcome }}" required>
+                        {% endfor %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning
+                        Outcome</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-prepared-by">Prepared By</label>
+                    <select name="concept-paper-prepared-by" id="concept-paper-prepared-by" required>
+                        <option value="" disabled>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if
+                            concept_paper.concept_paper_forms_prepared_by==user.users_id %}selected{% endif %}>{{
+                            user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-signed-and-reviewed-by">Signed and Reviewed By</label>
+                    <select name="concept-paper-signed-and-reviewed-by" id="concept-paper-signed-and-reviewed-by"
+                        required>
+                        <option value="" disabled>Select Reviewer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if
+                            concept_paper.concept_paper_forms_signed_and_reviewed_by==user.users_id %}selected{% endif
+                            %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-endorsed-by">Endorsed By</label>
+                    <select name="concept-paper-endorsed-by" id="concept-paper-endorsed-by" required>
+                        <option value="" disabled>Select Endorser</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            concept_paper.concept_paper_forms_endorsed_by==signatory.signatory_id %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-recommending-approval-by">Recommending Approval By</label>
+                    <select name="concept-paper-recommending-approval-by" id="concept-paper-recommending-approval-by"
+                        required>
+                        <option value="" disabled>Select Approver</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            concept_paper.concept_paper_forms_recommending_approval_by==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="concept-paper-approved-by">Approved By</label>
+                    <select name="concept-paper-approved-by" id="concept-paper-approved-by" required>
+                        <option value="" disabled>Select Approver</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            concept_paper.concept_paper_forms_approved_by==signatory.signatory_id %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h3>Excuse Letter Form</h3>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-department-office-unit">Department/Office/Unit</label>
+                    <input type="text" name="excuse-letter-department-office-unit"
+                        id="excuse-letter-department-office-unit"
+                        value="{{ concept_paper.excuse_letter_forms[0].excuse_letter_forms_department_office_unit if concept_paper.excuse_letter_forms else '' }}"
+                        placeholder="Department/Office/Unit">
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-dean">Dean</label>
+                    <select name="excuse-letter-dean" id="excuse-letter-dean">
+                        <option value="" disabled>Select Dean</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.excuse_letter_forms and
+                            concept_paper.excuse_letter_forms[0].excuse_letter_forms_dean==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="excuse-letter-noted-by">Noted By</label>
+                    <select name="excuse-letter-noted-by" id="excuse-letter-noted-by">
+                        <option value="" disabled>Select Noted By</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.excuse_letter_forms and
+                            concept_paper.excuse_letter_forms[0].excuse_letter_forms_noted_by==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h3>Activity Report Form</h3>
+
+                <div class="input-pair">
+                    <label for="activity-report-date-submission">Date of Submission</label>
+                    <input type="date" name="activity-report-date-submission" id="activity-report-date-submission"
+                        value="{{ concept_paper.activity_report_forms[0].activity_report_date_submission.strftime('%Y-%m-%d') if concept_paper.activity_report_forms }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-report-contact-numbers">Contact Numbers</label>
+                    <input type="text" name="activity-report-contact-numbers" id="activity-report-contact-numbers"
+                        value="{{ concept_paper.activity_report_forms[0].activity_report_forms_contact_numbers if concept_paper.activity_report_forms }}"
+                        placeholder="Contact Numbers">
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-report-prepared-by">Prepared By</label>
+                    <select name="activity-report-prepared-by" id="activity-report-prepared-by">
+                        <option value="" disabled>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if concept_paper.activity_report_forms and
+                            concept_paper.activity_report_forms[0].activity_report_forms_prepared_by==user.users_id
+                            %}selected{% endif %}>
+                            {{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-report-noted-by">Noted By</label>
+                    <select name="activity-report-noted-by" id="activity-report-noted-by">
+                        <option value="" disabled>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.activity_report_forms and
+                            concept_paper.activity_report_forms[0].activity_report_forms_noted_by==signatory.signatory_id
+                            %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label>Strengths</label>
+                    <div id="activity-strengths">
+                        {% if concept_paper.activity_report_forms %}
+                        {% for strength in concept_paper.activity_report_forms[0].activity_strengths %}
+                        <input type="text" name="activity-strengths"
+                            value="{{ strength.activity_strength.activity_strengths_content }}"
+                            placeholder="Enter Strength" required>
+                        {% endfor %}
+                        {% else %}
+                        <input type="text" name="activity-strengths" placeholder="Enter Strength" required>
+                        {% endif %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addStrength()">Add Strength</button>
+                </div>
+
+                <div class="input-pair">
+                    <label>Weaknesses</label>
+                    <div id="activity-weaknesses">
+                        {% if concept_paper.activity_report_forms %}
+                        {% for weakness in concept_paper.activity_report_forms[0].activity_weaknesses %}
+                        <input type="text" name="activity-weaknesses"
+                            value="{{ weakness.activity_weakness.activity_weaknesses_content }}"
+                            placeholder="Enter Weakness" required>
+                        {% endfor %}
+                        {% else %}
+                        <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required>
+                        {% endif %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
+                </div>
+
+                <div class="input-pair">
+                    <label>Recommendations</label>
+                    <div id="activity-recommendations">
+                        {% if concept_paper.activity_report_forms %}
+                        {% for recommendation in concept_paper.activity_report_forms[0].activity_recommendations %}
+                        <input type="text" name="activity-recommendations"
+                            value="{{ recommendation.activity_recommendation.activity_recommendations_content }}"
+                            placeholder="Enter Recommendation" required>
+                        {% endfor %}
+                        {% else %}
+                        <input type="text" name="activity-recommendations" placeholder="Enter Recommendation" required>
+                        {% endif %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addRecommendation()">Add
+                        Recommendation</button>
+                </div>
+
+                <h3>Learning Journal Form</h3>
+
+                <div class="input-pair">
+                    <label for="learning-journal-name-of-student">Name of Student</label>
+                    <input type="text" name="learning-journal-name-of-student" id="learning-journal-name-of-student"
+                        value="{{ learning_journal.learning_journal_forms_name_of_student }}"
+                        placeholder="Name of Student" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-course-year-level">Course/Year Level</label>
+                    <input type="text" name="learning-journal-course-year-level" id="learning-journal-course-year-level"
+                        value="{{ learning_journal.learning_journal_forms_course_year_level }}"
+                        placeholder="Course/Year Level" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-id-number">ID Number</label>
+                    <input type="text" name="learning-journal-id-number" id="learning-journal-id-number"
+                        value="{{ learning_journal.learning_journal_forms_id_number }}" placeholder="ID Number"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-date">Date</label>
+                    <input type="date" name="learning-journal-date" id="learning-journal-date"
+                        value="{{ learning_journal.learning_journal_forms_date.strftime('%Y-%m-%d') if learning_journal.learning_journal_forms_date else '' }}"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-observations">Observations</label>
+                    <div id="learning-journal-observations">
+                        {% for observation in learning_journal.observations %}
+                        <input type="text" name="learning-journal-observations"
+                            value="{{ observation.observation.observations_content }}" required>
+                        {% endfor %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-learnings">Learnings</label>
+                    <div id="learning-journal-learnings">
+                        {% for learning in learning_journal.learnings %}
+                        <input type="text" name="learning-journal-learnings"
+                            value="{{ learning.learning.learnings_content }}" required>
+                        {% endfor %}
+                    </div>
+                    <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-overall-reflection">Overall Reflection</label>
+                    <textarea name="learning-journal-overall-reflection" id="learning-journal-overall-reflection"
+                        placeholder="Overall Reflection"
+                        required>{{ learning_journal.learning_journal_forms_overall_reflection }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-prepared-by">Prepared By</label>
+                    <select name="learning-journal-prepared-by" id="learning-journal-prepared-by" required>
+                        <option value="" disabled>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if
+                            learning_journal.learning_journal_forms_prepared_by==user.users_id %}selected{% endif %}>{{
+                            user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-seen-and-read-by">Seen and Read By</label>
+                    <select name="learning-journal-seen-and-read-by" id="learning-journal-seen-and-read-by" required>
+                        <option value="" disabled>Select Reader</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if
+                            learning_journal.learning_journal_forms_seen_and_read_by==user.users_id %}selected{% endif
+                            %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-checked-by">Checked By</label>
+                    <select name="learning-journal-checked-by" id="learning-journal-checked-by" required>
+                        <option value="" disabled>Select Checker</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            learning_journal.learning_journal_forms_checked_by==signatory.signatory_id %}selected{%
+                            endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h3>Personnel In Charge Form</h3>
+
+                <div class="input-pair">
+                    <label for="personnel-in-charge">Personnel In Charge</label>
+                    <select name="personnel-in-charge" id="personnel-in-charge" required>
+                        <option value="" disabled selected>Select Personnel In Charge</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if concept_paper.personnel_in_charge_forms and
+                            concept_paper.personnel_in_charge_forms[0].personnel_in_charge_forms_name_of_personnel_in_charge==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="personnel-in-charge-noted-by-college-dean">Noted By College Dean</label>
+                    <select name="personnel-in-charge-noted-by-college-dean"
+                        id="personnel-in-charge-noted-by-college-dean" required>
+                        <option value="" disabled>Select Noted By College Dean</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if noted_by_college_dean==signatory.signatory_id
+                            %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="personnel-in-charge-noted-by-sas">Noted By Head of Student Affairs Services</label>
+                    <select name="personnel-in-charge-noted-by-sas" id="personnel-in-charge-noted-by-sas" required>
+                        <option value="" disabled>Select Noted By Head of Student Affairs Services</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if noted_by_sas==signatory.signatory_id
+                            %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h3>Parent/Guardian Consent Form</h3>
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-name-of-student">Name of Student</label>
+                    <input type="text" name="parent-guardian-consent-name-of-student"
+                        id="parent-guardian-consent-name-of-student"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_name_of_student }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-course-year-level">Course/Year Level</label>
+                    <input type="text" name="parent-guardian-consent-course-year-level"
+                        id="parent-guardian-consent-course-year-level"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_course_year_level }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-id-number">ID Number</label>
+                    <input type="text" name="parent-guardian-consent-id-number" id="parent-guardian-consent-id-number"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_id_number }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-department-office-unit">Department/Office/Unit</label>
+                    <input type="text" name="parent-guardian-consent-department-office-unit"
+                        id="parent-guardian-consent-department-office-unit"
+                        value="{{ parent_guardian_consent_form.parent_guardian_consent_forms_department_office_unit }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-dean-immediate-supervisor">Dean/Immediate Supervisor</label>
+                    <select name="parent-guardian-consent-dean-immediate-supervisor"
+                        id="parent-guardian-consent-dean-immediate-supervisor">
+                        <option value="" disabled>Select Dean/Immediate Supervisor</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_dean_immediate_supervisor==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-checked-by">Checked By</label>
+                    <select name="parent-guardian-consent-checked-by" id="parent-guardian-consent-checked-by">
+                        <option value="" disabled>Select Checker</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_checked_by==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-content">Content</label>
+                    <textarea name="parent-guardian-consent-content"
+                        id="parent-guardian-consent-content">{{ parent_guardian_consent_form.parent_guardian_consent_forms_content }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-prepared-by">Prepared By</label>
+                    <select name="parent-guardian-consent-prepared-by" id="parent-guardian-consent-prepared-by">
+                        <option value="" disabled>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_prepared_by==user.users_id
+                            %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="parent-guardian-consent-noted-by">Noted By</label>
+                    <select name="parent-guardian-consent-noted-by" id="parent-guardian-consent-noted-by">
+                        <option value="" disabled>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            parent_guardian_consent_form.parent_guardian_consent_forms_noted_by==signatory.signatory_id
+                            %}selected{% endif %}>{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name
+                            }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('concept_papers_overview') }}"
+                        class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Update Concept Paper</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    function toggleOtherAcademicYear() {
+        const academicYearSelect = document.getElementById('concept-paper-academic-year');
+        const otherAcademicYearInput = document.getElementById('other-academic-year-input');
+        const otherAcademicYearLabel = document.getElementById('other-academic-year-label');
+        if (academicYearSelect.value === 'Other') {
+            otherAcademicYearInput.style.display = 'block';
+            otherAcademicYearInput.required = true;
+            otherAcademicYearLabel.style.display = 'block';
+            otherAcademicYearLabel.required = true;
+        } else {
+            otherAcademicYearInput.style.display = 'none';
+            otherAcademicYearInput.required = false;
+            otherAcademicYearLabel.style.display = 'none';
+            otherAcademicYearLabel.required = false;
+        }
+    }
+
+    function addObjective() {
+        const container = document.getElementById('concept-paper-objectives');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'concept-paper-objectives';
+        input.placeholder = 'Enter Objective';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addLearningOutcome() {
+        const container = document.getElementById('concept-paper-learning-outcomes');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'concept-paper-learning-outcomes';
+        input.placeholder = 'Enter Learning Outcome';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addStrength() {
+        const container = document.getElementById('activity-strengths');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'activity-strengths';
+        input.placeholder = 'Enter Strength';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addWeakness() {
+        const container = document.getElementById('activity-weaknesses');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'activity-weaknesses';
+        input.placeholder = 'Enter Weakness';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addRecommendation() {
+        const container = document.getElementById('activity-recommendations');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'activity-recommendations';
+        input.placeholder = 'Enter Recommendation';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addObservation() {
+        const container = document.getElementById('learning-journal-observations');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'learning-journal-observations';
+        input.placeholder = 'Enter Observation';
+        input.required = true;
+        container.appendChild(input);
+    }
+
+    function addLearning() {
+        const container = document.getElementById('learning-journal-learnings');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'learning-journal-learnings';
+        input.placeholder = 'Enter Learning';
+        input.required = true;
+        container.appendChild(input);
+    }
+</script>
+{% endblock %}

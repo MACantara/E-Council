@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Add Minutes of the Meeting{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="primary-button fit-content-button">Back to Minutes of the Meeting Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div class="container">
+            <h2>Add Minutes of the Meeting</h2>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
+                    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+                    academicYearSelect.addEventListener('change', function () {
+                        if (academicYearSelect.value === 'Other') {
+                            otherAcademicYearContainer.style.display = 'block';
+                        } else {
+                            otherAcademicYearContainer.style.display = 'none';
+                        }
+                    });
+                });
+            </script>
+
+            <form method="POST" action="{{ url_for('add_minutes_of_the_meeting') }}" enctype="multipart/form-data">
+                <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-date">Date</label>
+                    <input type="datetime-local" name="minutes-of-the-meeting-date" id="minutes-of-the-meeting-date" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-semester">Semester</label>
+                    <select name="minutes-of-the-meeting-semester" id="minutes-of-the-meeting-semester" required>
+                        <option value="" disabled selected>Select a Semester</option>
+                        <option value="1st Semester">1st Semester</option>
+                        <option value="2nd Semester">2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-academic-year">Academic Year</label>
+                    <select name="minutes-of-the-meeting-academic-year" id="minutes-of-the-meeting-academic-year" required>
+                        <option value="" disabled selected>Select an Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other A.Y.</option>
+                    </select>
+                </div>
+
+                <div class="input-pair" id="other-academic-year-container" style="display: none;">
+                    <label for="other-academic-year">Other Academic Year</label>
+                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-status">Status</label>
+                    <select name="minutes-of-the-meeting-status" id="minutes-of-the-meeting-status" required>
+                        <option value="" disabled selected>Select a Status</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Postponed">Postponed</option>
+                        <option value="Done">Done</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
+                    <select name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" required>
+                        <option value="" disabled selected>Select a Presiding Officer</option>
+                        {% for organization in student_organizations %}
+                        <optgroup label="{{ organization.student_organizations_name }}">
+                            {% for user in organization.users %}
+                            <option value="{{ user.users_id }}">
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
+                            </option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-attendees">Attendees</label>
+                    <div id="minutes-of-the-meeting-attendees">
+                        {% for organization in student_organizations %}
+                        <fieldset>
+                            <legend>{{ organization.student_organizations_name }}</legend>
+                            {% for user in organization.users %}
+                            <div>
+                                <label><input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}">
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
+                            </div>
+                            {% endfor %}
+                        </fieldset>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-agenda">Agenda</label>
+                    <textarea name="minutes-of-the-meeting-agenda" id="minutes-of-the-meeting-agenda" placeholder="Agenda" required></textarea>
+                </div>
+
+
+                <div class="input-pair">
+                    <label for="meeting-recording">Meeting Recording</label>
+                    <input type="file" name="meeting-recording" id="meeting-recording" hidden accept="audio/*,video/*">
+                    <label for="meeting-recording" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="meeting-recording-file-name" class="file-name">No files chosen</span>
+                    </label>
+                    <p>Upload audio (max 9.5 hours) or video (max 2 hours) recording of the meeting</p>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-adjourned">Adjourned</label>
+                    <input type="datetime-local" name="minutes-of-the-meeting-adjourned" id="minutes-of-the-meeting-adjourned">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-prepared-by">Prepared By</label>
+                    <input type="text" name="minutes-of-the-meeting-prepared-by-display" id="minutes-of-the-meeting-prepared-by-display" value="{{ current_user.users_first_name }} {{ current_user.users_last_name }} - {{ current_user.users_student_organization_position }} - {{ student_org_name }}" readonly>
+                    <input type="hidden" name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by" value="{{ current_user.users_id }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-approved-by">Approved By</label>
+                    <select name="minutes-of-the-meeting-approved-by" id="minutes-of-the-meeting-approved-by">
+                        <option value="" disabled selected>Select a User</option>
+                        {% for organization_id, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
+                        <optgroup label="{{ org_dict[organization_id] }}">
+                            {% for user in members %}
+                            <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-noted-by">Noted By</label>
+                    <select name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" required>
+                        <option value="" disabled selected>Select a Signatory</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }} - {{ signatory.signatory_department }}</option>
+                        {% endfor %}
+                        <option value="add-new-noted-by">Add new signatory</option>
+                    </select>
+                </div>
+
+                <!-- New signatory fields for Noted By -->
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-title">Title</label>
+                    <input type="text" name="new-noted-by-title" id="new-noted-by-title" placeholder="Title">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-first-name">First Name</label>
+                    <input type="text" name="new-noted-by-first-name" id="new-noted-by-first-name" placeholder="First Name">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-middle-name">Middle Name</label>
+                    <input type="text" name="new-noted-by-middle-name" id="new-noted-by-middle-name" placeholder="Middle Name">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-last-name">Last Name</label>
+                    <input type="text" name="new-noted-by-last-name" id="new-noted-by-last-name" placeholder="Last Name">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-suffix">Suffix</label>
+                    <input type="text" name="new-noted-by-suffix" id="new-noted-by-suffix" placeholder="Suffix">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-position">Position</label>
+                    <input type="text" name="new-noted-by-position" id="new-noted-by-position" placeholder="Position">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-department">Department</label>
+                    <input type="text" name="new-noted-by-department" id="new-noted-by-department" placeholder="Department">
+                </div>
+
+                <div class="input-pair">
+                    <label for="photo-documentation">Photo Documentation</label>
+                    <input type="file" name="photo-documentation" id="photo-documentation" hidden accept="image/jpeg, image/jpg, image/png" multiple>
+                    <label for="photo-documentation" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="photo-documentation-file-name" class="file-name">No files chosen</span>
+                    </label>
+                    <p>Supported file types: .jpeg, .jpg, .png</p>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-button-pair-positioned-right">
+                    <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Add Minutes of the Meeting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
+        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+        academicYearSelect.addEventListener('change', function () {
+            if (academicYearSelect.value === 'Other') {
+                otherAcademicYearContainer.style.display = 'block';
+            } else {
+                otherAcademicYearContainer.style.display = 'none';
+            }
+        });
+
+        document.getElementById('meeting-recording').addEventListener('change', function () {
+            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
+            document.getElementById('meeting-recording-file-name').textContent = fileNames;
+        });
+
+        document.getElementById('photo-documentation').addEventListener('change', function () {
+            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
+            document.getElementById('photo-documentation-file-name').textContent = fileNames;
+        });
+
+        const notedBySelect = document.getElementById('minutes-of-the-meeting-noted-by');
+
+        function toggleNewSignatoryFields(selectElement, prefix) {
+            const fields = [
+                'title', 'first-name', 'middle-name', 'last-name', 'suffix', 'position', 'department'
+            ];
+            fields.forEach(field => {
+                document.getElementById(`new-${prefix}-${field}`).parentElement.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
+            });
+        }
+
+        notedBySelect.addEventListener('change', function () {
+            toggleNewSignatoryFields(notedBySelect, 'noted-by');
+        });
+    });
+</script>
+
+{% endblock %}

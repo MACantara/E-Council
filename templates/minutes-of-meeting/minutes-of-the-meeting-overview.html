@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Minutes of the Meeting Overview{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+        <!-- Flash messages section for the main page -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <h2>Minutes of the Meeting Overview</h2>
+
+        <a href="{{ url_for('add_minutes_of_the_meeting') }}" class="primary-button create-button">Create New Minutes of the Meeting</a>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const selects = document.querySelectorAll('select[name="meeting-status-select-button"]');
+                selects.forEach(select => {
+                    select.addEventListener('change', function () {
+                        const meetingId = this.getAttribute('data-meeting-id');
+                        const newStatus = this.value;
+                        const meetingName = this.getAttribute('data-meeting-name');
+
+                        fetch(`/update-minutes-of-the-meeting-status/${meetingId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
+                            },
+                            body: JSON.stringify({ status: newStatus, name: meetingName })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert(`Meeting status for "${meetingName}" updated successfully.`);
+                                } else {
+                                    alert(`Failed to update meeting status for "${meetingName}".`);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert(`An error occurred while updating the meeting status for "${meetingName}".`);
+                            });
+                    });
+                });
+            });
+        </script>
+
+        <div class="overview-content-container-group">
+            {% if minutes_of_the_meeting %}
+            {% set sorted_meetings = meetings_only | sort(attribute='minutes_of_the_meeting_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester', '2nd Semester'] %}
+            {% set academic_years = sorted_meetings | map(attribute='minutes_of_the_meeting_academic_year') | unique | list %}
+
+            {% for academic_year in academic_years %}
+            {% for semester in semesters %}
+            {% if sorted_meetings | has_meetings(semester, academic_year) %}
+            <div class="grid-header">
+                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            </div>
+
+            {% for meeting, first_name, last_name in minutes_of_the_meeting %}
+            {% if meeting.minutes_of_the_meeting_semester == semester and meeting.minutes_of_the_meeting_academic_year == academic_year %}
+            <div class="overview-content-grid-item">
+                <select class="fit-content-button" name="meeting-status-select-button"
+                    id="meeting-status-select-button-{{ loop.index }}" aria-label="Select a Meeting Status"
+                    data-meeting-id="{{ meeting.minutes_of_the_meeting_id }}"
+                    data-meeting-name="{{ meeting.minutes_of_the_meeting_agenda }}" required>
+                    <option value="Upcoming" {% if meeting.minutes_of_the_meeting_status=='Upcoming' %}selected{% endif %}>Upcoming</option>
+                    <option value="Postponed" {% if meeting.minutes_of_the_meeting_status=='Postponed' %}selected{% endif %}>Postponed</option>
+                    <option value="Done" {% if meeting.minutes_of_the_meeting_status=='Done' %}selected{% endif %}>Done</option>
+                    <option value="Cancelled" {% if meeting.minutes_of_the_meeting_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+
+                <h3>{{ meeting.minutes_of_the_meeting_agenda }}</h3>
+
+                <p class="meeting-description">{{ meeting.minutes_of_the_meeting_notes | truncate(100) }}</p>
+
+                <div class="grid-item-details">
+                    <div class="grid-item-details-pair">
+                        <p>Date:</p>
+                        <p>{{ meeting.minutes_of_the_meeting_date.strftime('%B %d, %Y') if meeting.minutes_of_the_meeting_date else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Time:</p>
+                        <p>{{ meeting.minutes_of_the_meeting_date.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_date else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Adjourned:</p>
+                        <p>{{ meeting.minutes_of_the_meeting_adjourned.strftime('%I:%M %p') if meeting.minutes_of_the_meeting_adjourned else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Presiding Officer:</p>
+                        <p>{{ first_name }} {{ last_name }}</p>
+                    </div>
+                </div>
+
+                <div class="grid-item-button-group">
+                    <a href="{{ url_for('generate_mom_pdf', minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id) }}"
+                        class="primary-button">View</a>
+                    <a href="{{ url_for('update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
+                        class="secondary-button">Update</a>
+                    <a href="{{ url_for('delete_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
+                        class="secondary-button">Delete</a>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% else %}
+            <p>No minutes of the meeting found for your department.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

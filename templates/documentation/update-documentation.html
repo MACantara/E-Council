@@ -1,0 +1,1075 @@
+{% extends "base.html" %}
+
+{% block title %}Update Documentation{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to
+            Documentation Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <form method="POST" enctype="multipart/form-data"
+            action="{{ url_for('update_documentation', documentation_id=documentation.documentation_id) }}">
+            <div class="form-container">
+                <h2>Update Documentation</h2>
+                <h3>Documentation Details</h3>
+
+                <div class="input-pair">
+                    <label for="documentation-events-id">Event</label>
+                    <select name="documentation-events-id" id="documentation-events-id" required>
+                        <option value="" disabled>Select Event</option>
+                        {% for event in events %}
+                        <option value="{{ event.events_id }}" {% if
+                            documentation.documentation_events_id==event.events_id %}selected{% endif %}>{{
+                            event.events_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-academic-year">Academic Year</label>
+                    <select name="documentation-academic-year" id="documentation-academic-year" required>
+                        <option value="" disabled>Select Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}" {% if documentation.documentation_academic_year==year %}selected{%
+                            endif %}>{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other A.Y.</option>
+                    </select>
+                </div>
+
+                <div class="input-pair" id="other-academic-year-container" style="display: none;">
+                    <label for="other-academic-year">Other Academic Year</label>
+                    <input type="text" name="other-academic-year" id="other-academic-year"
+                        placeholder="Enter Academic Year">
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-semester">Semester</label>
+                    <select name="documentation-semester" id="documentation-semester" required>
+                        <option value="" disabled>Select a Semester</option>
+                        <option value="1st Semester" {% if documentation.documentation_semester=='1st Semester'
+                            %}selected{% endif %}>1st Semester</option>
+                        <option value="2nd Semester" {% if documentation.documentation_semester=='2nd Semester'
+                            %}selected{% endif %}>2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-status">Status</label>
+                    <select name="documentation-status" id="documentation-status" required>
+                        <option value="" disabled>Select Status</option>
+                        <option value="Upcoming" {% if documentation.documentation_status=='Upcoming' %}selected{% endif
+                            %}>Upcoming</option>
+                        <option value="Postponed" {% if documentation.documentation_status=='Postponed' %}selected{%
+                            endif %}>Postponed</option>
+                        <option value="Done" {% if documentation.documentation_status=='Done' %}selected{% endif %}>Done
+                        </option>
+                        <option value="Cancelled" {% if documentation.documentation_status=='Cancelled' %}selected{%
+                            endif %}>Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-type">Type</label>
+                    <input type="text" name="documentation-type" id="documentation-type" placeholder="Type"
+                        value="{{ documentation.documentation_type }}" required>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Activity Report Form</h3>
+
+                <div class="input-pair">
+                    <label for="documentation-activity-report-forms-id">Activity Report Form</label>
+                    <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id"
+                        class="form-select">
+                        <option value="" disabled {% if not documentation.documentation_activity_report_forms_id
+                            %}selected{% endif %}>Select Activity Report Form</option>
+                        {% if activity_reports %}
+                        {% for report in activity_reports %}
+                        <option value="{{ report.activity_report_forms_id }}" {% if
+                            documentation.documentation_activity_report_forms_id==report.activity_report_forms_id
+                            %}selected{% endif %}>
+                            {{ report.events_name }} Activity Report Form
+                        </option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+
+                <!-- Activity Strengths Section -->
+                <div class="input-pair">
+                    <label>Activity Strengths</label>
+                    <div class="dynamic-list" id="strengths-list">
+                        {% if strengths %}
+                        {% for strength in strengths %}
+                        <div class="dynamic-item">
+                            <input type="text" name="activity-strengths[]" class="form-input"
+                                value="{{ strength.activity_strengths_content }}" placeholder="Enter strength" required>
+                            <button type="button" class="remove-item-btn secondary-button"
+                                onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn secondary-button"
+                        onclick="addNewField('strengths', 'strength')">Add Strength</button>
+                </div>
+
+                <!-- Activity Weaknesses Section -->
+                <div class="input-pair">
+                    <label>Activity Weaknesses</label>
+                    <div class="dynamic-list" id="weaknesses-list">
+                        {% if weaknesses %}
+                        {% for weakness in weaknesses %}
+                        <div class="dynamic-item">
+                            <input type="text" name="activity-weaknesses[]" class="form-input"
+                                value="{{ weakness.activity_weaknesses_content }}" placeholder="Enter weakness"
+                                required>
+                            <button type="button" class="remove-item-btn secondary-button"
+                                onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn secondary-button"
+                        onclick="addNewField('weaknesses', 'weakness')">Add Weakness</button>
+                </div>
+
+                <!-- Activity Recommendations Section -->
+                <div class="input-pair">
+                    <label>Activity Recommendations</label>
+                    <div class="dynamic-list" id="recommendations-list">
+                        {% if recommendations %}
+                        {% for recommendation in recommendations %}
+                        <div class="dynamic-item">
+                            <input type="text" name="activity-recommendations[]" class="form-input"
+                                value="{{ recommendation.activity_recommendations_content }}"
+                                placeholder="Enter recommendation" required>
+                            <button type="button" class="remove-item-btn secondary-button"
+                                onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn secondary-button"
+                        onclick="addNewField('recommendations', 'recommendation')">Add Recommendation</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-prepared-by">Prepared By</label>
+                    <select name="documentation-prepared-by" id="documentation-prepared-by" required>
+                        <option value="" disabled>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if documentation.documentation_prepared_by==user.users_id
+                            %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-noted-by">Noted By</label>
+                    <select name="documentation-noted-by" id="documentation-noted-by" required>
+                        <option value="" disabled>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            documentation.documentation_noted_by==signatory.signatory_id %}selected{% endif %}>{{
+                            signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Learning Journal Form</h3>
+
+                <div class="input-pair">
+                    <label for="documentation-learning-journal-forms-id">Linked Learning Journal Form</label>
+                    <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id"
+                        class="form-select">
+                        <option value="" disabled {% if not documentation.documentation_learning_journal_forms_id
+                            %}selected{% endif %}>Select Learning Journal Form</option>
+                        {% if learning_journals %}
+                        {% for journal in learning_journals %}
+                        <option value="{{ journal.learning_journal_forms_id }}" {% if
+                            documentation.documentation_learning_journal_forms_id==journal.learning_journal_forms_id
+                            %}selected{% endif %}>
+                            {{ journal.events_name }} Learning Journal Form
+                        </option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="student-name">Name of Student</label>
+                    <input type="text" name="student-name" id="student-name" class="form-input"
+                        value="{{ learning_journals[0].learning_journal_forms_name_of_student if learning_journals else '' }}"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="course-year-level">Course & Year Level</label>
+                    <input type="text" name="course-year-level" id="course-year-level" class="form-input"
+                        value="{{ learning_journals[0].learning_journal_forms_course_year_level if learning_journals else '' }}"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="id-number">ID Number</label>
+                    <input type="text" name="id-number" id="id-number" class="form-input"
+                        value="{{ learning_journals[0].learning_journal_forms_id_number if learning_journals else '' }}"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label>Learnings</label>
+                    <div class="dynamic-list" id="learnings-list">
+                        {% if learnings %}
+                        {% for learning in learnings %}
+                        <div class="dynamic-item">
+                            <input type="text" name="learnings[]" class="form-input"
+                                value="{{ learning.learnings_content }}" placeholder="Enter learning" required>
+                            <button type="button" class="remove-item-btn secondary-button"
+                                onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn secondary-button"
+                        onclick="addNewField('learnings', 'learning')">Add Learning</button>
+                </div>
+
+                <div class="input-pair">
+                    <label>Observations</label>
+                    <div class="dynamic-list" id="observations-list">
+                        {% if observations %}
+                        {% for observation in observations %}
+                        <div class="dynamic-item">
+                            <input type="text" name="observations[]" class="form-input"
+                                value="{{ observation.observations_content }}" placeholder="Enter observation" required>
+                            <button type="button" class="remove-item-btn secondary-button"
+                                onclick="removeItem(this)">&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="add-item-btn secondary-button"
+                        onclick="addNewField('observations', 'observation')">Add Observation</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="overall-reflection">Overall Reflection</label>
+                    <textarea name="overall-reflection" id="overall-reflection" class="form-input"
+                        required>{{ learning_journals[0].learning_journal_forms_overall_reflection if learning_journals else '' }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-prepared-by">Prepared By</label>
+                    <select name="documentation-prepared-by" id="documentation-prepared-by" class="form-select"
+                        required>
+                        <option value="" disabled>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}" {% if documentation.documentation_prepared_by==user.users_id
+                            %}selected{% endif %}>
+                            {{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="seen-read-by">Seen and Read By</label>
+                    <input type="text" name="seen-read-by" id="seen-read-by" class="form-input"
+                        value="{{ learning_journals[0].learning_journal_forms_seen_and_read_by if learning_journals else '' }}"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-checked-by">Checked By</label>
+                    <select name="documentation-checked-by" id="documentation-checked-by" class="form-select" required>
+                        <option value="" disabled>Select Checker</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if
+                            documentation.documentation_checked_by==signatory.signatory_id %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
+                            signatory.signatory_position }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Tally</h3>
+
+                <div id="tally-items">
+                    <table class="tally-table">
+                        <thead>
+                            <tr>
+                                <th colspan="5">Total Ratings</th>
+                            </tr>
+                            <tr>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Satisfied (4)</th>
+                                <th>Neutral (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if tally_items %}
+                            {% for item in tally_items %}
+                            <tr class="tally-item-name">
+                                <td colspan="5">
+                                    <div class="tally-name-container">
+                                        <label for="tally-items-name">Tally Item Name</label>
+                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
+                                            value="{{ item.tally_items_name }}" placeholder="Enter tally item name"
+                                            required>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tally-item-ratings">
+                                <td>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
+                                        value="{{ item.tally_items_extremely_satisfied_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0"
+                                        value="{{ item.tally_items_satisfied_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0"
+                                        value="{{ item.tally_items_neutral_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
+                                        value="{{ item.tally_items_dissatisfied_rating_total }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
+                                        min="0" value="{{ item.tally_items_extremely_dissatisfied_rating_total }}"
+                                        required>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr class="tally-item-name">
+                                <td colspan="5">
+                                    <div class="tally-name-container">
+                                        <label for="tally-items-name">Tally Item Name</label>
+                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
+                                            placeholder="Enter tally item name" required>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tally-item-ratings">
+                                <td>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0" value="0"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0" value="0"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
+                                        min="0" value="0" required>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" class="secondary-button" onclick="addNewTallyItem()">Add New Tally Item</button>
+
+                <div class="input-pair">
+                    <label for="documentation-date-of-submission">Date of Submission</label>
+                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission"
+                        value="{{ documentation.documentation_date_of_submission.strftime('%Y-%m-%d') }}" required>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Results of the Evaluation Images</h3>
+                <div class="input-pair">
+                    <label for="evaluation-images">Upload Evaluation Images</label>
+                    <input type="file" name="evaluation-images[]" id="evaluation-images" accept="image/*" multiple
+                        hidden>
+                    <label for="evaluation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="evaluation-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="evaluation-files-list" class="selected-files-list"></div>
+                </div>
+
+                {% if documentation.results_of_the_evaluation_images %}
+                <div class="existing-images">
+                    <h5>Current Evaluation Images</h5>
+                    <div class="selected-files-list">
+                        {% for image in documentation.results_of_the_evaluation_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.results_of_the_evaluation_images_id }}">
+                            <button type="button" class="remove-file-button" onclick="removeExistingImage(this)"
+                                title="Remove image">×</button>
+                            <div class="file-preview-container">
+                                <img src="{{ image.results_of_the_evaluation_images_cloudinary_url }}"
+                                    class="file-preview" alt="Evaluation Image">
+                            </div>
+                            <span class="file-item-name">Current Image {{ loop.index }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <!-- Hidden input to track deleted images -->
+                <input type="hidden" name="deleted_evaluation_images" id="deleted-evaluation-images" value="">
+            </div>
+
+            <div class="form-container">
+                <h3>Evaluation Form</h3>
+
+                <div id="evaluation-tally-items" class="evaluation-tally-container">
+                    <table class="evaluation-tally-table">
+                        <thead>
+                            <tr>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Very Satisfied (4)</th>
+                                <th>Satisfied (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items will be added here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="input-pair">
+                    <div class="calculated-rating">
+                        <span>Overall Rating: </span>
+                        <span id="calculated-rating-value">{{ documentation.documentation_rating|default(0) }}</span>
+                        <input type="hidden" name="documentation-rating" id="documentation-rating"
+                            value="{{ documentation.documentation_rating|default(0) }}">
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-comments-suggestions">Comments/Suggestions</label>
+                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
+                        placeholder="Comments/Suggestions">{{ documentation.documentation_comments_suggestions }}</textarea>
+                </div>
+            </div>
+
+            <!-- Summary of Attendance Images Section -->
+            <div class="form-container">
+                <h3>Summary of Attendance Images</h3>
+                <div class="input-pair">
+                    <label for="attendance-images">Upload Attendance Images</label>
+                    <input type="file" name="attendance-images[]" id="attendance-images" accept="image/*" multiple
+                        hidden>
+                    <label for="attendance-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="attendance-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="attendance-files-list" class="selected-files-list"></div>
+                </div>
+
+                {% if documentation.summary_of_attendance_images %}
+                <div class="existing-images">
+                    <h5>Current Attendance Images</h5>
+                    <div class="selected-files-list">
+                        {% for image in documentation.summary_of_attendance_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.summary_of_attendance_images_id }}">
+                            <button type="button" class="remove-file-button"
+                                onclick="removeExistingAttendanceImage(this)" title="Remove image">×</button>
+                            <div class="file-preview-container">
+                                <img src="{{ image.summary_of_attendance_images_cloudinary_url }}" class="file-preview"
+                                    alt="Attendance Image">
+                            </div>
+                            <span class="file-item-name">Current Image {{ loop.index }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <input type="hidden" name="deleted_attendance_images" id="deleted-attendance-images" value="">
+            </div>
+
+            <div class="form-container">
+                <h3>Evaluation Student List</h3>
+                <div class="input-pair">
+                    <label>Student Names</label>
+                    <div id="evaluation-student-list" class="dynamic-list scrollable-list">
+                        {% if evaluation_student_list %}
+                        {% for student in evaluation_student_list %}
+                        <div class="dynamic-item">
+                            <input type="text" name="evaluation-student-names[]"
+                                value="{{ student.evaluation_list_of_student_names_student }}"
+                                placeholder="Enter student name">
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                        </div>
+                        {% endfor %}
+                        {# Add additional empty entries to make it 10 #}
+                        {% for _ in range(10 - evaluation_student_list|length) %}
+                        <div class="dynamic-item">
+                            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        {% for _ in range(10) %}
+                        <div class="dynamic-item">
+                            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+                            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="secondary-button" onclick="addNewStudent()">Add Student</button>
+                </div>
+            </div>
+
+            <!-- Event Photo Documentation Section -->
+            <div class="form-container">
+                <h3>Event Photo Documentation</h3>
+                <div class="input-pair">
+                    <label for="event-photo-documentation-images">Upload Event Photo Documentation</label>
+                    <input type="file" name="event-photo-documentation-images[]" id="event-photo-documentation-images"
+                        accept="image/*" multiple hidden>
+                    <label for="event-photo-documentation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="event-photo-doc-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="event-photo-doc-files-list" class="selected-files-list"></div>
+                </div>
+
+                {% if documentation.event_photo_documentation_images %}
+                <div class="existing-images">
+                    <h5>Current Event Photo Documentation</h5>
+                    <div class="selected-files-list">
+                        {% for image in documentation.event_photo_documentation_images %}
+                        <div class="selected-file-item" data-image-id="{{ image.event_photo_documentation_images_id }}">
+                            <button type="button" class="remove-file-button"
+                                onclick="removeExistingEventPhotoDocImage(this)" title="Remove image">×</button>
+                            <div class="file-preview-container">
+                                <img src="{{ image.event_photo_documentation_images_cloudinary_url }}"
+                                    class="file-preview" alt="Event Photo Documentation">
+                            </div>
+                            <span class="file-item-name">Current Image {{ loop.index }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <input type="hidden" name="deleted_event_photo_doc_images" id="deleted-event-photo-doc-images" value="">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('documentation_overview') }}"
+                        class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Update Documentation</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const academicYearSelect = document.getElementById('documentation-academic-year');
+        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+        const eventsSelect = document.getElementById('documentation-events-id');
+        const activityReportSelect = document.getElementById('documentation-activity-report-forms-id');
+        const learningJournalSelect = document.getElementById('documentation-learning-journal-forms-id');
+
+        academicYearSelect.addEventListener('change', function () {
+            if (academicYearSelect.value === 'Other') {
+                otherAcademicYearContainer.style.display = 'flex';
+            } else {
+                otherAcademicYearContainer.style.display = 'none';
+            }
+        });
+
+        eventsSelect.addEventListener('change', function () {
+            const eventId = this.value;
+
+            fetch(`/get-related-forms/${eventId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update Activity Report Form options
+                    activityReportSelect.innerHTML = '<option value="" disabled selected>Select Activity Report Form</option>';
+                    data.activity_reports.forEach(report => {
+                        const option = document.createElement('option');
+                        option.value = report.activity_report_forms_id;
+                        option.textContent = report.events_name;
+                        activityReportSelect.appendChild(option);
+                    });
+
+                    // Update Learning Journal Form options
+                    learningJournalSelect.innerHTML = '<option value="" disabled selected>Select Learning Journal Form</option>';
+                    data.learning_journals.forEach(journal => {
+                        const option = document.createElement('option');
+                        option.value = journal.learning_journal_forms_id;
+                        option.textContent = journal.events_name;
+                        learningJournalSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching related forms:', error));
+        });
+    });
+
+    function addNewField(type, placeholder) {
+        const config = {
+            strengths: {
+                listId: 'strengths-list',
+                inputName: 'activity-strengths[]',
+                placeholder: 'Enter strength'
+            },
+            weaknesses: {
+                listId: 'weaknesses-list',
+                inputName: 'activity-weaknesses[]',
+                placeholder: 'Enter weakness'
+            },
+            recommendations: {
+                listId: 'recommendations-list',
+                inputName: 'activity-recommendations[]',
+                placeholder: 'Enter recommendation'
+            },
+            learnings: {
+                listId: 'learnings-list',
+                inputName: 'learnings[]',
+                placeholder: 'Enter learning'
+            },
+            observations: {
+                listId: 'observations-list',
+                inputName: 'observations[]',
+                placeholder: 'Enter observation'
+            }
+        };
+
+        const settings = config[type];
+        if (!settings) return;
+
+        const list = document.getElementById(settings.listId);
+        const div = document.createElement('div');
+        div.className = 'dynamic-item';
+
+        div.innerHTML = `
+            <input type="text" 
+                   class="form-input"
+                   name="${settings.inputName}" 
+                   placeholder="${settings.placeholder}" 
+                   required>
+            <button type="button" 
+                    class="remove-item-btn secondary-button" 
+                    onclick="removeItem(this)">&times;</button>
+        `;
+
+        list.appendChild(div);
+    }
+
+    function removeItem(button) {
+        button.parentElement.remove();
+    }
+
+    // Evaluation Images file handling
+    document.getElementById('evaluation-images').addEventListener('change', function (e) {
+        const fileNameSpan = document.getElementById('evaluation-files-name');
+        const filesList = document.getElementById('evaluation-files-list');
+        const input = this;
+
+        if (this.files.length > 0) {
+            fileNameSpan.textContent = `${this.files.length} file(s) selected`;
+            filesList.innerHTML = '';
+
+            Array.from(this.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                fileItem.dataset.index = index;
+
+                const fileName = document.createElement('span');
+                fileName.className = 'file-item-name';
+                fileName.textContent = file.name;
+
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'file-preview-container';
+
+                const preview = document.createElement('img');
+                preview.className = 'file-preview';
+                preview.src = URL.createObjectURL(file);
+
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-file-button';
+                removeButton.innerHTML = '×';
+                removeButton.type = 'button';
+                removeButton.title = 'Remove image';
+
+                removeButton.addEventListener('click', function () {
+                    const dt = new DataTransfer();
+                    const files = Array.from(input.files);
+                    files.splice(index, 1);
+
+                    files.forEach(file => dt.items.add(file));
+                    input.files = dt.files;
+
+                    fileItem.remove();
+
+                    if (input.files.length > 0) {
+                        fileNameSpan.textContent = `${input.files.length} file(s) selected`;
+                    } else {
+                        fileNameSpan.textContent = 'No files chosen';
+                        filesList.innerHTML = '';
+                    }
+                });
+
+                previewContainer.appendChild(preview);
+                fileItem.appendChild(removeButton);
+                fileItem.appendChild(previewContainer);
+                fileItem.appendChild(fileName);
+                filesList.appendChild(fileItem);
+            });
+        } else {
+            fileNameSpan.textContent = 'No files chosen';
+            filesList.innerHTML = '';
+        }
+    });
+
+    // Function to remove existing evaluation images
+    function removeExistingImage(button) {
+        const imageContainer = button.closest('.selected-file-item');
+        const imageId = imageContainer.dataset.imageId;
+
+        // Add the image ID to the hidden input
+        const deletedImagesInput = document.getElementById('deleted-evaluation-images');
+        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
+        deletedImages.push(imageId);
+        deletedImagesInput.value = deletedImages.join(',');
+
+        // Remove the image container from the DOM
+        imageContainer.remove();
+    }
+
+    // Attendance Images file handling
+    document.getElementById('attendance-images').addEventListener('change', function (e) {
+        handleFileSelect(this, 'attendance-files-name', 'attendance-files-list');
+    });
+
+    // Event Photo Documentation file handling
+    document.getElementById('event-photo-documentation-images').addEventListener('change', function (e) {
+        handleFileSelect(this, 'event-photo-doc-files-name', 'event-photo-doc-files-list');
+    });
+
+    // Generic file handling function
+    function handleFileSelect(input, nameSpanId, filesListId) {
+        const fileNameSpan = document.getElementById(nameSpanId);
+        const filesList = document.getElementById(filesListId);
+
+        if (input.files.length > 0) {
+            fileNameSpan.textContent = `${input.files.length} file(s) selected`;
+            filesList.innerHTML = '';
+
+            Array.from(input.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                fileItem.dataset.index = index;
+
+                const fileName = document.createElement('span');
+                fileName.className = 'file-item-name';
+                fileName.textContent = file.name;
+
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'file-preview-container';
+
+                const preview = document.createElement('img');
+                preview.className = 'file-preview';
+                preview.src = URL.createObjectURL(file);
+
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-file-button';
+                removeButton.innerHTML = '×';
+                removeButton.type = 'button';
+                removeButton.title = 'Remove image';
+
+                removeButton.addEventListener('click', function () {
+                    const dt = new DataTransfer();
+                    const files = Array.from(input.files);
+                    files.splice(index, 1);
+
+                    files.forEach(file => dt.items.add(file));
+                    input.files = dt.files;
+
+                    fileItem.remove();
+
+                    if (input.files.length > 0) {
+                        fileNameSpan.textContent = `${input.files.length} file(s) selected`;
+                    } else {
+                        fileNameSpan.textContent = 'No files chosen';
+                        filesList.innerHTML = '';
+                    }
+                });
+
+                previewContainer.appendChild(preview);
+                fileItem.appendChild(removeButton);
+                fileItem.appendChild(previewContainer);
+                fileItem.appendChild(fileName);
+                filesList.appendChild(fileItem);
+            });
+        } else {
+            fileNameSpan.textContent = 'No files chosen';
+            filesList.innerHTML = '';
+        }
+    }
+
+    // Functions to remove existing images
+    function removeExistingAttendanceImage(button) {
+        const imageContainer = button.closest('.selected-file-item');
+        const imageId = imageContainer.dataset.imageId;
+
+        const deletedImagesInput = document.getElementById('deleted-attendance-images');
+        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
+        deletedImages.push(imageId);
+        deletedImagesInput.value = deletedImages.join(',');
+
+        imageContainer.remove();
+    }
+
+    // Function to remove existing event photo documentation images
+    function removeExistingEventPhotoDocImage(button) {
+        const imageContainer = button.closest('.selected-file-item');
+        const imageId = imageContainer.dataset.imageId;
+
+        const deletedImagesInput = document.getElementById('deleted-event-photo-doc-images');
+        const deletedImages = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
+        deletedImages.push(imageId);
+        deletedImagesInput.value = deletedImages.join(',');
+
+        imageContainer.remove();
+    }
+
+    function addNewStudent() {
+        const container = document.getElementById('evaluation-student-list');
+        const newItem = document.createElement('div');
+        newItem.className = 'dynamic-item';
+
+        newItem.innerHTML = `
+            <input type="text" name="evaluation-student-names[]" placeholder="Enter student name">
+            <button type="button" class="remove-item-btn" onclick="removeItem(this)">×</button>
+        `;
+
+        container.appendChild(newItem);
+    }
+
+    const evaluationForms = {{ evaluation_forms| tojson | safe }};
+
+    function addNewTallyItem() {
+        const tallyItemsContainer = document.querySelector('#tally-items tbody');
+        const nameRow = document.createElement('tr');
+        const ratingsRow = document.createElement('tr');
+
+        nameRow.className = 'tally-item-name';
+        ratingsRow.className = 'tally-item-ratings';
+
+        // Get the current number of items to create unique indices
+        const currentItemCount = document.querySelectorAll('.tally-item-name').length;
+
+        // Create the name row
+        nameRow.innerHTML = `
+        <td colspan="5">
+            <div class="tally-name-container">
+                <label for="tally-items-name-${currentItemCount}">Tally Item Name</label>
+                <input type="text" id="tally-items-name-${currentItemCount}" 
+                       name="tally-items-name[]" 
+                       placeholder="Enter tally item name" required>
+            </div>
+        </td>
+    `;
+
+        // Create the ratings row
+        ratingsRow.innerHTML = `
+        <td>
+            <input type="number" name="tally-items-extremely-satisfied-rating-total[]" 
+                   min="0" value="0" required>
+        </td>
+        <td>
+            <input type="number" name="tally-items-satisfied-rating-total[]" 
+                   min="0" value="0" required>
+        </td>
+        <td>
+            <input type="number" name="tally-items-neutral-rating-total[]" 
+                   min="0" value="0" required>
+        </td>
+        <td>
+            <input type="number" name="tally-items-dissatisfied-rating-total[]" 
+                   min="0" value="0" required>
+        </td>
+        <td>
+            <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]" 
+                   min="0" value="0" required>
+        </td>
+    `;
+
+        // Add the new rows
+        tallyItemsContainer.appendChild(nameRow);
+        tallyItemsContainer.appendChild(ratingsRow);
+
+        // Sync the tally items to update the evaluation form
+        syncTallyItems();
+
+        // Add change event listeners to the new inputs
+        const newInputs = ratingsRow.querySelectorAll('input[type="number"]');
+        newInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                syncTallyItems();
+                calculateOverallRating();
+            });
+        });
+    }
+
+    // Function to sync tally items to evaluation form
+    function syncTallyItems() {
+        const tallyRows = document.querySelectorAll('.tally-table tbody tr');
+        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
+        evaluationTallyContainer.innerHTML = '';
+
+        for (let i = 0; i < tallyRows.length; i += 2) {
+            const nameRow = tallyRows[i];
+            const nameInput = nameRow.querySelector('input[type="text"]');
+            if (nameInput) {
+                const itemName = nameInput.value || `Item ${(i / 2) + 1}`;
+
+                // Create name row that spans all columns
+                const nameRowEval = document.createElement('tr');
+                nameRowEval.innerHTML = `
+                <td colspan="6" class="tally-item-name">${itemName}</td>
+            `;
+
+                // Create ratings row
+                const ratingsRow = document.createElement('tr');
+
+                // Get existing evaluation form data for this item
+                const evaluationForm = evaluationForms.find(form => form.evaluation_form_name === itemName);
+                let selectedValue = '3'; // Default to neutral if no existing data
+
+                if (evaluationForm) {
+                    if (evaluationForm.evaluation_form_extremely_satisfied_rating === 1) selectedValue = '5';
+                    else if (evaluationForm.evaluation_form_satisfied_rating === 1) selectedValue = '4';
+                    else if (evaluationForm.evaluation_form_neutral_rating === 1) selectedValue = '3';
+                    else if (evaluationForm.evaluation_form_dissatisfied_rating === 1) selectedValue = '2';
+                    else if (evaluationForm.evaluation_form_extremely_dissatisfied_rating === 1) selectedValue = '1';
+                }
+
+                ratingsRow.innerHTML = `
+                <td><input type="radio" name="eval-tally-${i / 2}" value="5" ${selectedValue === '5' ? 'checked' : ''} required></td>
+                <td><input type="radio" name="eval-tally-${i / 2}" value="4" ${selectedValue === '4' ? 'checked' : ''}></td>
+                <td><input type="radio" name="eval-tally-${i / 2}" value="3" ${selectedValue === '3' ? 'checked' : ''}></td>
+                <td><input type="radio" name="eval-tally-${i / 2}" value="2" ${selectedValue === '2' ? 'checked' : ''}></td>
+                <td><input type="radio" name="eval-tally-${i / 2}" value="1" ${selectedValue === '1' ? 'checked' : ''}></td>
+            `;
+
+                evaluationTallyContainer.appendChild(nameRowEval);
+                evaluationTallyContainer.appendChild(ratingsRow);
+            }
+        }
+
+        calculateOverallRating();
+    }
+
+    // Add event listeners for tally item changes
+    document.addEventListener('DOMContentLoaded', function () {
+        const tallyTable = document.querySelector('.tally-table');
+
+        // Initial sync
+        syncTallyItems();
+
+        // Sync when tally items change
+        tallyTable.addEventListener('input', function (e) {
+            if (e.target.type === 'text') {
+                syncTallyItems();
+            }
+        });
+
+        // Sync when add button is clicked
+        document.querySelector('.add-tally-button').addEventListener('click', function () {
+            setTimeout(syncTallyItems, 100); // Give time for the new row to be added
+        });
+
+        // Sync when remove button is clicked
+        tallyTable.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-tally-button')) {
+                setTimeout(syncTallyItems, 100); // Give time for the row to be removed
+            }
+        });
+    });
+
+    // Function to calculate and update overall rating
+    function calculateOverallRating() {
+        const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
+        const rows = evaluationTallyContainer.querySelectorAll('tr:not(.tally-item-name)');
+        let totalRating = 0;
+        let totalItems = 0;
+
+        rows.forEach(row => {
+            const selectedRadio = row.querySelector('input[type="radio"]:checked');
+            if (selectedRadio) {
+                totalRating += parseInt(selectedRadio.value);
+                totalItems++;
+            }
+        });
+
+        // Calculate average rating
+        let averageRating = totalItems > 0 ? totalRating / totalItems : 0;
+
+        // Round to nearest 0.01 (two decimal places)
+        averageRating = Math.round(averageRating * 100) / 100;
+
+        // Update the display and hidden input with two decimal places
+        document.getElementById('calculated-rating-value').textContent = averageRating.toFixed(2);
+        document.getElementById('documentation-rating').value = averageRating;
+
+        // Update radio buttons
+        const roundedRating = Math.round(averageRating);
+        const radioButton = document.getElementById(`documentation-rating-${roundedRating}`);
+        if (radioButton) {
+            radioButton.checked = true;
+        }
+    }
+
+    // Add event listener for radio button changes in evaluation form
+    document.querySelector('.evaluation-tally-table').addEventListener('change', function (e) {
+        if (e.target.type === 'radio') {
+            calculateOverallRating();
+        }
+    });
+</script>
+{% endblock %}

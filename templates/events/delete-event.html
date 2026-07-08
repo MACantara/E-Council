@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Event{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div class="container">
+            <h2>Delete Event</h2>
+            <p>Are you sure you want to delete the event "{{ event.events_name }}"? This action cannot be undone.</p>
+            <form method="POST" action="{{ url_for('delete_event', event_id=event.events_id) }}">
+                <div class="horizontal-button-pair-positioned-right">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="secondary-button fit-content-button" type="submit">Delete Event</button>
+                    <a href="{{ url_for('events_overview') }}" class="primary-button fit-content-button">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

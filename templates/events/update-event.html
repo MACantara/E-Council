@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Update Event{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="container">
+            <span id="close-update-event-modal-button" class="close-button">&times;</span>
+            <h2>Update Event</h2>
+
+            <form method="POST" action="{{ url_for('update_event', event_id=event.events_id) }}">
+                <div class="input-pair">
+                    <label for="events-name">Event Name</label>
+                    <input type="text" name="events-name" id="events-name" placeholder="Event Name"
+                        value="{{ event.events_name }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-semester">Semester</label>
+                    <select name="events-semester" id="events-semester" required>
+                        <option value="" disabled>Select a Semester</option>
+                        <option value="1st Semester" {% if event.events_semester=='1st Semester' %}selected{% endif %}>
+                            1st
+                            Semester</option>
+                        <option value="2nd Semester" {% if event.events_semester=='2nd Semester' %}selected{% endif %}>
+                            2nd
+                            Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-academic-year">Academic Year</label>
+                    <select name="events-academic-year" id="events-academic-year" required>
+                        <option value="" disabled>Select an Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year.events_academic_year }}" {% if event.events_academic_year == year.events_academic_year %}selected{% endif %}>A.Y {{ year.events_academic_year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-start-date-and-time">Start Date and Time</label>
+                    <input type="datetime-local" name="events-start-date-and-time"
+                        id="events-start-date-and-time"
+                        value="{{ event.events_start_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-end-date-and-time">End Date and Time</label>
+                    <input type="datetime-local" name="events-end-date-and-time"
+                        id="events-end-date-and-time"
+                        value="{{ event.events_end_date_and_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-venue">Venue</label>
+                    <input type="text" name="events-venue" id="events-venue" placeholder="Venue"
+                        value="{{ event.events_venue }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-budget">Budget</label>
+                    <input type="text" name="events-budget" id="events-budget" placeholder="Budget"
+                        value="{{ event.events_budget }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-status">Event Status</label>
+                    <select name="events-status" id="events-status" required>
+                        <option value="" disabled>Select an Event Status</option>
+                        <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>
+                            Upcoming</option>
+                        <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>
+                            Postponed</option>
+                        <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done
+                        </option>
+                        <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>
+                            Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-description">Description</label>
+                    <textarea name="events-description" id="events-description"
+                        placeholder="Description" required>{{ event.events_description }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="events-remarks">Remarks</label>
+                    <input type="text" name="events-remarks" id="events-remarks"
+                        placeholder="Remarks (Optional)" value="{{ event.events_remarks }}">
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-button-pair-positioned-right">
+                    <a href="{{ url_for('events_overview')}}"
+                        class="secondary-button fit-content-button" type="button">Cancel</a>
+                    <button class="primary-button"  type="submit">Update
+                        Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

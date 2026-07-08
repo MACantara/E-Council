@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}Add Documentation{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('documentation_overview') }}" class="primary-button fit-content-button">Back to
+            Documentation Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_documentation') }}">
+            <div class="form-container">
+                <h2>Add Documentation</h2>
+                <h3>Documentation Details</h3>
+
+                <div class="input-pair">
+                    <label for="documentation-type">Type</label>
+                    <select name="documentation-type" id="documentation-type" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="Activity Report">Activity Report</option>
+                        <option value="After Documentation">After Documentation</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-events-id">Event</label>
+                    <select name="documentation-events-id" id="documentation-events-id" required>
+                        <option value="" disabled selected>Select Event</option>
+                        {% for event in events %}
+                        <option value="{{ event.events_id }}">{{ event.events_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-status">Status</label>
+                    <select name="documentation-status" id="documentation-status" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Postponed">Postponed</option>
+                        <option value="Done">Done</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Activity Report Form</h3>
+
+                <div class="input-pair">
+                    <label for="documentation-activity-report-forms-id">Activity Report Form</label>
+                    <select name="documentation-activity-report-forms-id" id="documentation-activity-report-forms-id">
+                        <option value="" disabled selected>Select Activity Report Form</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-strengths">Activity Strengths</label>
+                    <div id="activity-strengths">
+                        <input type="text" name="activity-strengths" placeholder="Enter Activity Strength" value="">
+                    </div>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('activity-strengths', 'Activity Strength')">Add New Strength</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-weaknesses">Activity Weaknesses</label>
+                    <div id="activity-weaknesses">
+                        <input type="text" name="activity-weaknesses" placeholder="Enter Activity Weakness" value="">
+                    </div>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('activity-weaknesses', 'Activity Weakness')">Add New Weakness</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="activity-recommendations">Activity Recommendations</label>
+                    <div id="activity-recommendations">
+                        <input type="text" name="activity-recommendations" placeholder="Enter Activity Recommendation"
+                            value="">
+                    </div>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('activity-recommendations', 'Activity Recommendation')">Add New
+                        Recommendation</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-prepared-by">Prepared By</label>
+                    <select name="documentation-prepared-by" id="documentation-prepared-by" required>
+                        <option value="" disabled selected>Select Preparer</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-noted-by">Noted By</label>
+                    <select name="documentation-noted-by" id="documentation-noted-by" required>
+                        <option value="" disabled selected>Select Noter</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{
+                            signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Learning Journal Form</h3>
+
+                <div class="input-pair">
+                    <label for="documentation-learning-journal-forms-id">Learning Journal Form</label>
+                    <select name="documentation-learning-journal-forms-id" id="documentation-learning-journal-forms-id">
+                        <option value="" disabled selected>Select Learning Journal Form</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-name-of-student">Name of Student</label>
+                    <input type="text" name="learning-journal-forms-name-of-student"
+                        id="learning-journal-forms-name-of-student" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-course-year-level">Course & Year Level</label>
+                    <input type="text" name="learning-journal-forms-course-year-level"
+                        id="learning-journal-forms-course-year-level" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-id-number">ID Number</label>
+                    <input type="text" name="learning-journal-forms-id-number" id="learning-journal-forms-id-number"
+                        required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learnings">Learnings</label>
+                    <div id="learnings">
+                        <input type="text" name="learnings" placeholder="Enter Learning" value="">
+                    </div>
+                    <button type="button" class="secondary-button" onclick="addNewField('learnings', 'Learning')">Add
+                        New Learning</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="observations">Observations</label>
+                    <div id="observations">
+                        <input type="text" name="observations" placeholder="Enter Observation" value="">
+                    </div>
+                    <button type="button" class="secondary-button"
+                        onclick="addNewField('observations', 'Observation')">Add New Observation</button>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-overall-reflection">Overall Reflection</label>
+                    <textarea name="learning-journal-forms-overall-reflection"
+                        id="learning-journal-forms-overall-reflection" rows="4" required></textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-prepared-by">Prepared By</label>
+                    <select name="learning-journal-forms-prepared-by" id="learning-journal-forms-prepared-by" required>
+                        <option value="" disabled selected>Select User</option>
+                        {% for user in users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-seen-and-read-by">Seen and Read By</label>
+                    <input type="text" name="learning-journal-forms-seen-and-read-by"
+                        id="learning-journal-forms-seen-and-read-by">
+                </div>
+
+                <div class="input-pair">
+                    <label for="learning-journal-forms-checked-by">Checked By</label>
+                    <select name="learning-journal-forms-checked-by" id="learning-journal-forms-checked-by" required>
+                        <option value="" disabled selected>Select Signatory</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatories_id }}">{{ signatory.signatory_first_name }} {{
+                            signatory.signatory_last_name }} - {{ signatory.signatory_position }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Tally</h3>
+
+                <div id="tally-items">
+                    <table class="tally-table">
+                        <thead>
+                            <tr>
+                                <th colspan="5">Total Ratings</th>
+                            </tr>
+                            <tr>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Satisfied (4)</th>
+                                <th>Neutral (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="tally-item-name">
+                                <td colspan="5">
+                                    <div class="tally-name-container">
+                                        <label for="tally-items-name">Tally Item Name</label>
+                                        <input type="text" id="tally-items-name" name="tally-items-name[]"
+                                            placeholder="Enter tally item name" required>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tally-item-ratings">
+                                <td>
+                                    <input type="number" name="tally-items-extremely-satisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-satisfied-rating-total[]" min="0" value="0"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-neutral-rating-total[]" min="0" value="0"
+                                        required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-dissatisfied-rating-total[]" min="0"
+                                        value="0" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="tally-items-extremely-dissatisfied-rating-total[]"
+                                        min="0" value="0" required>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" class="secondary-button" onclick="addNewTallyItem()">Add New Tally Item</button>
+
+                <div class="input-pair">
+                    <label for="documentation-date-of-submission">Date of Submission</label>
+                    <input type="date" name="documentation-date-of-submission" id="documentation-date-of-submission"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Results of the Evaluation Images</h3>
+
+                <div class="input-pair">
+                    <label for="evaluation-images">Upload Images</label>
+                    <input type="file" name="evaluation-images[]" id="evaluation-images" multiple accept="image/*"
+                        hidden>
+                    <label for="evaluation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="evaluation-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="selected-files-list" class="selected-files-list"></div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Evaluation Form</h3>
+
+                <div id="evaluation-tally-items" class="evaluation-tally-container">
+                    <!-- Tally items will be synced here -->
+                    <table class="evaluation-tally-table">
+                        <thead>
+                            <tr>
+                                <th>Extremely Satisfied (5)</th>
+                                <th>Very Satisfied (4)</th>
+                                <th>Satisfied (3)</th>
+                                <th>Dissatisfied (2)</th>
+                                <th>Extremely Dissatisfied (1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items will be added here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="input-pair">
+                    <div class="calculated-rating">
+                        <span>Overall Rating: </span>
+                        <span id="calculated-rating-value">0</span>
+                        <input type="hidden" name="documentation-rating" id="documentation-rating" value="0">
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="documentation-comments-suggestions">Comments/Suggestions</label>
+                    <textarea name="documentation-comments-suggestions" id="documentation-comments-suggestions"
+                        placeholder="Comments/Suggestions"></textarea>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Summary of Attendance Images</h3>
+            
+                <div class="input-pair">
+                    <label for="attendance-images">Upload Images</label>
+                    <input type="file" name="attendance-images[]" id="attendance-images" multiple accept="image/*" hidden>
+                    <label for="attendance-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="attendance-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="attendance-files-list" class="selected-files-list"></div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Evaluation Student List</h3>
+
+                <div class="input-pair">
+                    <label for="student-list-excel">Upload Student List (.xlsx)</label>
+                    <input type="file" name="student-list-excel" id="student-list-excel" accept=".xlsx" hidden>
+                    <label for="student-list-excel" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Excel File</span>
+                        <span id="excel-file-name" class="file-name">No file chosen</span>
+                    </label>
+                    <div id="student-list-preview" class="student-list-preview">
+                        <h4 class="student-list-preview-title">Detected Students:</h4>
+                        <ul id="student-names-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h3>Photo Documentation</h3>
+                <div class="input-pair">
+                    <label for="photo-documentation-images">Upload Photo Documentation</label>
+                    <input type="file" name="photo-documentation-images[]" id="photo-documentation-images" accept="image/*" multiple hidden>
+                    <label for="photo-documentation-images" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="photo-doc-files-name" class="file-name">No files chosen</span>
+                    </label>
+                    <div id="photo-doc-files-list" class="selected-files-list"></div>
+                </div>
+            
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+                <div class="horizontal-input-pair">
+                    <a href="{{ url_for('documentation_overview') }}"
+                        class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Add Documentation</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/add-documentation.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Update Minutes of the Meeting{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="primary-button fit-content-button">Back to Minutes of the Meeting Overview</a>
+
+        <!-- Flash messages section for the modal -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin bottom-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div class="container">
+            <h2>Update Minutes of the Meeting</h2>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
+                    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+                    academicYearSelect.addEventListener('change', function () {
+                        if (academicYearSelect.value === 'Other') {
+                            otherAcademicYearContainer.style.display = 'block';
+                        } else {
+                            otherAcademicYearContainer.style.display = 'none';
+                        }
+                    });
+                });
+            </script>
+
+            <form method="POST" action="{{ url_for('update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}" enctype="multipart/form-data">
+                <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-date">Date</label>
+                    <input type="datetime-local" name="minutes-of-the-meeting-date" id="minutes-of-the-meeting-date" value="{{ meeting.minutes_of_the_meeting_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-semester">Semester</label>
+                    <select name="minutes-of-the-meeting-semester" id="minutes-of-the-meeting-semester" required>
+                        <option value="" disabled>Select a Semester</option>
+                        <option value="1st Semester" {% if meeting.minutes_of_the_meeting_semester == '1st Semester' %}selected{% endif %}>1st Semester</option>
+                        <option value="2nd Semester" {% if meeting.minutes_of_the_meeting_semester == '2nd Semester' %}selected{% endif %}>2nd Semester</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-academic-year">Academic Year</label>
+                    <select name="minutes-of-the-meeting-academic-year" id="minutes-of-the-meeting-academic-year" required>
+                        <option value="" disabled>Select an Academic Year</option>
+                        {% for year in academic_years %}
+                        <option value="{{ year }}" {% if meeting.minutes_of_the_meeting_academic_year == year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                        <option value="Other">Other A.Y.</option>
+                    </select>
+                </div>
+
+                <div class="input-pair" id="other-academic-year-container" style="display: none;">
+                    <label for="other-academic-year">Other Academic Year</label>
+                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-status">Status</label>
+                    <select name="minutes-of-the-meeting-status" id="minutes-of-the-meeting-status" required>
+                        <option value="" disabled>Select a Status</option>
+                        <option value="Upcoming" {% if meeting.minutes_of_the_meeting_status == 'Upcoming' %}selected{% endif %}>Upcoming</option>
+                        <option value="Postponed" {% if meeting.minutes_of_the_meeting_status == 'Postponed' %}selected{% endif %}>Postponed</option>
+                        <option value="Done" {% if meeting.minutes_of_the_meeting_status == 'Done' %}selected{% endif %}>Done</option>
+                        <option value="Cancelled" {% if meeting.minutes_of_the_meeting_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
+                    <select name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" required>
+                        <option value="" disabled>Select a Presiding Officer</option>
+                        {% for organization in student_organizations %}
+                        <optgroup label="{{ organization.student_organizations_name }}">
+                            {% for user in organization.users %}
+                            <option value="{{ user.users_id }}" {% if meeting.minutes_of_the_meeting_presiding_officer == user.users_id %}selected{% endif %}>
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}
+                            </option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-attendees">Attendees</label>
+                    <div id="minutes-of-the-meeting-attendees">
+                        {% for organization in student_organizations %}
+                        <fieldset>
+                            <legend>{{ organization.student_organizations_name }}</legend>
+                            {% for user in organization.users %}
+                            <div>
+                                <label><input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" {% if user.users_id in meeting_attendees %}checked{% endif %}>
+                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
+                            </div>
+                            {% endfor %}
+                        </fieldset>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-agenda">Agenda</label>
+                    <textarea name="minutes-of-the-meeting-agenda" id="minutes-of-the-meeting-agenda" placeholder="Agenda" required>{{ meeting.minutes_of_the_meeting_agenda }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-notes">Notes</label>
+                    <textarea name="minutes-of-the-meeting-notes" id="minutes-of-the-meeting-notes" placeholder="Notes">{{ meeting.minutes_of_the_meeting_notes }}</textarea>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-adjourned">Adjourned</label>
+                    <input type="datetime-local" name="minutes-of-the-meeting-adjourned" id="minutes-of-the-meeting-adjourned" value="{{ meeting.minutes_of_the_meeting_adjourned.strftime('%Y-%m-%dT%H:%M') if meeting.minutes_of_the_meeting_adjourned else '' }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-prepared-by">Prepared By</label>
+                    <input type="text" name="minutes-of-the-meeting-prepared-by-display" id="minutes-of-the-meeting-prepared-by-display" value="{{ current_user.users_first_name }} {{ current_user.users_last_name }} - {{ current_user.users_student_organization_position }} - {{ current_user.users_student_organization }}" readonly>
+                    <input type="hidden" name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by" value="{{ current_user.users_id }}">
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-approved-by">Approved By</label>
+                    <select name="minutes-of-the-meeting-approved-by" id="minutes-of-the-meeting-approved-by">
+                        <option value="" disabled>Select a User</option>
+                        {% for organization, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
+                        <optgroup label="{{ organization }}">
+                            {% for user in members %}
+                            <option value="{{ user.users_id }}" {% if meeting.minutes_of_the_meeting_approved_by == user.users_id %}selected{% endif %}>{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-pair">
+                    <label for="minutes-of-the-meeting-noted-by">Noted By</label>
+                    <select name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" required>
+                        <option value="" disabled>Select a Signatory</option>
+                        {% for signatory in signatories %}
+                        <option value="{{ signatory.signatory_id }}" {% if meeting.minutes_of_the_meeting_noted_by == signatory.signatory_id %}selected{% endif %}>
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }} - {{ signatory.signatory_department }}
+                        </option>
+                        {% endfor %}
+                        <option value="add-new-noted-by">Add new signatory</option>
+                    </select>
+                </div>
+
+                <!-- New signatory fields for Noted By -->
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-title">Title</label>
+                    <input type="text" name="new-noted-by-title" id="new-noted-by-title" placeholder="Title">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-first-name">First Name</label>
+                    <input type="text" name="new-noted-by-first-name" id="new-noted-by-first-name" placeholder="First Name">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-middle-name">Middle Name</label>
+                    <input type="text" name="new-noted-by-middle-name" id="new-noted-by-middle-name" placeholder="Middle Name">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-last-name">Last Name</label>
+                    <input type="text" name="new-noted-by-last-name" id="new-noted-by-last-name" placeholder="Last Name">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-suffix">Suffix</label>
+                    <input type="text" name="new-noted-by-suffix" id="new-noted-by-suffix" placeholder="Suffix">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-position">Position</label>
+                    <input type="text" name="new-noted-by-position" id="new-noted-by-position" placeholder="Position">
+                </div>
+                <div class="input-pair" style="display: none;">
+                    <label for="new-noted-by-department">Department</label>
+                    <input type="text" name="new-noted-by-department" id="new-noted-by-department" placeholder="Department">
+                </div>
+
+                <div class="input-pair">
+                    <label for="photo-documentation">Photo Documentation</label>
+                    <input type="file" name="photo-documentation" id="photo-documentation" hidden accept="image/jpeg, image/jpg, image/png" multiple>
+                    <label for="photo-documentation" class="custom-file-upload-input">
+                        <span class="choose-file-text">Choose Files</span>
+                        <span id="file-name" class="file-name">No files chosen</span>
+                    </label>
+                    <p>Supported file types: .jpeg, .jpg, .png</p>
+                </div>
+    
+                <div class="input-pair">
+                    <label>Current Photo Documentation</label>
+                    <div class="current-photos">
+                        {% for photo in photo_documentations %}
+                        <div class="photo-item">
+                            <img src="{{ photo.minutes_of_the_meeting_photo_documentation_cloudinary_url }}" alt="Photo Documentation" class="photo-thumbnail">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="horizontal-button-pair-positioned-right">
+                    <a href="{{ url_for('minutes_of_the_meeting_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <button class="primary-button" type="submit">Update Minutes of the Meeting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
+        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+        academicYearSelect.addEventListener('change', function () {
+            if (academicYearSelect.value === 'Other') {
+                otherAcademicYearContainer.style.display = 'block';
+            } else {
+                otherAcademicYearContainer.style.display = 'none';
+            }
+        });
+        document.getElementById('photo-documentation').addEventListener('change', function () {
+            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
+            document.getElementById('file-name').textContent = fileNames;
+        });
+
+        const notedBySelect = document.getElementById('minutes-of-the-meeting-noted-by');
+
+        function toggleNewSignatoryFields(selectElement, prefix) {
+            const fields = [
+                'title', 'first-name', 'middle-name', 'last-name', 'suffix', 'position', 'department'
+            ];
+            fields.forEach(field => {
+                document.getElementById(`new-${prefix}-${field}`).parentElement.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
+            });
+        }
+
+        notedBySelect.addEventListener('change', function () {
+            toggleNewSignatoryFields(notedBySelect, 'noted-by');
+        });
+    });
+</script>
+
+{% endblock %}

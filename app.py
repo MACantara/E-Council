@@ -1266,7 +1266,7 @@ def index():
 def signup():
     if request.method == "GET":
         student_organizations = StudentOrganizations.query.all()
-        return render_template("signup.html", student_organizations=student_organizations)
+        return render_template("auth/signup.html", student_organizations=student_organizations)
     elif request.method == "POST":
         users_first_name = request.form.get("users-first-name")
         users_last_name = request.form.get("users-last-name")
@@ -1284,56 +1284,56 @@ def signup():
         # Validation
         if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_password:
             flash("All fields are required.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
 
         if users_role == "Student Council Officer":
             if not users_student_organization or not users_student_organization_position:
                 flash("Student Organization and Position are required for Student Council Officers.", "error")
-                return render_template("signup.html")
+                return render_template("auth/signup.html")
 
         # Check if username already exists
         if Users.query.filter_by(users_username=users_username).first():
             flash("Username already exists.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
 
         # Check if passwords match
         if users_password != users_repeat_password:
             flash("Passwords do not match.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
 
         # Check password requirements
         if len(users_password) < 8:
             flash("Password must be at least 8 characters.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         if not any(char.isupper() for char in users_password):
             flash("Password must contain at least one uppercase letter.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         if not any(char.islower() for char in users_password):
             flash("Password must contain at least one lowercase letter.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         if not any(char.isdigit() for char in users_password):
             flash("Password must contain at least one number.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         if not any(char in "!@#$%^&*(),.?\":{}|<>" for char in users_password):
             flash("Password must contain at least one special character.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
 
         # Ensure the role, student organization, and position are valid Enum values
         if users_role not in Users.users_role.type.enums:
             flash("Invalid role.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         if users_student_organization and not db.session.get(StudentOrganizations, users_student_organization):
             flash("Invalid student organization.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
             flash("Invalid student organization position.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
 
         # Get the departments_id through the departments_name
         department = Departments.query.filter_by(departments_name=users_department).first()
         if not department:
             flash("Department not found.", "error")
-            return render_template("signup.html")
+            return render_template("auth/signup.html")
         users_departments_id = department.departments_id
 
         # Clear student organization fields if the role is Faculty or Staff
@@ -1399,7 +1399,7 @@ def confirm_email(token):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        return render_template("auth/login.html")
     elif request.method == "POST":
         users_username_email = request.form.get("users-username-email")
         users_password = request.form.get("users-password")
@@ -1521,7 +1521,7 @@ def forgot_password():
         else:
             flash("Email address not found.", "error")
             return redirect(url_for("forgot_password"))
-    return render_template("forgot-password.html")
+    return render_template("auth/forgot-password.html")
 
 @app.route("/reset-password/<selector>/<token>", methods=["GET", "POST"])
 def reset_password(selector, token):
@@ -1559,12 +1559,12 @@ def reset_password(selector, token):
         flash("Your password has been reset. Please log in.", "success")
         return redirect(url_for("login"))
 
-    return render_template("reset-password.html", selector=selector, token=token)
+    return render_template("auth/reset-password.html", selector=selector, token=token)
 
 @app.route("/account")
 @login_required
 def account():
-    return render_template("account.html")
+    return render_template("account/account.html")
 
 @app.route("/upload-profile-picture", methods=["POST"])
 @login_required
@@ -1686,7 +1686,7 @@ def account_settings():
     # Query all departments and student organizations to pass to the template
     departments = Departments.query.all()
     student_organizations = StudentOrganizations.query.all()
-    return render_template("account-settings.html", departments=departments, student_organizations=student_organizations)
+    return render_template("account/account-settings.html", departments=departments, student_organizations=student_organizations)
 
 @app.route("/delete-user-account", methods=["POST"])
 @login_required
@@ -1761,7 +1761,7 @@ def email_settings():
         flash("A verification email has been sent to your new email address. Please check your email to confirm the change.", "success")
         return redirect(url_for("email_settings"))
 
-    return render_template("email-settings.html")
+    return render_template("account/email-settings.html")
 
 @app.route("/confirm_new_email/<token>")
 @login_required
@@ -1844,12 +1844,12 @@ def password_security_settings():
         flash("Your password has been updated successfully.", "success")
         return redirect(url_for("password_security_settings"))
 
-    return render_template("password-security-settings.html")
+    return render_template("account/password-security-settings.html")
 
 @app.route("/council-overview")
 @login_required
 def council_overview():
-    return render_template("council-overview.html")
+    return render_template("dashboard/council-overview.html")
 
 @app.route("/events-overview", methods=["GET", "POST"])
 @login_required
@@ -1893,7 +1893,7 @@ def events_overview():
             'events_budget': events_budget
         })
 
-    return render_template("events-overview.html", events=events, academic_years=academic_years, sort_by_date=sort_by_date, event_data=event_data)
+    return render_template("events/events-overview.html", events=events, academic_years=academic_years, sort_by_date=sort_by_date, event_data=event_data)
 
 @app.route("/update-event/<int:event_id>", methods=["POST", "GET"])
 @login_required
@@ -1903,7 +1903,7 @@ def update_event(event_id):
         academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
         
         # Render the template with the event and academic years
-        return render_template("update-event.html", event=Events.query.get_or_404(event_id), academic_years=academic_years)
+        return render_template("events/update-event.html", event=Events.query.get_or_404(event_id), academic_years=academic_years)
     
     elif request.method == "POST":
         # Get the event by ID
@@ -1981,13 +1981,13 @@ def add_event():
         if creation_method == "scratch":
             if not events_name or not events_semester or not events_academic_year or not events_start_date_and_time or not events_end_date_and_time:
                 flash("Please fill out all required fields.", "modal-error")
-                return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
+                return render_template("events/add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
 
             # Check if event name already exists
             existing_event = Events.query.filter_by(events_name=events_name).first()
             if existing_event:
                 flash("An event with this name already exists. Please choose a different name.", "modal-error")
-                return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
+                return render_template("events/add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
 
             # Validate date format
             try:
@@ -1995,7 +1995,7 @@ def add_event():
                 events_end_date_and_time = datetime.strptime(events_end_date_and_time, '%Y-%m-%dT%H:%M')
             except ValueError:
                 flash("Invalid date format. Please use the format YYYY-MM-DDTHH:MM.", "modal-error")
-                return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
+                return render_template("events/add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
 
             # Validate budget format
             if events_budget:
@@ -2003,7 +2003,7 @@ def add_event():
                     events_budget = float(events_budget)
                 except ValueError:
                     flash("Invalid budget format. Please enter a valid number.", "modal-error")
-                    return render_template("add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
+                    return render_template("events/add-event.html", academic_years=get_distinct_academic_years(), concept_papers=get_concept_papers())
 
         # If creating from an existing concept paper, retrieve the concept paper details
         if creation_method == "existing" and concept_paper_forms_id:
@@ -2051,7 +2051,7 @@ def add_event():
     # Query distinct academic years and concept papers
     academic_years = get_distinct_academic_years()
     concept_papers = get_concept_papers()
-    return render_template("add-event.html", academic_years=academic_years, concept_papers=concept_papers)
+    return render_template("events/add-event.html", academic_years=academic_years, concept_papers=concept_papers)
 
 @app.route("/delete-event/<int:event_id>", methods=["GET", "POST"])
 @login_required
@@ -2073,7 +2073,7 @@ def delete_event(event_id):
         flash("Event deleted successfully.", "success")
         return redirect(url_for("events_overview"))
 
-    return render_template("delete-event.html", event=event)
+    return render_template("events/delete-event.html", event=event)
 
 @app.route("/event-dashboard/<int:event_id>", methods=["GET", "POST"])
 @login_required
@@ -2122,7 +2122,7 @@ def event_dashboard(event_id):
     else:
         remaining_budget = f"Budget: {events_budget}"  # Return as string if not a float
 
-    return render_template("event-dashboard.html", event=event, transactions=transactions, top5_income=top5_income_dicts, top5_expense=top5_expense_dicts, total_income=total_income, total_expense=total_expense, remaining_budget=remaining_budget)
+    return render_template("events/event-dashboard.html", event=event, transactions=transactions, top5_income=top5_income_dicts, top5_expense=top5_expense_dicts, total_income=total_income, total_expense=total_expense, remaining_budget=remaining_budget)
 
 @app.route("/add-transaction/<int:event_id>", methods=["GET", "POST"])
 @login_required
@@ -2178,7 +2178,7 @@ def add_transaction(event_id):
     # Query distinct transaction categories
     transaction_categories = db.session.query(TransactionHistory.transaction_category).distinct().order_by(TransactionHistory.transaction_category).all()
 
-    return render_template("add-transaction.html", event=event, transaction_categories=transaction_categories)
+    return render_template("events/add-transaction.html", event=event, transaction_categories=transaction_categories)
 
 @app.route("/update-transaction/<int:event_id>/<int:transaction_id>", methods=["GET", "POST"])
 @login_required
@@ -2233,7 +2233,7 @@ def update_transaction(event_id, transaction_id):
     # Query distinct transaction categories
     transaction_categories = [category[0] for category in db.session.query(TransactionHistory.transaction_category).distinct().all()]
 
-    return render_template("update-transaction.html", event=event, transaction=transaction, transaction_categories=transaction_categories)
+    return render_template("events/update-transaction.html", event=event, transaction=transaction, transaction_categories=transaction_categories)
 
 @app.route("/invite-user/<int:event_id>", methods=["GET", "POST"])
 @login_required
@@ -2277,7 +2277,7 @@ def invite_user(event_id):
 
     # Get the source from the query parameters
     source = request.args.get("source", "events_overview")
-    return render_template("invite-user.html", event=event, source=source)
+    return render_template("events/invite-user.html", event=event, source=source)
 
 @app.route("/accept-invite/<token>")
 @login_required
@@ -2364,12 +2364,12 @@ def reject_invite(token):
 @app.route("/event-invite-rejected")
 @login_required
 def event_invite_rejected():
-    return render_template("event-invite-rejected.html")
+    return render_template("events/event-invite-rejected.html")
 
 @app.route("/event-invite-accepted")
 @login_required
 def event_invite_accepted():
-    return render_template("event-invite-accepted.html")
+    return render_template("events/event-invite-accepted.html")
 
 @app.route("/concept-papers-overview")
 @login_required
@@ -2380,7 +2380,7 @@ def concept_papers_overview():
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
 
-    return render_template("concept-papers-overview.html", concept_papers=concept_papers, sort_by_date=sort_by_date)
+    return render_template("concept-papers/concept-papers-overview.html", concept_papers=concept_papers, sort_by_date=sort_by_date)
 
 @app.route('/add-concept-paper', methods=['GET', 'POST'])
 @login_required
@@ -2576,7 +2576,7 @@ def add_concept_paper():
     # Query for signatories
     signatories = Signatories.query.all()
 
-    return render_template('add-concept-paper.html', academic_years=academic_years, users=users, signatories=signatories)
+    return render_template('concept-papers/add-concept-paper.html', academic_years=academic_years, users=users, signatories=signatories)
 
 @app.route("/update-concept-paper-status/<int:paper_id>", methods=["POST"])
 @login_required
@@ -2916,7 +2916,7 @@ def update_concept_paper(paper_id):
     noted_by_college_dean = personnel_in_charge_form.personnel_in_charge_forms_noted_by_college_dean if personnel_in_charge_form else None
     noted_by_sas = personnel_in_charge_form.personnel_in_charge_forms_noted_by_sas if personnel_in_charge_form else None
 
-    return render_template('update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form, noted_by_college_dean=noted_by_college_dean, noted_by_sas=noted_by_sas)
+    return render_template('concept-papers/update-concept-paper.html', concept_paper=concept_paper, academic_years=academic_years, users=users, signatories=signatories, objectives_of_the_activity=objectives_of_the_activity, learning_outcomes=learning_outcomes, learning_journal=learning_journal, parent_guardian_consent_form=parent_guardian_consent_form, noted_by_college_dean=noted_by_college_dean, noted_by_sas=noted_by_sas)
 
 @app.route('/delete-concept-paper/<int:paper_id>', methods=['GET', 'POST'])
 @login_required
@@ -2937,7 +2937,7 @@ def delete_concept_paper(paper_id):
         flash('Concept paper deleted successfully!', 'success')
         return redirect(url_for('concept_papers_overview'))
 
-    return render_template('delete-concept-paper.html', concept_paper=concept_paper)
+    return render_template('concept-papers/delete-concept-paper.html', concept_paper=concept_paper)
 
 @app.route('/generate-concept-body', methods=['POST'])
 @login_required
@@ -4746,7 +4746,7 @@ def documentation_overview():
         Documentation.documentation_semester.desc()
     ).all()
 
-    return render_template("documentation-overview.html", 
+    return render_template("documentation/documentation-overview.html", 
                          documentations=documentations, 
                          sort_by_date='recent-to-old')
 
@@ -5035,7 +5035,7 @@ def add_documentation():
     # Query for learning journal forms and include related events
     learning_journals = db.session.query(LearningJournalForms).join(Events, LearningJournalForms.learning_journal_forms_concept_paper_forms_id == Events.events_concept_paper_forms_id).all()
 
-    return render_template('add-documentation.html', events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
+    return render_template('documentation/add-documentation.html', events=events, academic_years=academic_years, users=users, signatories=signatories, activity_reports=activity_reports, learning_journals=learning_journals)
 
 @app.route("/update-documentation-status/<int:documentation_id>", methods=["POST"])
 @login_required
@@ -5442,7 +5442,7 @@ def update_documentation(documentation_id):
     ).all()
     evaluation_forms_dict = [form.to_dict() for form in evaluation_forms]
 
-    return render_template('update-documentation.html', 
+    return render_template('documentation/update-documentation.html', 
                          documentation=documentation, 
                          events=events, 
                          academic_years=academic_years, 
@@ -5535,7 +5535,7 @@ def delete_documentation(documentation_id):
             app.logger.error(f"Failed to delete documentation: {str(e)}")
             flash('Failed to delete documentation.', 'error')
 
-    return render_template('delete-documentation.html', documentation=documentation)
+    return render_template('documentation/delete-documentation.html', documentation=documentation)
 
 @app.route('/get-related-forms/<int:event_id>', methods=['GET'])
 @login_required
@@ -6955,7 +6955,7 @@ def financial_reports_overview():
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
 
-    return render_template("financial-reports-overview.html", financial_reports=financial_reports, sort_by_date=sort_by_date)
+    return render_template("financial-reports/financial-reports-overview.html", financial_reports=financial_reports, sort_by_date=sort_by_date)
 
 @app.route('/add-financial-report', methods=['GET', 'POST'])
 @login_required
@@ -7007,7 +7007,7 @@ def add_financial_report():
     academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('add-financial-report.html', events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
+    return render_template('financial-reports/add-financial-report.html', events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
 
 @app.route('/update-financial-report/<int:report_id>', methods=['GET', 'POST'])
 @login_required
@@ -7056,7 +7056,7 @@ def update_financial_report(report_id):
     academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
-    return render_template('update-financial-report.html', report=report, events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
+    return render_template('financial-reports/update-financial-report.html', report=report, events=events, student_organizations=student_organizations, signatories=signatories, academic_years=academic_years)
 
 @app.route("/update-financial-report-status/<int:report_id>", methods=["POST"])
 @login_required
@@ -7086,7 +7086,7 @@ def delete_financial_report(report_id):
         flash('Financial report deleted successfully!', 'success')
         return redirect(url_for('financial_reports_overview'))
 
-    return render_template('delete-financial-report.html', report=report)
+    return render_template('financial-reports/delete-financial-report.html', report=report)
 
 @app.route('/generate-financial-report-pdf/<int:financial_report_id>')
 @login_required
@@ -7477,7 +7477,7 @@ def board_resolutions_overview():
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
 
-    return render_template("board-resolutions-overview.html", board_resolutions=board_resolutions, sort_by_date=sort_by_date)
+    return render_template("board-resolutions/board-resolutions-overview.html", board_resolutions=board_resolutions, sort_by_date=sort_by_date)
 
 @app.route('/add-board-resolution', methods=['GET', 'POST'])
 @login_required
@@ -7567,7 +7567,7 @@ def add_board_resolution():
     student_organizations = StudentOrganizations.query.all()
     signatories = Signatories.query.all()
 
-    return render_template('add-board-resolution.html', events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
+    return render_template('board-resolutions/add-board-resolution.html', events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
 
 @app.route("/delete-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
 @login_required
@@ -7591,7 +7591,7 @@ def delete_board_resolution(resolution_id):
         flash("Board resolution deleted successfully.", "success")
         return redirect(url_for("board_resolutions_overview"))
 
-    return render_template("delete-board-resolution.html", resolution=resolution)
+    return render_template("board-resolutions/delete-board-resolution.html", resolution=resolution)
 
 @app.route('/update-board-resolution/<int:resolution_id>', methods=['GET', 'POST'])
 @login_required
@@ -7683,7 +7683,7 @@ def update_board_resolution(resolution_id):
     # Query for existing student signatories
     existing_signatories = [signatory.board_resolutions_users_id for signatory in resolution.student_signatories]
 
-    return render_template('update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories, existing_signatories=existing_signatories)
+    return render_template('board-resolutions/update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories, existing_signatories=existing_signatories)
 
 @app.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
 @login_required
@@ -8027,7 +8027,7 @@ def minutes_of_the_meeting_overview():
     # Extract only the MinutesOfTheMeeting objects for filtering
     meetings_only = [meeting for meeting, _, _ in minutes_of_the_meeting]
 
-    return render_template("minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date, meetings_only=meetings_only)
+    return render_template("minutes-of-meeting/minutes-of-the-meeting-overview.html", minutes_of_the_meeting=minutes_of_the_meeting, sort_by_date=sort_by_date, meetings_only=meetings_only)
 
 @app.route('/generate-mom-pdf/<int:minutes_of_the_meeting_id>')
 @login_required
@@ -8550,7 +8550,7 @@ def add_minutes_of_the_meeting():
     student_org_name = student_org.student_organizations_name if student_org else "Unknown Organization"
     org_dict = {org.student_organizations_id: org.student_organizations_name for org in student_organizations}
 
-    return render_template('add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories, student_organizations=student_organizations, student_org_name=student_org_name, current_user=current_user, org_dict=org_dict)
+    return render_template('minutes-of-meeting/add-minutes-of-the-meeting.html', academic_years=academic_years, users=users, signatories=signatories, student_organizations=student_organizations, student_org_name=student_org_name, current_user=current_user, org_dict=org_dict)
 
 @app.route('/update-minutes-of-the-meeting/<int:meeting_id>', methods=['GET', 'POST'])
 @login_required
@@ -8655,7 +8655,7 @@ def update_minutes_of_the_meeting(meeting_id):
     # Query for student organizations and their members
     student_organizations = StudentOrganizations.query.all()
 
-    return render_template('update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories, meeting_attendees=meeting_attendees, student_organizations=student_organizations)
+    return render_template('minutes-of-meeting/update-minutes-of-the-meeting.html', meeting=meeting, academic_years=academic_years, photo_documentations=photo_documentations, users=users, signatories=signatories, meeting_attendees=meeting_attendees, student_organizations=student_organizations)
 
 @app.route("/update-minutes-of-the-meeting-status/<int:meeting_id>", methods=["POST"])
 @login_required
@@ -8697,7 +8697,7 @@ def delete_minutes_of_the_meeting(meeting_id):
         flash('Minutes of the meeting deleted successfully!', 'success')
         return redirect(url_for('minutes_of_the_meeting_overview'))
 
-    return render_template('delete-minutes-of-the-meeting.html', meeting=meeting)
+    return render_template('minutes-of-meeting/delete-minutes-of-the-meeting.html', meeting=meeting)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

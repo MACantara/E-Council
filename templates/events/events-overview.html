@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Events Overview{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+        <!-- Flash messages section for the main page -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages center no-top-margin">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <h2>Events Overview</h2>
+
+        <a href="{{ url_for('add_event') }}" class="primary-button create-button">Create New Event</a>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const selects = document.querySelectorAll('select[name="event-status-select-button"]');
+                selects.forEach(select => {
+                    select.addEventListener('change', function () {
+                        const eventId = this.getAttribute('data-event-id');
+                        const newStatus = this.value;
+                        const eventName = this.getAttribute('data-event-name');
+
+                        fetch(`/update-event-status/${eventId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
+                            },
+                            body: JSON.stringify({ status: newStatus, name: eventName })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert(`Event status for "${eventName}" updated successfully.`);
+                                } else {
+                                    alert(`Failed to update event status for "${eventName}".`);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert(`An error occurred while updating the event status for "${eventName}".`);
+                            });
+                    });
+                });
+            });
+
+            // Function to update the chart when color scheme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                updateChartColors();
+            });
+
+            // Function to get CSS variable value
+            function getCssVariable(variable) {
+                return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+            }
+
+            // Update the label and range colors using CSS variables
+            function getLabelColor() {
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? getCssVariable('--primary-text-color') // Dark mode
+                    : getCssVariable('--primary-text-color'); // Light mode
+            }
+
+            function getRangeColor() {
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? getCssVariable('--primary-text-color')
+                    : getCssVariable('--primary-text-color');
+            }
+
+            function getFontFamily() {
+                chartFontFamily = getCssVariable('--chart-font-family');
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? chartFontFamily
+                    : chartFontFamily;
+            }
+
+            function getFontSize() {
+                chartFontSize = getCssVariable('--chart-font-size');
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? chartFontSize
+                    : chartFontSize;
+            }
+
+            function getFontWeight() {
+                chartFontWeight = getCssVariable('--chart-font-weight');
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? chartFontWeight
+                    : chartFontWeight;
+            }
+        </script>
+
+        <div class="overview-content-container-group">
+            {% if events %}
+            {% set sorted_events = events | sort(attribute='events_academic_year', reverse=(sort_by_date ==
+            'recent-to-old')) %}
+            {% set semesters = ['2nd Semester', '1st Semester'] if sort_by_date == "recent-to-old" else ['1st Semester',
+            '2nd Semester']
+            %}
+            {% set academic_years = sorted_events | map(attribute='events_academic_year') | unique | list %}
+
+            {% for academic_year in academic_years %}
+            {% for semester in semesters %}
+            {% if sorted_events | has_events(semester, academic_year) %}
+            <div class="grid-header">
+                <h2>{{ semester }} - A.Y. {{ academic_year }}</h2>
+            </div>
+
+            {% for event in sorted_events %}
+            {% if event.events_semester == semester and event.events_academic_year == academic_year %}
+            <div class="overview-content-grid-item">
+                <select class="fit-content-button" name="event-status-select-button"
+                    id="event-status-select-button-{{ loop.index }}" aria-label="Select an Event Status"
+                    data-event-id="{{ event.events_id }}" data-event-name="{{ event.events_name }}" required>
+                    <option value="Upcoming" {% if event.events_status=='Upcoming' %}selected{% endif %}>Upcoming
+                    </option>
+                    <option value="Postponed" {% if event.events_status=='Postponed' %}selected{% endif %}>Postponed
+                    </option>
+                    <option value="Done" {% if event.events_status=='Done' %}selected{% endif %}>Done</option>
+                    <option value="Cancelled" {% if event.events_status=='Cancelled' %}selected{% endif %}>Cancelled
+                    </option>
+                </select>
+
+                <h3>{{ event.events_name | truncate(41) }}</h3>
+
+                <p class="events-description">{{ event.events_description | truncate(100) }}</p>
+
+                <div class="grid-item-details">
+                    <div class="grid-item-details-pair">
+                        <p>Date:</p>
+                        <p>{{ event.events_start_date_and_time.strftime('%B %d, %Y') if event.events_start_date_and_time
+                            else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Time:</p>
+                        <p>{{ event.events_start_date_and_time.strftime('%I:%M %p') if event.events_start_date_and_time
+                            else 'N/A' }} - {{ event.events_end_date_and_time.strftime('%I:%M %p') if
+                            event.events_end_date_and_time else 'N/A' }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Venue:</p>
+                        <p>{{ event.events_venue }}</p>
+                    </div>
+                    <div class="grid-item-details-pair">
+                        <p>Initial Budget:</p>
+                        <p>₱ 
+                            {% if event.events_budget is string %}
+                                {{ event.events_budget }}
+                            {% else %}
+                                {{ "{:,.2f}".format(event.events_budget) if event.events_budget else '0.00' }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const eventData = {{ event_data | tojson }};
+                        console.log("Event Data:", eventData); // Debugging statement to verify eventData
+                        const canvasElements = document.querySelectorAll('[id^="budget-chart-"]');
+                        const charts = [];
+                
+                        canvasElements.forEach((canvasElement, index) => {
+                            const ctx = canvasElement.getContext('2d');
+                            if (ctx) {
+                                const eventId = canvasElement.getAttribute('data-event-id');
+                                const event = eventData.find(e => e.event_id == eventId);
+                
+                                if (!event) {
+                                    console.error(`Event with ID ${eventId} not found in eventData`);
+                                    return;
+                                }
+                
+                                // Always use green color for remaining budget
+                                const remainingBudgetColor = getCssVariable('--remaining-budget-color');
+                                const expensesWithinBudgetColor = getCssVariable('--expenses-within-budget-color');
+                                const expensesOverBudgetColor = getCssVariable('--expenses-over-budget-color');
+                                const remainingBudget = event.remaining_budget > 0 ? event.remaining_budget : 0;
+                
+                                // Datasets array
+                                const datasets = [
+                                    {
+                                        label: 'Remaining Budget',
+                                        data: [remainingBudget],
+                                        backgroundColor: remainingBudgetColor,
+                                        borderColor: remainingBudgetColor,
+                                        borderWidth: 1,
+                                        stack: 'Stack 0'
+                                    }
+                                ];
+                
+                                // Calculate expenses within budget and over budget
+                                const expensesWithinBudget = event.total_expense > event.events_budget ? event.events_budget : event.total_expense;
+                                const expensesOverBudget = event.total_expense > remainingBudget ? event.total_expense - event.events_budget : 0;
+                
+                                // If remaining budget is 0 or less, add the "Expenses (over budget)" dataset
+                                if (remainingBudget <= 0) {
+                                    datasets.push({
+                                        label: 'Expenses (Within Budget)',
+                                        data: [expensesWithinBudget],
+                                        backgroundColor: expensesWithinBudgetColor,
+                                        borderColor: expensesWithinBudgetColor,
+                                        borderWidth: 1,
+                                        stack: 'Stack 1'
+                                    }, {
+                                        label: 'Expenses (Over Budget)',
+                                        data: [expensesOverBudget],
+                                        backgroundColor: expensesOverBudgetColor,
+                                        borderColor: expensesOverBudgetColor,
+                                        borderWidth: 1,
+                                        stack: 'Stack 1'
+                                    });
+                                } else {
+                                    datasets.push({
+                                        label: 'Expenses',
+                                        data: [event.total_expense],
+                                        backgroundColor: expensesWithinBudgetColor,
+                                        borderColor: expensesWithinBudgetColor,
+                                        borderWidth: 1,
+                                        stack: 'Stack 1'
+                                    });
+                                }
+                
+                                // Destroy existing chart instance if it exists
+                                if (canvasElement.chartInstance) {
+                                    canvasElement.chartInstance.destroy();
+                                }
+                
+                                const budgetChart = new Chart(ctx, {
+                                    type: 'bar', // Use 'bar' type for horizontal bars
+                                    data: {
+                                        labels: ['Budget Overview'], // Label for the dataset
+                                        datasets: datasets
+                                    },
+                                    options: {
+                                        indexAxis: 'y', // Horizontal bars
+                                        responsive: true, // Make the chart responsive
+                                        maintainAspectRatio: false, // Allow the chart to resize based on its container
+                                        scales: {
+                                            y: {
+                                                display: false // Hide the y-axis
+                                            },
+                                            x: {
+                                                stacked: true, // Enable stacking for the x-axis
+                                                beginAtZero: true, // Start the x-axis at 0
+                                                ticks: {
+                                                    color: getCssVariable('--primary-text-color') // X-axis ticks color
+                                                },
+                                                title: {
+                                                    display: true, // Optionally add a title to the X-axis
+                                                    color: getCssVariable('--primary-text-color') // X-axis title color
+                                                }
+                                            }
+                                        },
+                                        plugins: {
+                                            legend: {
+                                                display: true, // Show the legend
+                                                labels: {
+                                                    color: getLabelColor(),
+                                                    font: {
+                                                        family: getFontFamily(),
+                                                        size: getFontSize(),
+                                                        weight: getFontWeight()
+                                                    }
+                                                }
+                                            },
+                                        },
+                                    }
+                                });
+                
+                                // Store the chart instance on the canvas element
+                                canvasElement.chartInstance = budgetChart;
+                                charts.push(budgetChart);
+                            }
+                        });
+                
+                        // Function to update the chart when color scheme changes
+                        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                            updateChartColors();
+                        });
+                
+                        // Function to update chart colors dynamically
+                        function updateChartColors() {
+                            const labelColor = getLabelColor();
+                            const rangeColor = getRangeColor();
+                
+                            charts.forEach(chart => {
+                                // Update legend label colors
+                                chart.options.plugins.legend.labels.color = labelColor;
+                                chart.options.scales.x.title.color = rangeColor;
+                                chart.options.scales.x.ticks.color = rangeColor;
+                                chart.update();
+                            });
+                        }
+                    });
+                </script>
+
+                <div class="events-overview-chart-container">
+                    <canvas id="budget-chart-{{ event.events_id }}" data-event-id="{{ event.events_id }}"></canvas>
+                </div>
+
+                <div class="grid-item-button-group">
+                    <a href="{{ url_for('event_dashboard', event_id=event.events_id) }}" class="primary-button">View</a>
+                    <a href="{{ url_for('update_event', event_id=event.events_id) }}"
+                        class="secondary-button">Update</a>
+                    <a href="{{ url_for('invite_user', event_id=event.events_id, source='events_overview') }}"
+                        class="secondary-button">Invite</a>
+                    <a href="{{ url_for('delete_event', event_id=event.events_id) }}"
+                        class="secondary-button">Delete</a>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% else %}
+            <p>No events found for your department.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Financial Report{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+
+        <a href="{{ url_for('financial_reports_overview') }}" class="primary-button fit-content-button">Back to Financial Reports Overview</a>
+
+        <div class="container">
+            <h2>Delete Financial Report</h2>
+
+            <p>Are you sure you want to delete the financial report titled "{{ report.financial_reports_title }}"?</p>
+
+            <form method="POST" action="{{ url_for('delete_financial_report', report_id=report.financial_reports_id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="horizontal-button-pair-positioned-right">
+                    <button class="secondary-button fit-content-button" type="submit">Delete Financial Report</button>
+                    <a href="{{ url_for('financial_reports_overview') }}" class="primary-button fit-content-button">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

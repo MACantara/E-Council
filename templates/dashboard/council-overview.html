@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Council Overview{% endblock %}
+
+{% block content %}
+
+<div class="council-overview-container">
+    {% include "dashboard/council-overview-sidebar.html" %}
+
+    <div class="council-overview-content-container">
+        <h2>E-Council Overview</h2>
+
+        <select name="council-overview-school-year" id="council-overview-school-year" aria-label="Select a School Year"
+            required>
+            <option value="" disabled selected>Select a School Year</option>
+            <option value="2024-2025">S.Y 2024-2025</option>
+        </select>
+
+        <div class="council-overview-content-container-group">
+            <div class="council-overview-content-subcontainer">
+                <h3>Events</h3>
+
+                <table class="council-overview-content-table">
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>CompTIA and IC3 Certification Examination</td>
+                        <td>July 8, 2024</td>
+                        <td>Postponed</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Onsite Seminar: Data Mining</td>
+                        <td>June 14, 2024</td>
+                        <td>Canceled</td>
+                    </tr>
+                    <tr>
+                        <td>TechTutor: Empowering Communities with AI...</td>
+                        <td>May 24, 2024</td>
+                        <td>Done</td>
+                    </tr>
+                    <tr>
+                        <td>CompTIA and IC3 Certification Examination</td>
+                        <td>September 8, 2024</td>
+                        <td>Postponed</td>
+                    </tr>
+                    <!-- <tr>
+                        <td>Hackin’ ka na lang 2024: “Unveiling Future...</td>
+                        <td>April 27, 2024</td>
+                        <td>Canceled</td>
+                    </tr> -->
+                    <!-- <tr>
+                        <td>College of Computer Studies 2nd Semester...</td>
+                        <td>March 14, 2024</td>
+                        <td>Done</td>
+                    </tr> -->
+                </table>
+
+                <a href="{{ url_for('events_overview') }}" class="primary-button">View More Events on Events Overview</a>
+            </div>
+            <div class="council-overview-content-subcontainer">
+                <h3>Financial Bank Book</h3>
+
+                <canvas id="financial-bank-book-chart"></canvas>
+
+                <p>Remaining Budget: ₱ 4,000.00</p>
+            </div>
+            <div class="council-overview-content-subcontainer">
+                <h3>Activity Completion Rate</h3>
+
+                <canvas id="activity-completion-rate-chart"></canvas>
+
+                <p>Activity Completion Rate: 80%</p>
+            </div>
+            <div class="council-overview-content-subcontainer">
+                <h3>Activity Evaluation Graph</h3>
+
+                <canvas id="activity-evaluation-graph-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Data for the chart
+    var financialBankBookData = {
+        labels: ["Income", "Expenses", "Savings"],
+        datasets: [{
+            label: "Financial Bank Book",
+            data: [12000, 8000, 4000],
+            backgroundColor: [
+                "rgba(0, 128, 0, 1)",
+                "rgba(255, 0, 0, 1)",
+                "rgba(255, 165, 0, 1)"
+            ],
+            borderColor: [
+                "rgba(0, 128, 0, 1)",
+                "rgba(255, 0, 0, 1)",
+                "rgba(255, 165, 0, 1)"
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    var activityCompletionRateData = {
+        labels: ["Completed", "In Progress", "Not Started"],
+        datasets: [{
+            label: "Activity Completion Rate",
+            data: [80, 15, 5],
+            backgroundColor: [
+                "rgba(0, 128, 0, 1)",
+                "rgba(255, 165, 0, 1)",
+                "rgba(255, 0, 0, 1)"
+            ],
+            borderColor: [
+                "rgba(0, 128, 0, 1)",
+                "rgba(255, 165, 0, 1)",
+                "rgba(255, 0, 0, 1)"
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    var activityEvaluationGraphData = {
+        labels: ["Criteria 1", "Criteria 2", "Criteria 3"],
+        datasets: [{
+            label: "Activity Evaluation",
+            data: [70, 85, 90],
+            backgroundColor: "rgba(75, 192, 192, 1)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1
+        }]
+    };
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        // Update charts if the color scheme changes
+        updateChartColors();
+    });
+
+    // Function to update chart colors based on the prefers-color-scheme setting
+    function updateChartColors() {
+        const labelColor = getLabelColor();
+        const rangeColor = getRangeColor();
+
+        financialBankBookChart.options.plugins.legend.labels.color = labelColor;
+        financialBankBookChart.options.title.font.color = labelColor;
+        financialBankBookChart.update();
+
+        activityCompletionRateChart.options.plugins.legend.labels.color = labelColor;
+        activityCompletionRateChart.options.title.font.color = labelColor;
+        activityCompletionRateChart.update();
+
+        activityEvaluationGraphChart.options.plugins.legend.labels.color = labelColor;
+        activityEvaluationGraphChart.options.scales.y.title.color = rangeColor; // Update y-axis title color
+        activityEvaluationGraphChart.options.scales.y.ticks.color = rangeColor; // Update y-axis ticks color
+        activityEvaluationGraphChart.options.scales.x.title.color = rangeColor; // Update x-axis title color
+        activityEvaluationGraphChart.options.scales.x.ticks.color = rangeColor; // Update x-axis ticks color
+        activityEvaluationGraphChart.options.title.font.color = labelColor;
+        activityEvaluationGraphChart.update();
+    }
+
+    // Function to get CSS variable value
+    function getCssVariable(variable) {
+        return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+    }
+
+    // Update the label and range colors using CSS variables
+    function getLabelColor() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? getCssVariable('--primary-text-color')
+            : getCssVariable('--primary-text-color');
+    }
+
+    function getRangeColor() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? getCssVariable('--primary-text-color')
+            : getCssVariable('--primary-text-color');
+    }
+
+    function getFontFamily() {
+        chartFontFamily = getCssVariable('--chart-font-family');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontFamily
+            : chartFontFamily;
+    }
+
+    function getFontSize() {
+        chartFontSize = getCssVariable('--chart-font-size');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontSize
+            : chartFontSize;
+    }
+
+    function getFontWeight() {
+        chartFontWeight = getCssVariable('--chart-font-weight');
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? chartFontWeight
+            : chartFontWeight;
+    }
+
+    // Create the charts
+    var financialBankBookChart = new Chart(document.getElementById("financial-bank-book-chart"), {
+        type: "doughnut",
+        data: financialBankBookData,
+        options: {
+            title: {
+                display: true,
+                text: "Financial Bank Book",
+                font: {
+                    color: getLabelColor()
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: getLabelColor(),
+                        font: {
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    var activityCompletionRateChart = new Chart(document.getElementById("activity-completion-rate-chart"), {
+        type: "doughnut",
+        data: activityCompletionRateData,
+        options: {
+            title: {
+                display: true,
+                text: "Activity Completion Rate",
+                font: {
+                    color: getLabelColor()
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: getLabelColor(),
+                        font: {
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    var activityEvaluationGraphChart = new Chart(document.getElementById("activity-evaluation-graph-chart"), {
+        type: 'bar',
+        data: activityEvaluationGraphData,
+        options: {
+            title: {
+                display: true,
+                text: "Activity Evaluation",
+                font: {
+                    color: getLabelColor()
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: getLabelColor(),
+                        font: {
+                            family: getFontFamily(),
+                            size: getFontSize(),
+                            weight: getFontWeight()
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Criteria",
+                        color: getRangeColor(), // Set the x-axis title color
+                        font: {
+                            size: getFontSize()
+                        }
+                    },
+                    ticks: {
+                        color: getRangeColor(), // Set the ticks color for x-axis
+                        font: {
+                            size: getFontSize()
+                        }
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: "Scores",
+                        color: getRangeColor(), // Set the y-axis title color
+                        font: {
+                            size: getFontSize()
+                        }
+                    },
+                    ticks: {
+                        color: getRangeColor(), // Set the ticks color for y-axis
+                        font: {
+                            size: getFontSize()
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
