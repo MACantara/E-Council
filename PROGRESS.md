@@ -679,6 +679,35 @@ static/css/
 
 ---
 
+### Phase 15: Template Updates for Blueprint Routes (Week 7)
+**Status:** Completed  
+**Progress:** 100%
+
+#### Template Update Tasks
+- [x] Update concept paper templates to use concept_papers blueprint namespace
+- [x] Update event templates to use events blueprint namespace
+- [x] Update authentication templates to use auth blueprint namespace
+- [x] Update account templates to use account blueprint namespace
+- [x] Update dashboard templates to use dashboard blueprint namespace
+- [x] Update documentation templates to use documentation blueprint namespace
+- [x] Update financial templates to use financial blueprint namespace
+- [x] Update board resolution templates to use board_resolutions blueprint namespace
+- [x] Update meeting templates to use meetings blueprint namespace
+
+#### Template Files Updated
+- **Concept papers** (4 files): concept-papers-overview.html, add-concept-paper.html, update-concept-paper.html, delete-concept-paper.html
+- **Events** (8 files): events-overview.html, add-transaction.html, delete-event.html, invite-user.html, update-transaction.html, event-dashboard.html, council-overview-sidebar.html, council-overview.html
+- **Authentication** (2 files): forgot-password.html, email-settings.html
+- **Account** (3 files): account.html, account-settings.html, account-settings-sidebar.html
+- **Dashboard** (2 files): council-overview-sidebar.html, council-overview.html
+- **Documentation** (1 file): add-documentation.html
+- **Board resolutions** (5 files): add-board-resolution.html, delete-board-resolution.html, update-board-resolution.html, board-resolutions-overview.html, council-overview-sidebar.html
+- **Meetings** (5 files): add-minutes-of-the-meeting.html, delete-minutes-of-the-meeting.html, update-minutes-of-the-meeting.html, minutes-of-the-meeting-overview.html, council-overview-sidebar.html
+
+**Template Updates Complete:** All 30+ template files updated to use blueprint namespaces. All url_for() calls and fetch URLs updated to use new route structure. Application fully integrated with modular blueprint architecture.
+
+---
+
 ## Issues & Blockers
 
 ### Current Issues
