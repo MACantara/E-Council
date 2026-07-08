@@ -48,19 +48,30 @@ import pandas as pd
 # Load environment variables from .env file
 load_dotenv()
 
-# Flask Configuration
-app = Flask(__name__, template_folder="templates")
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
+# Import new configuration and utilities
+from config import DatabaseConfig, EmailConfig, CloudinaryConfig, AIConfig
+from utils import register_filters, register_error_handlers
+from utils.helpers import get_distinct_academic_years, get_concept_papers, safe_decimal_conversion, allowed_image_file
+from utils.processing import process_tally_items, process_evaluation_forms
+from utils.auth import load_user, unauthorized
 
-# Flask Mail Configuration
-app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
-app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT"))
-app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS") == 'True'
-app.config["MAIL_USE_SSL"] = os.getenv("MAIL_USE_SSL") == 'True'
-app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
-app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER")
+# Flask Configuration using new config classes
+app = Flask(__name__, template_folder="templates")
+
+# Use configuration classes
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["SQLALCHEMY_DATABASE_URI"] = DatabaseConfig.SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = DatabaseConfig.SQLALCHEMY_TRACK_MODIFICATIONS
+app.config["SQLALCHEMY_ECHO"] = DatabaseConfig.SQLALCHEMY_ECHO
+
+# Flask Mail Configuration using EmailConfig
+app.config["MAIL_SERVER"] = EmailConfig.MAIL_SERVER
+app.config["MAIL_PORT"] = EmailConfig.MAIL_PORT
+app.config["MAIL_USE_TLS"] = EmailConfig.MAIL_USE_TLS
+app.config["MAIL_USE_SSL"] = EmailConfig.MAIL_USE_SSL
+app.config["MAIL_USERNAME"] = EmailConfig.MAIL_USERNAME
+app.config["MAIL_PASSWORD"] = EmailConfig.MAIL_PASSWORD
+app.config["MAIL_DEFAULT_SENDER"] = EmailConfig.MAIL_DEFAULT_SENDER
 
 s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
@@ -72,18 +83,18 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# Cloudinary Configuration       
-cloudinary.config( 
-    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
-    api_key = os.getenv("CLOUDINARY_API_KEY"), 
-    api_secret = os.getenv("CLOUDINARY_API_SECRET"),
-    secure=True
+# Cloudinary Configuration using CloudinaryConfig
+cloudinary.config(
+    cloud_name=CloudinaryConfig.CLOUDINARY_CLOUD_NAME,
+    api_key=CloudinaryConfig.CLOUDINARY_API_KEY,
+    api_secret=CloudinaryConfig.CLOUDINARY_API_SECRET,
+    secure=CloudinaryConfig.CLOUDINARY_SECURE
 )
 
-# Gemini AI Configuration
-genai.configure(api_key=os.getenv("GOOGLE_GEMINI_AI_API_KEY"))
-model = genai.GenerativeModel('gemini-1.5-flash')
-model_gemini_flash = genai.GenerativeModel('gemini-1.5-flash')
+# Gemini AI Configuration using AIConfig
+genai.configure(api_key=AIConfig.GOOGLE_GEMINI_AI_API_KEY)
+model = genai.GenerativeModel(AIConfig.GEMINI_MODEL)
+model_gemini_flash = genai.GenerativeModel(AIConfig.GEMINI_MODEL)
 
 safety_settings = {
     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
@@ -98,14 +109,9 @@ csrf = CSRFProtect(app)
 UPLOAD_FOLDER = 'uploads/receipts'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@login_manager.user_loader
-def load_user(user_id):
-    return db.session.get(Users, int(user_id))
-
-@login_manager.unauthorized_handler
-def unauthorized():
-    flash("You need to be logged in to access this page.", "error")
-    return redirect(url_for("login"))
+# Use imported auth functions
+login_manager.user_loader(load_user)
+login_manager.unauthorized_handler(unauthorized)
 
 class CustomUnderline(Flowable):
     def __init__(self, width, thickness, y_offset=0, gap=2):
@@ -797,61 +803,9 @@ class EventPhotoDocumentationImages(db.Model):
     def __repr__(self):
         return f'<EventPhotoDocumentationImages {self.event_photo_documentation_images_id}>'
 
-# Custom Jinja2 Filters
-@app.template_filter('truncate')
-def truncate_text(text, length=100, suffix='...'):
-    if text is None:
-        return ''
-    if len(text) > length:
-        return text[:length].rsplit(' ', 1)[0] + suffix
-    return text
-
-app.jinja_env.filters['truncate'] = truncate_text
-
-def has_events(events, semester, academic_year):
-    return any(event.events_semester == semester and event.events_academic_year == academic_year for event in events)
-
-app.jinja_env.filters['has_events'] = has_events
-
-# Custom Jinja2 filter to check if there are resolutions for a given semester and academic year
-@app.template_filter('has_resolutions')
-def has_resolutions(resolutions, semester, academic_year):
-    return any(resolution.board_resolutions_semester == semester and resolution.board_resolutions_academic_year == academic_year for resolution in resolutions)
-
-app.jinja_env.filters['has_resolutions'] = has_resolutions
-
-# Custom Jinja2 filter to check if there are meetings for a given semester and academic year
-@app.template_filter('has_meetings')
-def has_meetings(meetings, semester, academic_year):
-    return any(meeting.minutes_of_the_meeting_semester == semester and meeting.minutes_of_the_meeting_academic_year == academic_year for meeting in meetings)
-
-app.jinja_env.filters['has_meetings'] = has_meetings
-
-# Custom Jinja2 filter to check if there are financial reports for a given semester and academic year
-@app.template_filter('has_financial_reports')
-def has_financial_reports(reports, semester, academic_year):
-    return any(report.financial_reports_semester == semester and report.financial_reports_academic_year == academic_year for report in reports)
-
-app.jinja_env.filters['has_financial_reports'] = has_financial_reports
-
-# Custom Jinja2 filter to check if there are concept papers for a given semester and academic year
-@app.template_filter('has_papers')
-def has_papers(papers, semester, academic_year):
-    return any(paper.concept_paper_forms_semester == semester and paper.concept_paper_forms_academic_year == academic_year for paper in papers)
-
-app.jinja_env.filters['has_papers'] = has_papers
-
-# Define the has_documentations filter
-@app.template_filter('has_documentations')
-def has_documentations(documentations, semester, academic_year):
-    return any(doc[0].documentation_semester == semester and doc[0].documentation_academic_year == academic_year for doc in documentations)
-
-# Error handlers
-@app.errorhandler(CloudinaryError)
-def handle_cloudinary_error(error):
-    app.logger.error(f"Cloudinary error: {str(error)}")
-    flash("An error occurred while processing images.", "error")
-    return redirect(url_for('documentation_overview'))
+# Register custom Jinja2 filters and error handlers from utils
+register_filters(app)
+register_error_handlers(app)
 
 # Python functions
 def send_verification_email(users_email):
@@ -1179,83 +1133,6 @@ def send_invite_email(users_email, event_name, event_id):
     )
     db.session.add(event_invitation)
     db.session.commit()
-
-def get_distinct_academic_years():
-    return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
-
-def get_concept_papers():
-    return ConceptPaperForms.query.all()
-
-def safe_decimal_conversion(value):
-    try:
-        return Decimal(value)
-    except (ValueError, TypeError, InvalidOperation):
-        return str(value)
-
-def allowed_image_file(filename):
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def process_tally_items(documentation_id, tally_names, extremely_satisfied, satisfied, neutral, dissatisfied, extremely_dissatisfied):
-    # First, delete all existing tally items
-    TallyItems.query.filter_by(tally_items_documentation_id=documentation_id).delete()
-    
-    # Process new tally items
-    for i in range(len(tally_names)):
-        if tally_names[i].strip():  # Only process if name is not empty
-            tally_name = tally_names[i].strip()
-            
-            # Get the rating counts for tally
-            es_count = int(extremely_satisfied[i] or 0)
-            s_count = int(satisfied[i] or 0)
-            n_count = int(neutral[i] or 0)
-            d_count = int(dissatisfied[i] or 0)
-            ed_count = int(extremely_dissatisfied[i] or 0)
-            
-            # Create new tally item
-            new_tally = TallyItems(
-                tally_items_documentation_id=documentation_id,
-                tally_items_name=tally_name,
-                tally_items_extremely_satisfied_rating_total=es_count,
-                tally_items_satisfied_rating_total=s_count,
-                tally_items_neutral_rating_total=n_count,
-                tally_items_dissatisfied_rating_total=d_count,
-                tally_items_extremely_dissatisfied_rating_total=ed_count
-            )
-            db.session.add(new_tally)
-
-def process_evaluation_forms(documentation_id, tally_names, request):
-    # First, delete all existing evaluation forms
-    EvaluationForm.query.filter_by(evaluation_form_documentation_id=documentation_id).delete()
-    
-    # Process new evaluation forms
-    for i in range(len(tally_names)):
-        if tally_names[i].strip():  # Only process if name is not empty
-            tally_name = tally_names[i].strip()
-            
-            # Get the evaluation rating for this item
-            eval_rating_key = f'eval-tally-{i}'
-            rating_value = request.form.get(eval_rating_key)
-            
-            # Convert radio button value to rating counts
-            eval_es_count = 1 if rating_value == '5' else 0
-            eval_s_count = 1 if rating_value == '4' else 0
-            eval_n_count = 1 if rating_value == '3' else 0
-            eval_d_count = 1 if rating_value == '2' else 0
-            eval_ed_count = 1 if rating_value == '1' else 0
-            
-            # Create new evaluation form entry
-            new_evaluation = EvaluationForm(
-                evaluation_form_documentation_id=documentation_id,
-                evaluation_form_name=tally_name,
-                evaluation_form_extremely_satisfied_rating=eval_es_count,
-                evaluation_form_satisfied_rating=eval_s_count,
-                evaluation_form_neutral_rating=eval_n_count,
-                evaluation_form_dissatisfied_rating=eval_d_count,
-                evaluation_form_extremely_dissatisfied_rating=eval_ed_count
-            )
-            db.session.add(new_evaluation)
 
 # Routes
 @app.route("/")
