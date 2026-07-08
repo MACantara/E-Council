@@ -5,27 +5,33 @@ Handles user registration, login, logout, password reset, and email verification
 
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, flash, redirect, url_for, Markup
-from flask_login import login_user, logout_user, login_required
-from itsdangerous import SignatureExpired, BadSignature
+from flask_login import login_user, logout_user, login_required, current_user
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from markupsafe import Markup as SafeMarkup
 
-# Import database models and utilities
-# Note: These imports will need to be adjusted based on the final model structure
-# For now, we'll use the existing imports from app.py
-# from models.user import Users, EmailVerification, PasswordReset, LoginAttempts
-# from models.department import Departments, StudentOrganizations
-# from utils.email import send_verification_email, send_reset_password_email
+# Import database models from models package
+from models import (
+    db,
+    Users,
+    StudentOrganizations,
+    EmailVerification,
+    PasswordReset,
+    LoginAttempts,
+    Departments
+)
 
-# Temporary imports from app.py (will be refactored later)
-from app import db, s, Users, EmailVerification, PasswordReset, LoginAttempts, Departments, StudentOrganizations
-from app import send_verification_email, send_reset_password_email
+# Import email functions from utils.email
+from utils.email import send_verification_email, send_reset_password_email
 
-auth_bp = Blueprint('auth', __name__)
+# Import current app to get SECRET_KEY for serializer
+from flask import current_app
 
+# Initialize URLSafeTimedSerializer
+def get_serializer():
+    return URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
 
-@auth_bp.route("/")
-def index():
-    return render_template("index.html")
+# Create blueprint with url_prefix='/auth'
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
@@ -133,6 +139,7 @@ def signup():
 
 @auth_bp.route("/confirm_email/<token>")
 def confirm_email(token):
+    s = get_serializer()
     try:
         email = s.loads(token, salt='email-confirm', max_age=3600)
     except SignatureExpired:

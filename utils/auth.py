@@ -34,7 +34,7 @@ def unauthorized():
         Redirect to login page with flash message
     """
     flash("You need to be logged in to access this page.", "error")
-    return redirect(url_for("login"))
+    return redirect(url_for("auth.login"))
 
 
 def setup_login_manager(login_manager, app):
