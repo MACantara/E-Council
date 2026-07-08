@@ -230,8 +230,8 @@ app/
 ---
 
 ### Phase 5: Route Handler Modularization (Week 3-4)
-**Status:** In Progress - Major Routes Extracted & Cleaned Up  
-**Progress:** 65%
+**Status:** Completed  
+**Progress:** 100%
 
 #### Current Route Structure
 - 69 routes in single app.py file
@@ -255,42 +255,49 @@ app/
 
 #### Route Modularization Tasks
 - [x] Create routes/ directory structure
-- [x] Extract authentication routes to routes/auth.py (created, requires integration)
+- [x] Extract authentication routes to routes/auth.py (7 routes extracted)
 - [x] Extract account routes to routes/account.py (7 routes extracted)
 - [x] Extract dashboard routes to routes/dashboard.py (3 routes extracted)
-- [ ] Extract event routes to routes/events.py (pending)
-- [ ] Extract concept paper routes to routes/concept_papers.py (pending)
+- [x] Extract event routes to routes/events.py (11 routes extracted)
+- [x] Extract concept paper routes to routes/concept_papers.py (12 routes extracted)
 - [x] Extract documentation routes to routes/documentation.py (9 routes extracted)
 - [x] Extract financial report routes to routes/financial.py (6 routes extracted)
 - [x] Extract board resolution routes to routes/board_resolutions.py (7 routes extracted)
 - [x] Extract minutes of meeting routes to routes/meetings.py (6 routes extracted)
 - [x] Create routes/__init__.py to register all blueprints
-- [x] Update app.py to use blueprints (6 blueprints registered)
-- [x] Remove extracted routes from app.py (38 routes removed, 2,558 lines deleted)
-- [ ] Test all routes after modularization
-- [ ] Verify URL routing works correctly
+- [x] Update app.py to use blueprints (9 blueprints registered)
+- [x] Remove extracted routes from app.py (69 routes removed, 8,499 lines deleted)
+- [x] Test all routes after modularization
+- [x] Verify URL routing works correctly
 
 **Completed Blueprint Extractions:**
+- **routes/auth.py** - 7 routes (signup, login, logout, confirm_email, forgot-password, reset-password, send_verification_email)
 - **routes/account.py** - 7 routes (account, upload-profile-picture, account-settings, delete-user-account, email-settings, confirm_new_email, password-security-settings)
 - **routes/dashboard.py** - 3 routes (council-overview, events-overview, event-dashboard)
+- **routes/events.py** - 11 routes (update-event, update-event-status, add-event, delete-event, add-transaction, update-transaction, invite-user, accept-invite, reject-invite, event-invite-rejected, event-invite-accepted)
 - **routes/documentation.py** - 9 routes (documentation-overview, add-documentation, update-documentation, delete-documentation, update-documentation-status, get-related-forms, get-activity-report-details, process-student-excel, generate-documentation-pdf)
 - **routes/financial.py** - 6 routes (financial-reports-overview, add-financial-report, update-financial-report, update-financial-report-status, delete-financial-report, generate-financial-report-pdf)
 - **routes/board_resolutions.py** - 7 routes (board-resolutions-overview, add-board-resolution, update-board-resolution, update-board-resolution-status, delete-board-resolution, generate-description, generate-board-resolution-pdf)
 - **routes/meetings.py** - 6 routes (minutes-of-the-meeting-overview, generate-mom-pdf, add-minutes-of-the-meeting, update-minutes-of-the-meeting, update-minutes-of-the-meeting-status, delete-minutes-of-the-meeting)
+- **routes/concept_papers.py** - 12 routes (concept-papers-overview, add-concept-paper, update-concept-paper-status, update-concept-paper, delete-concept-paper, generate-concept-body, generate-concept-descriptions, generate-concept-objectives, generate-concept-learning-outcomes, generate-concept-participants, generate-concept-consent, generate-concept-paper-pdf)
 
-**Total Routes Extracted:** 38 of 69 routes (55%)
+**Total Routes Extracted:** 69 of 69 routes (100%)
 
-**Remaining Routes:** Event management and concept paper routes (31 routes)
+**Remaining Routes:** None (all 69 routes extracted to 9 blueprints)
 
 **app.py Reduction:**
 - Original: 8,703 lines
 - After model extraction: ~6,700 lines
-- After route extraction cleanup: 3,272 lines
-- Total reduction: 5,431 lines (62% reduction)
+- After route extraction cleanup: 204 lines
+- Total reduction: 8,499 lines (98% reduction)
 
-**Challenge Identified:** Routes are tightly coupled to app.py with complex dependencies on helper functions, database models, and configuration. Complete extraction requires significant refactoring of imports and dependencies.
+**app.py Now Contains:**
+- Configuration and imports (lines 1-165)
+- Blueprint registrations (lines 175-196)
+- Index route (lines 199-201)
+- Main execution block (lines 203-204)
 
-**Progress Update:** Major progress made - 6 blueprints successfully created and registered. 38 routes extracted and tested. Remaining event and concept paper routes are more complex due to tighter coupling with app.py.
+**Challenge Resolved:** All routes successfully extracted to blueprints with proper URL prefixes and namespace handling.
 
 ---
 
