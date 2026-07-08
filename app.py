@@ -198,22 +198,6 @@ events_bp.init_serializer(app.config["SECRET_KEY"])
 def index():
     return render_template("index.html")
 
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
 @app.route("/concept-papers-overview")
 @login_required
 def concept_papers_overview():
