@@ -21,7 +21,7 @@
 
         <h2>Minutes of the Meeting Overview</h2>
 
-        <a href="{{ url_for('add_minutes_of_the_meeting') }}" class="primary-button create-button">Create New Minutes of the Meeting</a>
+        <a href="{{ url_for('meetings.add_minutes_of_the_meeting') }}" class="primary-button create-button">Create New Minutes of the Meeting</a>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -32,7 +32,7 @@
                         const newStatus = this.value;
                         const meetingName = this.getAttribute('data-meeting-name');
 
-                        fetch(`/update-minutes-of-the-meeting-status/${meetingId}`, {
+                        fetch(`/meetings/update-minutes-of-the-meeting-status/${meetingId}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -107,11 +107,11 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('generate_mom_pdf', minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id) }}"
+                    <a href="{{ url_for('meetings.generate_mom_pdf', minutes_of_the_meeting_id=meeting.minutes_of_the_meeting_id) }}"
                         class="primary-button">View</a>
-                    <a href="{{ url_for('update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
+                    <a href="{{ url_for('meetings.update_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
                         class="secondary-button">Update</a>
-                    <a href="{{ url_for('delete_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
+                    <a href="{{ url_for('meetings.delete_minutes_of_the_meeting', meeting_id=meeting.minutes_of_the_meeting_id) }}"
                         class="secondary-button">Delete</a>
                 </div>
             </div>

@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board Resolutions Overview</a>
+        <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board Resolutions Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -24,11 +24,11 @@
         <div class="container">
             <h2>Delete Board Resolution</h2>
             <p>Are you sure you want to delete the board resolution "{{ resolution.board_resolutions_title }}"? This action cannot be undone.</p>
-            <form method="POST" action="{{ url_for('delete_board_resolution', resolution_id=resolution.board_resolutions_id) }}">
+            <form method="POST" action="{{ url_for('board_resolutions.delete_board_resolution', resolution_id=resolution.board_resolutions_id) }}">
                 <div class="horizontal-button-pair-positioned-right">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="secondary-button fit-content-button" type="submit">Delete Board Resolution</button>
-                    <a href="{{ url_for('board_resolutions_overview') }}" class="primary-button fit-content-button">Cancel</a>
+                    <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}" class="primary-button fit-content-button">Cancel</a>
                 </div>
             </form>
         </div>

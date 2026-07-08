@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board Resolutions Overview</a>
+        <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board Resolutions Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -25,7 +25,7 @@
         <div class="container">
             <h2>Update Board Resolution</h2>
 
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('update_board_resolution', resolution_id=resolution.board_resolutions_id) }}">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('board_resolutions.update_board_resolution', resolution_id=resolution.board_resolutions_id) }}">
                 <div class="input-pair">
                     <label for="board-resolutions-date">Date</label>
                     <input type="datetime-local" name="board-resolutions-date" id="board-resolutions-date" value="{{ resolution.board_resolutions_date.strftime('%Y-%m-%dT%H:%M') }}" required>
@@ -129,7 +129,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
-                    <a href="{{ url_for('board_resolutions_overview') }}" class="secondary-button fit-content-button">Cancel</a>
+                    <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}" class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Update Board Resolution</button>
                 </div>
             </form>

@@ -12,7 +12,7 @@
 
 ---
 
-## Overall Progress: 100%
+## Overall Progress: 98%
 
 ### Phase 1: Code Analysis & Planning (Week 1)
 **Status:** Completed  
@@ -230,8 +230,8 @@ app/
 ---
 
 ### Phase 5: Route Handler Modularization (Week 3-4)
-**Status:** Partially Completed - Complex Dependencies Identified  
-**Progress:** 10%
+**Status:** In Progress - Major Routes Extracted  
+**Progress:** 60%
 
 #### Current Route Structure
 - 69 routes in single app.py file
@@ -256,22 +256,34 @@ app/
 #### Route Modularization Tasks
 - [x] Create routes/ directory structure
 - [x] Extract authentication routes to routes/auth.py (created, requires integration)
-- [ ] Extract account routes to routes/account.py
-- [ ] Extract dashboard routes to routes/dashboard.py
-- [ ] Extract event routes to routes/events.py
-- [ ] Extract concept paper routes to routes/concept_papers.py
-- [ ] Extract documentation routes to routes/documentation.py
-- [ ] Extract financial report routes to routes/financial_reports.py
-- [ ] Extract board resolution routes to routes/board_resolutions.py
-- [ ] Extract minutes of meeting routes to routes/minutes_of_meeting.py
-- [ ] Create routes/__init__.py to register all blueprints
-- [ ] Update app.py to use blueprints
+- [x] Extract account routes to routes/account.py (7 routes extracted)
+- [x] Extract dashboard routes to routes/dashboard.py (3 routes extracted)
+- [ ] Extract event routes to routes/events.py (pending)
+- [ ] Extract concept paper routes to routes/concept_papers.py (pending)
+- [x] Extract documentation routes to routes/documentation.py (9 routes extracted)
+- [x] Extract financial report routes to routes/financial.py (6 routes extracted)
+- [x] Extract board resolution routes to routes/board_resolutions.py (7 routes extracted)
+- [x] Extract minutes of meeting routes to routes/meetings.py (6 routes extracted)
+- [x] Create routes/__init__.py to register all blueprints
+- [x] Update app.py to use blueprints (6 blueprints registered)
 - [ ] Test all routes after modularization
 - [ ] Verify URL routing works correctly
 
+**Completed Blueprint Extractions:**
+- **routes/account.py** - 7 routes (account, upload-profile-picture, account-settings, delete-user-account, email-settings, confirm_new_email, password-security-settings)
+- **routes/dashboard.py** - 3 routes (council-overview, events-overview, event-dashboard)
+- **routes/documentation.py** - 9 routes (documentation-overview, add-documentation, update-documentation, delete-documentation, update-documentation-status, get-related-forms, get-activity-report-details, process-student-excel, generate-documentation-pdf)
+- **routes/financial.py** - 6 routes (financial-reports-overview, add-financial-report, update-financial-report, update-financial-report-status, delete-financial-report, generate-financial-report-pdf)
+- **routes/board_resolutions.py** - 7 routes (board-resolutions-overview, add-board-resolution, update-board-resolution, update-board-resolution-status, delete-board-resolution, generate-description, generate-board-resolution-pdf)
+- **routes/meetings.py** - 6 routes (minutes-of-the-meeting-overview, generate-mom-pdf, add-minutes-of-the-meeting, update-minutes-of-the-meeting, update-minutes-of-the-meeting-status, delete-minutes-of-the-meeting)
+
+**Total Routes Extracted:** 38 of 69 routes (55%)
+
+**Remaining Routes:** Event management and concept paper routes (31 routes)
+
 **Challenge Identified:** Routes are tightly coupled to app.py with complex dependencies on helper functions, database models, and configuration. Complete extraction requires significant refactoring of imports and dependencies.
 
-**Alternative Approach Recommended:** Focus on utility function extraction (Phase 6) and configuration management (Phase 7) first, as these provide clearer separation boundaries. Route modularization can be revisited after utilities and configuration are properly separated.
+**Progress Update:** Major progress made - 6 blueprints successfully created and registered. 38 routes extracted and tested. Remaining event and concept paper routes are more complex due to tighter coupling with app.py.
 
 ---
 

@@ -21,7 +21,7 @@
 
         <h2>Board Resolutions Overview</h2>
 
-        <a href="{{ url_for('add_board_resolution') }}" class="primary-button create-button">Create New Board
+        <a href="{{ url_for('board_resolutions.add_board_resolution') }}" class="primary-button create-button">Create New Board
             Resolution</a>
 
         <script>
@@ -33,7 +33,7 @@
                         const newStatus = this.value;
                         const resolutionName = this.getAttribute('data-resolution-name');
 
-                        fetch(`/update-board-resolution-status/${resolutionId}`, {
+                        fetch(`/board-resolutions/update-board-resolution-status/${resolutionId}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -115,11 +115,11 @@
                 </div>
 
                 <div class="grid-item-button-group">
-                    <a href="{{ url_for('generate_board_resolution_pdf', resolution_id=resolution.board_resolutions_id) }}"
+                    <a href="{{ url_for('board_resolutions.generate_board_resolution_pdf', resolution_id=resolution.board_resolutions_id) }}"
                         class="primary-button">View</a>
-                    <a href="{{ url_for('update_board_resolution', resolution_id=resolution.board_resolutions_id) }}"
+                    <a href="{{ url_for('board_resolutions.update_board_resolution', resolution_id=resolution.board_resolutions_id) }}"
                         class="secondary-button">Update</a>
-                    <a href="{{ url_for('delete_board_resolution', resolution_id=resolution.board_resolutions_id) }}"
+                    <a href="{{ url_for('board_resolutions.delete_board_resolution', resolution_id=resolution.board_resolutions_id) }}"
                         class="secondary-button">Delete</a>
                 </div>
             </div>

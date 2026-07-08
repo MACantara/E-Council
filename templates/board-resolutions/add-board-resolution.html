@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board
+        <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board
             Resolutions Overview</a>
 
         <!-- Flash messages section for the modal -->
@@ -26,7 +26,7 @@
         <div class="container">
             <h2>Add Board Resolution</h2>
 
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_board_resolution')}}">
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('board_resolutions.add_board_resolution')}}">
                 <div class="input-pair">
                     <label for="board-resolutions-date">Date</label>
                     <input type="datetime-local" name="board-resolutions-date" id="board-resolutions-date" required>
@@ -163,7 +163,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-input-pair">
-                    <a href="{{ url_for('board_resolutions_overview') }}"
+                    <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}"
                         class="secondary-button fit-content-button">Cancel</a>
                     <button class="primary-button" type="submit">Add Board Resolution</button>
                 </div>

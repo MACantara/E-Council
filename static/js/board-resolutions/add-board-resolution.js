@@ -68,7 +68,7 @@ function generateDescription() {
     generateButton.textContent = 'Generating...';
     generateButton.disabled = true;
 
-    fetch('/generate-description', {
+    fetch('/board-resolutions/generate-description', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -14,7 +14,15 @@ from models.concept_paper import (
     ObjectivesOfTheActivity,
     LearningOutcomes,
     ExcuseLetterForms,
-    ActivityReportForms
+    ActivityReportForms,
+    PersonnelInChargeForms,
+    LearningJournalForms,
+    Observations,
+    Learnings,
+    ParentGuardianConsentForms,
+    ActivityReportFormsActivityStrengths,
+    ActivityReportFormsActivityWeaknesses,
+    ActivityReportFormsActivityRecommendations
 )
 from models.documentation import (
     Documentation,
@@ -63,6 +71,14 @@ __all__ = [
     'LearningOutcomes',
     'ExcuseLetterForms',
     'ActivityReportForms',
+    'PersonnelInChargeForms',
+    'LearningJournalForms',
+    'Observations',
+    'Learnings',
+    'ParentGuardianConsentForms',
+    'ActivityReportFormsActivityStrengths',
+    'ActivityReportFormsActivityWeaknesses',
+    'ActivityReportFormsActivityRecommendations',
     
     # Documentation models
     'Documentation',
