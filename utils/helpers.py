@@ -9,7 +9,7 @@ from decimal import Decimal, InvalidOperation
 # from models.concept_paper import ConceptPaperForms
 
 # Temporary imports from app.py (will be refactored later)
-from app import db, Events, ConceptPaperForms
+# Using lazy imports to avoid circular dependency with app.py
 
 
 def get_distinct_academic_years():
@@ -19,6 +19,8 @@ def get_distinct_academic_years():
     Returns:
         List of distinct academic years ordered by most recent
     """
+    from app import db, Events
+    
     return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
 
@@ -29,6 +31,8 @@ def get_concept_papers():
     Returns:
         List of all concept paper forms
     """
+    from app import ConceptPaperForms
+    
     return ConceptPaperForms.query.all()
 
 

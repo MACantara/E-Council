@@ -5,7 +5,8 @@ Handles all email sending functionality including verification, password reset, 
 
 from datetime import datetime, timedelta
 import os
-from flask import url_for, flash, current_user
+from flask import url_for, flash
+from flask_login import current_user
 from flask_mail import Message
 
 # Note: These imports will need to be adjusted based on final model structure
@@ -15,7 +16,7 @@ from flask_mail import Message
 # from models.event import EventInvitations
 
 # Temporary imports from app.py (will be refactored later)
-from app import db, mail, s, Users, EmailVerification, PasswordReset, EventInvitations, Departments
+# Using lazy imports to avoid circular dependency with app.py
 
 
 def send_verification_email(users_email):
@@ -25,6 +26,8 @@ def send_verification_email(users_email):
     Args:
         users_email: Email address of the user to verify
     """
+    from app import db, mail, s, Users, EmailVerification
+    
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     token = s.dumps(users_email, salt='email-confirm')
     link = url_for('confirm_email', token=token, _external=True)
@@ -89,6 +92,8 @@ def send_reset_password_email(users_email):
     Args:
         users_email: Email address of the user requesting password reset
     """
+    from app import db, mail, Users, PasswordReset
+    
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     selector = os.urandom(16).hex()
     token = os.urandom(32).hex()
@@ -157,6 +162,8 @@ def send_password_change_notification_email(users_email):
     Args:
         users_email: Email address of the user
     """
+    from app import mail
+    
     msg = Message('Password Change Notification', recipients=[users_email])
     
     # HTML email body
@@ -191,6 +198,8 @@ def send_email_change_notification(users_old_email, users_new_email):
         users_old_email: Old email address of the user
         users_new_email: New email address of the user
     """
+    from app import mail
+    
     msg = Message('Email Change Notification', recipients=[users_old_email])
     
     # HTML email body
@@ -225,6 +234,8 @@ def send_email_change_confirmation(users_old_email, users_new_email):
         users_old_email: Old email address of the user
         users_new_email: New email address of the user
     """
+    from app import mail
+    
     msg = Message('Email Change Confirmation', recipients=[users_new_email])
     
     # HTML email body
@@ -258,6 +269,8 @@ def send_new_email_verification(users_new_email):
     Args:
         users_new_email: New email address to verify
     """
+    from app import db, mail, s, EmailVerification
+    
     user = current_user
     token = s.dumps(users_new_email, salt='email-change')
     link = url_for('confirm_new_email', token=token, _external=True)
@@ -312,6 +325,8 @@ def send_account_deletion_notification_email(users_email):
     Args:
         users_email: Email address of the user
     """
+    from app import mail
+    
     msg = Message('Account Deletion Notification', recipients=[users_email])
     
     # HTML email body
@@ -347,6 +362,8 @@ def send_invite_email(users_email, event_name, event_id):
         event_name: Name of the event
         event_id: ID of the event
     """
+    from app import db, mail, s, Users, Departments, EventInvitations
+    
     # Get the current user's details
     inviter = Users.query.get(current_user.users_id)
     inviter_first_name = inviter.users_first_name

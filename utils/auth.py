@@ -10,7 +10,7 @@ from flask_login import LoginManager, login_required, current_user
 # from models.user import Users
 
 # Temporary imports from app.py (will be refactored later)
-from app import db, Users
+# Using lazy imports to avoid circular dependency with app.py
 
 
 def load_user(user_id):
@@ -23,6 +23,8 @@ def load_user(user_id):
     Returns:
         User object or None if not found
     """
+    from app import db, Users
+    
     return db.session.get(Users, int(user_id))
 
 

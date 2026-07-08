@@ -3,7 +3,7 @@ Error handlers for E-Council.
 """
 
 from flask import flash, redirect, url_for
-from cloudinary.exceptions import CloudinaryError
+from cloudinary.exceptions import Error
 
 
 def handle_cloudinary_error(error):
@@ -16,7 +16,9 @@ def handle_cloudinary_error(error):
     Returns:
         Redirect with flash message
     """
-    app.logger.error(f"Cloudinary error: {str(error)}")
+    from flask import current_app
+    
+    current_app.logger.error(f"Cloudinary error: {str(error)}")
     flash("An error occurred while processing images.", "error")
     return redirect(url_for('documentation_overview'))
 
@@ -28,4 +30,4 @@ def register_error_handlers(app):
     Args:
         app: Flask application instance
     """
-    app.errorhandler(CloudinaryError)(handle_cloudinary_error)
+    app.errorhandler(Error)(handle_cloudinary_error)

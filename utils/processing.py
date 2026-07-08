@@ -7,7 +7,7 @@ Data processing functions for E-Council.
 # from models.documentation import TallyItems, EvaluationForm
 
 # Temporary imports from app.py (will be refactored later)
-from app import db, TallyItems, EvaluationForm
+# Using lazy imports to avoid circular dependency with app.py
 
 
 def process_tally_items(documentation_id, tally_names, extremely_satisfied, satisfied, neutral, dissatisfied, extremely_dissatisfied):
@@ -23,6 +23,8 @@ def process_tally_items(documentation_id, tally_names, extremely_satisfied, sati
         dissatisfied: List of dissatisfied counts
         extremely_dissatisfied: List of extremely dissatisfied counts
     """
+    from app import db, TallyItems
+    
     # First, delete all existing tally items
     TallyItems.query.filter_by(tally_items_documentation_id=documentation_id).delete()
     
@@ -51,6 +53,8 @@ def process_evaluation_forms(documentation_id, tally_names, request):
         tally_names: List of tally item names
         request: Flask request object containing form data
     """
+    from app import db, EvaluationForm
+    
     # First, delete all existing evaluation forms
     EvaluationForm.query.filter_by(evaluation_form_documentation_id=documentation_id).delete()
     
