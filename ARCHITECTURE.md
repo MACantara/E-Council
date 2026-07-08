@@ -50,9 +50,8 @@ E-Council/
 │   │   ├── financial-reports/     # Financial reports JavaScript (future)
 │   │   └── minutes-of-meeting/    # Minutes of meeting JavaScript (future)
 │   └── img/
-│       ├── logos/                 # Logo files (CCS-LOGO.png, ISO.png)
+│       ├── logos/                 # Logo files (CCS-LOGO.png, ISO.png, HEADER-PERPS.png)
 │       ├── heroes/                # Hero images (home-page-hero-image.png)
-│       └── HEADER-PERPS.png       # Header image
 ├── templates/
 │   ├── base.html                  # Base template with layout
 │   ├── index.html                 # Landing page
