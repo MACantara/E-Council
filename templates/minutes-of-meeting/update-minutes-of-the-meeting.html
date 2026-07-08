@@ -228,39 +228,6 @@
 {% endblock %}
 
 {% block script %}
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
-        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-
-        academicYearSelect.addEventListener('change', function () {
-            if (academicYearSelect.value === 'Other') {
-                otherAcademicYearContainer.style.display = 'block';
-            } else {
-                otherAcademicYearContainer.style.display = 'none';
-            }
-        });
-        document.getElementById('photo-documentation').addEventListener('change', function () {
-            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
-            document.getElementById('file-name').textContent = fileNames;
-        });
-
-        const notedBySelect = document.getElementById('minutes-of-the-meeting-noted-by');
-
-        function toggleNewSignatoryFields(selectElement, prefix) {
-            const fields = [
-                'title', 'first-name', 'middle-name', 'last-name', 'suffix', 'position', 'department'
-            ];
-            fields.forEach(field => {
-                document.getElementById(`new-${prefix}-${field}`).parentElement.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
-            });
-        }
-
-        notedBySelect.addEventListener('change', function () {
-            toggleNewSignatoryFields(notedBySelect, 'noted-by');
-        });
-    });
-</script>
-
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/minutes-of-meeting/update-minutes-of-the-meeting.js') }}"></script>
 {% endblock %}

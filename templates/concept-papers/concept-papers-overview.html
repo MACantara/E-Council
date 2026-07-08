@@ -23,40 +23,6 @@
 
         <a href="{{ url_for('concept_papers.add_concept_paper') }}" class="primary-button create-button">Create New Concept Paper</a>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select[name="concept-paper-status-select-button"]');
-                selects.forEach(select => {
-                    select.addEventListener('change', function () {
-                        const paperId = this.getAttribute('data-paper-id');
-                        const newStatus = this.value;
-                        const paperName = this.getAttribute('data-paper-name');
-
-                        fetch(`/concept-papers/update-status/${paperId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
-                            },
-                            body: JSON.stringify({ status: newStatus, name: paperName })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert(`Concept paper status for "${paperName}" updated successfully.`);
-                                } else {
-                                    alert(`Failed to update concept paper status for "${paperName}".`);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert(`An error occurred while updating the concept paper status for "${paperName}".`);
-                            });
-                    });
-                });
-            });
-        </script>
-
         <div class="overview-content-container-group">
             {% if concept_papers %}
             {% set sorted_papers = concept_papers | sort(attribute='concept_paper_forms_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
@@ -120,4 +86,9 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/concept-papers/concept-papers-overview.js') }}"></script>
 {% endblock %}

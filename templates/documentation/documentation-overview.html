@@ -23,40 +23,6 @@
 
         <a href="{{ url_for('add_documentation') }}" class="primary-button create-button">Create New Documentation</a>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select[name="documentation-status-select-button"]');
-                selects.forEach(select => {
-                    select.addEventListener('change', function () {
-                        const documentationId = this.getAttribute('data-documentation-id');
-                        const newStatus = this.value;
-                        const documentationName = this.getAttribute('data-documentation-name');
-
-                        fetch(`/update-documentation-status/${documentationId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
-                            },
-                            body: JSON.stringify({ status: newStatus, name: documentationName })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert(`Documentation status for "${documentationName}" updated successfully.`);
-                                } else {
-                                    alert(`Failed to update documentation status for "${documentationName}".`);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert(`An error occurred while updating the documentation status for "${documentationName}".`);
-                            });
-                    });
-                });
-            });
-        </script>
-
         <div class="overview-content-container-group">
             {% if documentations %}
             {% set sorted_documentations = documentations | sort(attribute='0.documentation_academic_year',
@@ -135,4 +101,9 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/documentation/documentation-overview.js') }}"></script>
 {% endblock %}

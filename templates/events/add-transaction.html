@@ -102,50 +102,6 @@
 {% endblock %}
 
 {% block script %}
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const transactionDateInput = document.getElementById('transaction-date');
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
-        transactionDateInput.value = formattedDate;
-
-        const transactionCategorySelect = document.getElementById('transaction-category');
-        const otherTransactionCategoryContainer = document.getElementById('other-transaction-category-container');
-
-        transactionCategorySelect.addEventListener('change', function () {
-            if (transactionCategorySelect.value === 'Other') {
-                otherTransactionCategoryContainer.style.display = 'block';
-            } else {
-                otherTransactionCategoryContainer.style.display = 'none';
-            }
-        });
-
-        const unitAmountInput = document.getElementById('transaction-unit-amount');
-        const unitPriceInput = document.getElementById('transaction-unit-price');
-        const totalInput = document.getElementById('transaction-total');
-
-        function calculateTotal() {
-            const unitAmount = parseFloat(unitAmountInput.value) || 0;
-            const unitPrice = parseFloat(unitPriceInput.value) || 0;
-            const total = unitAmount * unitPrice;
-            totalInput.value = total.toFixed(2);
-        }
-
-        unitAmountInput.addEventListener('input', calculateTotal);
-        unitPriceInput.addEventListener('input', calculateTotal);
-    });
-
-    // File upload
-    document.getElementById('transaction-receipt').addEventListener('change', function () {
-        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-        document.getElementById('file-name').textContent = fileName;
-    });
-</script>
-
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/events/add-transaction.js') }}"></script>
 {% endblock %}

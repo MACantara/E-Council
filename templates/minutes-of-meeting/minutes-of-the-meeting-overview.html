@@ -23,40 +23,6 @@
 
         <a href="{{ url_for('meetings.add_minutes_of_the_meeting') }}" class="primary-button create-button">Create New Minutes of the Meeting</a>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select[name="meeting-status-select-button"]');
-                selects.forEach(select => {
-                    select.addEventListener('change', function () {
-                        const meetingId = this.getAttribute('data-meeting-id');
-                        const newStatus = this.value;
-                        const meetingName = this.getAttribute('data-meeting-name');
-
-                        fetch(`/meetings/update-minutes-of-the-meeting-status/${meetingId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
-                            },
-                            body: JSON.stringify({ status: newStatus, name: meetingName })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert(`Meeting status for "${meetingName}" updated successfully.`);
-                                } else {
-                                    alert(`Failed to update meeting status for "${meetingName}".`);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert(`An error occurred while updating the meeting status for "${meetingName}".`);
-                            });
-                    });
-                });
-            });
-        </script>
-
         <div class="overview-content-container-group">
             {% if minutes_of_the_meeting %}
             {% set sorted_meetings = meetings_only | sort(attribute='minutes_of_the_meeting_academic_year', reverse=(sort_by_date == 'recent-to-old')) %}
@@ -127,4 +93,9 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/minutes-of-meeting/minutes-of-the-meeting-overview.js') }}"></script>
 {% endblock %}

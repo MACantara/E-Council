@@ -141,33 +141,9 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const academicYearSelect = document.getElementById('financial-reports-academic-year');
-        const otherAcademicYearInput = document.getElementById('other-academic-year');
-        const eventSelect = document.getElementById('financial-reports-events-id');
-        const titleInput = document.getElementById('financial-reports-title');
+{% endblock %}
 
-        academicYearSelect.addEventListener('change', function () {
-            if (this.value === 'Other') {
-                otherAcademicYearInput.style.display = 'block';
-                otherAcademicYearInput.required = true;
-            } else {
-                otherAcademicYearInput.style.display = 'none';
-                otherAcademicYearInput.required = false;
-            }
-        });
-
-        eventSelect.addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            const eventName = selectedOption.getAttribute('data-event-name');
-            if (eventName) {
-                titleInput.value = `${eventName} Financial Report`;
-            } else {
-                titleInput.value = '';
-            }
-        });
-    });
-</script>
-
+{% block script %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/financial-reports/add-financial-report.js') }}"></script>
 {% endblock %}

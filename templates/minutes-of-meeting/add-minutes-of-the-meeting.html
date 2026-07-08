@@ -24,21 +24,6 @@
         <div class="container">
             <h2>Add Minutes of the Meeting</h2>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
-                    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-
-                    academicYearSelect.addEventListener('change', function () {
-                        if (academicYearSelect.value === 'Other') {
-                            otherAcademicYearContainer.style.display = 'block';
-                        } else {
-                            otherAcademicYearContainer.style.display = 'none';
-                        }
-                    });
-                });
-            </script>
-
             <form method="POST" action="{{ url_for('meetings.add_minutes_of_the_meeting') }}" enctype="multipart/form-data">
                 <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
                 <div class="input-pair">
@@ -221,45 +206,6 @@
 {% endblock %}
 
 {% block script %}
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const academicYearSelect = document.getElementById('minutes-of-the-meeting-academic-year');
-        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-
-        academicYearSelect.addEventListener('change', function () {
-            if (academicYearSelect.value === 'Other') {
-                otherAcademicYearContainer.style.display = 'block';
-            } else {
-                otherAcademicYearContainer.style.display = 'none';
-            }
-        });
-
-        document.getElementById('meeting-recording').addEventListener('change', function () {
-            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
-            document.getElementById('meeting-recording-file-name').textContent = fileNames;
-        });
-
-        document.getElementById('photo-documentation').addEventListener('change', function () {
-            const fileNames = Array.from(this.files).map(file => file.name).join(', ') || 'No files chosen';
-            document.getElementById('photo-documentation-file-name').textContent = fileNames;
-        });
-
-        const notedBySelect = document.getElementById('minutes-of-the-meeting-noted-by');
-
-        function toggleNewSignatoryFields(selectElement, prefix) {
-            const fields = [
-                'title', 'first-name', 'middle-name', 'last-name', 'suffix', 'position', 'department'
-            ];
-            fields.forEach(field => {
-                document.getElementById(`new-${prefix}-${field}`).parentElement.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
-            });
-        }
-
-        notedBySelect.addEventListener('change', function () {
-            toggleNewSignatoryFields(notedBySelect, 'noted-by');
-        });
-    });
-</script>
-
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/minutes-of-meeting/add-minutes-of-the-meeting.js') }}"></script>
 {% endblock %}

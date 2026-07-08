@@ -24,40 +24,6 @@
         <a href="{{ url_for('board_resolutions.add_board_resolution') }}" class="primary-button create-button">Create New Board
             Resolution</a>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select[name="resolution-status-select-button"]');
-                selects.forEach(select => {
-                    select.addEventListener('change', function () {
-                        const resolutionId = this.getAttribute('data-resolution-id');
-                        const newStatus = this.value;
-                        const resolutionName = this.getAttribute('data-resolution-name');
-
-                        fetch(`/board-resolutions/update-board-resolution-status/${resolutionId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token for security
-                            },
-                            body: JSON.stringify({ status: newStatus, name: resolutionName })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert(`Resolution status for "${resolutionName}" updated successfully.`);
-                                } else {
-                                    alert(`Failed to update resolution status for "${resolutionName}".`);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert(`An error occurred while updating the resolution status for "${resolutionName}".`);
-                            });
-                    });
-                });
-            });
-        </script>
-
         <div class="overview-content-container-group">
             {% if board_resolutions %}
             {% set sorted_resolutions = board_resolutions | sort(attribute='board_resolutions_academic_year',
@@ -135,4 +101,9 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/board-resolutions/board-resolutions-overview.js') }}"></script>
 {% endblock %}

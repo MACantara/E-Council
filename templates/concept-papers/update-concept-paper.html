@@ -44,8 +44,7 @@
 
                 <div class="input-pair">
                     <label for="concept-paper-academic-year">Academic Year</label>
-                    <select name="concept-paper-academic-year" id="concept-paper-academic-year" required
-                        onchange="toggleOtherAcademicYear()">
+                    <select name="concept-paper-academic-year" id="concept-paper-academic-year" required>
                         <option value="" disabled>Select Academic Year</option>
                         {% for year in academic_years %}
                         <option value="{{ year }}" {% if concept_paper.concept_paper_forms_academic_year==year
@@ -149,7 +148,7 @@
                         <input type="text" name="concept-paper-objectives" value="{{ objective }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
+                    <button class="primary-button" type="button">Add Objective</button>
                 </div>
 
                 <div class="input-pair">
@@ -159,8 +158,7 @@
                         <input type="text" name="concept-paper-learning-outcomes" value="{{ outcome }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning
-                        Outcome</button>
+                    <button class="primary-button" type="button">Add Learning Outcome</button>
                 </div>
 
                 <div class="input-pair">
@@ -321,7 +319,7 @@
                         <input type="text" name="activity-strengths" placeholder="Enter Strength" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addStrength()">Add Strength</button>
+                    <button class="primary-button" type="button">Add Strength</button>
                 </div>
 
                 <div class="input-pair">
@@ -337,7 +335,7 @@
                         <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
+                    <button class="primary-button" type="button">Add Weakness</button>
                 </div>
 
                 <div class="input-pair">
@@ -353,8 +351,7 @@
                         <input type="text" name="activity-recommendations" placeholder="Enter Recommendation" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addRecommendation()">Add
-                        Recommendation</button>
+                    <button class="primary-button" type="button">Add Recommendation</button>
                 </div>
 
                 <h3>Learning Journal Form</h3>
@@ -395,7 +392,7 @@
                             value="{{ observation.observation.observations_content }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
+                    <button class="primary-button" type="button">Add Observation</button>
                 </div>
 
                 <div class="input-pair">
@@ -406,7 +403,7 @@
                             value="{{ learning.learning.learnings_content }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
+                    <button class="primary-button" type="button">Add Learning</button>
                 </div>
 
                 <div class="input-pair">
@@ -598,92 +595,6 @@
 {% endblock %}
 
 {% block script %}
-<script>
-    function toggleOtherAcademicYear() {
-        const academicYearSelect = document.getElementById('concept-paper-academic-year');
-        const otherAcademicYearInput = document.getElementById('other-academic-year-input');
-        const otherAcademicYearLabel = document.getElementById('other-academic-year-label');
-        if (academicYearSelect.value === 'Other') {
-            otherAcademicYearInput.style.display = 'block';
-            otherAcademicYearInput.required = true;
-            otherAcademicYearLabel.style.display = 'block';
-            otherAcademicYearLabel.required = true;
-        } else {
-            otherAcademicYearInput.style.display = 'none';
-            otherAcademicYearInput.required = false;
-            otherAcademicYearLabel.style.display = 'none';
-            otherAcademicYearLabel.required = false;
-        }
-    }
-
-    function addObjective() {
-        const container = document.getElementById('concept-paper-objectives');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'concept-paper-objectives';
-        input.placeholder = 'Enter Objective';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addLearningOutcome() {
-        const container = document.getElementById('concept-paper-learning-outcomes');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'concept-paper-learning-outcomes';
-        input.placeholder = 'Enter Learning Outcome';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addStrength() {
-        const container = document.getElementById('activity-strengths');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'activity-strengths';
-        input.placeholder = 'Enter Strength';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addWeakness() {
-        const container = document.getElementById('activity-weaknesses');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'activity-weaknesses';
-        input.placeholder = 'Enter Weakness';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addRecommendation() {
-        const container = document.getElementById('activity-recommendations');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'activity-recommendations';
-        input.placeholder = 'Enter Recommendation';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addObservation() {
-        const container = document.getElementById('learning-journal-observations');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'learning-journal-observations';
-        input.placeholder = 'Enter Observation';
-        input.required = true;
-        container.appendChild(input);
-    }
-
-    function addLearning() {
-        const container = document.getElementById('learning-journal-learnings');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'learning-journal-learnings';
-        input.placeholder = 'Enter Learning';
-        input.required = true;
-        container.appendChild(input);
-    }
-</script>
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/concept-papers/update-concept-paper.js') }}"></script>
 {% endblock %}
