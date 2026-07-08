@@ -381,10 +381,23 @@ function addDynamicInput(containerId, name, placeholder, type = 'text') {
 
     const div = document.createElement('div');
     div.className = 'input-group';
-    div.innerHTML = `
-        <input type="${type}" name="${name}" placeholder="${placeholder}" required>
-        <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
-    `;
+
+    const input = document.createElement('input');
+    input.type = type;
+    input.name = name;
+    input.placeholder = placeholder;
+    input.required = true;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'delete-btn';
+    removeBtn.textContent = 'Delete';
+    removeBtn.addEventListener('click', function () {
+        div.remove();
+    });
+
+    div.appendChild(input);
+    div.appendChild(removeBtn);
     container.appendChild(div);
 }
 
@@ -440,10 +453,23 @@ function populateFieldsFromBulletPoints(containerId, items, name) {
     for (let i = 1; i < items.length; i++) {
         const div = document.createElement('div');
         div.className = 'input-group';
-        div.innerHTML = `
-            <input type="text" name="${name}" value="${items[i]}" required>
-            <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Delete</button>
-        `;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = name;
+        input.value = items[i];
+        input.required = true;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'delete-btn';
+        removeBtn.textContent = 'Delete';
+        removeBtn.addEventListener('click', function () {
+            div.remove();
+        });
+
+        div.appendChild(input);
+        div.appendChild(removeBtn);
         container.appendChild(div);
     }
 }

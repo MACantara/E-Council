@@ -128,7 +128,7 @@ function createFileItem(file, index, input, includePreview) {
     removeBtn.type = 'button';
     removeBtn.className = 'remove-file-btn';
     removeBtn.textContent = '×';
-    removeBtn.onclick = () => removeFile(index, input);
+    removeBtn.addEventListener('click', () => removeFile(index, input));
     
     fileItem.appendChild(fileName);
     

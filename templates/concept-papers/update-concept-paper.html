@@ -148,7 +148,7 @@
                         <input type="text" name="concept-paper-objectives" value="{{ objective }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addObjective()">Add Objective</button>
+                    <button id="add-objective-btn" class="primary-button" type="button">Add Objective</button>
                 </div>
 
                 <div class="input-pair">
@@ -158,7 +158,7 @@
                         <input type="text" name="concept-paper-learning-outcomes" value="{{ outcome }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addLearningOutcome()">Add Learning Outcome</button>
+                    <button id="add-learning-outcome-btn" class="primary-button" type="button">Add Learning Outcome</button>
                 </div>
 
                 <div class="input-pair">
@@ -318,7 +318,7 @@
                         <input type="text" name="activity-strengths" placeholder="Enter Strength" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addStrength()">Add Strength</button>
+                    <button id="add-strength-btn" class="primary-button" type="button">Add Strength</button>
                 </div>
 
                 <div class="input-pair">
@@ -333,7 +333,7 @@
                         <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addWeakness()">Add Weakness</button>
+                    <button id="add-weakness-btn" class="primary-button" type="button">Add Weakness</button>
                 </div>
 
                 <div class="input-pair">
@@ -348,7 +348,7 @@
                         <input type="text" name="activity-recommendations" placeholder="Enter Recommendation" required>
                         {% endif %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addRecommendation()">Add Recommendation</button>
+                    <button id="add-recommendation-btn" class="primary-button" type="button">Add Recommendation</button>
                 </div>
 
                 <h3>Learning Journal Form</h3>
@@ -388,7 +388,7 @@
                         <input type="text" name="learning-journal-observations" value="{{ observation }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addObservation()">Add Observation</button>
+                    <button id="add-observation-btn" class="primary-button" type="button">Add Observation</button>
                 </div>
 
                 <div class="input-pair">
@@ -398,7 +398,7 @@
                         <input type="text" name="learning-journal-learnings" value="{{ learning }}" required>
                         {% endfor %}
                     </div>
-                    <button class="primary-button" type="button" onclick="addLearning()">Add Learning</button>
+                    <button id="add-learning-btn" class="primary-button" type="button">Add Learning</button>
                 </div>
 
                 <div class="input-pair">

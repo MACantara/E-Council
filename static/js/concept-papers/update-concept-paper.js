@@ -8,54 +8,46 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function initializeUpdateConceptPaperForm() {
-    // Remove inline onclick handlers and replace with event listeners
-    const addObjectiveButton = document.querySelector('button[onclick="addObjective()"]');
-    const addLearningOutcomeButton = document.querySelector('button[onclick="addLearningOutcome()"]');
-    const addStrengthButton = document.querySelector('button[onclick="addStrength()"]');
-    const addWeaknessButton = document.querySelector('button[onclick="addWeakness()"]');
-    const addRecommendationButton = document.querySelector('button[onclick="addRecommendation()"]');
-    const addObservationButton = document.querySelector('button[onclick="addObservation()"]');
-    const addLearningButton = document.querySelector('button[onclick="addLearning()"]');
+    // Attach click listeners to add-field buttons
+    const addObjectiveButton = document.getElementById('add-objective-btn');
+    const addLearningOutcomeButton = document.getElementById('add-learning-outcome-btn');
+    const addStrengthButton = document.getElementById('add-strength-btn');
+    const addWeaknessButton = document.getElementById('add-weakness-btn');
+    const addRecommendationButton = document.getElementById('add-recommendation-btn');
+    const addObservationButton = document.getElementById('add-observation-btn');
+    const addLearningButton = document.getElementById('add-learning-btn');
 
     if (addObjectiveButton) {
-        addObjectiveButton.removeAttribute('onclick');
         addObjectiveButton.addEventListener('click', addObjective);
     }
 
     if (addLearningOutcomeButton) {
-        addLearningOutcomeButton.removeAttribute('onclick');
         addLearningOutcomeButton.addEventListener('click', addLearningOutcome);
     }
 
     if (addStrengthButton) {
-        addStrengthButton.removeAttribute('onclick');
         addStrengthButton.addEventListener('click', addStrength);
     }
 
     if (addWeaknessButton) {
-        addWeaknessButton.removeAttribute('onclick');
         addWeaknessButton.addEventListener('click', addWeakness);
     }
 
     if (addRecommendationButton) {
-        addRecommendationButton.removeAttribute('onclick');
         addRecommendationButton.addEventListener('click', addRecommendation);
     }
 
     if (addObservationButton) {
-        addObservationButton.removeAttribute('onclick');
         addObservationButton.addEventListener('click', addObservation);
     }
 
     if (addLearningButton) {
-        addLearningButton.removeAttribute('onclick');
         addLearningButton.addEventListener('click', addLearning);
     }
 
     // Handle academic year toggle
     const academicYearSelect = document.getElementById('concept-paper-academic-year');
     if (academicYearSelect) {
-        academicYearSelect.removeAttribute('onchange');
         academicYearSelect.addEventListener('change', toggleOtherAcademicYear);
     }
 }
