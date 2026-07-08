@@ -26,11 +26,13 @@ def send_verification_email(users_email):
     Args:
         users_email: Email address of the user to verify
     """
-    from app import db, mail, s, Users, EmailVerification
+    from extensions import db, mail, get_serializer
+    from models import Users, EmailVerification
+    s = get_serializer()
     
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     token = s.dumps(users_email, salt='email-confirm')
-    link = url_for('confirm_email', token=token, _external=True)
+    link = url_for('auth.confirm_email', token=token, _external=True)
     msg = Message('New Account Email Verification', recipients=[users_email])
     
     # HTML email body
@@ -92,7 +94,8 @@ def send_reset_password_email(users_email):
     Args:
         users_email: Email address of the user requesting password reset
     """
-    from app import db, mail, Users, PasswordReset
+    from extensions import db, mail
+    from models import Users, PasswordReset
     
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     selector = os.urandom(16).hex()
@@ -100,7 +103,7 @@ def send_reset_password_email(users_email):
     expires = datetime.utcnow() + timedelta(hours=1)
     
     # Create the password reset link
-    link = url_for('reset_password', selector=selector, token=token, _external=True)
+    link = url_for('auth.reset_password', selector=selector, token=token, _external=True)
     msg = Message('Password Reset Request', recipients=[users_email])
     
     # HTML email body
@@ -162,7 +165,7 @@ def send_password_change_notification_email(users_email):
     Args:
         users_email: Email address of the user
     """
-    from app import mail
+    from extensions import mail
     
     msg = Message('Password Change Notification', recipients=[users_email])
     
@@ -198,7 +201,7 @@ def send_email_change_notification(users_old_email, users_new_email):
         users_old_email: Old email address of the user
         users_new_email: New email address of the user
     """
-    from app import mail
+    from extensions import mail
     
     msg = Message('Email Change Notification', recipients=[users_old_email])
     
@@ -234,7 +237,7 @@ def send_email_change_confirmation(users_old_email, users_new_email):
         users_old_email: Old email address of the user
         users_new_email: New email address of the user
     """
-    from app import mail
+    from extensions import mail
     
     msg = Message('Email Change Confirmation', recipients=[users_new_email])
     
@@ -269,11 +272,13 @@ def send_new_email_verification(users_new_email):
     Args:
         users_new_email: New email address to verify
     """
-    from app import db, mail, s, EmailVerification
+    from extensions import db, mail, get_serializer
+    from models import EmailVerification
+    s = get_serializer()
     
     user = current_user
     token = s.dumps(users_new_email, salt='email-change')
-    link = url_for('confirm_new_email', token=token, _external=True)
+    link = url_for('account.confirm_new_email', token=token, _external=True)
     msg = Message('Email Change Verification', recipients=[users_new_email])
     
     # HTML email body
@@ -325,7 +330,7 @@ def send_account_deletion_notification_email(users_email):
     Args:
         users_email: Email address of the user
     """
-    from app import mail
+    from extensions import mail
     
     msg = Message('Account Deletion Notification', recipients=[users_email])
     
@@ -362,7 +367,9 @@ def send_invite_email(users_email, event_name, event_id):
         event_name: Name of the event
         event_id: ID of the event
     """
-    from app import db, mail, s, Users, Departments, EventInvitations
+    from extensions import db, mail, get_serializer
+    from models import Users, Departments, EventInvitations
+    s = get_serializer()
     
     # Get the current user's details
     inviter = Users.query.get(current_user.users_id)
@@ -371,8 +378,8 @@ def send_invite_email(users_email, event_name, event_id):
     inviter_department = Departments.query.get(inviter.users_departments_id).departments_name
 
     token = s.dumps(users_email, salt='invite-user')
-    accept_link = url_for('accept_invite', token=token, _external=True)
-    reject_link = url_for('reject_invite', token=token, _external=True)
+    accept_link = url_for('events.accept_invite', token=token, _external=True)
+    reject_link = url_for('events.reject_invite', token=token, _external=True)
     msg = Message('Invitation to Manage Event', recipients=[users_email])
     
     # HTML email body

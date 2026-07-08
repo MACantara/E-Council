@@ -19,7 +19,7 @@ def truncate_text(text, length=100, suffix='...'):
         return ''
     if len(text) <= length:
         return text
-    return text[:length] + suffix
+    return text[:length - len(suffix)] + suffix
 
 
 def has_events(events, semester, academic_year):
