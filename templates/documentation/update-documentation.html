@@ -549,27 +549,4 @@
 
 <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script src="{{ url_for('static', filename='js/documentation/update-documentation.js') }}"></script>
-<script>
-    // Pass server-side data to JavaScript
-    const evaluationForms = {{ evaluation_forms| tojson | safe }};
-
-    // Initialize academic year toggle
-    document.addEventListener('DOMContentLoaded', function () {
-        const academicYearSelect = document.getElementById('documentation-academic-year');
-        const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
-
-        academicYearSelect.addEventListener('change', function () {
-            if (academicYearSelect.value === 'Other') {
-                otherAcademicYearContainer.style.display = 'flex';
-            } else {
-                otherAcademicYearContainer.style.display = 'none';
-            }
-        });
-
-        // Initialize academic year toggle
-        if (academicYearSelect.value === 'Other') {
-            otherAcademicYearContainer.style.display = 'flex';
-        }
-    });
-</script>
 {% endblock %}

@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeFileUploads();
     initializeTallySystem();
     initializeDynamicLists();
+    initializeAcademicYearToggle();
 
     // Initialize add field buttons
     document.getElementById('add-strength-btn')?.addEventListener('click', function () {
@@ -332,5 +333,25 @@ function calculateOverallRating() {
     const overallRatingInput = document.getElementById('overall-rating');
     if (overallRatingInput) {
         overallRatingInput.value = average;
+    }
+}
+
+function initializeAcademicYearToggle() {
+    const academicYearSelect = document.getElementById('documentation-academic-year');
+    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
+
+    if (!academicYearSelect || !otherAcademicYearContainer) return;
+
+    academicYearSelect.addEventListener('change', function () {
+        if (academicYearSelect.value === 'Other') {
+            otherAcademicYearContainer.style.display = 'flex';
+        } else {
+            otherAcademicYearContainer.style.display = 'none';
+        }
+    });
+
+    // Initialize academic year toggle
+    if (academicYearSelect.value === 'Other') {
+        otherAcademicYearContainer.style.display = 'flex';
     }
 }
