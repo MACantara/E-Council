@@ -21,7 +21,7 @@
 
         <h2>Events Overview</h2>
 
-        <a href="{{ url_for('add_event') }}" class="primary-button create-button">Create New Event</a>
+        <a href="{{ url_for('events.add_event') }}" class="primary-button create-button">Create New Event</a>
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -32,7 +32,7 @@
                         const newStatus = this.value;
                         const eventName = this.getAttribute('data-event-name');
 
-                        fetch(`/update-event-status/${eventId}`, {
+                        fetch(`/events/update-event-status/${eventId}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

@@ -9,7 +9,7 @@
 
     <div class="council-overview-content-container">
 
-        <a href="{{ url_for('events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
+        <a href="{{ url_for('dashboard.events_overview') }}" class="primary-button fit-content-button">Back to Events Overview</a>
 
         <!-- Flash messages section for the modal -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -26,7 +26,7 @@
             <span id="close-update-event-modal-button" class="close-button">&times;</span>
             <h2>Update Event</h2>
 
-            <form method="POST" action="{{ url_for('update_event', event_id=event.events_id) }}">
+            <form method="POST" action="{{ url_for('events.update_event', event_id=event.events_id) }}">
                 <div class="input-pair">
                     <label for="events-name">Event Name</label>
                     <input type="text" name="events-name" id="events-name" placeholder="Event Name"
@@ -112,7 +112,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="horizontal-button-pair-positioned-right">
-                    <a href="{{ url_for('events_overview')}}"
+                    <a href="{{ url_for('dashboard.events_overview')}}"
                         class="secondary-button fit-content-button" type="button">Cancel</a>
                     <button class="primary-button"  type="submit">Update
                         Event</button>
