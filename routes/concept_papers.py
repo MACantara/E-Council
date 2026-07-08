@@ -3,8 +3,8 @@ Concept Papers Blueprint
 Handles all concept paper related routes including CRUD operations and PDF generation.
 """
 
-from flask import Blueprint, request, flash, redirect, url_for, render_template, login_required, current_user, make_response, jsonify, send_file, current_app
-from flask_login import current_user
+from flask import Blueprint, request, flash, redirect, url_for, render_template, make_response, jsonify, send_file, current_app
+from flask_login import login_required, current_user
 from io import BytesIO
 from datetime import datetime
 from string import ascii_lowercase

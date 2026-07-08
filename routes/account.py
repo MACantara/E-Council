@@ -23,8 +23,8 @@ from utils.email import (
     send_password_change_notification_email
 )
 
-# Temporary imports from app.py (will be refactored later)
-from app import s
+# Import serializer from extensions
+from extensions import get_serializer
 
 account_bp = Blueprint('account', __name__, url_prefix='/account')
 
@@ -240,6 +240,7 @@ def email_settings():
 @login_required
 def confirm_new_email(token):
     try:
+        s = get_serializer()
         users_new_email = s.loads(token, salt='email-change', max_age=3600)
     except SignatureExpired:
         flash("The email confirmation link has expired.", "error")

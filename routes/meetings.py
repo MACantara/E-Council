@@ -4,7 +4,8 @@ import requests
 import tempfile
 import time
 
-from flask import Blueprint, request, flash, redirect, url_for, render_template, login_required, jsonify, send_file
+from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file
+from flask_login import login_required
 from io import BytesIO
 from datetime import datetime
 

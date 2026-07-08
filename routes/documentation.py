@@ -38,32 +38,15 @@ from models import (
     DepartmentsEvents,
     ObjectivesOfTheActivity,
     LearningOutcomes,
-    StudentOrganizations
+    StudentOrganizations,
+    LearningJournalForms,
+    Learnings,
+    Observations,
+    PersonnelInChargeForms,
+    ActivityReportFormsActivityStrengths,
+    ActivityReportFormsActivityWeaknesses,
+    ActivityReportFormsActivityRecommendations
 )
-
-# TODO: These models need to be created or imported from the appropriate location:
-# - LearningJournalForms
-# - Learnings
-# - Observations
-# - PersonnelInChargeForms
-# - ActivityReportFormsActivityStrengths (association table)
-# - ActivityReportFormsActivityWeaknesses (association table)
-# - ActivityReportFormsActivityRecommendations (association table)
-
-# For now, we'll import them from the main app if they exist there
-# This is a temporary workaround until these models are properly extracted
-try:
-    from app import LearningJournalForms, Learnings, Observations, PersonnelInChargeForms
-    from app import ActivityReportFormsActivityStrengths, ActivityReportFormsActivityWeaknesses, ActivityReportFormsActivityRecommendations
-except ImportError:
-    # If not available, we'll use None and the routes will need to be fixed
-    LearningJournalForms = None
-    Learnings = None
-    Observations = None
-    PersonnelInChargeForms = None
-    ActivityReportFormsActivityStrengths = None
-    ActivityReportFormsActivityWeaknesses = None
-    ActivityReportFormsActivityRecommendations = None
 
 # Import helper function from utils
 from utils.helpers import allowed_image_file

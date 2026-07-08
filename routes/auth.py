@@ -4,10 +4,10 @@ Handles user registration, login, logout, password reset, and email verification
 """
 
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, flash, redirect, url_for, Markup
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from markupsafe import Markup as SafeMarkup
+from markupsafe import Markup
 
 # Import database models from models package
 from models import (
