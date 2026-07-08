@@ -69,6 +69,10 @@ class TestingConfig(Config):
     # Testing-specific overrides
     WTF_CSRF_ENABLED = False  # Disable CSRF for testing
     SESSION_COOKIE_SECURE = False
+    
+    # Use an in-memory SQLite database for tests
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DatabaseConfig:
