@@ -63,6 +63,8 @@ function initializeCouncilOverviewCharts() {
         type: "doughnut",
         data: financialBankBookData,
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             title: {
                 display: true,
                 text: "Financial Bank Book",
@@ -90,6 +92,8 @@ function initializeCouncilOverviewCharts() {
         type: "doughnut",
         data: activityCompletionRateData,
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             title: {
                 display: true,
                 text: "Activity Completion Rate",
@@ -117,6 +121,8 @@ function initializeCouncilOverviewCharts() {
         type: 'bar',
         data: activityEvaluationGraphData,
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             title: {
                 display: true,
                 text: "Activity Evaluation",
@@ -174,8 +180,8 @@ function initializeCouncilOverviewCharts() {
         }
     });
 
-    // Update charts when color scheme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    // Update charts when theme changes
+    document.addEventListener('themeChanged', function () {
         updateChartColors(financialBankBookChart, activityCompletionRateChart, activityEvaluationGraphChart);
     });
 }

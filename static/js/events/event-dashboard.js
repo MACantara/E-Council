@@ -177,8 +177,8 @@ function initializeEventDashboardCharts() {
         });
     }
 
-    // Update charts when color scheme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    // Update charts when theme changes
+    document.addEventListener('themeChanged', function () {
         updateChartColors(top5ExpensesChart, top5IncomeChart, remainingBudgetChart);
     });
 }
