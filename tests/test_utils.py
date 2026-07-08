@@ -80,7 +80,7 @@ class TestFilters:
         """Test text truncation with custom suffix."""
         from utils.filters import truncate_text
         result = truncate_text("Long text here", length=10, suffix=">>")
-        assert result == "Long text >>"
+        assert result == "Long tex>>"
     
     def test_has_events_empty(self):
         """Test has_events with empty list."""

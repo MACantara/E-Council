@@ -9,38 +9,38 @@ import os
 # Add the directory containing app.py to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app, db
+from app import create_app
+from extensions import db
 
 
 @pytest.fixture
-def app_config():
-    """Application configuration for testing."""
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
-    return app
-
-
-@pytest.fixture
-def client(app_config):
-    """Flask test client."""
-    with app_config.test_client() as client:
-        yield client
-
-
-@pytest.fixture
-def app_context(app_config):
-    """Application context for database operations."""
-    with app_config.app_context():
+def app():
+    """Create a fresh Flask application configured for testing."""
+    app = create_app('testing')
+    with app.app_context():
         db.create_all()
-        yield
+    yield app
+    with app.app_context():
         db.drop_all()
+
+
+@pytest.fixture
+def client(app):
+    """Flask test client for the testing app."""
+    return app.test_client()
+
+
+@pytest.fixture
+def app_context(app):
+    """Application context for database operations."""
+    with app.app_context():
+        yield
 
 
 @pytest.fixture
 def sample_user(app_context):
     """Create a sample user for testing."""
-    from app import Users, Departments
+    from models import Users, Departments
     
     # Create a department first
     department = Departments(departments_name="Test Department")
