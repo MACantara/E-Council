@@ -1,0 +1,200 @@
+/* Table Styles */
+
+.council-overview-content-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.council-overview-content-table th {
+    font-weight: bold;
+    border-bottom: 1px solid var(--divider-color);
+    font-size: var(--font-size-medium);
+    padding: var(--gap-medium);
+}
+
+.council-overview-content-table td {
+    border-bottom: 1px solid var(--divider-color);
+    font-size: var(--font-size-medium);
+    padding: var(--gap-medium);
+}
+
+.council-overview-content-table td:not(:first-child) {
+    text-align: center;
+}
+
+.council-overview-content-table th:nth-child(1),
+.council-overview-content-table td:nth-child(1) {
+    width: 55%;
+}
+
+.council-overview-content-table th:nth-child(2),
+.council-overview-content-table td:nth-child(2) {
+    width: 25%;
+}
+
+.council-overview-content-table th:nth-child(3),
+.council-overview-content-table td:nth-child(3) {
+    width: 20%;
+}
+
+.transaction-history-table-container {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+}
+
+.transaction-history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-history-table th,
+.transaction-history-table td {
+    padding: var(--gap-small);
+    text-align: center;
+}
+
+.transaction-history-table td {
+    border-top: 1px solid var(--secondary-color);
+}
+
+/* Tally Section Styles */
+.tally-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.tally-table th,
+.tally-table td {
+    padding: var(--padding-small);
+    text-align: center;
+    border: 1px solid var(--divider-color);
+}
+
+.tally-table th {
+    background-color: var(--secondary-color);
+    color: var(--primary-button-text-color);
+    font-weight: 600;
+}
+
+.tally-table input[type="text"],
+.tally-table input[type="number"] {
+    width: 100%;
+    padding: var(--odd-padding-extra-small);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--small-border-radius);
+    text-align: center;
+    background-color: var(--white-background-color);
+    color: var(--primary-text-color-dark);
+}
+
+.tally-table input[type="text"] {
+    text-align: left;
+}
+
+.tally-table tbody tr:hover {
+    background-color: var(--form-background-color);
+}
+
+.tally-table .tally-item-name td {
+    background-color: var(--form-background-color);
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.tally-table .tally-item-name input[type="text"] {
+    font-weight: 600;
+    font-size: var(--font-size-medium);
+}
+
+.tally-table thead tr:first-child th {
+    border-bottom: none;
+}
+
+.tally-name-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+}
+
+.tally-name-container label {
+    font-weight: 600;
+    color: var(--primary-text-color);
+    text-align: left;
+}
+
+.tally-table .tally-item-name input[type="text"] {
+    margin-top: 0.25rem;
+}
+
+/* Make the table responsive */
+@media (max-width: 992px) {
+    .tally-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* Evaluation Form Table Styles */
+.evaluation-tally-table {
+    width: 100%;
+    border-collapse: separate;  /* Changed from collapse to allow border-radius */
+    border-spacing: 0;  /* Maintain tight borders */
+    background-color: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    margin-top: var(--gap-small);
+    border-radius: var(--border-radius);
+    overflow: hidden;  /* Ensures inner elements don't break the border radius */
+}
+
+.evaluation-tally-table th,
+.evaluation-tally-table td {
+    padding: var(--padding-small);
+    border: 1px solid var(--secondary-color);
+    text-align: center;
+}
+
+.evaluation-tally-table th {
+    background-color: var(--secondary-color);
+    color: var(--on-secondary-color);
+    font-weight: 600;
+}
+
+.evaluation-tally-table .tally-item-name {
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+    font-weight: 600;
+    text-align: left;
+}
+
+.evaluation-tally-table tr:not(.tally-item-name) {
+    background-color: var(--form-background-color);
+}
+
+.evaluation-tally-table tr:not(.tally-item-name):hover {
+    background-color: var(--hover-color);
+}
+
+.evaluation-tally-table input[type="radio"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    margin: 0;
+    border-radius: 50%;  /* Make radio buttons perfectly round */
+    border: 2px solid var(--secondary-color);
+}
+
+.evaluation-tally-table input[type="radio"]:hover {
+    transform: scale(1.1);
+}
+
+@media screen and (max-width: 768px) {
+    .evaluation-tally-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}

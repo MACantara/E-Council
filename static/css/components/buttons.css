@@ -1,0 +1,162 @@
+/* Button Styles */
+
+.primary-button {
+    display: inline-block;
+    padding: var(--padding-small);
+    background-color: var(--secondary-color);
+    color: var(--primary-button-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    cursor: pointer;
+    font-size: var(--font-size-medium);
+    text-align: center;
+    width: 100%;
+}
+
+.secondary-button {
+    display: inline-block;
+    padding: var(--padding-small);
+    color: var(--primary-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    cursor: pointer;
+    font-size: var(--font-size-medium);
+    text-align: center;
+    background-color: var(--primary-color);
+    width: 100%;
+}
+
+.text-button,
+.logo-button {
+    display: inline-block;
+    padding: var(--padding-small);
+    color: var(--primary-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    text-align: center;
+}
+
+.hero-button {
+    display: inline-block;
+    margin-top: 1rem;
+    background-color: var(--secondary-color);
+    color: var(--primary-button-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    text-align: center;
+    padding: 1rem;
+}
+
+.hero-button:hover,
+.primary-button:hover {
+    background-color: var(--primary-button-hover-background-color);
+}
+
+.secondary-button:hover,
+.text-button:hover {
+    background-color: var(--secondary-button-hover-background-color);
+}
+
+.create-button {
+    max-width: fit-content;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+.fit-content-button {
+    width: fit-content;
+}
+
+.email-verified-button {
+    display: inline-block;
+    padding: var(--padding-small);
+    color: var(--primary-text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
+    font-size: var(--font-size-medium);
+    text-align: center;
+    background-color: var(--primary-color);
+}
+
+.show-password-button {
+    font-size: var(--font-size-medium);
+    align-self: flex-end;
+    border: none;
+    background: transparent;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.remove-file-btn {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 var(--even-padding-extra-small);
+}
+
+.remove-file-btn:hover {
+    color: var(--secondary-button-hover-background-color);
+}
+
+.remove-file-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--secondary-color);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: background-color 0.2s;
+    z-index: 1;
+}
+
+.remove-file-button:hover {
+    background-color: var(--secondary-button-hover-background-color);
+}
+
+.remove-item-btn {
+    padding: var(--even-padding-extra-small);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    background-color: var(--form-background-color);
+    border: 1px solid var(--divider-color);
+    transition: all 0.2s ease;
+}
+
+.remove-item-btn:hover {
+    background-color: var(--secondary-button-hover-background-color);
+    color: var(--primary-button-text-color);
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}

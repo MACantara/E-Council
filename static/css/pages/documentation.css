@@ -1,0 +1,32 @@
+/* Documentation and Flash Message Styles */
+
+/* Flash Message Styles */
+.flash-messages {
+    margin-top: var(--padding-large);
+    max-width: var(--max-width-container);
+    width: 100%;
+}
+
+.alert {
+    padding: var(--padding-large);
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+    border-color: var(--color-success-border);
+}
+
+.alert-error {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    border-color: var(--color-error-border);
+}
+
+.alert-modal-error {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    border-color: var(--color-error-border);
+}
