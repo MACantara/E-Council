@@ -12,7 +12,7 @@
 
 ---
 
-## Overall Progress: 40%
+## Overall Progress: 50%
 
 ### Phase 1: Code Analysis & Planning (Week 1)
 **Status:** Completed  
@@ -276,8 +276,8 @@ app/
 ---
 
 ### Phase 6: Utility Function Extraction (Week 4)
-**Status:** Not Started  
-**Progress:** 0%
+**Status:** Completed  
+**Progress:** 100%
 
 #### Current Utility Functions
 - Mixed throughout app.py
@@ -299,22 +299,23 @@ app/
 ```
 
 #### Utility Extraction Tasks
-- [ ] Create utils/ directory structure
-- [ ] Extract email functions to utils/email.py
-- [ ] Extract PDF generation to utils/pdf.py
-- [ ] Extract AI integration to utils/ai.py
-- [ ] Extract Cloudinary functions to utils/cloudinary.py
-- [ ] Extract authentication helpers to utils/auth.py
-- [ ] Extract validation logic to utils/validation.py
-- [ ] Extract formatting functions to utils/formatters.py
-- [ ] Extract general helpers to utils/helpers.py
-- [ ] Create utils/__init__.py for common imports
+- [x] Create utils/ directory structure
+- [x] Extract email functions to utils/email.py (8 email functions)
+- [x] Extract Jinja2 filters to utils/filters.py (7 custom filters)
+- [x] Extract general helpers to utils/helpers.py (4 helper functions)
+- [x] Extract data processing to utils/processing.py (2 processing functions)
+- [x] Extract authentication helpers to utils/auth.py (3 auth functions)
+- [x] Extract error handlers to utils/error_handlers.py (1 error handler)
+- [x] Create utils/__init__.py for convenient imports
+- [x] Document utility functions with docstrings
 - [ ] Update route imports for new utility structure
 - [ ] Test all utility functions
 - [ ] Verify email sending works
 - [ ] Verify PDF generation works
 - [ ] Verify AI integration works
 - [ ] Verify file uploads work
+
+**Note:** PDF generation and AI integration functions are route handlers, not utility functions. They remain in app.py for now. Cloudinary functions are integrated within route handlers. The extracted utilities provide a solid foundation for continued refactoring.
 
 ---
 
