@@ -708,6 +708,44 @@ static/css/
 
 ---
 
+### Phase 16: JavaScript Externalization (Week 7)
+**Status:** Completed  
+**Progress:** 100%
+
+#### JavaScript Externalization Tasks
+- [x] Extract events JavaScript to external files (6 files created)
+- [x] Extract concept papers JavaScript to external files (2 files created)
+- [x] Extract documentation JavaScript to external files (1 file created)
+- [x] Extract financial reports JavaScript to external files (3 files created)
+- [x] Extract board resolutions JavaScript to external files (2 files created)
+- [x] Extract meetings JavaScript to external files (3 files created)
+- [x] Extract dashboard JavaScript to external files (1 file created)
+- [x] Update templates to reference external JS files
+- [x] Ensure utils.js is included in all external JS files
+
+#### JavaScript Files Created
+- **static/js/events/events-overview.js** - Event status updates, budget chart visualization
+- **static/js/events/add-event.js** - Form field toggling, academic year toggle
+- **static/js/events/event-dashboard.js** - Chart visualization for expenses, income, budget
+- **static/js/events/add-transaction.js** - Date initialization, category toggle, total calculation
+- **static/js/events/update-transaction.js** - Category toggle, total calculation, file upload
+- **static/js/concept-papers/concept-papers-overview.js** - Status update logic
+- **static/js/concept_papers/update-concept-paper.js** - Dynamic field addition, academic year toggle
+- **static/js/documentation/documentation-overview.js** - Status update logic
+- **static/js/financial-reports/financial-reports-overview.js** - Status update logic
+- **static/js/financial-reports/add-financial-report.js** - Academic year toggle, title auto-population
+- **static/js/financial-reports/update-financial-report.js** - Academic year toggle
+- **static/js/board-resolutions/board-resolutions-overview.js** - Status update logic
+- **static/js/board-resolutions/update-board-resolution.js** - Academic year toggle
+- **static/js/minutes-of-meeting/minutes-of-the-meeting-overview.js** - Status update logic
+- **static/js/minutes-of-meeting/add-minutes-of-the-meeting.js** - Academic year toggle, file display, signatory toggling
+- **static/js/minutes-of-meeting/update-minutes-of-the-meeting.js** - Academic year toggle, file display, signatory toggling
+- **static/js/dashboard/council-overview.js** - Chart visualization for financial, activity, evaluation
+
+**JavaScript Externalization Complete:** Successfully extracted 18 JavaScript files from HTML templates for better separation of concerns. All files follow consistent pattern with proper JSDoc comments, DOMContentLoaded listeners, and utils.js integration. Templates now have clean separation between HTML and JavaScript.
+
+---
+
 ## Issues & Blockers
 
 ### Current Issues
