@@ -15,6 +15,7 @@ class MeetingAttendee(db.Model):
         db.Integer, db.ForeignKey("minutes_of_the_meeting.minutes_of_the_meeting_id"), nullable=False, index=True
     )
     users_id = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=False, index=True)
+    attended = db.Column(db.Boolean, nullable=True, default=None)
 
     user = db.relationship("Users", backref="meeting_attendees")
 

@@ -762,11 +762,21 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/routers/meetings.py`, `api/schemas/meetings.py`, `services/meetings.py`
 
 **Checklist**
-- [ ] Add meeting CRUD endpoints under `/api/v1/meetings/`.
-- [ ] Add agenda and minutes endpoints.
-- [ ] Add attendee management endpoints (add, remove, mark attendance).
-- [ ] Add meeting status update endpoints.
-- [ ] Add tests covering agendas, attendees, and minutes.
+- [x] Add meeting CRUD endpoints under `/api/v1/meetings/`.
+- [x] Add agenda and minutes endpoints.
+- [x] Add attendee management endpoints (add, remove, mark attendance).
+- [x] Add meeting status update endpoints.
+- [x] Add tests covering agendas, attendees, and minutes.
+
+**Notes**
+- Added `attended` flag to `MeetingAttendee` to support marking attendance.
+- Added `api/schemas/meetings.py` with request/response models for `MinutesOfTheMeeting`, `MeetingAttendee`, and photo documentation.
+- Implemented `api/routers/meetings.py` with `GET /api/v1/meetings`, `POST /api/v1/meetings`, `GET /api/v1/meetings/{id}`, `PUT /api/v1/meetings/{id}`, `DELETE /api/v1/meetings/{id}`, `PUT /api/v1/meetings/{id}/status`, `PUT /api/v1/meetings/{id}/agenda`, `PUT /api/v1/meetings/{id}/minutes`, `POST /api/v1/meetings/{id}/attendees`, `PUT /api/v1/meetings/{id}/attendees/{attendee_id}/attendance`, `DELETE /api/v1/meetings/{id}/attendees/{attendee_id}`, and `GET /api/v1/meetings/{id}/pdf`.
+- Wired `api/routers/meetings.py` into `api/main.py`.
+- Meeting creation and update support multipart form data with a JSON payload and optional photo documentation uploads.
+- Attendee management uses the new `attended` flag and supports add, mark attendance, and remove operations.
+- Added `api/tests/test_meetings.py` covering CRUD, agenda, minutes, status updates, attendees, PDF export, and department scoping.
+- All FastAPI tests pass: `102 passed` across `api/tests/` and `tests/test_api.py`.
 
 **Acceptance criteria**: Feature parity with `routes/meetings.py` and the meeting functions in `services/meetings.py`.
 

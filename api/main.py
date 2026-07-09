@@ -11,6 +11,7 @@ from api.routers.admin import router as admin_router
 from api.routers.auth import router as auth_router
 from api.routers.concept_papers import router as concept_papers_router
 from api.routers.events import router as events_router
+from api.routers.meetings import router as meetings_router
 
 
 @asynccontextmanager
@@ -35,3 +36,4 @@ app.include_router(account_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
 app.include_router(concept_papers_router, prefix="/api/v1")
 app.include_router(events_router, prefix="/api/v1")
+app.include_router(meetings_router, prefix="/api/v1")
