@@ -136,8 +136,9 @@ class TestingConfig(Config):
     # Provide a default mail sender for tests so Flask-Mail messages validate
     MAIL_DEFAULT_SENDER = "test@example.com"
 
-    # Use the in-memory storage backend for tests; no network calls
+    # Use the in-memory storage and email backends for tests; no network calls
     STORAGE_PROVIDER = "memory"
+    EMAIL_PROVIDER = "memory"
 
 
 class DatabaseConfig:
@@ -182,7 +183,10 @@ class DatabaseConfig:
 class EmailConfig:
     """Email configuration settings."""
 
-    # Flask Mail Configuration
+    # Email provider: smtp, console, memory, sendgrid, mailgun, null
+    EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "smtp")
+
+    # Flask Mail Configuration (used by smtp provider)
     MAIL_SERVER = os.getenv("MAIL_SERVER")
     MAIL_PORT = int(os.getenv("MAIL_PORT", "587"))
     MAIL_USE_TLS = os.getenv("MAIL_USE_TLS") == "True"
@@ -194,6 +198,15 @@ class EmailConfig:
     # Email Settings
     MAIL_MAX_EMAILS = None
     MAIL_ASCII_ATTACHMENTS = False
+
+    # SendGrid configuration
+    SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+    SENDGRID_FROM_EMAIL = os.getenv("SENDGRID_FROM_EMAIL")
+
+    # Mailgun configuration
+    MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
+    MAILGUN_DOMAIN = os.getenv("MAILGUN_DOMAIN")
+    MAILGUN_FROM_EMAIL = os.getenv("MAILGUN_FROM_EMAIL")
 
 
 class CloudinaryConfig:

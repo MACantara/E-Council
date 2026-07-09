@@ -101,6 +101,16 @@ def create_app(config_name=None):
         os.getenv("MAIL_DEFAULT_SENDER") or app.config.get("MAIL_DEFAULT_SENDER") or EmailConfig.MAIL_DEFAULT_SENDER
     )
 
+    # Email provider configuration
+    app.config["EMAIL_PROVIDER"] = os.getenv("EMAIL_PROVIDER") or getattr(
+        config_class, "EMAIL_PROVIDER", EmailConfig.EMAIL_PROVIDER
+    )
+    app.config["SENDGRID_API_KEY"] = os.getenv("SENDGRID_API_KEY") or EmailConfig.SENDGRID_API_KEY
+    app.config["SENDGRID_FROM_EMAIL"] = os.getenv("SENDGRID_FROM_EMAIL") or EmailConfig.SENDGRID_FROM_EMAIL
+    app.config["MAILGUN_API_KEY"] = os.getenv("MAILGUN_API_KEY") or EmailConfig.MAILGUN_API_KEY
+    app.config["MAILGUN_DOMAIN"] = os.getenv("MAILGUN_DOMAIN") or EmailConfig.MAILGUN_DOMAIN
+    app.config["MAILGUN_FROM_EMAIL"] = os.getenv("MAILGUN_FROM_EMAIL") or EmailConfig.MAILGUN_FROM_EMAIL
+
     # Storage configuration
     app.config["STORAGE_PROVIDER"] = os.getenv("STORAGE_PROVIDER") or getattr(
         config_class, "STORAGE_PROVIDER", StorageConfig.STORAGE_PROVIDER

@@ -196,7 +196,12 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
 - **itsdangerous** — signed tokens for email verification and password reset
 
 ### Email
-- **Flask-Mail** — SMTP email (configured for Gmail by default)
+- **Email abstraction layer** (`services/email/`) — provider-agnostic email delivery
+  - Supports `smtp`, `console`, `memory`, `sendgrid`, `mailgun`, and `null` providers via the `EMAIL_PROVIDER` environment variable
+  - `SmtpEmailBackend` — Flask-Mail/SMTP adapter
+  - `ConsoleEmailBackend` / `InMemoryEmailBackend` — development and test backends
+  - `SendgridEmailBackend` / `MailgunEmailBackend` — API adapters
+  - `NullEmailBackend` — no-op backend
 
 ### File Storage
 - **Storage abstraction layer** (`services/storage/`) — profile pictures, signatures, receipts, and photo documentation
@@ -285,6 +290,13 @@ E-Council/
 │       ├── errors.py
 │       ├── protocol.py
 │       └── service.py
+│   └── email/               # Email delivery abstraction layer
+│       ├── __init__.py
+│       ├── backends.py
+│       ├── errors.py
+│       ├── protocol.py
+│       ├── service.py
+│       └── tasks.py
 ├── run_tests.py           # Test runner helper
 ├── static/                # Static assets
 │   ├── img/
@@ -407,6 +419,9 @@ Open `.env` and replace every placeholder with your own credentials. The example
 | `SQLALCHEMY_DATABASE_URI` | Yes | Use a local SQLite path (`sqlite:///e_council.db`) or a MySQL URI (e.g. `mysql+pymysql://user:pass@localhost/e_council`) |
 | `MAIL_DEFAULT_SENDER` | Yes | Any email address you control; used as the sender for verification and notification emails |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | Yes for real email | SMTP credentials; for Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) |
+| `EMAIL_PROVIDER` | No | Email backend: `smtp` (default), `console`, `memory`, `sendgrid`, `mailgun`, or `null` |
+| `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL` | No | Required when `EMAIL_PROVIDER=sendgrid` |
+| `MAILGUN_API_KEY` / `MAILGUN_DOMAIN` / `MAILGUN_FROM_EMAIL` | No | Required when `EMAIL_PROVIDER=mailgun` |
 | `STORAGE_PROVIDER` | No | Object storage backend: `cloudinary` (default), `local`, `memory`, or `null` |
 | `STORAGE_LOCAL_PATH` | No | Local directory for `STORAGE_PROVIDER=local` (default: `uploads`) |
 | `STORAGE_LOCAL_BASE_URL` | No | URL prefix for `STORAGE_PROVIDER=local` (default: `/static/uploads`) |
@@ -515,6 +530,7 @@ Test files live in the `tests/` directory:
 - `tests/test_signup.py` — signup tests
 - `tests/test_storage.py` — storage abstraction layer tests (memory, local, factory)
 - `tests/test_cloudinary.py` — Cloudinary backend route tests (mocked)
+- `tests/test_email.py` — email abstraction layer tests (in-memory backend, factory)
 - `tests/test_utils.py` — utility and filter tests
 
 ## License

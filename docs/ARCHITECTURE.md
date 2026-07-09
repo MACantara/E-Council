@@ -67,12 +67,19 @@ E-Council/
 │   ├── events.py
 │   ├── financial.py
 │   ├── meetings.py
-│   └── storage/                    # Storage abstraction layer
+│   ├── storage/                    # Storage abstraction layer
+│   │   ├── __init__.py
+│   │   ├── backends.py
+│   │   ├── errors.py
+│   │   ├── protocol.py
+│   │   └── service.py
+│   └── email/                      # Email abstraction layer
 │       ├── __init__.py
 │       ├── backends.py
 │       ├── errors.py
 │       ├── protocol.py
-│       └── service.py
+│       ├── service.py
+│       └── tasks.py
 ├── utils/                          # Utility functions
 │   ├── __init__.py
 │   ├── auth.py
@@ -314,6 +321,22 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 - `get_storage()` (`services/storage/service.py`) - Factory that reads `STORAGE_PROVIDER` from the Flask app config or `StorageConfig` and returns a configured backend.
 
 **Pattern**: Routes and services call `storage = get_storage()` and then `storage.upload(...)`, `storage.delete(...)`, and `storage.get_url(...)` instead of `cloudinary.uploader.upload` or `cloudinary.uploader.destroy`. The active provider is controlled by the `STORAGE_PROVIDER` environment variable (`cloudinary`, `local`, `memory`, or `null`), with `STORAGE_LOCAL_PATH` and `STORAGE_LOCAL_BASE_URL` configuring the local backend.
+
+### Email Layer (`services/email/`)
+
+**Purpose**: Abstract email delivery so the application can send verification, notification, and invitation emails without depending on a single provider (SMTP, SendGrid, Mailgun, console, in-memory).
+
+**Key components**:
+- `EmailBackend` (`services/email/protocol.py`) - Abstract protocol/ABC defining `send`, `send_template`, and `send_batch`.
+- `SmtpEmailBackend` (`services/email/backends.py`) - Adapter for Flask-Mail/SMTP.
+- `ConsoleEmailBackend` (`services/email/backends.py`) - Prints emails to stdout for development.
+- `InMemoryEmailBackend` (`services/email/backends.py`) - Stores emails in memory for tests.
+- `SendgridEmailBackend` / `MailgunEmailBackend` (`services/email/backends.py`) - Adapters for SendGrid and Mailgun APIs.
+- `NullEmailBackend` (`services/email/backends.py`) - No-op backend.
+- `get_email()` (`services/email/service.py`) - Factory that reads `EMAIL_PROVIDER` from the Flask app config and returns a configured backend.
+- `send_email` Celery task (`services/email/tasks.py`) - Background task that calls `get_email().send(...)`.
+
+**Pattern**: `utils/email.py` renders templates and calls `send_email_task.apply_async(...)` to queue a message. The Celery task uses the configured `EmailBackend` to deliver the message. The active provider is controlled by `EMAIL_PROVIDER` (`smtp`, `console`, `memory`, `sendgrid`, `mailgun`, or `null`).
 
 ### Flask Extensions (`extensions.py`)
 

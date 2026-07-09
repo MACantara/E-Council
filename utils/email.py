@@ -8,10 +8,9 @@ from datetime import datetime, timedelta
 
 from flask import flash, render_template, url_for
 from flask_login import current_user
-from flask_mail import Message
 
 from repositories import repo
-from tasks import send_email as send_email_task
+from services.email.tasks import send_email as send_email_task
 
 # Note: These imports will need to be adjusted based on final model structure
 # For now, importing from app.py (will be refactored later)
@@ -38,9 +37,10 @@ def send_verification_email(users_email: str) -> None:
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     token = s.dumps(users_email, salt="email-confirm")
     link = url_for("auth.confirm_email", token=token, _external=True)
-    msg = Message("New Account Email Verification", recipients=[users_email])
-    msg.html = render_template("email/verification_email.html", link=link)
-    msg.body = render_template("email/verification_email.txt", link=link)
+    subject = "New Account Email Verification"
+    recipients = [users_email]
+    html = render_template("email/verification_email.html", link=link)
+    body = render_template("email/verification_email.txt", link=link)
 
     # Check for existing email verification records
     existing_verification = EmailVerification.query.filter_by(
@@ -51,7 +51,7 @@ def send_verification_email(users_email: str) -> None:
         flash("A verification email has already been sent to this email address. Please check your email.", "error")
         return
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
     # Track email verification in the database
     email_verification = EmailVerification(
@@ -79,9 +79,10 @@ def send_reset_password_email(users_email: str) -> None:
 
     # Create the password reset link
     link = url_for("auth.reset_password", selector=selector, token=token, _external=True)
-    msg = Message("Password Reset Request", recipients=[users_email])
-    msg.html = render_template("email/reset_password_email.html", link=link)
-    msg.body = render_template("email/reset_password_email.txt", link=link)
+    subject = "Password Reset Request"
+    recipients = [users_email]
+    html = render_template("email/reset_password_email.html", link=link)
+    body = render_template("email/reset_password_email.txt", link=link)
 
     # Check for existing password reset records
     existing_reset = PasswordReset.query.filter_by(password_reset_users_id=user.users_id).first()
@@ -90,7 +91,7 @@ def send_reset_password_email(users_email: str) -> None:
         flash("A password reset email has already been sent to this email address. Please check your email.", "error")
         return
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
     # Track password reset in the database
     password_reset = PasswordReset(
@@ -111,11 +112,12 @@ def send_password_change_notification_email(users_email: str) -> None:
         users_email: Email address of the user
     """
 
-    msg = Message("Password Change Notification", recipients=[users_email])
-    msg.html = render_template("email/password_change_notification_email.html")
-    msg.body = render_template("email/password_change_notification_email.txt")
+    subject = "Password Change Notification"
+    recipients = [users_email]
+    html = render_template("email/password_change_notification_email.html")
+    body = render_template("email/password_change_notification_email.txt")
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
 
 def send_email_change_notification(users_old_email: str, users_new_email: str) -> None:
@@ -127,15 +129,16 @@ def send_email_change_notification(users_old_email: str, users_new_email: str) -
         users_new_email: New email address of the user
     """
 
-    msg = Message("Email Change Notification", recipients=[users_old_email])
-    msg.html = render_template(
+    subject = "Email Change Notification"
+    recipients = [users_old_email]
+    html = render_template(
         "email/email_change_notification_email.html", old_email=users_old_email, new_email=users_new_email
     )
-    msg.body = render_template(
+    body = render_template(
         "email/email_change_notification_email.txt", old_email=users_old_email, new_email=users_new_email
     )
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
 
 def send_email_change_confirmation(users_old_email: str, users_new_email: str) -> None:
@@ -147,13 +150,14 @@ def send_email_change_confirmation(users_old_email: str, users_new_email: str) -
         users_new_email: New email address of the user
     """
 
-    msg = Message("Email Change Confirmation", recipients=[users_new_email])
-    msg.html = render_template(
+    subject = "Email Change Confirmation"
+    recipients = [users_new_email]
+    html = render_template(
         "email/email_change_confirmation_email.html", old_email=users_old_email, new_email=users_new_email
     )
-    msg.body = render_template("email/email_change_confirmation_email.txt", new_email=users_new_email)
+    body = render_template("email/email_change_confirmation_email.txt", new_email=users_new_email)
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
 
 def send_new_email_verification(users_new_email: str) -> None:
@@ -171,11 +175,12 @@ def send_new_email_verification(users_new_email: str) -> None:
     user = current_user
     token = s.dumps(users_new_email, salt="email-change")
     link = url_for("account.confirm_new_email", token=token, _external=True)
-    msg = Message("Email Change Verification", recipients=[users_new_email])
-    msg.html = render_template("email/new_email_verification_email.html", link=link)
-    msg.body = render_template("email/new_email_verification_email.txt", link=link)
+    subject = "Email Change Verification"
+    recipients = [users_new_email]
+    html = render_template("email/new_email_verification_email.html", link=link)
+    body = render_template("email/new_email_verification_email.txt", link=link)
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
     # Track email verification in the database
     email_verification = EmailVerification(
@@ -195,11 +200,12 @@ def send_account_deletion_notification_email(users_email: str) -> None:
         users_email: Email address of the user
     """
 
-    msg = Message("Account Deletion Notification", recipients=[users_email])
-    msg.html = render_template("email/account_deletion_notification_email.html")
-    msg.body = render_template("email/account_deletion_notification_email.txt")
+    subject = "Account Deletion Notification"
+    recipients = [users_email]
+    html = render_template("email/account_deletion_notification_email.html")
+    body = render_template("email/account_deletion_notification_email.txt")
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
 
 def send_invite_email(users_email: str, event_name: str, event_id: int) -> None:
@@ -225,8 +231,9 @@ def send_invite_email(users_email: str, event_name: str, event_id: int) -> None:
     token = s.dumps(users_email, salt="invite-user")
     accept_link = url_for("events.accept_invite", token=token, _external=True)
     reject_link = url_for("events.reject_invite", token=token, _external=True)
-    msg = Message("Invitation to Manage Event", recipients=[users_email])
-    msg.html = render_template(
+    subject = "Invitation to Manage Event"
+    recipients = [users_email]
+    html = render_template(
         "email/invite_email.html",
         event_name=event_name,
         inviter_first_name=inviter_first_name,
@@ -235,7 +242,7 @@ def send_invite_email(users_email: str, event_name: str, event_id: int) -> None:
         accept_link=accept_link,
         reject_link=reject_link,
     )
-    msg.body = render_template(
+    body = render_template(
         "email/invite_email.txt",
         event_name=event_name,
         inviter_first_name=inviter_first_name,
@@ -245,7 +252,7 @@ def send_invite_email(users_email: str, event_name: str, event_id: int) -> None:
         reject_link=reject_link,
     )
 
-    send_email_task.apply_async(args=(msg.recipients, msg.subject, msg.html, msg.body, msg.sender))
+    send_email_task.apply_async(args=(recipients, subject, html, body, None))
 
     # Store the invitation details in the event_invitations table
     event_invitation = EventInvitations(

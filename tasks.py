@@ -24,7 +24,7 @@ celery_app = Celery(
     "e-council",
     broker=broker_url,
     backend=result_backend,
-    include=["tasks"],
+    include=["tasks", "services.email.tasks"],
 )
 
 celery_app.conf.update(
@@ -64,26 +64,6 @@ def _get_download_name(response):
         _, _, filename = content_disposition.partition("filename=")
         return filename.strip('"')
     return "document.pdf"
-
-
-@celery_app.task(name="tasks.send_email")
-def send_email(recipients, subject, html, body, sender=None):
-    """
-    Send an email message in the background.
-
-    Args:
-        recipients: List of recipient email addresses.
-        subject: Email subject.
-        html: HTML body.
-        body: Plain text body.
-        sender: Optional sender address.
-    """
-    from flask_mail import Message
-
-    from extensions import mail
-
-    msg = Message(subject=subject, recipients=recipients, html=html, body=body, sender=sender)
-    mail.send(msg)
 
 
 @celery_app.task(name="tasks.generate_ai_content")

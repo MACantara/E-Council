@@ -565,13 +565,13 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `services/email/`, `utils/email.py`, `tasks.py`, `config/config.py`, `templates/email/`
 
 **Checklist**
-- [ ] Define an `EmailBackend` protocol (`send`, `send_template`, `send_batch`).
-- [ ] Implement `SmtpEmailBackend`, `SendgridEmailBackend`, `MailgunEmailBackend`, `ConsoleEmailBackend` (dev), and `InMemoryEmailBackend` (tests).
-- [ ] Move `send_email_task` and Flask-Mail `Message` usage into `services/email/`.
-- [ ] Add provider-agnostic config in `config/config.py` (e.g., `EMAIL_PROVIDER`, `EMAIL_*` environment variables).
-- [ ] Update `utils/email.py` to use the new backend.
-- [ ] Update tests to use `InMemoryEmailBackend` and assert emails are sent.
-- [ ] Document supported email providers and configuration.
+- [x] Define an `EmailBackend` protocol (`send`, `send_template`, `send_batch`).
+- [x] Implement `SmtpEmailBackend`, `SendgridEmailBackend`, `MailgunEmailBackend`, `ConsoleEmailBackend` (dev), `InMemoryEmailBackend` (tests), and `NullEmailBackend`.
+- [x] Move `send_email_task` and Flask-Mail `Message` usage into `services/email/` (`services/email/tasks.py` and `services/email/backends.py`).
+- [x] Add provider-agnostic config in `config/config.py` (`EMAIL_PROVIDER`, `SENDGRID_*`, `MAILGUN_*`, `MAIL_*` environment variables).
+- [x] Update `utils/email.py` to render templates and call `send_email_task` through the abstraction.
+- [x] Update tests to use `InMemoryEmailBackend` and assert emails are sent (`TestingConfig.EMAIL_PROVIDER = "memory"`).
+- [x] Document supported email providers and configuration in `ARCHITECTURE.md`, `README.md`, and `.env.example`.
 
 **Acceptance criteria**: The application can switch email providers by changing a config value. Tests run without a real SMTP server.
 
