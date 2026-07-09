@@ -23,11 +23,13 @@ from werkzeug.utils import secure_filename
 from models import MeetingAttendee, MinutesOfTheMeeting, Signatories, StudentOrganizations, Users, db
 from services import ai
 from utils.auth import belongs_to_user_or_department, is_admin
+from utils.helpers import get_pagination_args
 
 
 def minutes_of_the_meeting_overview():
-    # Determine the sorting order
+    # Determine the sorting order and pagination parameters
     sort_by_date = request.args.get("sort_by_date", "recent-to-old")
+    page, per_page = get_pagination_args()
 
     # Base query for minutes of the meeting sorted by date (most recent first)
     query = (
@@ -45,14 +47,15 @@ def minutes_of_the_meeting_overview():
             )
         )
 
-    minutes_of_the_meeting = query.all()
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
     # Extract only the MinutesOfTheMeeting objects for filtering
-    meetings_only = [meeting for meeting, _, _ in minutes_of_the_meeting]
+    meetings_only = [meeting for meeting, _, _ in pagination.items]
 
     return render_template(
         "minutes-of-meeting/minutes-of-the-meeting-overview.html",
-        minutes_of_the_meeting=minutes_of_the_meeting,
+        minutes_of_the_meeting=pagination.items,
+        pagination=pagination,
         sort_by_date=sort_by_date,
         meetings_only=meetings_only,
     )

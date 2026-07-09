@@ -23,11 +23,13 @@ from models import (
     db,
 )
 from utils.auth import belongs_to_user_or_department, is_admin
-from utils.helpers import allowed_image_file
+from utils.helpers import allowed_image_file, get_pagination_args
 
 
 def documentation_overview():
     # Query for all documentation with concept paper subject, ordered by academic year (desc) and semester
+    page, per_page = get_pagination_args()
+
     query = (
         db.session.query(Documentation, ConceptPaperForms.concept_paper_forms_subject)
         .outerjoin(
@@ -47,7 +49,11 @@ def documentation_overview():
                 == ConceptPaperForms.concept_paper_forms_id,
             ),
         )
-        .order_by(Documentation.documentation_academic_year.desc(), Documentation.documentation_semester.desc())
+        .order_by(
+            Documentation.documentation_academic_year.desc(),
+            Documentation.documentation_semester.desc(),
+            Documentation.documentation_date_of_submission.desc(),
+        )
     )
 
     # Admins can view all documentation; others only see their own department's or ones they prepared
@@ -59,10 +65,13 @@ def documentation_overview():
             )
         )
 
-    documentations = query.all()
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
-        "documentation/documentation-overview.html", documentations=documentations, sort_by_date="recent-to-old"
+        "documentation/documentation-overview.html",
+        documentations=pagination.items,
+        pagination=pagination,
+        sort_by_date="recent-to-old",
     )
 
 

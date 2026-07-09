@@ -5,6 +5,8 @@ General helper functions for E-Council.
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
+from flask import request
+
 from extensions import db
 from models import ConceptPaperForms, Events
 
@@ -57,3 +59,24 @@ def allowed_image_file(filename: str) -> bool:
     """
     allowed_extensions = {"png", "jpg", "jpeg", "gif"}
     return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed_extensions
+
+
+def get_pagination_args(default_per_page: int = 10) -> tuple[int, int]:
+    """
+    Retrieve page and per_page query parameters for pagination.
+
+    Args:
+        default_per_page: Default number of items per page
+
+    Returns:
+        Tuple of (page, per_page)
+    """
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", default_per_page, type=int)
+
+    if page < 1:
+        page = 1
+    if per_page < 1:
+        per_page = default_per_page
+
+    return page, per_page

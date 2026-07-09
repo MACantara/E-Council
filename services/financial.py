@@ -28,6 +28,7 @@ from models import (
     db,
 )
 from utils.auth import belongs_to_user_or_department, is_admin
+from utils.helpers import get_pagination_args
 
 
 class CustomUnderline(Flowable):
@@ -46,23 +47,26 @@ class CustomUnderline(Flowable):
 
 
 def financial_reports_overview():
-    # Determine the sorting order
+    # Determine the sorting order and pagination parameters
     sort_by_date = request.args.get("sort_by_date", "recent-to-old")
+    page, per_page = get_pagination_args()
 
     # Admins can view all financial reports; others only see their own department's or ones they prepared
-    if is_admin(current_user):
-        financial_reports = FinancialReports.query.all()
-    else:
-        financial_reports = FinancialReports.query.filter(
+    query = FinancialReports.query.order_by(FinancialReports.financial_reports_date.desc())
+    if not is_admin(current_user):
+        query = query.filter(
             or_(
                 FinancialReports.financial_reports_departments_id == current_user.users_departments_id,
                 FinancialReports.financial_reports_audited_and_prepared_by == current_user.users_id,
             )
-        ).all()
+        )
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
         "financial-reports/financial-reports-overview.html",
-        financial_reports=financial_reports,
+        financial_reports=pagination.items,
+        pagination=pagination,
         sort_by_date=sort_by_date,
     )
 

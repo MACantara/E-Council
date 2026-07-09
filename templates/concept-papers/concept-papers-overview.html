@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from 'macros/ui.html' import button_link, card, empty_state %}
+{% from 'macros/pagination.html' import pagination_controls %}
 
 {% block title %}Concept Papers Overview{% endblock %}
 
@@ -61,6 +62,8 @@
             {% else %}
             {{ empty_state('file-text', 'No concept papers found', 'There are no concept papers for your department yet. Create one to get started.', button_link('Create New Concept Paper', url_for('concept_papers.add_concept_paper'), variant='primary')) }}
             {% endif %}
+
+            {{ pagination_controls(pagination, request.endpoint) }}
         </div>
     </main>
 </div>

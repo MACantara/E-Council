@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 
 from models import DepartmentsEvents, Events, db
 from utils.auth import belongs_to_user_or_department
-from utils.helpers import safe_decimal_conversion
+from utils.helpers import get_pagination_args, safe_decimal_conversion
 
 # Create blueprint with url_prefix='/dashboard'
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
@@ -21,8 +21,9 @@ def council_overview():
 @dashboard_bp.route("/events-overview", methods=["GET", "POST"])
 @login_required
 def events_overview():
-    # Get the current user's department ID
+    # Get the current user's department ID and pagination parameters
     users_departments_id = current_user.users_departments_id
+    page, per_page = get_pagination_args()
 
     # Set default sorting to recent-to-old if not provided
     sort_by_date = "recent-to-old"
@@ -32,19 +33,19 @@ def events_overview():
         db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
     )
 
-    # Set default academic year to "All" if not provided
-
     # Base query for events associated with the user's department
     query = (
         db.session.query(Events)
         .join(DepartmentsEvents)
         .filter(DepartmentsEvents.departments_id == users_departments_id)
+        .order_by(Events.events_academic_year.desc(), Events.events_start_date_and_time.desc())
     )
 
-    # Execute the query
-    events = query.all()
+    # Execute the query with pagination
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    events = pagination.items
 
-    # Fetch transactions and calculate expenses, income, and remaining budget from JSON lists
+    # Fetch transactions and calculate expenses, income, and remaining budget for the page
     event_data = []
 
     for event in events:
@@ -71,6 +72,7 @@ def events_overview():
     return render_template(
         "events/events-overview.html",
         events=events,
+        pagination=pagination,
         academic_years=academic_years,
         sort_by_date=sort_by_date,
         event_data=event_data,

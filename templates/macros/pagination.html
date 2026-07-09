@@ -1,0 +1,47 @@
+{% from 'macros/icons.html' import lucide %}
+
+{% macro pagination_controls(pagination, endpoint) %}
+{% if pagination and pagination.pages > 1 %}
+{% set args = request.args.to_dict() %}
+{% set _ = args.pop('page', None) %}
+<nav class="mt-6 flex justify-center" aria-label="Pagination">
+    <div class="inline-flex items-center gap-1 rounded-lg border border-edge bg-surface p-1 shadow-sm">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for(endpoint, page=pagination.prev_num, **args) }}" class="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">
+            {{ lucide('chevron-left', 16, 'w-4 h-4') }}
+            Previous
+        </a>
+        {% else %}
+        <span class="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium text-ink-3 cursor-not-allowed">
+            {{ lucide('chevron-left', 16, 'w-4 h-4') }}
+            Previous
+        </span>
+        {% endif %}
+
+        {% for page in pagination.iter_pages() %}
+        {% if page %}
+        {% if page == pagination.page %}
+        <span class="rounded-md bg-accent px-3 py-1.5 text-sm font-semibold text-white">{{ page }}</span>
+        {% else %}
+        <a href="{{ url_for(endpoint, page=page, **args) }}" class="rounded-md px-3 py-1.5 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">{{ page }}</a>
+        {% endif %}
+        {% else %}
+        <span class="px-2 py-1.5 text-sm text-ink-3">...</span>
+        {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <a href="{{ url_for(endpoint, page=pagination.next_num, **args) }}" class="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium text-ink-2 hover:bg-surface-lowered hover:text-ink">
+            Next
+            {{ lucide('chevron-right', 16, 'w-4 h-4') }}
+        </a>
+        {% else %}
+        <span class="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium text-ink-3 cursor-not-allowed">
+            Next
+            {{ lucide('chevron-right', 16, 'w-4 h-4') }}
+        </span>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
+{% endmacro %}

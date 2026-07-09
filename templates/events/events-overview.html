@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from 'macros/ui.html' import button_link, card, empty_state %}
 {% from 'macros/icons.html' import lucide %}
+{% from 'macros/pagination.html' import pagination_controls %}
 
 {% block title %}Events Overview{% endblock %}
 
@@ -53,7 +54,7 @@
                         </div>
 
                         <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                            {{ button_link('View', url_for('events.event_dashboard', event_id=event.events_id), variant='secondary', class='justify-center') }}
+                            {{ button_link('View', url_for('dashboard.event_dashboard', event_id=event.events_id), variant='secondary', class='justify-center') }}
                             {{ button_link('Update', url_for('events.update_event', event_id=event.events_id), variant='secondary', class='justify-center') }}
                             {{ button_link('Invite', url_for('events.invite_user', event_id=event.events_id, source='events_overview'), variant='ghost', class='justify-center') }}
                             {{ button_link('Delete', url_for('events.delete_event', event_id=event.events_id), variant='danger', class='justify-center') }}
@@ -70,6 +71,8 @@
             {% else %}
             {{ empty_state('calendar-x', 'No events found', 'There are no events for your department yet. Create an event to get started.', button_link('Create New Event', url_for('events.add_event'), variant='primary')) }}
             {% endif %}
+
+            {{ pagination_controls(pagination, request.endpoint) }}
         </div>
     </main>
 </div>

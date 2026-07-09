@@ -380,12 +380,12 @@ Phase 3 moves business logic out of route handlers and into services, improves t
 **Scope**: `routes/*.py`, `templates/**/*-overview.html`, `models/*.py`
 
 **Checklist**
-- [ ] Add `index=True` to foreign keys and frequently filtered columns in `models/*.py`.
-- [ ] Create Flask-Migrate migrations for the indexes.
-- [ ] Add `page` and `per_page` query parameters to each overview route.
-- [ ] Use `paginate()` in SQLAlchemy queries.
-- [ ] Update overview templates to show page numbers and next/previous links.
-- [ ] Add tests verifying pagination returns correct subsets.
+- [x] Add `index=True` to foreign keys and frequently filtered columns in `models/*.py`.
+- [x] Create Flask-Migrate migrations for the indexes.
+- [x] Add `page` and `per_page` query parameters to each overview route.
+- [x] Use `paginate()` in SQLAlchemy queries.
+- [x] Update overview templates to show page numbers and next/previous links.
+- [x] Add tests verifying pagination returns correct subsets.
 
 **Acceptance criteria**: Overview pages with 100+ records load quickly. Pagination controls are visible. Tests verify page boundaries.
 

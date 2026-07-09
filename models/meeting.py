@@ -9,20 +9,20 @@ class MinutesOfTheMeeting(db.Model):
     __tablename__ = "minutes_of_the_meeting"
 
     minutes_of_the_meeting_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    minutes_of_the_meeting_date = db.Column(db.DateTime, nullable=False)
-    minutes_of_the_meeting_semester = db.Column(db.String(50), nullable=False)
-    minutes_of_the_meeting_academic_year = db.Column(db.String(50), nullable=False)
-    minutes_of_the_meeting_status = db.Column(db.String(50), nullable=False)
+    minutes_of_the_meeting_date = db.Column(db.DateTime, nullable=False, index=True)
+    minutes_of_the_meeting_semester = db.Column(db.String(50), nullable=False, index=True)
+    minutes_of_the_meeting_academic_year = db.Column(db.String(50), nullable=False, index=True)
+    minutes_of_the_meeting_status = db.Column(db.String(50), nullable=False, index=True)
     minutes_of_the_meeting_departments_id = db.Column(
-        db.Integer, db.ForeignKey("departments.departments_id"), nullable=True
+        db.Integer, db.ForeignKey("departments.departments_id"), nullable=True, index=True
     )
     minutes_of_the_meeting_presiding_officer = db.Column(db.String(100), nullable=False)
     minutes_of_the_meeting_agenda = db.Column(db.Text, nullable=False)
     minutes_of_the_meeting_notes = db.Column(db.Text, nullable=True)
     minutes_of_the_meeting_adjourned = db.Column(db.DateTime, nullable=True)
-    minutes_of_the_meeting_approved_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
-    minutes_of_the_meeting_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
-    minutes_of_the_meeting_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
+    minutes_of_the_meeting_approved_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
+    minutes_of_the_meeting_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
+    minutes_of_the_meeting_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
     photo_documentation = db.Column(db.JSON, nullable=False, default=list)
 
     # Relationships - using string references to avoid circular imports

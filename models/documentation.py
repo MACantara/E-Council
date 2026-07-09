@@ -12,22 +12,22 @@ class Documentation(db.Model):
     __tablename__ = "documentation"
 
     documentation_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    documentation_events_id = db.Column(db.Integer, db.ForeignKey("events.events_id"), nullable=True)
-    documentation_academic_year = db.Column(db.String(50), nullable=True)
-    documentation_semester = db.Column(db.String(50), nullable=True)
-    documentation_status = db.Column(db.String(50), nullable=True)
-    documentation_departments_id = db.Column(db.Integer, db.ForeignKey("departments.departments_id"), nullable=True)
+    documentation_events_id = db.Column(db.Integer, db.ForeignKey("events.events_id"), nullable=True, index=True)
+    documentation_academic_year = db.Column(db.String(50), nullable=True, index=True)
+    documentation_semester = db.Column(db.String(50), nullable=True, index=True)
+    documentation_status = db.Column(db.String(50), nullable=True, index=True)
+    documentation_departments_id = db.Column(db.Integer, db.ForeignKey("departments.departments_id"), nullable=True, index=True)
     documentation_type = db.Column(db.String(50), nullable=True)
     documentation_activity_report_forms_id = db.Column(
-        db.Integer, db.ForeignKey("activity_report_forms.activity_report_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("activity_report_forms.activity_report_forms_id"), nullable=True, index=True
     )
-    documentation_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
+    documentation_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
     documentation_learning_journal_forms_id = db.Column(
-        db.Integer, db.ForeignKey("learning_journal_forms.learning_journal_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("learning_journal_forms.learning_journal_forms_id"), nullable=True, index=True
     )
-    documentation_checked_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
-    documentation_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
-    documentation_date_of_submission = db.Column(db.DateTime, nullable=True)
+    documentation_checked_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
+    documentation_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
+    documentation_date_of_submission = db.Column(db.DateTime, nullable=True, index=True)
     documentation_rating = db.Column(db.Float, nullable=True)
     documentation_comments_suggestions = db.Column(db.Text, nullable=True)
     evaluation_images = db.Column(db.JSON, nullable=False, default=list)

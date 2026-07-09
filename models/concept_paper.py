@@ -13,19 +13,19 @@ class ConceptPaperForms(db.Model):
     __tablename__ = "concept_paper_forms"
 
     concept_paper_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    concept_paper_forms_semester = db.Column(db.String(50), nullable=True)
-    concept_paper_forms_academic_year = db.Column(db.String(50), nullable=True)
-    concept_paper_forms_status = db.Column(db.String(50), nullable=True)
+    concept_paper_forms_semester = db.Column(db.String(50), nullable=True, index=True)
+    concept_paper_forms_academic_year = db.Column(db.String(50), nullable=True, index=True)
+    concept_paper_forms_status = db.Column(db.String(50), nullable=True, index=True)
     concept_paper_forms_departments_id = db.Column(
-        db.Integer, db.ForeignKey("departments.departments_id"), nullable=True
+        db.Integer, db.ForeignKey("departments.departments_id"), nullable=True, index=True
     )
-    concept_paper_forms_endorsed_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
+    concept_paper_forms_endorsed_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
     concept_paper_forms_recommending_approval_by = db.Column(
-        db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True
+        db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True
     )
-    concept_paper_forms_approved_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
+    concept_paper_forms_approved_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
     concept_paper_forms_subject = db.Column(db.String(255), nullable=True)
-    concept_paper_forms_date = db.Column(db.Date, nullable=True)
+    concept_paper_forms_date = db.Column(db.Date, nullable=True, index=True)
     concept_paper_forms_body = db.Column(db.Text, nullable=True)
     concept_paper_forms_event_start_date_and_time = db.Column(db.DateTime, nullable=True)
     concept_paper_forms_event_end_date_and_time = db.Column(db.DateTime, nullable=True)
@@ -34,8 +34,8 @@ class ConceptPaperForms(db.Model):
     concept_paper_forms_budget = db.Column(db.String(255), nullable=True)
     concept_paper_forms_descriptions = db.Column(db.Text, nullable=True)
     concept_paper_forms_expected_number_of_participants = db.Column(db.Text, nullable=True)
-    concept_paper_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
-    concept_paper_forms_signed_and_reviewed_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
+    concept_paper_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
+    concept_paper_forms_signed_and_reviewed_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
 
     # Relationships - using string references to avoid circular imports
     endorsed_by_signatory = db.relationship("Signatories", foreign_keys=[concept_paper_forms_endorsed_by])
@@ -62,14 +62,14 @@ class ExcuseLetterForms(db.Model):
 
     excuse_letter_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     excuse_letter_forms_concept_paper_forms_id = db.Column(
-        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True, index=True
     )
     excuse_letter_forms_department_office_unit = db.Column(db.String(255), nullable=True)
     excuse_letter_forms_personnel_in_charge_forms_id = db.Column(
-        db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True
+        db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True
     )
-    excuse_letter_forms_dean = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
-    excuse_letter_forms_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
+    excuse_letter_forms_dean = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
+    excuse_letter_forms_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
 
     concept_paper_form = db.relationship("ConceptPaperForms", backref="excuse_letter_forms")
     personnel_in_charge_signatory = db.relationship(
@@ -87,16 +87,16 @@ class ActivityReportForms(db.Model):
 
     activity_report_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     activity_report_forms_concept_paper_forms_id = db.Column(
-        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True, index=True
     )
     activity_report_forms_nature_of_the_activity = db.Column(db.String(255), nullable=True)
     activity_report_forms_personnel_in_charge_forms_id = db.Column(
-        db.Integer, db.ForeignKey("personnel_in_charge_forms.personnel_in_charge_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("personnel_in_charge_forms.personnel_in_charge_forms_id"), nullable=True, index=True
     )
     activity_report_forms_contact_numbers = db.Column(db.String(255), nullable=True)
-    activity_report_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
-    activity_report_forms_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
-    activity_report_date_submission = db.Column(db.Date, nullable=True)
+    activity_report_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
+    activity_report_forms_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
+    activity_report_date_submission = db.Column(db.Date, nullable=True, index=True)
 
     concept_paper_form = db.relationship("ConceptPaperForms", backref="activity_report_forms")
     activity_report_items = db.relationship(
@@ -128,7 +128,7 @@ class LearningJournalForms(db.Model):
 
     learning_journal_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     learning_journal_forms_concept_paper_forms_id = db.Column(
-        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True, index=True
     )
     learning_journal_forms_name = db.Column(db.String(255), nullable=False)
     learning_journal_forms_date = db.Column(db.Date, nullable=False)
@@ -136,7 +136,7 @@ class LearningJournalForms(db.Model):
     learning_journal_forms_location = db.Column(db.String(255), nullable=False)
     learning_journal_forms_activity = db.Column(db.String(255), nullable=False)
     learning_journal_forms_role = db.Column(db.String(255), nullable=False)
-    learning_journal_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
+    learning_journal_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
     observations = db.Column(db.JSON, nullable=False, default=list)
     learnings = db.Column(db.JSON, nullable=False, default=list)
 
@@ -152,7 +152,7 @@ class ParentGuardianConsentForms(db.Model):
 
     parent_guardian_consent_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     parent_guardian_consent_forms_concept_paper_forms_id = db.Column(
-        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True, index=True
     )
     parent_guardian_consent_forms_parent_guardian_name = db.Column(db.String(255), nullable=False)
     parent_guardian_consent_forms_parent_guardian_contact_number = db.Column(db.String(20), nullable=False)

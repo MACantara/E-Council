@@ -10,16 +10,16 @@ class Events(db.Model):
 
     events_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     events_concept_paper_forms_id = db.Column(
-        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True
+        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=True, index=True
     )
     events_name = db.Column(db.String(255), nullable=True)
-    events_semester = db.Column(db.String(50), nullable=False)
-    events_academic_year = db.Column(db.String(50), nullable=False)
-    events_start_date_and_time = db.Column(db.DateTime, nullable=True)
-    events_end_date_and_time = db.Column(db.DateTime, nullable=True)
+    events_semester = db.Column(db.String(50), nullable=False, index=True)
+    events_academic_year = db.Column(db.String(50), nullable=False, index=True)
+    events_start_date_and_time = db.Column(db.DateTime, nullable=True, index=True)
+    events_end_date_and_time = db.Column(db.DateTime, nullable=True, index=True)
     events_venue = db.Column(db.String(255), nullable=True)
     events_budget = db.Column(db.String(255), nullable=True)
-    events_status = db.Column(db.String(50), nullable=True)
+    events_status = db.Column(db.String(50), nullable=True, index=True)
     events_description = db.Column(db.Text, nullable=True)
     events_remarks = db.Column(db.String(255), nullable=True)
 
@@ -54,10 +54,10 @@ class EventInvitations(db.Model):
     __tablename__ = "event_invitations"
 
     event_invitations_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    event_invitations_events_id = db.Column(db.Integer, db.ForeignKey("events.events_id"), nullable=False)
+    event_invitations_events_id = db.Column(db.Integer, db.ForeignKey("events.events_id"), nullable=False, index=True)
     event_invitations_email = db.Column(db.String(255), nullable=False)
     event_invitations_token = db.Column(db.String(64), nullable=False)
-    event_invitations_created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False)
+    event_invitations_created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False, index=True)
 
     # Relationship to Events model
     event = db.relationship("Events", backref="event_invitations")

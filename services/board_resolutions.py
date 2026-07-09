@@ -37,30 +37,30 @@ from models import (
 )
 from services import ai
 from utils.auth import belongs_to_user_or_department, is_admin
+from utils.helpers import get_pagination_args
 
 
 def board_resolutions_overview():
-    # Determine the sorting order
+    # Determine the sorting order and pagination parameters
     sort_by_date = request.args.get("sort_by_date", "recent-to-old")
+    page, per_page = get_pagination_args()
 
     # Admins can view all board resolutions; others only see their own department's or ones they prepared
-    if is_admin(current_user):
-        board_resolutions = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc()).all()
-    else:
-        board_resolutions = (
-            BoardResolutions.query.filter(
-                or_(
-                    BoardResolutions.board_resolutions_departments_id == current_user.users_departments_id,
-                    BoardResolutions.board_resolutions_prepared_by == current_user.users_id,
-                )
+    query = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc())
+    if not is_admin(current_user):
+        query = query.filter(
+            or_(
+                BoardResolutions.board_resolutions_departments_id == current_user.users_departments_id,
+                BoardResolutions.board_resolutions_prepared_by == current_user.users_id,
             )
-            .order_by(BoardResolutions.board_resolutions_date.desc())
-            .all()
         )
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
         "board-resolutions/board-resolutions-overview.html",
-        board_resolutions=board_resolutions,
+        board_resolutions=pagination.items,
+        pagination=pagination,
         sort_by_date=sort_by_date,
     )
 

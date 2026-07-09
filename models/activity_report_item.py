@@ -16,13 +16,15 @@ class ActivityReportItem(db.Model):
         db.Integer,
         db.ForeignKey("activity_report_forms.activity_report_forms_id"),
         nullable=True,
+        index=True,
     )
     documentation_id = db.Column(
         db.Integer,
         db.ForeignKey("documentation.documentation_id"),
         nullable=True,
+        index=True,
     )
-    item_type = db.Column(db.String(50), nullable=False)
+    item_type = db.Column(db.String(50), nullable=False, index=True)
     item_text = db.Column(db.Text, nullable=False)
 
     def __str__(self):

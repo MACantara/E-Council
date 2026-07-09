@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from 'macros/ui.html' import button_link, card, empty_state %}
+{% from 'macros/pagination.html' import pagination_controls %}
 
 {% block title %}Minutes of the Meeting Overview{% endblock %}
 
@@ -62,6 +63,8 @@
             {% else %}
             {{ empty_state('clock', 'No minutes of the meeting found', 'There are no meeting minutes for your department yet. Create one to get started.', button_link('Create New Minutes of the Meeting', url_for('meetings.add_minutes_of_the_meeting'), variant='primary')) }}
             {% endif %}
+
+            {{ pagination_controls(pagination, request.endpoint) }}
         </div>
     </main>
 </div>

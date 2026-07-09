@@ -12,9 +12,9 @@ class MeetingAttendee(db.Model):
 
     meeting_attendee_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     minutes_of_the_meeting_id = db.Column(
-        db.Integer, db.ForeignKey("minutes_of_the_meeting.minutes_of_the_meeting_id"), nullable=False
+        db.Integer, db.ForeignKey("minutes_of_the_meeting.minutes_of_the_meeting_id"), nullable=False, index=True
     )
-    users_id = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=False)
+    users_id = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=False, index=True)
 
     user = db.relationship("Users", backref="meeting_attendees")
 

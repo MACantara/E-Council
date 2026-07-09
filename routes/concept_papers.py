@@ -19,6 +19,7 @@ from models import (
 from services import ai
 from services import concept_papers as concept_paper_service
 from utils.auth import is_admin
+from utils.helpers import get_pagination_args
 
 # Create blueprint
 concept_papers_bp = Blueprint("concept_papers", __name__, url_prefix="/concept-papers")
@@ -27,24 +28,29 @@ concept_papers_bp = Blueprint("concept_papers", __name__, url_prefix="/concept-p
 @concept_papers_bp.route("/overview")
 @login_required
 def concept_papers_overview():
-    # Determine the sorting order
+    # Determine the sorting order and pagination parameters
     sort_by_date = request.args.get("sort_by_date", "recent-to-old")
+    page, per_page = get_pagination_args()
 
     # Admins can view all concept papers; others only see their own department's
-    if is_admin(current_user):
-        concept_papers = ConceptPaperForms.query.all()
-    else:
+    query = ConceptPaperForms.query.order_by(ConceptPaperForms.concept_paper_forms_date.desc())
+    if not is_admin(current_user):
         from sqlalchemy import or_
 
-        concept_papers = ConceptPaperForms.query.filter(
+        query = query.filter(
             or_(
                 ConceptPaperForms.concept_paper_forms_departments_id == current_user.users_departments_id,
                 ConceptPaperForms.concept_paper_forms_prepared_by == current_user.users_id,
             )
-        ).all()
+        )
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
-        "concept-papers/concept-papers-overview.html", concept_papers=concept_papers, sort_by_date=sort_by_date
+        "concept-papers/concept-papers-overview.html",
+        concept_papers=pagination.items,
+        pagination=pagination,
+        sort_by_date=sort_by_date,
     )
 
 

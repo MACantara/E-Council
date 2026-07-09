@@ -12,7 +12,7 @@ class Objective(db.Model):
 
     objective_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     concept_paper_forms_id = db.Column(
-        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=False
+        db.Integer, db.ForeignKey("concept_paper_forms.concept_paper_forms_id"), nullable=False, index=True
     )
     objective_text = db.Column(db.Text, nullable=False)
 
