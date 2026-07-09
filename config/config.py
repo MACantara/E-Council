@@ -192,31 +192,34 @@ class AIConfig:
     GOOGLE_GEMINI_AI_API_KEY = os.getenv("GOOGLE_GEMINI_AI_API_KEY")
     GEMINI_MODEL = "gemini-1.5-flash"
 
-    # AI Safety Settings
-    AI_SAFETY_SETTINGS = {
-        "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
-        "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
-        "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
-    }
+    @staticmethod
+    def _safety_settings():
+        """Return default safety settings as google-genai SafetySetting objects."""
+        from google.genai import types
+
+        return [
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+        ]
 
     @staticmethod
     def configure():
-        """Configure Google Gemini AI with environment variables."""
-        import google.generativeai as genai
-        from google.generativeai.types import HarmBlockThreshold, HarmCategory
-
-        genai.configure(api_key=AIConfig.GOOGLE_GEMINI_AI_API_KEY)
-
-        # Convert string safety settings to actual enums
-        safety_settings = {
-            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-        }
-
-        return safety_settings
+        """Return the default safety settings for Google Gemini requests."""
+        return AIConfig._safety_settings()
 
 
 class LoginConfig:

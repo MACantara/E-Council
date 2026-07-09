@@ -202,7 +202,7 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
 - **Cloudinary** — profile pictures and photo documentation
 
 ### AI
-- **google-generativeai** — Google Gemini integration (deprecated; migration to `google-genai` is tracked in `docs/ROADMAP.md`)
+- **google-genai** — Google Gemini integration
 
 ### PDF & Data Processing
 - **ReportLab** — PDF generation

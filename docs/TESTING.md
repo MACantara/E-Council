@@ -154,7 +154,7 @@ pytest tests/test_utils.py::TestHelpers::test_safe_decimal_conversion_valid -v
 - `pymysql` - MySQL driver
 - `cryptography` - Cryptographic functions
 - `cloudinary` - File upload service
-- `google-generativeai` - AI integration
+- `google-genai` - AI integration
 - `reportlab` - PDF generation
 - `pandas` - Data manipulation
 

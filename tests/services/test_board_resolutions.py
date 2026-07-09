@@ -1,23 +1,23 @@
 """Unit tests for the board resolutions service."""
 
 import json
-from unittest.mock import MagicMock
 
 import pytest
 from werkzeug.exceptions import HTTPException
 
 from models import BoardResolutions
 from services import board_resolutions
+from services.base import ServiceResult
 from tests.factories import BoardResolutionsFactory, SignatoriesFactory
 
 
 @pytest.fixture
-def mock_board_model(monkeypatch):
-    """Replace the module-level Gemini model with a mocked instance."""
-    mock = MagicMock()
-    mock.generate_content.return_value = MagicMock(text="Generated AI description")
-    monkeypatch.setattr("services.board_resolutions.model", mock)
-    return mock
+def mock_board_ai(monkeypatch):
+    """Replace the AI service generate_content function for board resolution tests."""
+    monkeypatch.setattr(
+        "services.board_resolutions.ai.generate_content",
+        lambda *args, **kwargs: ServiceResult.ok("Generated AI description"),
+    )
 
 
 class TestDeleteBoardResolution:
@@ -84,7 +84,7 @@ class TestUpdateBoardResolutionStatus:
 
 
 class TestGenerateDescription:
-    def test_success(self, app_context, auth_service_context, sample_user, mock_board_model):
+    def test_success(self, app_context, auth_service_context, sample_user, mock_board_ai):
         with auth_service_context(
             method="POST",
             data=json.dumps(

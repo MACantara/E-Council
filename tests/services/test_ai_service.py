@@ -1,6 +1,6 @@
 """Unit tests for the AI service."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -8,11 +8,11 @@ from services import ai
 
 
 @pytest.fixture
-def mock_model(monkeypatch):
-    """Replace the module-level Gemini model with a mocked instance."""
+def mock_client(monkeypatch):
+    """Replace the Google GenAI client with a mocked instance."""
     mock = MagicMock()
-    mock.generate_content.return_value = MagicMock(text="Generated AI content")
-    monkeypatch.setattr("services.ai._model", lambda: mock)
+    mock.models.generate_content.return_value = MagicMock(text="Generated AI content")
+    monkeypatch.setattr("services.ai._client", mock)
     return mock
 
 
@@ -29,100 +29,100 @@ class TestFormatDatetimeRange:
 
 
 class TestGenerateConceptPaperBody:
-    def test_success(self, mock_model):
+    def test_success(self, mock_client):
         result = ai.generate_concept_paper_body("Seminar", "2024-01-15T09:00", "2024-01-15T12:00", "Test Venue")
         assert result.success is True
         assert result.data == "Generated AI content"
-        mock_model.generate_content.assert_called_once()
+        mock_client.models.generate_content.assert_called_once()
 
-    def test_missing_required_fields(self, mock_model):
+    def test_missing_required_fields(self, mock_client):
         result = ai.generate_concept_paper_body("Seminar", "", "", "")
         assert result.success is False
         assert result.error == "Missing required fields"
-        mock_model.generate_content.assert_not_called()
+        mock_client.models.generate_content.assert_not_called()
 
-    def test_invalid_dates(self, mock_model):
+    def test_invalid_dates(self, mock_client):
         result = ai.generate_concept_paper_body("Seminar", "bad-date", "2024-01-15T12:00", "Test Venue")
         assert result.success is False
         assert result.error == "Invalid date format"
-        mock_model.generate_content.assert_not_called()
+        mock_client.models.generate_content.assert_not_called()
 
-    def test_handles_generation_exception(self, mock_model):
-        mock_model.generate_content.side_effect = RuntimeError("API down")
+    def test_handles_generation_exception(self, mock_client):
+        mock_client.models.generate_content.side_effect = RuntimeError("API down")
         result = ai.generate_concept_paper_body("Seminar", "2024-01-15T09:00", "2024-01-15T12:00", "Test Venue")
         assert result.success is False
         assert "API down" in result.error
 
 
 class TestGenerateConceptPaperDescriptions:
-    def test_success(self, mock_model):
+    def test_success(self, mock_client):
         result = ai.generate_concept_paper_descriptions("Workshop")
         assert result.success is True
         assert result.data == "Generated AI content"
 
-    def test_missing_subject(self, mock_model):
+    def test_missing_subject(self, mock_client):
         result = ai.generate_concept_paper_descriptions("")
         assert result.success is False
         assert result.error == "Missing subject"
 
 
 class TestGenerateConceptPaperObjectives:
-    def test_success(self, mock_model):
+    def test_success(self, mock_client):
         result = ai.generate_concept_paper_objectives("Workshop")
         assert result.success is True
 
-    def test_missing_subject(self, mock_model):
+    def test_missing_subject(self, mock_client):
         result = ai.generate_concept_paper_objectives("")
         assert result.success is False
         assert result.error == "Missing subject"
 
 
 class TestGenerateConceptPaperLearningOutcomes:
-    def test_success(self, mock_model):
+    def test_success(self, mock_client):
         result = ai.generate_concept_paper_learning_outcomes("Workshop")
         assert result.success is True
 
-    def test_missing_subject(self, mock_model):
+    def test_missing_subject(self, mock_client):
         result = ai.generate_concept_paper_learning_outcomes("")
         assert result.success is False
         assert result.error == "Missing subject"
 
 
 class TestGenerateConceptPaperParticipants:
-    def test_extracts_digits(self, mock_model):
-        mock_model.generate_content.return_value = MagicMock(text="42 participants")
+    def test_extracts_digits(self, mock_client):
+        mock_client.models.generate_content.return_value = MagicMock(text="42 participants")
         result = ai.generate_concept_paper_participants("Workshop")
         assert result.success is True
         assert result.data == "42"
 
-    def test_missing_subject(self, mock_model):
+    def test_missing_subject(self, mock_client):
         result = ai.generate_concept_paper_participants("")
         assert result.success is False
         assert result.error == "Missing subject"
 
 
 class TestGenerateConceptPaperConsent:
-    def test_success(self, mock_model):
+    def test_success(self, mock_client):
         result = ai.generate_concept_paper_consent("Workshop", "2024-01-15T09:00", "2024-01-15T12:00", "Test Venue")
         assert result.success is True
 
-    def test_missing_fields(self, mock_model):
+    def test_missing_fields(self, mock_client):
         result = ai.generate_concept_paper_consent("Workshop", "", "", "")
         assert result.success is False
         assert result.error == "Missing required fields"
 
 
 class TestSafetySettings:
-    def test_returns_dict(self):
-        assert isinstance(ai._safety_settings(), dict)
+    def test_returns_list(self):
+        assert isinstance(ai._safety_settings(), list)
+        assert len(ai._safety_settings()) > 0
 
 
-class TestModel:
-    @patch("services.ai.genai")
-    def test_configures_and_returns_model(self, mock_genai, monkeypatch):
-        with monkeypatch.context() as m:
-            m.setattr("services.ai.AIConfig.GOOGLE_GEMINI_AI_API_KEY", "test-key")
-            m.setattr("services.ai.AIConfig.GEMINI_MODEL", "test-model")
-            ai._model()
-        mock_genai.configure.assert_called_once_with(api_key="test-key")
-        mock_genai.GenerativeModel.assert_called_once_with("test-model")
+class TestClient:
+    def test_creates_client_with_configured_api_key(self, monkeypatch):
+        mock_client_cls = MagicMock()
+        monkeypatch.setattr("services.ai.genai.Client", mock_client_cls)
+        monkeypatch.setattr("services.ai._client", None)
+        monkeypatch.setattr("services.ai.AIConfig.GOOGLE_GEMINI_AI_API_KEY", "test-key")
+        ai.get_client()
+        mock_client_cls.assert_called_once_with(api_key="test-key")

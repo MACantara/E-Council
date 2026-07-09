@@ -337,12 +337,12 @@ Phase 3 moves business logic out of route handlers and into services, improves t
 **Scope**: `services/ai.py`, `config/config.py`, `requirements.txt`
 
 **Checklist**
-- [ ] Replace `google-generativeai` with `google-genai` in `requirements.txt`.
-- [ ] Update `AIConfig` to use `google.genai` configuration.
-- [ ] Update `services/ai.py` to use the new client and model classes.
-- [ ] Update safety settings to match the new SDK format.
-- [ ] Test all AI generation endpoints (concept paper, board resolutions, meetings) with the new SDK.
-- [ ] Update `tests/test_ai.py` mocks.
+- [x] Replace `google-generativeai` with `google-genai` in `requirements.txt`.
+- [x] Update `AIConfig` to use `google.genai` configuration.
+- [x] Update `services/ai.py` to use the new client and model classes.
+- [x] Update safety settings to match the new SDK format.
+- [x] Test all AI generation endpoints (concept paper, board resolutions, meetings) with the new SDK.
+- [x] Update `tests/test_ai.py` mocks.
 
 **Acceptance criteria**: No `import google.generativeai` remains. AI generation endpoints work in development and tests pass.
 
@@ -583,5 +583,6 @@ For each recommendation:
 ## Changelog
 
 - **2026-07-09**: Created initial roadmap from `docs/IMPROVEMENT_ANALYSIS.md`.
+- **2026-07-09**: Migrated AI SDK from `google-generativeai` to `google-genai` (Phase 3.2); all AI generation endpoints and tests updated.
 - **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
 - **2026-07-09**: Completed Phase 2.5 test coverage and fixtures (124 tests passing, 1 skipped `generate_concept_paper_pdf`).

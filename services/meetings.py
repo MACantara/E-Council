@@ -9,7 +9,6 @@ from io import BytesIO
 
 import cloudinary
 import cloudinary.uploader
-import google.generativeai as genai
 import requests
 from flask import abort, current_app, flash, jsonify, redirect, render_template, request, send_file, url_for
 from flask_login import current_user
@@ -22,6 +21,7 @@ from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
 from models import MinutesOfTheMeeting, Signatories, StudentOrganizations, Users, db
+from services import ai
 from utils.auth import belongs_to_user_or_department, is_admin
 
 
@@ -489,7 +489,10 @@ def add_minutes_of_the_meeting():
                 meeting_recording.save(temp_path)
 
                 # Use Gemini's File API to upload
-                uploaded_file = genai.upload_file(temp_path)
+                upload_result = ai.upload_file(temp_path)
+                if not upload_result:
+                    raise RuntimeError(upload_result.error)
+                uploaded_file = upload_result.data
 
                 # Wait for file to be ready (add a small delay)
                 time.sleep(10)  # Wait 10 seconds for file processing
@@ -508,13 +511,12 @@ def add_minutes_of_the_meeting():
                 No text formatting, markdown, or other formatting. No additional analysis or comments."""
 
                 # Process with Gemini Flash
-                from config import AIConfig
-
-                model_gemini_flash = genai.GenerativeModel(AIConfig.GEMINI_MODEL)
-                response = model_gemini_flash.generate_content([uploaded_file, prompt])
+                response_result = ai.generate_content(contents=[uploaded_file, prompt])
+                if not response_result:
+                    raise RuntimeError(response_result.error)
 
                 # Combine AI-generated notes with user input
-                ai_generated_notes = response.text
+                ai_generated_notes = response_result.data
                 notes = f"{notes}\n\nAI-Generated Summary:\n{ai_generated_notes}" if notes else ai_generated_notes
 
             except Exception as e:

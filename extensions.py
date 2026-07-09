@@ -70,9 +70,6 @@ def init_extensions(app):
     # Configure Cloudinary
     configure_cloudinary(app)
 
-    # Configure Google Gemini AI
-    configure_ai(app)
-
 
 def configure_cloudinary(app):
     """
@@ -91,29 +88,6 @@ def configure_cloudinary(app):
         api_secret=CloudinaryConfig.CLOUDINARY_API_SECRET,
         secure=CloudinaryConfig.CLOUDINARY_SECURE,
     )
-
-
-def configure_ai(app):
-    """
-    Configure Google Gemini AI with application settings.
-
-    Args:
-        app: Flask application instance
-    """
-    import google.generativeai as genai
-    from google.generativeai.types import HarmBlockThreshold, HarmCategory
-
-    from config import AIConfig
-
-    genai.configure(api_key=AIConfig.GOOGLE_GEMINI_AI_API_KEY)
-
-    # Return safety settings for use in routes
-    return {
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    }
 
 
 def get_serializer():

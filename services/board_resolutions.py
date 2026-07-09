@@ -3,7 +3,6 @@
 from datetime import datetime
 from io import BytesIO
 
-import google.generativeai as genai
 from flask import (
     abort,
     current_app,
@@ -17,7 +16,6 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
-from google.generativeai.types import HarmBlockThreshold, HarmCategory
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import (
@@ -28,7 +26,6 @@ from reportlab.platypus import (
 )
 from sqlalchemy import or_
 
-from config import AIConfig
 from models import (
     BoardResolutions,
     DepartmentsEvents,
@@ -38,20 +35,8 @@ from models import (
     Users,
     db,
 )
+from services import ai
 from utils.auth import belongs_to_user_or_department, is_admin
-
-genai.configure(api_key=AIConfig.GOOGLE_GEMINI_AI_API_KEY)
-
-
-model = genai.GenerativeModel(AIConfig.GEMINI_MODEL)
-
-
-safety_settings = {
-    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-}
 
 
 def board_resolutions_overview():
@@ -371,21 +356,16 @@ def generate_description():
                 Note: Create a comprehensive list of expense categories appropriate for this specific event"""
 
         current_app.logger.info("Sending request to Gemini API")
-        try:
-            response = model.generate_content(prompt, safety_settings=safety_settings)
-            current_app.logger.info("Received response from Gemini API")
+        result = ai.generate_content(prompt)
+        current_app.logger.info("Received response from Gemini API")
 
-            if response and hasattr(response, "text"):
-                description = response.text.strip()
-                current_app.logger.info(f"Generated description: {description[:100]}...")
-                return make_response(jsonify({"description": description}), 200)
-            else:
-                current_app.logger.error("Invalid response format from Gemini API")
-                return make_response(jsonify({"error": "Invalid response from AI model"}), 500)
+        if result:
+            description = result.data
+            current_app.logger.info(f"Generated description: {description[:100]}...")
+            return make_response(jsonify({"description": description}), 200)
 
-        except Exception as gemini_error:
-            current_app.logger.error(f"Gemini API error: {str(gemini_error)}")
-            return make_response(jsonify({"error": f"AI generation error: {str(gemini_error)}"}), 500)
+        current_app.logger.error("Gemini API error: %s", result.error)
+        return make_response(jsonify({"error": f"AI generation error: {result.error}"}), 500)
 
     except Exception as e:
         current_app.logger.error(f"Error generating description: {str(e)}")

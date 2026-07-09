@@ -18,19 +18,18 @@ import pytest
 
 
 @pytest.fixture
-def mock_model(monkeypatch):
-    """Replace the module-level Gemini model with a mocked instance."""
+def mock_client(monkeypatch):
+    """Replace the Google GenAI client with a mocked instance."""
     mock = MagicMock()
-    mock.generate_content.return_value = MagicMock(text="Generated AI content")
-    monkeypatch.setattr("services.ai._model", lambda: mock)
-    monkeypatch.setattr("services.board_resolutions.model", mock)
+    mock.models.generate_content.return_value = MagicMock(text="Generated AI content")
+    monkeypatch.setattr("services.ai._client", mock)
     return mock
 
 
 class TestConceptPaperAI:
     """AI generation tests for the concept paper routes."""
 
-    def test_generate_body(self, auth_client, mock_model):
+    def test_generate_body(self, auth_client, mock_client):
         response = auth_client.post(
             "/concept-papers/generate-body",
             json={
@@ -42,15 +41,15 @@ class TestConceptPaperAI:
         )
         assert response.status_code == 200
         assert response.json["content"] == "Generated AI content"
-        mock_model.generate_content.assert_called()
+        mock_client.models.generate_content.assert_called()
 
-    def test_generate_descriptions(self, auth_client, mock_model):
+    def test_generate_descriptions(self, auth_client, mock_client):
         response = auth_client.post("/concept-papers/generate-descriptions", json={"subject": "Workshop"})
         assert response.status_code == 200
         assert response.json["content"] == "Generated AI content"
-        mock_model.generate_content.assert_called()
+        mock_client.models.generate_content.assert_called()
 
-    def test_generate_consent(self, auth_client, mock_model):
+    def test_generate_consent(self, auth_client, mock_client):
         response = auth_client.post(
             "/concept-papers/generate-consent",
             json={
@@ -62,15 +61,15 @@ class TestConceptPaperAI:
         )
         assert response.status_code == 200
         assert response.json["content"] == "Generated AI content"
-        mock_model.generate_content.assert_called()
+        mock_client.models.generate_content.assert_called()
 
-    def test_generate_participants(self, auth_client, mock_model):
+    def test_generate_participants(self, auth_client, mock_client):
         # The route extracts digits from the AI response to return a number.
-        mock_model.generate_content.return_value.text = "42 participants"
+        mock_client.models.generate_content.return_value.text = "42 participants"
         response = auth_client.post("/concept-papers/generate-participants", json={"subject": "Workshop"})
         assert response.status_code == 200
         assert response.json["content"] == "42"
-        mock_model.generate_content.assert_called()
+        mock_client.models.generate_content.assert_called()
 
     def test_generate_body_missing_fields(self, auth_client):
         response = auth_client.post("/concept-papers/generate-body", json={"subject": "Seminar"})
@@ -80,7 +79,7 @@ class TestConceptPaperAI:
 class TestBoardResolutionsAI:
     """AI generation tests for the board resolution routes."""
 
-    def test_generate_description(self, auth_client, mock_model):
+    def test_generate_description(self, auth_client, mock_client):
         response = auth_client.post(
             "/board-resolutions/generate-description",
             json={
@@ -92,7 +91,7 @@ class TestBoardResolutionsAI:
         )
         assert response.status_code == 200
         assert response.json["description"] == "Generated AI content"
-        mock_model.generate_content.assert_called()
+        mock_client.models.generate_content.assert_called()
 
     def test_generate_description_missing_fields(self, auth_client):
         response = auth_client.post("/board-resolutions/generate-description", json={"event_name": "Test Event"})

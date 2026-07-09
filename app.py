@@ -23,7 +23,7 @@ except ImportError:
     pass
 
 # Import configuration
-from config import AIConfig, CloudinaryConfig, DatabaseConfig, EmailConfig, get_config
+from config import CloudinaryConfig, DatabaseConfig, EmailConfig, get_config
 
 # Import extensions
 from extensions import db, init_extensions
@@ -115,11 +115,6 @@ def create_app(config_name=None):
         api_secret=CloudinaryConfig.CLOUDINARY_API_SECRET,
         secure=CloudinaryConfig.CLOUDINARY_SECURE,
     )
-
-    # Configure Gemini AI
-    import google.generativeai as genai
-
-    genai.configure(api_key=AIConfig.GOOGLE_GEMINI_AI_API_KEY)
 
     # Initialize upload folder
     upload_folder = "uploads/receipts"
