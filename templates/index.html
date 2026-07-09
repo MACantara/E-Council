@@ -100,19 +100,19 @@
             <p class="mt-2 text-ink-2">Three connected modules that handle the full council lifecycle.</p>
         </div>
         <div class="grid gap-6 sm:grid-cols-3">
-            {% call card(title=('<span class="inline-flex items-center gap-2">' + lucide('calendar-days', 20, 'w-5 h-5 text-accent') + ' Events</span>')|safe, class='p-6') %}
+            {% call card(title=(('<span class="inline-flex items-center gap-2">'|safe) + lucide('calendar-days', 20, 'w-5 h-5 text-accent') + (' Events</span>'|safe)), class='p-6') %}
                 <p class="text-sm text-ink-2">From concept to post-event reports, manage every stage in one place.</p>
                 <a href="{{ url_for('events.events_overview') if current_user.is_authenticated else url_for('auth.signup') }}" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-hover">
                     {{ lucide('arrow-right', 16, 'w-4 h-4') }} Explore Events
                 </a>
             {% endcall %}
-            {% call card(title=('<span class="inline-flex items-center gap-2">' + lucide('file-text', 20, 'w-5 h-5 text-accent') + ' Documents</span>')|safe, class='p-6') %}
+            {% call card(title=(('<span class="inline-flex items-center gap-2">'|safe) + lucide('file-text', 20, 'w-5 h-5 text-accent') + (' Documents</span>'|safe)), class='p-6') %}
                 <p class="text-sm text-ink-2">Concept papers, board resolutions, and meeting minutes made simple.</p>
                 <a href="{{ url_for('concept_papers.concept_papers_overview') if current_user.is_authenticated else url_for('auth.signup') }}" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-hover">
                     {{ lucide('arrow-right', 16, 'w-4 h-4') }} Explore Documents
                 </a>
             {% endcall %}
-            {% call card(title=('<span class="inline-flex items-center gap-2">' + lucide('bar-chart-2', 20, 'w-5 h-5 text-accent') + ' Reports</span>')|safe, class='p-6') %}
+            {% call card(title=(('<span class="inline-flex items-center gap-2">'|safe) + lucide('bar-chart-2', 20, 'w-5 h-5 text-accent') + (' Reports</span>'|safe)), class='p-6') %}
                 <p class="text-sm text-ink-2">Financial reports, charts, and evaluation summaries at a glance.</p>
                 <a href="{{ url_for('financial.financial_reports_overview') if current_user.is_authenticated else url_for('auth.signup') }}" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-hover">
                     {{ lucide('arrow-right', 16, 'w-4 h-4') }} Explore Reports
