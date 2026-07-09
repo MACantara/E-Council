@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 os.environ["FASTAPI_DATABASE_URI"] = "sqlite:///:memory:"
 os.environ["STORAGE_PROVIDER"] = "memory"
 os.environ["EMAIL_PROVIDER"] = "memory"
+os.environ["AI_PROVIDER"] = "mock"
 
 import api.database
 

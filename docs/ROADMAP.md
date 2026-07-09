@@ -703,12 +703,21 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/routers/concept_papers.py`, `api/schemas/concept_papers.py`, `services/concept_papers.py`, `services/ai/`
 
 **Checklist**
-- [ ] Add CRUD endpoints for concept papers under `/api/v1/concept-papers/`.
-- [ ] Add endpoints for the concept paper status workflow (draft, submit, approve, reject, etc.).
-- [ ] Add AI generation endpoints reusing the abstracted AI service from Phase 4.9.
-- [ ] Add export/PDF generation endpoints (synchronous or queued using the background task abstraction).
-- [ ] Add pagination, filtering, and department-scoped listing.
-- [ ] Add tests covering happy paths, validation, and department scoping.
+- [x] Add CRUD endpoints for concept papers under `/api/v1/concept-papers/`.
+- [x] Add endpoints for the concept paper status workflow (Upcoming, Postponed, Done, Cancelled).
+- [x] Add AI generation endpoints reusing the abstracted AI service from Phase 4.9.
+- [x] Add export/PDF generation endpoints (synchronous PDF generation).
+- [x] Add pagination, filtering, and department-scoped listing.
+- [x] Add tests covering happy paths, validation, and department scoping.
+
+**Notes**
+- Added `api/schemas/concept_papers.py` with request/response models for `ConceptPaperForms`, `Objective`, `LearningOutcome`, `ActivityReportForms`, `PersonnelInChargeForms`, `ExcuseLetterForms`, `LearningJournalForms`, and `ParentGuardianConsentForms`.
+- Implemented `api/routers/concept_papers.py` with `GET /api/v1/concept-papers`, `POST /api/v1/concept-papers`, `GET /api/v1/concept-papers/{id}`, `PUT /api/v1/concept-papers/{id}`, `DELETE /api/v1/concept-papers/{id}`, `PUT /api/v1/concept-papers/{id}/status`, AI generation endpoints, and `GET /api/v1/concept-papers/{id}/pdf`.
+- Implemented `api/services/concept_papers.py` for synchronous PDF generation using ReportLab.
+- Wired `api/routers/concept_papers.py` into `api/main.py`.
+- Updated `services/ai/service.py` to work outside a Flask app context by falling back to `AIConfig` when `current_app` is unavailable.
+- Added `api/tests/test_concept_papers.py` covering CRUD, status updates, AI generation, PDF download, and department scoping.
+- All FastAPI tests pass: `73 passed` across `api/tests/` and `tests/test_api.py`.
 
 **Acceptance criteria**: Feature parity with `routes/concept_papers.py`. All CRUD, AI, and export workflows work through REST endpoints.
 
