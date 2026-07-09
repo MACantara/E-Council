@@ -13,7 +13,7 @@
         <div class="mx-auto max-w-2xl space-y-6">
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <h1 class="text-2xl font-bold text-ink">Add Event</h1>
-                {{ button_link('Back to Events Overview', url_for('events.events_overview'), variant='secondary', icon='arrow-left') }}
+                {{ button_link('Back to Events Overview', url_for('dashboard.events_overview'), variant='secondary', icon='arrow-left') }}
             </div>
 
             <form method="POST" action="{{ url_for('events.add_event') }}" class="space-y-5 rounded-xl border border-edge bg-surface p-6 shadow-sm">
@@ -73,7 +73,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    {{ button_link('Cancel', url_for('events.events_overview'), variant='secondary') }}
+                    {{ button_link('Cancel', url_for('dashboard.events_overview'), variant='secondary') }}
                     {{ button('Add Event', type='submit') }}
                 </div>
             </form>

@@ -3,7 +3,8 @@ Concept Papers Blueprint
 Handles all concept paper related routes including CRUD operations and PDF generation.
 """
 
-from flask import Blueprint, request, flash, redirect, url_for, render_template, make_response, jsonify, send_file, current_app
+from flask import Blueprint, request, flash, redirect, url_for, render_template, make_response, jsonify, send_file, abort, current_app
+from utils.auth import belongs_to_user_or_department, is_admin
 from flask_login import login_required, current_user
 from io import BytesIO
 from datetime import datetime
@@ -57,11 +58,20 @@ concept_papers_bp = Blueprint('concept_papers', __name__, url_prefix='/concept-p
 @concept_papers_bp.route('/overview')
 @login_required
 def concept_papers_overview():
-    # Query for all concept papers
-    concept_papers = ConceptPaperForms.query.all()
-
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    # Admins can view all concept papers; others only see their own department's
+    if is_admin(current_user):
+        concept_papers = ConceptPaperForms.query.all()
+    else:
+        from sqlalchemy import or_
+        concept_papers = ConceptPaperForms.query.filter(
+            or_(
+                ConceptPaperForms.concept_paper_forms_departments_id == current_user.users_departments_id,
+                ConceptPaperForms.concept_paper_forms_prepared_by == current_user.users_id
+            )
+        ).all()
 
     return render_template("concept-papers/concept-papers-overview.html", concept_papers=concept_papers, sort_by_date=sort_by_date)
 
@@ -113,6 +123,7 @@ def add_concept_paper():
             concept_paper_forms_academic_year=concept_paper_academic_year,
             concept_paper_forms_semester=concept_paper_semester,
             concept_paper_forms_status=concept_paper_status,
+            concept_paper_forms_departments_id=current_user.users_departments_id,
             concept_paper_forms_event_start_date_and_time=concept_paper_event_start_date_and_time,
             concept_paper_forms_event_end_date_and_time=concept_paper_event_end_date_and_time,
             concept_paper_forms_location=concept_paper_location,
@@ -254,6 +265,9 @@ def update_concept_paper_status(paper_id):
     # Find the concept paper by ID
     concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
 
+    if not belongs_to_user_or_department(concept_paper, current_user):
+        abort(403)
+
     # Update the concept paper status
     concept_paper.concept_paper_forms_status = new_status
     db.session.commit()
@@ -264,6 +278,10 @@ def update_concept_paper_status(paper_id):
 @login_required
 def update_concept_paper(paper_id):
     concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
+
+    if not belongs_to_user_or_department(concept_paper, current_user):
+        abort(403)
+
     learning_journal = LearningJournalForms.query.filter_by(learning_journal_forms_concept_paper_forms_id=paper_id).first()
     parent_guardian_consent_form = ParentGuardianConsentForms.query.filter_by(parent_guardian_consent_forms_concept_paper_forms_id=paper_id).first()
     personnel_in_charge_form = PersonnelInChargeForms.query.filter_by(personnel_in_charge_forms_concept_paper_forms_id=paper_id).first()
@@ -508,6 +526,9 @@ def update_concept_paper(paper_id):
 def delete_concept_paper(paper_id):
     concept_paper = ConceptPaperForms.query.get_or_404(paper_id)
 
+    if not belongs_to_user_or_department(concept_paper, current_user):
+        abort(403)
+
     if request.method == 'POST':
         # Delete the concept paper (JSON data is removed automatically with the record)
         db.session.delete(concept_paper)
@@ -749,6 +770,11 @@ def generate_concept_consent():
 @concept_papers_bp.route('/generate-pdf/<int:concept_paper_id>')
 @login_required
 def generate_concept_paper_pdf(concept_paper_id):
+    concept_paper = ConceptPaperForms.query.get_or_404(concept_paper_id)
+
+    if not belongs_to_user_or_department(concept_paper, current_user):
+        abort(403)
+
     buffer = BytesIO()
     
     def header(canvas, doc):
@@ -847,8 +873,6 @@ def generate_concept_paper_pdf(concept_paper_id):
         spaceBefore=0,
         spaceAfter=0
     )
-    
-    concept_paper = ConceptPaperForms.query.get_or_404(concept_paper_id)
     
     routing_data = [
         ["FOR:", Paragraph(f"<b>{concept_paper.approved_by_signatory.signatory_first_name} {concept_paper.approved_by_signatory.signatory_last_name}</b>", wrapped_style)],

@@ -1,5 +1,7 @@
-from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, make_response, send_file, current_app
+from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, make_response, send_file, abort, current_app
 from flask_login import login_required, current_user
+from utils.auth import belongs_to_user_or_department, is_admin
+from sqlalchemy import or_
 from io import BytesIO
 from datetime import datetime
 from reportlab.lib import colors
@@ -46,11 +48,19 @@ board_resolutions_bp = Blueprint('board_resolutions', __name__, url_prefix='/boa
 @board_resolutions_bp.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
-    # Query for all board resolutions sorted by date (most recent first)
-    board_resolutions = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc()).all()
-
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    # Admins can view all board resolutions; others only see their own department's or ones they prepared
+    if is_admin(current_user):
+        board_resolutions = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc()).all()
+    else:
+        board_resolutions = BoardResolutions.query.filter(
+            or_(
+                BoardResolutions.board_resolutions_departments_id == current_user.users_departments_id,
+                BoardResolutions.board_resolutions_prepared_by == current_user.users_id
+            )
+        ).order_by(BoardResolutions.board_resolutions_date.desc()).all()
 
     return render_template("board-resolutions/board-resolutions-overview.html", board_resolutions=board_resolutions, sort_by_date=sort_by_date)
 
@@ -105,6 +115,7 @@ def add_board_resolution():
         # Create a new board resolution
         new_resolution = BoardResolutions(
             board_resolutions_events_id=events_id,
+            board_resolutions_departments_id=current_user.users_departments_id,
             board_resolutions_title=title,
             board_resolutions_description=description,
             board_resolutions_total_amount=total_amount,
@@ -146,6 +157,9 @@ def delete_board_resolution(resolution_id):
     # Find the board resolution by ID
     resolution = BoardResolutions.query.get_or_404(resolution_id)
 
+    if not belongs_to_user_or_department(resolution, current_user):
+        abort(403)
+
     if request.method == "POST":
         # Delete related records in the departments_events table
         DepartmentsEvents.query.filter_by(events_id=resolution.board_resolutions_events_id).delete()
@@ -164,6 +178,9 @@ def delete_board_resolution(resolution_id):
 @login_required
 def update_board_resolution(resolution_id):
     resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    if not belongs_to_user_or_department(resolution, current_user):
+        abort(403)
 
     if request.method == 'POST':
         events_id = request.form.get('board-resolutions-events-id')
@@ -254,6 +271,9 @@ def update_board_resolution_status(resolution_id):
 
     # Find the board resolution by ID
     resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    if not belongs_to_user_or_department(resolution, current_user):
+        abort(403)
 
     # Update the board resolution status
     resolution.board_resolutions_status = new_status
@@ -353,6 +373,9 @@ def generate_description():
 def generate_board_resolution_pdf(resolution_id):
     # Get the resolution data
     resolution = BoardResolutions.query.get_or_404(resolution_id)
+
+    if not belongs_to_user_or_department(resolution, current_user):
+        abort(403)
 
     # Get prepared by and approved by users
     prepared_by = Users.query.get(resolution.board_resolutions_prepared_by)

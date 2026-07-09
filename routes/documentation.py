@@ -3,8 +3,10 @@ Documentation routes blueprint for E-Council.
 Contains all routes related to documentation management.
 """
 
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, send_file
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, send_file, abort
 from flask_login import login_required, current_user
+from utils.auth import belongs_to_user_or_department, is_admin
+from sqlalchemy import or_
 from io import BytesIO
 import cloudinary
 import cloudinary.uploader
@@ -41,7 +43,7 @@ documentation_bp = Blueprint('documentation', __name__, url_prefix='/documentati
 @login_required
 def documentation_overview():
     # Query for all documentation with concept paper subject, ordered by academic year (desc) and semester
-    documentations = db.session.query(
+    query = db.session.query(
         Documentation,
         ConceptPaperForms.concept_paper_forms_subject
     ).outerjoin(
@@ -59,7 +61,18 @@ def documentation_overview():
     ).order_by(
         Documentation.documentation_academic_year.desc(),
         Documentation.documentation_semester.desc()
-    ).all()
+    )
+
+    # Admins can view all documentation; others only see their own department's or ones they prepared
+    if not is_admin(current_user):
+        query = query.filter(
+            or_(
+                Documentation.documentation_departments_id == current_user.users_departments_id,
+                Documentation.documentation_prepared_by == current_user.users_id
+            )
+        )
+
+    documentations = query.all()
 
     return render_template("documentation/documentation-overview.html",
                          documentations=documentations,
@@ -224,6 +237,7 @@ def add_documentation():
             documentation_academic_year=documentation_academic_year,
             documentation_semester=documentation_semester,
             documentation_status=documentation_status,
+            documentation_departments_id=current_user.users_departments_id,
             documentation_type=documentation_type,
             documentation_activity_report_forms_id=documentation_activity_report_forms_id,
             documentation_prepared_by=documentation_prepared_by,
@@ -280,6 +294,9 @@ def update_documentation_status(documentation_id):
     # Find the documentation by ID
     documentation = Documentation.query.get_or_404(documentation_id)
 
+    if not belongs_to_user_or_department(documentation, current_user):
+        abort(403)
+
     # Update the documentation status
     documentation.documentation_status = new_status
     db.session.commit()
@@ -291,6 +308,9 @@ def update_documentation_status(documentation_id):
 @login_required
 def update_documentation(documentation_id):
     documentation = Documentation.query.get_or_404(documentation_id)
+
+    if not belongs_to_user_or_department(documentation, current_user):
+        abort(403)
 
     # Get or create learning journal
     learning_journal = None
@@ -574,6 +594,9 @@ def update_documentation(documentation_id):
 def delete_documentation(documentation_id):
     documentation = Documentation.query.get_or_404(documentation_id)
 
+    if not belongs_to_user_or_department(documentation, current_user):
+        abort(403)
+
     if request.method == 'POST':
         try:
             # Delete associated images from Cloudinary
@@ -738,7 +761,12 @@ def generate_documentation_pdf(documentation_id):
     3. Update all url_for calls to use the blueprint prefix (e.g., url_for('documentation.documentation_overview'))
     4. Replace 'app.logger' with current_app.logger or import current_app
     """
-    
+
+    # Authorize access to the documentation record
+    documentation = Documentation.query.get_or_404(documentation_id)
+    if not belongs_to_user_or_department(documentation, current_user):
+        abort(403)
+
     # For now, return an error indicating the function needs to be completed
     return jsonify({
         'success': False,

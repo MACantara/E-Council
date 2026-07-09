@@ -160,18 +160,18 @@ Phase 2 builds the infrastructure needed for safer, faster development: validati
 **Scope**: `routes/*.py`, `models/*.py`, `utils/auth.py`
 
 **Checklist**
-- [ ] Add a helper `belongs_to_user_or_department(record, user)` in `utils/auth.py`.
-- [ ] Decide authorization rules per module:
+- [x] Add a helper `belongs_to_user_or_department(record, user)` in `utils/auth.py`.
+- [x] Decide authorization rules per module:
   - `ConceptPaperForms` — by `concept_paper_forms_departments_id` or `concept_paper_forms_prepared_by`
-  - `Events` — by `events_departments_id` (add a column if missing) or `DepartmentsEvents`
+  - `Events` — by `DepartmentsEvents` (existing junction table)
   - `Documentation` — by `documentation_departments_id` or `documentation_prepared_by`
-  - `FinancialReports` — by `financial_reports_departments_id`
-  - `MinutesOfTheMeeting` — by `minutes_of_the_meeting_departments_id`
-  - `BoardResolutions` — by `board_resolutions_departments_id`
-- [ ] Add a decorator `@department_or_403` or an inline check at the start of each `update`/`delete` route.
-- [ ] Update overview routes to filter by `current_user.users_departments_id` or admin role.
-- [ ] Add an admin bypass so admins can still see all records.
-- [ ] Add tests in `tests/test_authorization.py` that verify:
+  - `FinancialReports` — by `financial_reports_departments_id` or `financial_reports_audited_and_prepared_by`
+  - `MinutesOfTheMeeting` — by `minutes_of_the_meeting_departments_id` or `minutes_of_the_meeting_prepared_by`
+  - `BoardResolutions` — by `board_resolutions_departments_id` or `board_resolutions_prepared_by`
+- [x] Add a decorator `@department_or_403` or an inline check at the start of each `update`/`delete` route.
+- [x] Update overview routes to filter by `current_user.users_departments_id` or admin role.
+- [x] Add an admin bypass so admins can still see all records.
+- [x] Add tests in `tests/test_authorization.py` that verify:
   - User A cannot edit User B's concept paper
   - User A cannot see User B's department events
   - Admin can see everything

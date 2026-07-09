@@ -62,3 +62,53 @@ def sample_user(app_context):
     db.session.commit()
     
     return user
+
+
+@pytest.fixture
+def other_user(app_context):
+    """Create another user and department for cross-department tests."""
+    from models import Users, Departments
+
+    other_department = Departments(departments_name="Other Department")
+    db.session.add(other_department)
+    db.session.commit()
+
+    user = Users(
+        users_first_name="Other",
+        users_last_name="User",
+        users_username="otheruser",
+        users_email="other@example.com",
+        users_departments_id=other_department.departments_id,
+        users_role="Student Council Officer",
+        users_email_verified=1
+    )
+    user.set_password("Password123!")
+    db.session.add(user)
+    db.session.commit()
+
+    return user
+
+
+@pytest.fixture
+def admin_user(app_context):
+    """Create an admin user for authorization tests."""
+    from models import Users, Departments
+
+    department = Departments(departments_name="Admin Department")
+    db.session.add(department)
+    db.session.commit()
+
+    user = Users(
+        users_first_name="Admin",
+        users_last_name="User",
+        users_username="adminuser",
+        users_email="admin@example.com",
+        users_departments_id=department.departments_id,
+        users_role="Admin",
+        users_email_verified=1
+    )
+    user.set_password("Password123!")
+    db.session.add(user)
+    db.session.commit()
+
+    return user

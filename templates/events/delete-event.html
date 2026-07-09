@@ -12,7 +12,7 @@
         <div class="mx-auto max-w-2xl space-y-6">
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <h1 class="text-2xl font-bold text-ink">Delete Event</h1>
-                {{ button_link('Back to Events Overview', url_for('events.events_overview'), variant='secondary', icon='arrow-left') }}
+                {{ button_link('Back to Events Overview', url_for('dashboard.events_overview'), variant='secondary', icon='arrow-left') }}
             </div>
 
             <div class="rounded-xl border border-edge bg-surface p-6 shadow-sm">
@@ -21,7 +21,7 @@
                 </p>
                 <form method="POST" action="{{ url_for('events.delete_event', event_id=event.events_id) }}" class="flex items-center justify-end gap-3">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    {{ button_link('Cancel', url_for('events.events_overview'), variant='secondary') }}
+                    {{ button_link('Cancel', url_for('dashboard.events_overview'), variant='secondary') }}
                     {{ button('Delete Event', type='submit', variant='danger') }}
                 </form>
             </div>

@@ -4,8 +4,10 @@ import requests
 import tempfile
 import time
 
-from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file
+from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file, abort
 from flask_login import login_required, current_user
+from utils.auth import belongs_to_user_or_department, is_admin
+from sqlalchemy import or_
 from io import BytesIO
 from datetime import datetime
 
@@ -38,8 +40,11 @@ meetings_bp = Blueprint('meetings', __name__, url_prefix='/meetings')
 @meetings_bp.route("/minutes-of-the-meeting-overview")
 @login_required
 def minutes_of_the_meeting_overview():
-    # Query for all minutes of the meeting sorted by date (most recent first)
-    minutes_of_the_meeting = db.session.query(
+    # Determine the sorting order
+    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    # Base query for minutes of the meeting sorted by date (most recent first)
+    query = db.session.query(
         MinutesOfTheMeeting,
         Users.users_first_name,
         Users.users_last_name
@@ -47,10 +52,18 @@ def minutes_of_the_meeting_overview():
         Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id
     ).order_by(
         MinutesOfTheMeeting.minutes_of_the_meeting_date.desc()
-    ).all()
+    )
 
-    # Determine the sorting order
-    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+    # Admins can view all minutes; others only see their own department's or ones they prepared
+    if not is_admin(current_user):
+        query = query.filter(
+            or_(
+                MinutesOfTheMeeting.minutes_of_the_meeting_departments_id == current_user.users_departments_id,
+                MinutesOfTheMeeting.minutes_of_the_meeting_prepared_by == current_user.users_id
+            )
+        )
+
+    minutes_of_the_meeting = query.all()
 
     # Extract only the MinutesOfTheMeeting objects for filtering
     meetings_only = [meeting for meeting, _, _ in minutes_of_the_meeting]
@@ -66,6 +79,9 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
         .join(Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id)\
         .filter(MinutesOfTheMeeting.minutes_of_the_meeting_id == minutes_of_the_meeting_id)\
         .first_or_404()
+
+    if not belongs_to_user_or_department(meeting[0], current_user):
+        abort(403)
     
     # Get attendees from the JSON list of user IDs
     attendees = [Users.query.get(user_id) for user_id in meeting[0].attendees or []]
@@ -517,6 +533,7 @@ def add_minutes_of_the_meeting():
             minutes_of_the_meeting_semester=semester,
             minutes_of_the_meeting_academic_year=academic_year,
             minutes_of_the_meeting_status=status,
+            minutes_of_the_meeting_departments_id=current_user.users_departments_id,
             minutes_of_the_meeting_presiding_officer=presiding_officer,
             minutes_of_the_meeting_agenda=agenda,
             minutes_of_the_meeting_notes=notes,
@@ -569,6 +586,9 @@ def add_minutes_of_the_meeting():
 @login_required
 def update_minutes_of_the_meeting(meeting_id):
     meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    if not belongs_to_user_or_department(meeting, current_user):
+        abort(403)
 
     if request.method == 'POST':
         date = request.form.get('minutes-of-the-meeting-date')
@@ -666,6 +686,9 @@ def update_minutes_of_the_meeting_status(meeting_id):
     # Find the minutes of the meeting by ID
     meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
 
+    if not belongs_to_user_or_department(meeting, current_user):
+        abort(403)
+
     # Update the minutes of the meeting status
     meeting.minutes_of_the_meeting_status = new_status
     db.session.commit()
@@ -677,6 +700,9 @@ def update_minutes_of_the_meeting_status(meeting_id):
 @login_required
 def delete_minutes_of_the_meeting(meeting_id):
     meeting = MinutesOfTheMeeting.query.get_or_404(meeting_id)
+
+    if not belongs_to_user_or_department(meeting, current_user):
+        abort(403)
 
     if request.method == 'POST':
         # Delete related photo documentation from Cloudinary

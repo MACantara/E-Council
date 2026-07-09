@@ -1,5 +1,7 @@
-from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file
+from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file, abort
 from flask_login import login_required, current_user
+from utils.auth import belongs_to_user_or_department, is_admin
+from sqlalchemy import or_
 from io import BytesIO
 from datetime import datetime
 from reportlab.lib import colors
@@ -49,11 +51,19 @@ financial_bp = Blueprint('financial', __name__, url_prefix='/financial')
 @financial_bp.route("/financial-reports-overview")
 @login_required
 def financial_reports_overview():
-    # Query for all financial reports
-    financial_reports = FinancialReports.query.all()
-
     # Determine the sorting order
     sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+
+    # Admins can view all financial reports; others only see their own department's or ones they prepared
+    if is_admin(current_user):
+        financial_reports = FinancialReports.query.all()
+    else:
+        financial_reports = FinancialReports.query.filter(
+            or_(
+                FinancialReports.financial_reports_departments_id == current_user.users_departments_id,
+                FinancialReports.financial_reports_audited_and_prepared_by == current_user.users_id
+            )
+        ).all()
 
     return render_template("financial-reports/financial-reports-overview.html", financial_reports=financial_reports, sort_by_date=sort_by_date)
 
@@ -79,6 +89,7 @@ def add_financial_report():
             financial_reports_academic_year=financial_reports_academic_year,
             financial_reports_semester=financial_reports_semester,
             financial_reports_events_id=financial_reports_events_id,
+            financial_reports_departments_id=current_user.users_departments_id,
             financial_reports_title=financial_reports_title,
             financial_reports_status=financial_reports_status,
             financial_reports_audited_and_prepared_by=financial_reports_audited_and_prepared_by,
@@ -115,6 +126,9 @@ def add_financial_report():
 @login_required
 def update_financial_report(report_id):
     report = FinancialReports.query.get_or_404(report_id)
+
+    if not belongs_to_user_or_department(report, current_user):
+        abort(403)
 
     if request.method == 'POST':
         financial_reports_date = request.form.get('financial-reports-date')
@@ -170,6 +184,9 @@ def update_financial_report_status(report_id):
     # Find the financial report by ID
     report = FinancialReports.query.get_or_404(report_id)
 
+    if not belongs_to_user_or_department(report, current_user):
+        abort(403)
+
     # Update the financial report status
     report.financial_reports_status = new_status
     db.session.commit()
@@ -181,6 +198,9 @@ def update_financial_report_status(report_id):
 @login_required
 def delete_financial_report(report_id):
     report = FinancialReports.query.get_or_404(report_id)
+
+    if not belongs_to_user_or_department(report, current_user):
+        abort(403)
 
     if request.method == 'POST':
         # Delete the financial report
@@ -201,6 +221,9 @@ def generate_financial_report_pdf(financial_report_id):
         .outerjoin(Events, FinancialReports.financial_reports_events_id == Events.events_id)\
         .filter(FinancialReports.financial_reports_id == financial_report_id)\
         .first_or_404()
+
+    if not belongs_to_user_or_department(report[0], current_user):
+        abort(403)
 
     buffer = BytesIO()
 

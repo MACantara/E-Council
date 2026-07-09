@@ -14,7 +14,7 @@
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <h1 class="text-2xl font-bold text-ink">{{ event.events_name }}</h1>
                 <div class="flex flex-wrap gap-2">
-                    {{ button_link('Back', url_for('events.events_overview'), variant='secondary', icon='arrow-left', class='justify-center') }}
+                    {{ button_link('Back', url_for('dashboard.events_overview'), variant='secondary', icon='arrow-left', class='justify-center') }}
                     {{ button_link('Add Transaction', url_for('events.add_transaction', event_id=event.events_id), variant='primary', icon='plus', class='justify-center') }}
                     {{ button_link('Invite User', url_for('events.invite_user', event_id=event.events_id, source='event_dashboard'), variant='secondary', icon='user-plus', class='justify-center') }}
                     {{ button_link('Generate Financial Report', '#', variant='ghost', icon='file-bar-chart', class='justify-center') }}

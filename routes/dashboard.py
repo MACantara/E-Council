@@ -1,5 +1,6 @@
-from flask import Blueprint, request, flash, redirect, url_for, render_template
+from flask import Blueprint, request, flash, redirect, url_for, render_template, abort
 from flask_login import login_required, current_user
+from utils.auth import belongs_to_user_or_department, is_admin
 from decimal import Decimal
 from collections import defaultdict
 from models import db, Events, DepartmentsEvents
@@ -65,6 +66,9 @@ def events_overview():
 def event_dashboard(event_id):
     # Fetch the event details based on the event_id
     event = Events.query.get_or_404(event_id)
+
+    if not belongs_to_user_or_department(event, current_user):
+        abort(403)
 
     # Fetch the transactions for the given event from the JSON list, sorted by most recent
     transactions = sorted(

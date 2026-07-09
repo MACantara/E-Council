@@ -2,6 +2,7 @@ import os
 from types import SimpleNamespace
 from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, abort
 from flask_login import login_required, current_user
+from utils.auth import belongs_to_user_or_department, is_admin
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from datetime import datetime, timedelta
 import cloudinary
@@ -31,17 +32,20 @@ events_bp.init_serializer = init_serializer
 @events_bp.route("/update-event/<int:event_id>", methods=["POST", "GET"])
 @login_required
 def update_event(event_id):
+    # Get the event by ID and verify access
+    event = Events.query.get_or_404(event_id)
+
+    if not belongs_to_user_or_department(event, current_user):
+        abort(403)
+
     if request.method == "GET":
         # Query distinct academic years
         academic_years = db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
         # Render the template with the event and academic years
-        return render_template("events/update-event.html", event=Events.query.get_or_404(event_id), academic_years=academic_years)
+        return render_template("events/update-event.html", event=event, academic_years=academic_years)
 
     elif request.method == "POST":
-        # Get the event by ID
-        event = Events.query.get_or_404(event_id)
-
         # Get form data
         event_name = request.form.get("events-name")
         event_semester = request.form.get("events-semester")
@@ -82,6 +86,9 @@ def update_event_status(event_id):
 
     # Find the event by ID
     event = Events.query.get_or_404(event_id)
+
+    if not belongs_to_user_or_department(event, current_user):
+        abort(403)
 
     # Update the event status
     event.events_status = new_status
@@ -195,6 +202,9 @@ def delete_event(event_id):
     # Find the event by ID
     event = Events.query.get_or_404(event_id)
 
+    if not belongs_to_user_or_department(event, current_user):
+        abort(403)
+
     if request.method == "POST":
         # Delete related records in the departments_events table
         DepartmentsEvents.query.filter_by(events_id=event_id).delete()
@@ -225,6 +235,9 @@ def delete_event(event_id):
 def add_transaction(event_id):
     # Fetch the event details based on the event_id
     event = Events.query.get_or_404(event_id)
+
+    if not belongs_to_user_or_department(event, current_user):
+        abort(403)
 
     if request.method == "POST":
         # Get form data
@@ -290,6 +303,10 @@ def add_transaction(event_id):
 def update_transaction(event_id, transaction_id):
     # Fetch the event details based on the event_id
     event = Events.query.get_or_404(event_id)
+
+    if not belongs_to_user_or_department(event, current_user):
+        abort(403)
+
     transactions = event.transactions or []
     transaction = next((t for t in transactions if t.get('id') == transaction_id), None)
     if not transaction:
@@ -369,6 +386,9 @@ def update_transaction(event_id, transaction_id):
 def invite_user(event_id):
     # Get the event by ID
     event = Events.query.get_or_404(event_id)
+
+    if not belongs_to_user_or_department(event, current_user):
+        abort(403)
 
     if request.method == "POST":
         # Get form data

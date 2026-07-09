@@ -103,7 +103,7 @@
         <div class="grid gap-6 sm:grid-cols-3">
             {% call card(title=(('<span class="inline-flex items-center gap-2">'|safe) + lucide('calendar-days', 20, 'w-5 h-5 text-accent') + (' Events</span>'|safe)), class='p-6') %}
                 <p class="text-sm text-ink-2">From concept to post-event reports, manage every stage in one place.</p>
-                <a href="{{ url_for('events.events_overview') if current_user.is_authenticated else url_for('auth.signup') }}" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-hover">
+                <a href="{{ url_for('dashboard.events_overview') if current_user.is_authenticated else url_for('auth.signup') }}" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-hover">
                     {{ lucide('arrow-right', 16, 'w-4 h-4') }} Explore Events
                 </a>
             {% endcall %}
