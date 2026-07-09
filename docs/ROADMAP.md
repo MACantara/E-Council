@@ -25,16 +25,16 @@ Phase 1 focuses on low-risk cleanup that improves security, documentation, and p
 **Scope**: repository root, `.gitignore`
 
 **Checklist**
-- [ ] Delete `tmp_jinja_test.py` and `tmp_render_test.py` from the repo root.
-- [ ] Delete `htmlcov/` directory and `.coverage` file from the repo.
-- [ ] Add the following to `.gitignore`:
+- [x] Delete `tmp_jinja_test.py` and `tmp_render_test.py` from the repo root.
+- [x] Delete `htmlcov/` directory and `.coverage` file from the repo.
+- [x] Add the following to `.gitignore`:
   - `.coverage`
   - `htmlcov/`
   - `.pytest_cache/`
   - `tmp_*.py`
   - `*.log`
-- [ ] Verify `git status` no longer shows these files as tracked.
-- [ ] Run `pytest -q` to confirm the cleanup did not break anything.
+- [x] Verify `git status` no longer shows these files as tracked.
+- [x] Run `pytest -q` to confirm the cleanup did not break anything.
 
 **Acceptance criteria**: `git status --short` shows no generated/temporary files. `pytest -q` still passes.
 
