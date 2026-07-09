@@ -601,36 +601,234 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.10 Migrate to FastAPI backend + SPA
+### 4.10 FastAPI prototype and project scaffold
 
-**Why it matters**: FastAPI offers high-performance async endpoints, automatic OpenAPI documentation, and Pydantic-native validation. A fully decoupled FastAPI backend serves as the API layer for the SPA and future mobile clients.
+**Why it matters**: Phase 4.5 selected FastAPI as the long-term API/SPA architecture. Before migrating the full Flask feature set, a focused prototype validates the new project structure, dependency model, and database integration without risking the existing server-rendered application.
 
-**Scope**: New `api/` with FastAPI, `services/`, `repositories/`, `config/`
+**Scope**: `api/main.py`, `api/database.py`, `api/settings.py`, `api/dependencies.py`, `api/routers/auth.py`, `api/schemas/auth.py`
 
 **Checklist**
 - [ ] Complete Phases 4.6 through 4.9 before starting.
-- [ ] Set up FastAPI project structure (`api/main.py`, `api/routers/`, `api/services/`, `api/repositories/`).
-- [ ] Create Pydantic request/response models for all resources (users, events, concept papers, documents, financial reports, meetings, board resolutions).
-- [ ] Reimplement authentication and authorization with FastAPI dependencies and JWT tokens.
-- [ ] Reimplement all routes as REST endpoints under `/api/v1/`.
-- [ ] Update CI/CD to run the FastAPI backend and API tests.
-- [ ] Update `README.md`, `ARCHITECTURE.md`, and `DESIGN.md` to document the new backend stack.
-- [ ] Add integration tests for the FastAPI endpoints.
+- [ ] Set up the FastAPI package structure (`api/`, `api/routers/`, `api/schemas/`, `api/dependencies.py`, `api/settings.py`).
+- [ ] Add `lifespan` management in `api/main.py` to create tables on startup and dispose the SQLAlchemy engine on shutdown.
+- [ ] Add a database session dependency (`get_db`) in `api/database.py`.
+- [ ] Add JWT dependencies (`create_access_token`, `create_refresh_token`, `decode_token`, `get_current_user`) in `api/dependencies.py`.
+- [ ] Implement prototype auth endpoints (`/api/v1/auth/register`, `/login`, `/refresh`, `/me`) in `api/routers/auth.py`.
+- [ ] Add Pydantic schemas for auth in `api/schemas/auth.py`.
+- [ ] Add unit/integration tests for the FastAPI auth prototype.
+- [ ] Update `ARCHITECTURE.md` with the FastAPI prototype and the plan to migrate feature-by-feature.
 
-**Acceptance criteria**: The FastAPI backend has feature parity with the current Flask server-rendered application, all existing functionality is preserved through REST endpoints, and tests pass.
+**Acceptance criteria**: `uvicorn api.main:app --reload` starts successfully. The auth endpoints register users, issue tokens, and return the current user. The existing Flask application continues to work unchanged.
+
+**Effort**: Large
+
+---
+
+### 4.11 FastAPI shared API infrastructure
+
+**Why it matters**: Shared infrastructure prevents duplication across routers and enforces consistent behavior for pagination, error handling, file uploads, and role-based access. A stable foundation makes the per-feature migrations in Phases 4.12-4.19 faster and safer.
+
+**Scope**: `api/schemas/common.py`, `api/exceptions.py`, `api/dependencies.py`, `api/repositories/`, `services/`, `api/tests/`
+
+**Checklist**
+- [ ] Define reusable Pydantic base classes and response wrappers (`api/schemas/common.py`).
+- [ ] Add pagination, sorting, and filtering schemas reusable by every router.
+- [ ] Add global exception handlers for common API errors (`HTTPException` overrides, validation errors, repository errors).
+- [ ] Add role-based dependencies (e.g., `require_admin`) and ownership helpers.
+- [ ] Add shared file upload dependencies that integrate with the storage abstraction from Phase 4.7.
+- [ ] Add shared FastAPI test fixtures (`api/testclient`, authenticated client, db rollback).
+- [ ] Document shared API patterns in `ARCHITECTURE.md`.
+
+**Acceptance criteria**: New feature routers can rely on common schemas, pagination, file uploads, and role checks without rewriting boilerplate. Shared fixtures run in tests.
+
+**Effort**: Medium
+
+---
+
+### 4.12 FastAPI authentication and account endpoints
+
+**Why it matters**: Authentication, account management, and user administration are prerequisites for every other feature. Migrating them first lets later FastAPI endpoints use the existing JWT dependencies and user repositories.
+
+**Scope**: `api/routers/auth.py`, `api/routers/account.py`, `api/schemas/auth.py`, `api/schemas/account.py`, `api/dependencies.py`, `repositories/users.py`, `services/email/`
+
+**Checklist**
+- [ ] Reimplement the Flask `routes/auth.py` flows in FastAPI: signup, login, logout, refresh token, forgot password, reset password, email verification.
+- [ ] Reimplement `routes/account.py` as FastAPI account endpoints: profile, password change, account settings.
+- [ ] Add admin user management endpoints (list, promote, deactivate) previously in `routes/admin.py`.
+- [ ] Reuse the abstracted email service from Phase 4.8 for password reset and verification emails.
+- [ ] Ensure password hashing and validation match the Flask implementation.
+- [ ] Add comprehensive tests covering auth/account/admin flows.
+
+**Acceptance criteria**: Full parity with `routes/auth.py` and `routes/account.py`. Admins can manage users. Token-based auth is used by all subsequent FastAPI endpoints.
+
+**Effort**: Large
+
+---
+
+### 4.13 FastAPI concept paper endpoints
+
+**Why it matters**: Concept papers are the largest feature in the codebase (`routes/concept_papers.py` and `services/concept_papers.py`). Migrating them early validates the full pattern (CRUD, AI generation, PDF export, and status workflows) that later phases will follow.
+
+**Scope**: `api/routers/concept_papers.py`, `api/schemas/concept_papers.py`, `services/concept_papers.py`, `services/ai/`
+
+**Checklist**
+- [ ] Add CRUD endpoints for concept papers under `/api/v1/concept-papers/`.
+- [ ] Add endpoints for the concept paper status workflow (draft, submit, approve, reject, etc.).
+- [ ] Add AI generation endpoints reusing the abstracted AI service from Phase 4.9.
+- [ ] Add export/PDF generation endpoints (synchronous or queued using the background task abstraction).
+- [ ] Add pagination, filtering, and department-scoped listing.
+- [ ] Add tests covering happy paths, validation, and department scoping.
+
+**Acceptance criteria**: Feature parity with `routes/concept_papers.py`. All CRUD, AI, and export workflows work through REST endpoints.
 
 **Effort**: Extra Large
 
 ---
 
-### 4.11 Migrate to React + TypeScript frontend
+### 4.14 FastAPI event endpoints
+
+**Why it matters**: Events include their own sub-features (transactions, invitations, status updates) and are a core workflow for the student council. A dedicated phase lets these endpoints be tested in isolation.
+
+**Scope**: `api/routers/events.py`, `api/schemas/events.py`, `services/events.py`
+
+**Checklist**
+- [ ] Add event CRUD endpoints under `/api/v1/events/`.
+- [ ] Add event status update endpoints.
+- [ ] Add transaction endpoints for event budgets (`add-transaction`, `update-transaction`).
+- [ ] Add invite and accept-invite endpoints.
+- [ ] Add tests for event CRUD, transactions, and invitations.
+
+**Acceptance criteria**: Feature parity with `routes/events.py` and the event functions in `services/events.py`.
+
+**Effort**: Large
+
+---
+
+### 4.15 FastAPI meeting endpoints
+
+**Why it matters**: Meetings have agendas, attendees, and minutes that are closely tied to event and user data. Migrating them separately keeps scope focused and ensures the meeting workflow is intact.
+
+**Scope**: `api/routers/meetings.py`, `api/schemas/meetings.py`, `services/meetings.py`
+
+**Checklist**
+- [ ] Add meeting CRUD endpoints under `/api/v1/meetings/`.
+- [ ] Add agenda and minutes endpoints.
+- [ ] Add attendee management endpoints (add, remove, mark attendance).
+- [ ] Add meeting status update endpoints.
+- [ ] Add tests covering agendas, attendees, and minutes.
+
+**Acceptance criteria**: Feature parity with `routes/meetings.py` and the meeting functions in `services/meetings.py`.
+
+**Effort**: Large
+
+---
+
+### 4.16 FastAPI board resolution endpoints
+
+**Why it matters**: Board resolutions are the second AI-heavy feature. Like concept papers, they need AI generation, status workflows, and PDF export, so they get their own migration phase.
+
+**Scope**: `api/routers/board_resolutions.py`, `api/schemas/board_resolutions.py`, `services/board_resolutions.py`, `services/ai/`
+
+**Checklist**
+- [ ] Add board resolution CRUD endpoints under `/api/v1/board-resolutions/`.
+- [ ] Add status workflow endpoints.
+- [ ] Add AI generation endpoints using the abstracted AI service.
+- [ ] Add export/PDF generation endpoints.
+- [ ] Add pagination and department scoping.
+- [ ] Add tests for CRUD, AI generation, and export workflows.
+
+**Acceptance criteria**: Feature parity with `routes/board_resolutions.py`. All board resolution workflows work through REST endpoints.
+
+**Effort**: Large
+
+---
+
+### 4.17 FastAPI financial endpoints
+
+**Why it matters**: Financial reports, budgets, and receipt uploads are sensitive operations. A dedicated phase ensures the new API handles file uploads, receipt storage, and transaction reporting safely.
+
+**Scope**: `api/routers/financial.py`, `api/schemas/financial.py`, `services/financial.py`, `services/storage/`
+
+**Checklist**
+- [ ] Add financial report CRUD endpoints under `/api/v1/financial/`.
+- [ ] Add budget and transaction endpoints.
+- [ ] Add receipt upload endpoints using the storage abstraction from Phase 4.7.
+- [ ] Add reporting and aggregation endpoints (e.g., budget vs. actuals).
+- [ ] Add tests for financial reports, transactions, and receipts.
+
+**Acceptance criteria**: Feature parity with `routes/financial.py` and the financial functions in `services/financial.py`.
+
+**Effort**: Large
+
+---
+
+### 4.18 FastAPI documentation endpoints
+
+**Why it matters**: Documentation uploads, downloads, and organization records are a separate workflow from the other features. This phase focuses on file handling and metadata CRUD.
+
+**Scope**: `api/routers/documentation.py`, `api/schemas/documentation.py`, `services/documentation.py`, `services/storage/`
+
+**Checklist**
+- [ ] Add document CRUD endpoints under `/api/v1/documentation/`.
+- [ ] Add document upload endpoints using the storage abstraction.
+- [ ] Add download endpoints that return signed or direct URLs depending on storage backend.
+- [ ] Add tests for upload, download, and metadata CRUD.
+
+**Acceptance criteria**: Feature parity with `routes/documentation.py` and the document functions in `services/documentation.py`.
+
+**Effort**: Large
+
+---
+
+### 4.19 FastAPI admin, dashboard, and audit endpoints
+
+**Why it matters**: Admin and dashboard endpoints are consumed by a small set of privileged users but require accurate aggregation and audit logs. Migrating them after the core features lets the dashboard build on the existing FastAPI resource endpoints.
+
+**Scope**: `api/routers/admin.py`, `api/routers/dashboard.py`, `api/schemas/admin.py`, `services/audit.py`, `models/audit.py`
+
+**Checklist**
+- [ ] Add admin dashboard endpoints (user stats, recent activity, counts by resource).
+- [ ] Add audit log endpoints with pagination and filtering.
+- [ ] Add user/role management endpoints if not already covered in Phase 4.12.
+- [ ] Add dashboard endpoints consumed by the home/admin dashboard.
+- [ ] Add tests for admin and audit endpoints.
+
+**Acceptance criteria**: Feature parity with `routes/admin.py` and `routes/dashboard.py`. Admin users can query audit logs and dashboard statistics.
+
+**Effort**: Large
+
+---
+
+### 4.20 FastAPI integration and parity
+
+**Why it matters**: After each feature is migrated, the FastAPI application must be wired together, documented, and verified against the Flask application. This final FastAPI phase closes the migration and makes the new backend the primary API.
+
+**Scope**: `api/main.py`, `api/routers/__init__.py`, `api/`, `tests/`, `.github/workflows/`, `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, `docs/adr/`
+
+**Checklist**
+- [ ] Register all feature routers in `api/main.py` under `/api/v1/`.
+- [ ] Add root and health-check endpoints (`/`, `/health`, `/api/v1/`).
+- [ ] Confirm OpenAPI docs are generated at `/docs` and `/redoc`.
+- [ ] Update CI/CD to run the FastAPI backend and the full API test suite.
+- [ ] Add integration tests that exercise the full API surface end-to-end.
+- [ ] Update `README.md`, `ARCHITECTURE.md`, and `DESIGN.md` to document the FastAPI stack and directory layout.
+- [ ] Add or update an ADR documenting the FastAPI migration completion.
+- [ ] (Optional) Switch the production entry point from Flask to FastAPI; run Flask and FastAPI in parallel during the transition if needed.
+
+**Acceptance criteria**: The FastAPI backend has feature parity with the current Flask server-rendered application, all existing functionality is preserved through REST endpoints, all tests pass, and the project is documented.
+
+**Effort**: Extra Large
+
+---
+
+### 4.21 Migrate to React + TypeScript frontend
 
 **Why it matters**: A modern React frontend with TypeScript provides type-safe UI components, a better development experience, and full decoupling from the backend. It also enables richer interactivity and a shared component library.
 
 **Scope**: New `frontend/` with React + TypeScript + Tailwind CSS
 
 **Checklist**
-- [ ] Complete Phase 4.10 (FastAPI backend + SPA) before starting.
+- [ ] Complete Phase 4.20 (FastAPI backend + SPA) before starting.
 - [ ] Create a React frontend with TypeScript and Vite (or a similar build tool).
 - [ ] Port templates to React components/pages, preserving the Tailwind CSS 4 design system and existing macro behavior.
 - [ ] Build shared React components (Button, Card, Input, Select, etc.) to replace the Jinja2 macro system.
@@ -645,7 +843,7 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.12 Seed sample users and data for testing and demos
+### 4.22 Seed sample users and data for testing and demos
 
 **Why it matters**: A fresh environment currently has no users, departments, events, or documents, which makes manual and end-to-end testing tedious. A seeding layer creates representative sample data so developers and testers can verify workflows immediately without relying on manually created records.
 
@@ -667,7 +865,7 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.13 Document and update documentation for all changes
+### 4.23 Document and update documentation for all changes
 
 **Why it matters**: As the codebase has changed significantly (database abstraction, repository pattern, FastAPI prototype, service abstractions, seeding, and UI updates), the existing documentation must be audited and updated to match the current architecture. Complete documentation ensures the system is maintainable, the hand-off is smooth, and new contributors can set up and run the project without confusion.
 
@@ -720,7 +918,8 @@ For each recommendation:
 - **2026-07-09**: Created initial roadmap from `docs/IMPROVEMENT_ANALYSIS.md`.
 - **2026-07-09**: Migrated AI SDK from `google-generativeai` to `google-genai` (Phase 3.2); all AI generation endpoints and tests updated.
 - **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
-- **2026-07-09**: Added object storage, email, and AI abstraction layers to Phase 4; migration phases renumbered to 4.10 and 4.11.
-- **2026-07-09**: Added Phase 4.12 for seeding sample users and data for testing and demos.
-- **2026-07-09**: Added Phase 4.13 for documenting and updating all project documentation.
+- **2026-07-09**: Added object storage, email, and AI abstraction layers to Phase 4; migration phases provisionally renumbered to 4.10 (FastAPI) and 4.11 (React + TypeScript).
+- **2026-07-09**: Added a seeding phase for sample users and data for testing and demos.
+- **2026-07-09**: Added a documentation-update phase for all project documentation.
+- **2026-07-10**: Split Phase 4.10 (FastAPI backend + SPA) into individual FastAPI migration phases (4.10 through 4.20) and renumbered React frontend, seeding, and documentation phases to 4.21, 4.22, and 4.23.
 - **2026-07-09**: Completed Phase 4.6 database abstraction layer. Added `BaseRepository`, `repo`, and `get_repository()` in `repositories/`; refactored `routes/`, `services/`, `utils/`, and `forms/` to use the repository layer; updated `DatabaseConfig` to support SQLite, MySQL, and PostgreSQL; added `tests/test_repositories.py` integration tests; updated `ARCHITECTURE.md` and `README.md`.
