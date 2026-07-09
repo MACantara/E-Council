@@ -184,10 +184,10 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
 - **Jinja2** — templating
 
 ### Database
-- **MySQL** — primary datastore (database name: `e-council`)
+- **SQLite / MySQL / PostgreSQL** — any SQLAlchemy-compatible engine (configurable via `SQLALCHEMY_DATABASE_URI` or `DATABASE_URL`)
 - **Flask-SQLAlchemy** — ORM
 - **Flask-Migrate** — schema migrations (Alembic)
-- **PyMySQL** — MySQL driver, installed as a `MySQLdb` fallback
+- **Repository pattern** — `repositories/` is the only layer that touches `db.session`; routes and services use `repo` and `get_repository()`
 
 ### Authentication & Security
 - **Flask-Login** — session-based authentication
@@ -249,6 +249,10 @@ E-Council/
 │   ├── meeting.py
 │   └── user.py
 ├── pytest.ini             # pytest configuration
+├── repositories/          # SQLAlchemy repository abstraction layer
+│   ├── __init__.py
+│   ├── base.py
+│   └── users.py
 ├── requirements.txt       # Python dependencies
 ├── routes/                # Flask blueprints
 │   ├── __init__.py
@@ -257,6 +261,15 @@ E-Council/
 │   ├── board_resolutions.py
 │   ├── concept_papers.py
 │   ├── dashboard.py
+│   ├── documentation.py
+│   ├── events.py
+│   ├── financial.py
+│   └── meetings.py
+├── services/              # Business logic service layer
+│   ├── __init__.py
+│   ├── base.py
+│   ├── board_resolutions.py
+│   ├── concept_papers.py
 │   ├── documentation.py
 │   ├── events.py
 │   ├── financial.py
@@ -303,6 +316,7 @@ E-Council/
 ├── tests/                 # pytest tests
 │   ├── conftest.py
 │   ├── test_config.py
+│   ├── test_repositories.py
 │   ├── test_routes.py
 │   ├── test_signup.py
 │   └── test_utils.py
@@ -312,7 +326,7 @@ E-Council/
 └── LICENSE                # MIT
 ```
 
-> **Note on architecture:** The application now uses a modular Flask blueprint architecture. `app.py` contains the `create_app` factory, and business logic is split into `routes/`, `models/`, `utils/`, and `config/`. Legacy `static/css/` files were removed during the Tailwind CSS 4 migration.
+> **Note on architecture:** The application uses a modular Flask blueprint architecture. `app.py` contains the `create_app` factory, and business logic is split into `routes/`, `services/`, `models/`, `repositories/`, `utils/`, and `config/`. The `repositories/` layer is the only layer that touches SQLAlchemy session internals; routes and services use `repo` and `get_repository()` for persistence. Legacy `static/css/` files were removed during the Tailwind CSS 4 migration.
 
 ## Prerequisites
 
@@ -320,7 +334,7 @@ Before setting up the project, make sure you have the following:
 
 1. **Python 3.9 or higher** — [python.org](https://www.python.org/downloads/)
 2. **pip** — bundled with Python 3.4+
-3. **MySQL server** — a running instance you can connect to (e.g., locally on `localhost`)
+3. **A database** — SQLite, MySQL, or PostgreSQL (or any SQLAlchemy-compatible engine). SQLite is used by default, so no external server is required for local development.
 4. **A Cloudinary account** — for image hosting (cloud name, API key, and API secret)
 5. **A Google Gemini API key** — for AI-assisted document generation
 6. **An SMTP mailbox** — for email verification and notifications (the project is configured for Gmail by default; use a Gmail App Password, not your account password)
@@ -481,6 +495,7 @@ Test files live in the `tests/` directory:
 
 - `tests/conftest.py` — shared fixtures and app setup
 - `tests/test_config.py` — configuration tests
+- `tests/test_repositories.py` — repository abstraction integration tests
 - `tests/test_routes.py` — route tests
 - `tests/test_signup.py` — signup tests
 - `tests/test_utils.py` — utility and filter tests

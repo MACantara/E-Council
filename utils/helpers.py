@@ -7,8 +7,8 @@ from typing import Any
 
 from flask import request
 
-from extensions import db
 from models import ConceptPaperForms, Events
+from repositories import repo
 
 
 def get_distinct_academic_years() -> list[Any]:
@@ -18,7 +18,7 @@ def get_distinct_academic_years() -> list[Any]:
     Returns:
         List of distinct academic years ordered by most recent
     """
-    return db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+    return repo.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
 
 
 def get_concept_papers() -> list[ConceptPaperForms]:

@@ -5,12 +5,12 @@ Tracks state-changing actions for accountability and review.
 """
 
 import json
-from datetime import datetime, date
+from datetime import datetime
 from decimal import Decimal
 
 from flask_login import current_user
 from sqlalchemy import event
-from sqlalchemy.orm import object_mapper
+from sqlalchemy.orm import Session, object_mapper
 
 from models.base import db
 
@@ -60,12 +60,8 @@ class AuditLog(db.Model):
     __tablename__ = "audit_logs"
 
     audit_log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    audit_log_timestamp = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, index=True
-    )
-    audit_log_user_id = db.Column(
-        db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True
-    )
+    audit_log_timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+    audit_log_user_id = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
     audit_log_action = db.Column(db.String(50), nullable=False, index=True)
     audit_log_entity_type = db.Column(db.String(100), nullable=False, index=True)
     audit_log_entity_id = db.Column(db.Integer, nullable=True, index=True)
@@ -80,7 +76,7 @@ class AuditLog(db.Model):
         )
 
 
-def _audit_listener(session: object, flush_context: object = None) -> None:
+def _audit_listener(session: Session, flush_context: object = None) -> None:
     """Generate AuditLog records for create, update, and delete operations."""
     if session.info.get("_audit_logging"):
         return
@@ -94,9 +90,7 @@ def _audit_listener(session: object, flush_context: object = None) -> None:
             logs.append(
                 AuditLog(
                     audit_log_user_id=(
-                        current_user.users_id
-                        if current_user and current_user.is_authenticated
-                        else None
+                        current_user.users_id if current_user and current_user.is_authenticated else None
                     ),
                     audit_log_action="create",
                     audit_log_entity_type=obj.__class__.__name__,
@@ -111,9 +105,7 @@ def _audit_listener(session: object, flush_context: object = None) -> None:
             logs.append(
                 AuditLog(
                     audit_log_user_id=(
-                        current_user.users_id
-                        if current_user and current_user.is_authenticated
-                        else None
+                        current_user.users_id if current_user and current_user.is_authenticated else None
                     ),
                     audit_log_action="update",
                     audit_log_entity_type=obj.__class__.__name__,
@@ -128,9 +120,7 @@ def _audit_listener(session: object, flush_context: object = None) -> None:
             logs.append(
                 AuditLog(
                     audit_log_user_id=(
-                        current_user.users_id
-                        if current_user and current_user.is_authenticated
-                        else None
+                        current_user.users_id if current_user and current_user.is_authenticated else None
                     ),
                     audit_log_action="delete",
                     audit_log_entity_type=obj.__class__.__name__,
@@ -145,7 +135,7 @@ def _audit_listener(session: object, flush_context: object = None) -> None:
         session.info["_audit_logging"] = False
 
 
-def _before_commit_listener(session: object) -> None:
+def _before_commit_listener(session: Session) -> None:
     """Flush any generated audit logs before the transaction commits."""
     if session.info.get("_audit_committing"):
         return

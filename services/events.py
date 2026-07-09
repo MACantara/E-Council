@@ -9,7 +9,8 @@ from flask import abort, current_app, flash, jsonify, redirect, render_template,
 from flask_login import current_user
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
-from models import ConceptPaperForms, Departments, DepartmentsEvents, EventInvitations, Events, Transaction, Users, db
+from models import ConceptPaperForms, Departments, DepartmentsEvents, EventInvitations, Events, Transaction, Users
+from repositories import repo
 from utils.auth import belongs_to_user_or_department
 from utils.email import send_invite_email
 from utils.helpers import get_concept_papers, get_distinct_academic_years
@@ -33,7 +34,7 @@ def update_event(event_id):
     if request.method == "GET":
         # Query distinct academic years
         academic_years = (
-            db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+            repo.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
         )
 
         # Render the template with the event and academic years
@@ -65,7 +66,7 @@ def update_event(event_id):
         event.events_remarks = event_remarks
 
         # Commit changes to the database
-        db.session.commit()
+        repo.commit()
 
         flash("Event updated successfully.", "success")
 
@@ -84,7 +85,7 @@ def update_event_status(event_id):
 
     # Update the event status
     event.events_status = new_status
-    db.session.commit()
+    repo.commit()
 
     return jsonify(success=True)
 
@@ -187,14 +188,14 @@ def add_event():
             events_remarks=events_remarks,
         )
 
-        db.session.add(event)
-        db.session.commit()
+        repo.add(event)
+        repo.commit()
 
         # Insert into departments_events table
         departments_id = current_user.users_departments_id
         departments_event = DepartmentsEvents(departments_id=departments_id, events_id=event.events_id)
-        db.session.add(departments_event)
-        db.session.commit()
+        repo.add(departments_event)
+        repo.commit()
 
         flash("Event added successfully!", "success")
         return redirect(url_for("dashboard.events_overview"))
@@ -230,8 +231,8 @@ def delete_event(event_id):
                     )
 
         # Delete the event
-        db.session.delete(event)
-        db.session.commit()
+        repo.delete(event)
+        repo.commit()
 
         flash("Event deleted successfully.", "success")
         return redirect(url_for("dashboard.events_overview"))
@@ -284,7 +285,7 @@ def add_transaction(event_id):
             receipt_public_id=receipt_public_id,
         )
         event.transactions.append(new_transaction)
-        db.session.commit()
+        repo.commit()
 
         flash("Transaction added successfully.", "success")
         return redirect(url_for("dashboard.event_dashboard", event_id=event_id))
@@ -344,7 +345,7 @@ def update_transaction(event_id, transaction_id):
         transaction.receipt_public_id = receipt_public_id
 
         # Commit the changes to the database
-        db.session.commit()
+        repo.commit()
 
         flash("Transaction updated successfully.", "success")
         return redirect(url_for("dashboard.event_dashboard", event_id=event_id))
@@ -396,7 +397,7 @@ def invite_user(event_id):
 
         # Check if the departments_id and events_id pair already exists
         existing_entry = (
-            db.session.query(DepartmentsEvents)
+            repo.query(DepartmentsEvents)
             .join(Departments)
             .filter(DepartmentsEvents.departments_id == users_department_id, DepartmentsEvents.events_id == event_id)
             .first()
@@ -475,13 +476,13 @@ def accept_invite(token):
 
     # Link the user's department to the event in the departments_events junction table
     departments_event = DepartmentsEvents(departments_id=users_department_id, events_id=event_id)
-    db.session.add(departments_event)
+    repo.add(departments_event)
 
     # Delete the invitation record from the event_invitations table
-    db.session.delete(invitation)
+    repo.delete(invitation)
 
     # Commit changes to the database
-    db.session.commit()
+    repo.commit()
 
     flash("You have successfully accepted the invitation to manage the event.", "success")
     return redirect(url_for("dashboard.events_overview"))
@@ -515,8 +516,8 @@ def reject_invite(token):
     department = Departments.query.get_or_404(department_event.departments_id)
 
     # Delete the invitation record from the event_invitations table
-    db.session.delete(invitation)
-    db.session.commit()
+    repo.delete(invitation)
+    repo.commit()
 
     flash(
         f"You have successfully rejected the invitation to manage the event '{event.events_name}' from the department '{department.departments_name}'.",

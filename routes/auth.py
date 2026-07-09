@@ -18,7 +18,8 @@ from extensions import limiter
 from forms.auth import ForgotPasswordForm, LoginForm, ResetPasswordForm, SignupForm
 
 # Import database models from models package
-from models import Departments, EmailVerification, LoginAttempts, PasswordReset, StudentOrganizations, Users, db
+from models import Departments, EmailVerification, LoginAttempts, PasswordReset, StudentOrganizations, Users
+from repositories import repo
 
 # Import email functions from utils.email
 from utils.email import send_reset_password_email, send_verification_email
@@ -81,8 +82,8 @@ def signup():
 
         user.set_password(form.users_password.data)
 
-        db.session.add(user)
-        db.session.commit()
+        repo.add(user)
+        repo.commit()
 
         send_verification_email(form.users_email.data)
 
@@ -119,12 +120,12 @@ def confirm_email(token):
         flash("Account already verified. Please log in.", "error")
     else:
         user.users_email_verified = 1
-        db.session.commit()
+        repo.commit()
         flash("Your account has been verified. Please log in.", "success")
 
         # Delete the email verification record
-        db.session.delete(email_verification)
-        db.session.commit()
+        repo.delete(email_verification)
+        repo.commit()
 
     return redirect(url_for("auth.login"))
 
@@ -145,13 +146,13 @@ def login():
             if datetime.utcnow() - login_attempt.login_attempt_last_attempt_time < timedelta(minutes=15):
                 # Increment login attempts even if the limit is exceeded
                 login_attempt.login_attempt_count += 1
-                db.session.commit()
+                repo.commit()
                 flash("Too many login attempts. Please try again later.", "error")
                 return redirect(url_for("auth.login"))
             else:
                 # Reset login attempts after 15 minutes
                 login_attempt.login_attempt_count = 0
-                db.session.commit()
+                repo.commit()
 
         # Check if the identifier is an email or username
         user = Users.query.filter(
@@ -180,8 +181,8 @@ def login():
                     login_attempt.login_attempt_count = 0
                 else:
                     login_attempt = LoginAttempts(login_attempt_ip_address=ip_address, login_attempt_count=0)
-                    db.session.add(login_attempt)
-                db.session.commit()
+                    repo.add(login_attempt)
+                repo.commit()
                 return redirect(url_for("dashboard.council_overview"))
 
         # Increment login attempts on failure
@@ -189,8 +190,8 @@ def login():
             login_attempt.login_attempt_count += 1
         else:
             login_attempt = LoginAttempts(login_attempt_ip_address=ip_address, login_attempt_count=1)
-            db.session.add(login_attempt)
-        db.session.commit()
+            repo.add(login_attempt)
+        repo.commit()
 
         # Flash message for remaining attempts if login_attempt_count is at least 2
         attempts_left = 5 - login_attempt.login_attempt_count
@@ -297,11 +298,11 @@ def reset_password(selector, token):
     if form.validate_on_submit():
         user = Users.query.filter_by(users_id=password_reset.password_reset_users_id).first_or_404()
         user.set_password(form.users_password.data)
-        db.session.commit()
+        repo.commit()
 
         # Delete the password reset record
-        db.session.delete(password_reset)
-        db.session.commit()
+        repo.delete(password_reset)
+        repo.commit()
 
         flash("Your password has been reset. Please log in.", "success")
         return redirect(url_for("auth.login"))

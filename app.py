@@ -80,6 +80,11 @@ def create_app(config_name=None):
     app.config["SQLALCHEMY_DATABASE_URI"] = getattr(
         config_class, "SQLALCHEMY_DATABASE_URI", DatabaseConfig.get_database_uri()
     )
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = getattr(
+        config_class,
+        "SQLALCHEMY_ENGINE_OPTIONS",
+        DatabaseConfig.get_engine_options(app.config["SQLALCHEMY_DATABASE_URI"]),
+    )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = getattr(
         config_class, "SQLALCHEMY_TRACK_MODIFICATIONS", DatabaseConfig.SQLALCHEMY_TRACK_MODIFICATIONS
     )

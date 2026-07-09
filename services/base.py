@@ -11,6 +11,8 @@ from typing import Any, Generic, TypeVar
 
 from flask_login import current_user
 
+from repositories import repo
+
 T = TypeVar("T")
 
 
@@ -58,7 +60,6 @@ def log_action(
         changes: A dictionary of changed values or additional context.
         user_id: Optional user ID; defaults to the currently logged-in user.
     """
-    from extensions import db
     from models import AuditLog
 
     if user_id is None and current_user and current_user.is_authenticated:
@@ -71,5 +72,5 @@ def log_action(
         audit_log_entity_id=entity_id,
         audit_log_changes=changes,
     )
-    db.session.add(audit)
-    db.session.commit()
+    repo.add(audit)
+    repo.commit()

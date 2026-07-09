@@ -523,13 +523,13 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `models/base.py`, `repositories/` (new), `services/` (new), `routes/*.py`, `config/config.py`
 
 **Checklist**
-- [ ] Define a repository protocol / interface for each entity (create, read, update, delete, list).
-- [ ] Implement SQLAlchemy-backed repositories in `repositories/` (e.g., `repositories/concept_papers.py`).
-- [ ] Move all direct `db.session.query`, `db.session.add`, and `db.session.commit` calls out of routes and services into repositories.
-- [ ] Keep SQLAlchemy imports confined to the repository layer; business logic should operate on plain models / Pydantic DTOs.
-- [ ] Add configuration to support any SQLAlchemy-compatible engine (MySQL, PostgreSQL, SQLite) without changing route/service code.
-- [ ] Add integration tests that can swap the repository to an in-memory SQLite implementation.
-- [ ] Update `ARCHITECTURE.md` and `README.md` with the repository pattern.
+- [x] Define a repository protocol / interface for each entity (create, read, update, delete, list).
+- [x] Implement SQLAlchemy-backed repositories in `repositories/` (`BaseRepository`, `repo`, `get_repository`, and `UserRepository`).
+- [x] Move all direct `db.session.query`, `db.session.add`, and `db.session.commit` calls out of routes and services into repositories.
+- [x] Keep SQLAlchemy imports confined to the repository layer; business logic should operate on plain models / Pydantic DTOs.
+- [x] Add configuration to support any SQLAlchemy-compatible engine (MySQL, PostgreSQL, SQLite) without changing route/service code.
+- [x] Add integration tests that can swap the repository to an in-memory SQLite implementation.
+- [x] Update `ARCHITECTURE.md` and `README.md` with the repository pattern.
 
 **Acceptance criteria**: The application can connect to a different SQLAlchemy-compatible database without any changes to routes or services. All existing tests pass.
 
@@ -746,4 +746,4 @@ For each recommendation:
 - **2026-07-09**: Added object storage, email, AI, and PDF abstraction layers to Phase 4; migration phases renumbered to 4.11 and 4.12.
 - **2026-07-09**: Added Phase 4.13 for seeding sample users and data for testing and demos.
 - **2026-07-09**: Added Phase 4.14 for documenting and updating all project documentation.
-- **2026-07-09**: Completed Phase 2.5 test coverage and fixtures (124 tests passing, 1 skipped `generate_concept_paper_pdf`).
+- **2026-07-09**: Completed Phase 4.6 database abstraction layer. Added `BaseRepository`, `repo`, and `get_repository()` in `repositories/`; refactored `routes/`, `services/`, `utils/`, and `forms/` to use the repository layer; updated `DatabaseConfig` to support SQLite, MySQL, and PostgreSQL; added `tests/test_repositories.py` integration tests; updated `ARCHITECTURE.md` and `README.md`.

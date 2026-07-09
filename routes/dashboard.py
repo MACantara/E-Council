@@ -4,7 +4,8 @@ from decimal import Decimal
 from flask import Blueprint, abort, render_template
 from flask_login import current_user, login_required
 
-from models import DepartmentsEvents, Events, db
+from models import DepartmentsEvents, Events
+from repositories import repo
 from utils.auth import belongs_to_user_or_department
 from utils.helpers import get_pagination_args, safe_decimal_conversion
 
@@ -30,12 +31,12 @@ def events_overview():
 
     # Query distinct academic years
     academic_years = (
-        db.session.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
+        repo.query(Events.events_academic_year).distinct().order_by(Events.events_academic_year.desc()).all()
     )
 
     # Base query for events associated with the user's department
     query = (
-        db.session.query(Events)
+        repo.query(Events)
         .join(DepartmentsEvents)
         .filter(DepartmentsEvents.departments_id == users_departments_id)
         .order_by(Events.events_academic_year.desc(), Events.events_start_date_and_time.desc())

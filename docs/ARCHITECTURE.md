@@ -43,6 +43,10 @@ E-Council/
 │   ├── financial.py
 │   ├── meeting.py
 │   └── user.py
+├── repositories/                   # Repository abstraction layer (BaseRepository, per-entity repos)
+│   ├── __init__.py
+│   ├── base.py
+│   └── users.py
 ├── routes/                         # Flask blueprints
 │   ├── __init__.py
 │   ├── account.py
@@ -50,6 +54,15 @@ E-Council/
 │   ├── board_resolutions.py
 │   ├── concept_papers.py
 │   ├── dashboard.py
+│   ├── documentation.py
+│   ├── events.py
+│   ├── financial.py
+│   └── meetings.py
+├── services/                       # Business-logic service layer
+│   ├── __init__.py
+│   ├── base.py
+│   ├── board_resolutions.py
+│   ├── concept_papers.py
 │   ├── documentation.py
 │   ├── events.py
 │   ├── financial.py
@@ -140,12 +153,16 @@ E-Council/
 - Environment variable integration
 - Security settings per environment
 - Easy configuration switching
+- Database-agnostic engine configuration: `DatabaseConfig` supports SQLite, MySQL, PostgreSQL, or any SQLAlchemy-compatible URI via `SQLALCHEMY_DATABASE_URI` or `DATABASE_URL`
 
 **Environment variables**:
 All runtime secrets and service credentials are read from environment variables. A complete example is in `.env.example` (do not commit `.env`).
-- **Required core**: `SECRET_KEY`, `SQLALCHEMY_DATABASE_URI`, `MAIL_DEFAULT_SENDER`
+- **Required core**: `SECRET_KEY`, `SQLALCHEMY_DATABASE_URI` or `DATABASE_URL`, `MAIL_DEFAULT_SENDER`
 - **Feature-required**: `MAIL_*`, `CLOUDINARY_*`, `GOOGLE_GEMINI_AI_API_KEY`
 - **Optional**: `SENTRY_DSN`, `FLASK_ENV`
+
+**Database configuration**:
+`DatabaseConfig.get_database_uri()` reads `SQLALCHEMY_DATABASE_URI` or `DATABASE_URL` and falls back to `sqlite:///e_council.db` for local development. `DatabaseConfig.get_engine_options(uri)` returns engine-specific options (e.g., `pool_pre_ping` for PostgreSQL/MySQL, `check_same_thread=False` for SQLite). The repository layer means routes and services do not need to change when switching engines.
 
 The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_CSRF_ENABLED = False`) so the test suite can run without a real `.env` file. The CI pipeline sets `SECRET_KEY`, `SQLALCHEMY_DATABASE_URI`, and `MAIL_DEFAULT_SENDER` to satisfy the app-level tests.
 
@@ -215,7 +232,8 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 
 **Classes**:
 - `db` - SQLAlchemy instance
-- `BaseModel` - Base model with common CRUD methods
+
+> **Note**: Direct SQLAlchemy `db.session` usage is confined to the repository layer in `repositories/`. Routes and services use the `repo` object or `get_repository()` instead of calling `db.session` directly.
 
 #### `models/department.py`
 **Purpose**: Department and student organization models
@@ -251,6 +269,29 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 - `LearningOutcomes` - Learning outcomes
 - `ExcuseLetterForms` - Excuse letter forms
 - `ActivityReportForms` - Activity report forms
+
+### Repository Layer (`repositories/`)
+
+**Purpose**: The only place in the application that imports SQLAlchemy session internals.
+
+**Key components**:
+- `BaseRepository` (`repositories/base.py`) - Generic SQLAlchemy-backed repository with `query`, `add`, `commit`, `delete`, `get`, `get_or_404`, `create`, `update`, and `flush` helpers.
+- `repo` (exported from `repositories/__init__.py`) - Generic repository instance that can be used with any model, e.g. `repo.query(Users)` or `repo.add(obj)`.
+- `get_repository(model, session)` (exported from `repositories/__init__.py`) - Factory that returns a repository bound to a specific model.
+- `UserRepository` (`repositories/users.py`) - Existing user-specific repository with eager department loading.
+
+**Pattern**: Routes and services call `repo.query(Model)`, `repo.add(obj)`, `repo.commit()`, etc., instead of `db.session.query(Model)` or `Model.query`. This makes the application database-agnostic: switching to PostgreSQL, MySQL, or another SQLAlchemy-compatible engine requires no route or service changes.
+
+### Service Layer (`services/`)
+
+**Purpose**: Business logic for the main feature modules.
+
+**Key modules**:
+- `services/base.py` - Shared service utilities, including audit logging.
+- `services/concept_papers.py` - Concept paper CRUD, AI generation, and PDF generation.
+- `services/events.py`, `services/documentation.py`, `services/financial.py`, `services/board_resolutions.py`, `services/meetings.py` - Feature-specific business logic.
+
+All service modules use the repository layer (`repo`) for persistence and no longer contain direct `db.session` calls.
 
 ### Flask Extensions (`extensions.py`)
 
@@ -408,7 +449,7 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 
 ### Backend
 - **Framework**: Flask (Python web framework)
-- **Database**: MySQL with SQLAlchemy ORM
+- **Database**: SQLite / MySQL / PostgreSQL (any SQLAlchemy-compatible engine) via the repository layer
 - **Authentication**: Flask-Login
 - **Email**: Flask-Mail
 - **Migrations**: Flask-Migrate
@@ -419,15 +460,14 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 
 ### Frontend
 - **Templates**: Jinja2
-- **Styling**: Custom CSS with CSS variables
+- **Styling**: Tailwind CSS 4 with custom theme
 - **JavaScript**: Vanilla JavaScript
-- **Icons**: None currently (can be added)
+- **Icons**: Lucide Icons
 
 ### External Services
 - **Email**: SMTP (Gmail)
 - **File Storage**: Cloudinary
 - **AI**: Google Gemini AI
-- **Database**: MySQL
 
 ## Configuration
 
@@ -648,8 +688,9 @@ The current refactoring has established a solid foundation for future improvemen
 ## Testing Guidelines
 
 ### Current Testing State
-- No automated tests currently implemented
-- Manual testing required for changes
+- Automated pytest suite is implemented in `tests/`
+- Repository integration tests in `tests/test_repositories.py` verify the abstraction layer works with an in-memory SQLite database
+- Route, CRUD, utility, and configuration tests cover the main application paths
 
 ### Recommended Testing Approach
 

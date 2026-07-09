@@ -10,6 +10,7 @@ from flask import flash, render_template, url_for
 from flask_login import current_user
 from flask_mail import Message
 
+from repositories import repo
 from tasks import send_email as send_email_task
 
 # Note: These imports will need to be adjusted based on final model structure
@@ -29,7 +30,7 @@ def send_verification_email(users_email: str) -> None:
     Args:
         users_email: Email address of the user to verify
     """
-    from extensions import db, get_serializer
+    from extensions import get_serializer
     from models import EmailVerification, Users
 
     s = get_serializer()
@@ -58,8 +59,8 @@ def send_verification_email(users_email: str) -> None:
         email_verification_token=token,
         email_verification_new_email=users_email,
     )
-    db.session.add(email_verification)
-    db.session.commit()
+    repo.add(email_verification)
+    repo.commit()
 
 
 def send_reset_password_email(users_email: str) -> None:
@@ -69,7 +70,6 @@ def send_reset_password_email(users_email: str) -> None:
     Args:
         users_email: Email address of the user requesting password reset
     """
-    from extensions import db
     from models import PasswordReset, Users
 
     user = Users.query.filter_by(users_email=users_email).first_or_404()
@@ -99,8 +99,8 @@ def send_reset_password_email(users_email: str) -> None:
         password_reset_token=token,
         password_reset_expires=expires,
     )
-    db.session.add(password_reset)
-    db.session.commit()
+    repo.add(password_reset)
+    repo.commit()
 
 
 def send_password_change_notification_email(users_email: str) -> None:
@@ -163,7 +163,7 @@ def send_new_email_verification(users_new_email: str) -> None:
     Args:
         users_new_email: New email address to verify
     """
-    from extensions import db, get_serializer
+    from extensions import get_serializer
     from models import EmailVerification
 
     s = get_serializer()
@@ -183,8 +183,8 @@ def send_new_email_verification(users_new_email: str) -> None:
         email_verification_token=token,
         email_verification_new_email=users_new_email,
     )
-    db.session.add(email_verification)
-    db.session.commit()
+    repo.add(email_verification)
+    repo.commit()
 
 
 def send_account_deletion_notification_email(users_email: str) -> None:
@@ -211,7 +211,7 @@ def send_invite_email(users_email: str, event_name: str, event_id: int) -> None:
         event_name: Name of the event
         event_id: ID of the event
     """
-    from extensions import db, get_serializer
+    from extensions import get_serializer
     from models import Departments, EventInvitations, Users
 
     s = get_serializer()
@@ -251,5 +251,5 @@ def send_invite_email(users_email: str, event_name: str, event_id: int) -> None:
     event_invitation = EventInvitations(
         event_invitations_events_id=event_id, event_invitations_email=users_email, event_invitations_token=token
     )
-    db.session.add(event_invitation)
-    db.session.commit()
+    repo.add(event_invitation)
+    repo.commit()

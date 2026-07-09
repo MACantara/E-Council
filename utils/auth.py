@@ -17,6 +17,7 @@ from models import (
     FinancialReports,
     MinutesOfTheMeeting,
 )
+from repositories import repo
 
 # Note: These imports will need to be adjusted based on final model structure
 # For now, importing from app.py (will be refactored later)
@@ -36,9 +37,9 @@ def load_user(user_id: str | int) -> Any | None:
     Returns:
         User object or None if not found
     """
-    from app import Users, db
+    from app import Users
 
-    return db.session.get(Users, int(user_id))
+    return repo.get(Users, int(user_id))
 
 
 def unauthorized() -> Any:

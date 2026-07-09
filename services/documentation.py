@@ -20,8 +20,8 @@ from models import (
     Signatories,
     TallyItem,
     Users,
-    db,
 )
+from repositories import repo
 from utils.auth import belongs_to_user_or_department, is_admin
 from utils.helpers import allowed_image_file, get_pagination_args
 
@@ -31,7 +31,7 @@ def documentation_overview():
     page, per_page = get_pagination_args()
 
     query = (
-        db.session.query(Documentation, ConceptPaperForms.concept_paper_forms_subject)
+        repo.query(Documentation, ConceptPaperForms.concept_paper_forms_subject)
         .outerjoin(
             ActivityReportForms,
             Documentation.documentation_activity_report_forms_id == ActivityReportForms.activity_report_forms_id,
@@ -42,7 +42,7 @@ def documentation_overview():
         )
         .outerjoin(
             ConceptPaperForms,
-            db.or_(
+            or_(
                 ActivityReportForms.activity_report_forms_concept_paper_forms_id
                 == ConceptPaperForms.concept_paper_forms_id,
                 LearningJournalForms.learning_journal_forms_concept_paper_forms_id
@@ -277,8 +277,8 @@ def add_documentation():
                 )
             )
 
-        db.session.add(new_documentation)
-        db.session.commit()
+        repo.add(new_documentation)
+        repo.commit()
         flash("Documentation added successfully!", "success")
         return redirect(url_for("documentation.documentation_overview"))
 
@@ -286,7 +286,7 @@ def add_documentation():
     events = Events.query.all()
 
     # Query for distinct academic years
-    academic_years = db.session.query(Documentation.documentation_academic_year).distinct().all()
+    academic_years = repo.query(Documentation.documentation_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     # Query for users
@@ -297,7 +297,7 @@ def add_documentation():
 
     # Query for activity report forms and include related events
     activity_reports = (
-        db.session.query(ActivityReportForms)
+        repo.query(ActivityReportForms)
         .join(
             Events,
             ActivityReportForms.activity_report_forms_concept_paper_forms_id == Events.events_concept_paper_forms_id,
@@ -307,7 +307,7 @@ def add_documentation():
 
     # Query for learning journal forms and include related events
     learning_journals = (
-        db.session.query(LearningJournalForms)
+        repo.query(LearningJournalForms)
         .join(
             Events,
             LearningJournalForms.learning_journal_forms_concept_paper_forms_id == Events.events_concept_paper_forms_id,
@@ -338,7 +338,7 @@ def update_documentation_status(documentation_id):
 
     # Update the documentation status
     documentation.documentation_status = new_status
-    db.session.commit()
+    repo.commit()
 
     return jsonify(success=True)
 
@@ -355,7 +355,7 @@ def update_documentation(documentation_id):
         learning_journal = LearningJournalForms.query.get(documentation.documentation_learning_journal_forms_id)
     else:
         learning_journal = LearningJournalForms()
-        db.session.add(learning_journal)
+        repo.add(learning_journal)
         documentation.documentation_learning_journal_forms_id = learning_journal.learning_journal_forms_id
 
     if request.method == "POST":
@@ -552,7 +552,7 @@ def update_documentation(documentation_id):
             s.strip() for s in request.form.getlist("student-names[]") if s.strip()
         ]
 
-        db.session.commit()
+        repo.commit()
         flash("Documentation updated successfully!", "success")
         return redirect(url_for("documentation.documentation_overview"))
 
@@ -560,7 +560,7 @@ def update_documentation(documentation_id):
     events = Events.query.all()
 
     # Query for distinct academic years
-    academic_years = db.session.query(Documentation.documentation_academic_year).distinct().all()
+    academic_years = repo.query(Documentation.documentation_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     # Query for users
@@ -571,7 +571,7 @@ def update_documentation(documentation_id):
 
     # Query for activity report forms with concept paper subject
     activity_reports = (
-        db.session.query(ActivityReportForms, ConceptPaperForms.concept_paper_forms_subject)
+        repo.query(ActivityReportForms, ConceptPaperForms.concept_paper_forms_subject)
         .join(
             ConceptPaperForms,
             ActivityReportForms.activity_report_forms_concept_paper_forms_id
@@ -591,7 +591,7 @@ def update_documentation(documentation_id):
 
     # Query for learning journal forms with concept paper subject
     learning_journals = (
-        db.session.query(LearningJournalForms, ConceptPaperForms.concept_paper_forms_subject)
+        repo.query(LearningJournalForms, ConceptPaperForms.concept_paper_forms_subject)
         .join(
             ConceptPaperForms,
             LearningJournalForms.learning_journal_forms_concept_paper_forms_id
@@ -695,14 +695,14 @@ def delete_documentation(documentation_id):
                     flash("Error deleting some event photo documentation images", "error")
 
             # Delete the documentation entry (JSON data is removed automatically with the record)
-            db.session.delete(documentation)
-            db.session.commit()
+            repo.delete(documentation)
+            repo.commit()
 
             flash("Documentation deleted successfully!", "success")
             return redirect(url_for("documentation.documentation_overview"))
         except Exception as e:
             current_app.logger.error("Failed to delete documentation: %s", e, exc_info=True)
-            db.session.rollback()
+            repo.rollback()
             flash("Failed to delete documentation.", "error")
 
     return render_template("documentation/delete-documentation.html", documentation=documentation)
@@ -711,19 +711,19 @@ def delete_documentation(documentation_id):
 def get_related_forms(event_id):
     # Query for the concept paper form ID related to the event
     concept_paper_form_id = (
-        db.session.query(Events.events_concept_paper_forms_id).filter(Events.events_id == event_id).scalar()
+        repo.query(Events.events_concept_paper_forms_id).filter(Events.events_id == event_id).scalar()
     )
 
     # Query for activity report forms related to the concept paper form
     activity_reports = (
-        db.session.query(ActivityReportForms)
+        repo.query(ActivityReportForms)
         .filter(ActivityReportForms.activity_report_forms_concept_paper_forms_id == concept_paper_form_id)
         .all()
     )
 
     # Query for learning journal forms related to the concept paper form
     learning_journals = (
-        db.session.query(LearningJournalForms)
+        repo.query(LearningJournalForms)
         .filter(LearningJournalForms.learning_journal_forms_concept_paper_forms_id == concept_paper_form_id)
         .all()
     )
@@ -735,7 +735,7 @@ def get_related_forms(event_id):
             checked_by_ids.add(journal.learning_journal_forms_checked_by)
 
     # Query for filtered signatories
-    signatories = db.session.query(Signatories).filter(Signatories.signatory_id.in_(checked_by_ids)).all()
+    signatories = repo.query(Signatories).filter(Signatories.signatory_id.in_(checked_by_ids)).all()
 
     # Prepare the data to be sent as JSON
     activity_reports_data = [

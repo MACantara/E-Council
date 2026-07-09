@@ -45,8 +45,8 @@ from models import (
     Signatories,
     StudentOrganizations,
     Users,
-    db,
 )
+from repositories import repo
 from utils.auth import belongs_to_user_or_department
 
 
@@ -127,8 +127,8 @@ def create_concept_paper():
                 new_concept_paper.learning_outcomes.append(LearningOutcome(learning_outcome_text=outcome))
 
         # Add the new concept paper to the database
-        db.session.add(new_concept_paper)
-        db.session.commit()
+        repo.add(new_concept_paper)
+        repo.commit()
 
         # Excuse Letter Form data
         excuse_letter_department_office_unit = request.form.get("excuse-letter-department-office-unit")
@@ -144,8 +144,8 @@ def create_concept_paper():
             excuse_letter_forms_dean=excuse_letter_dean,
             excuse_letter_forms_noted_by=excuse_letter_noted_by,
         )
-        db.session.add(new_excuse_letter_form)
-        db.session.commit()
+        repo.add(new_excuse_letter_form)
+        repo.commit()
 
         # Activity Report Form data
         activity_report_nature_of_the_activity = request.form.get("activity-report-nature-of-the-activity")
@@ -167,8 +167,8 @@ def create_concept_paper():
                 personnel_in_charge_forms_noted_by_college_dean=personnel_in_charge_noted_by_college_dean,
                 personnel_in_charge_forms_noted_by_sas=personnel_in_charge_noted_by_sas,
             )
-            db.session.add(new_personnel_in_charge)
-            db.session.commit()
+            repo.add(new_personnel_in_charge)
+            repo.commit()
 
             # Create Activity Report Form with personnel in charge reference
             if activity_report_date_submission:
@@ -181,8 +181,8 @@ def create_concept_paper():
                     activity_report_forms_noted_by=activity_report_noted_by,
                     activity_report_date_submission=datetime.strptime(activity_report_date_submission, "%Y-%m-%d"),
                 )
-                db.session.add(new_activity_report)
-                db.session.commit()
+                repo.add(new_activity_report)
+                repo.commit()
 
         # Learning Journal Form data
         learning_journal_date = request.form.get("learning-journal-date")
@@ -199,8 +199,8 @@ def create_concept_paper():
         )
 
         # Add the new learning journal form to the database
-        db.session.add(new_learning_journal_form)
-        db.session.commit()
+        repo.add(new_learning_journal_form)
+        repo.commit()
 
         # Parent/Guardian Consent Form data
         concept_paper_forms_id = new_concept_paper.concept_paper_forms_id
@@ -227,14 +227,14 @@ def create_concept_paper():
             parent_guardian_consent_forms_noted_by=parent_guardian_consent_noted_by,
         )
 
-        db.session.add(parent_guardian_consent_form)
-        db.session.commit()
+        repo.add(parent_guardian_consent_form)
+        repo.commit()
 
         flash("Concept paper added successfully!", "success")
         return redirect(url_for("concept_papers.concept_papers_overview"))
 
     # Query for distinct academic years
-    academic_years = db.session.query(ConceptPaperForms.concept_paper_forms_academic_year).distinct().all()
+    academic_years = repo.query(ConceptPaperForms.concept_paper_forms_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     # Query for users
@@ -359,7 +359,7 @@ def update_concept_paper(paper_id):
                 excuse_letter_forms_dean=excuse_letter_dean,
                 excuse_letter_forms_noted_by=excuse_letter_noted_by,
             )
-            db.session.add(new_excuse_letter_form)
+            repo.add(new_excuse_letter_form)
 
         # Activity Report Form data
         activity_report_date_submission = request.form.get("activity-report-date-submission")
@@ -378,7 +378,7 @@ def update_concept_paper(paper_id):
         if activity_report_date_submission:
             if not activity_report:
                 activity_report = ActivityReportForms(activity_report_forms_concept_paper_forms_id=paper_id)
-                db.session.add(activity_report)
+                repo.add(activity_report)
 
             activity_report.activity_report_date_submission = datetime.strptime(
                 activity_report_date_submission, "%Y-%m-%d"
@@ -393,7 +393,7 @@ def update_concept_paper(paper_id):
             )
 
             # Single commit at the end for better performance
-            db.session.commit()
+            repo.commit()
 
         # Personnel In Charge Form data
         personnel_in_charge = request.form.get("personnel-in-charge")
@@ -410,21 +410,21 @@ def update_concept_paper(paper_id):
                 personnel_in_charge_form = PersonnelInChargeForms(
                     personnel_in_charge_forms_concept_paper_forms_id=paper_id
                 )
-                db.session.add(personnel_in_charge_form)
+                repo.add(personnel_in_charge_form)
 
             personnel_in_charge_form.personnel_in_charge_forms_name_of_personnel_in_charge = personnel_in_charge
             personnel_in_charge_form.personnel_in_charge_noted_by_college_dean = (
                 personnel_in_charge_noted_by_college_dean
             )
             personnel_in_charge_form.personnel_in_charge_noted_by_sas = personnel_in_charge_noted_by_sas
-            db.session.commit()
+            repo.commit()
 
             # Update Activity Report Form with personnel in charge reference
             if activity_report:
                 activity_report.activity_report_forms_personnel_in_charge_forms_id = (
                     personnel_in_charge_form.personnel_in_charge_forms_id
                 )
-                db.session.commit()
+                repo.commit()
 
         # Learning Journal Form data
         learning_journal_name_of_student = request.form.get("learning-journal-name-of-student")
@@ -449,7 +449,7 @@ def update_concept_paper(paper_id):
         learning_journal.learning_journal_forms_seen_and_read_by = learning_journal_seen_and_read_by
         learning_journal.learning_journal_forms_checked_by = learning_journal_checked_by
 
-        db.session.commit()
+        repo.commit()
 
         # Parent/Guardian Consent Form data
         parent_guardian_consent_name_of_student = request.form.get("parent-guardian-consent-name-of-student")
@@ -498,15 +498,15 @@ def update_concept_paper(paper_id):
                 parent_guardian_consent_forms_prepared_by=parent_guardian_consent_prepared_by,
                 parent_guardian_consent_forms_noted_by=parent_guardian_consent_noted_by,
             )
-            db.session.add(parent_guardian_consent_form)
+            repo.add(parent_guardian_consent_form)
 
-        db.session.commit()
+        repo.commit()
 
         flash("Concept paper updated successfully!", "success")
         return redirect(url_for("concept_papers.concept_papers_overview"))
 
     # Query for distinct academic years
-    academic_years = db.session.query(ConceptPaperForms.concept_paper_forms_academic_year).distinct().all()
+    academic_years = repo.query(ConceptPaperForms.concept_paper_forms_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     # Query for users
@@ -558,8 +558,8 @@ def delete_concept_paper(paper_id):
 
     if request.method == "POST":
         # Delete the concept paper (JSON data is removed automatically with the record)
-        db.session.delete(concept_paper)
-        db.session.commit()
+        repo.delete(concept_paper)
+        repo.commit()
 
         flash("Concept paper deleted successfully!", "success")
         return redirect(url_for("concept_papers.concept_papers_overview"))
@@ -579,7 +579,7 @@ def update_concept_paper_status(paper_id):
 
     # Update the concept paper status
     concept_paper.concept_paper_forms_status = new_status
-    db.session.commit()
+    repo.commit()
 
     return jsonify(success=True)
 
@@ -1626,7 +1626,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     if event:
         # Get documentation information using events_id
         documentation_data = (
-            db.session.query(Documentation).filter(Documentation.documentation_events_id == event.events_id).first()
+            repo.query(Documentation).filter(Documentation.documentation_events_id == event.events_id).first()
         )
 
     # Create signatory style for names and positions
@@ -1754,7 +1754,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     learning_journal_form = None
     if concept_paper:
         learning_journal_form = (
-            db.session.query(LearningJournalForms)
+            repo.query(LearningJournalForms)
             .filter(
                 LearningJournalForms.learning_journal_forms_concept_paper_forms_id
                 == concept_paper.concept_paper_forms_id
@@ -1927,13 +1927,13 @@ def generate_concept_paper_pdf(concept_paper_id):
     if learning_journal_form:
         if learning_journal_form.learning_journal_forms_prepared_by:
             prepared_by_user = (
-                db.session.query(Users)
+                repo.query(Users)
                 .filter(Users.users_id == learning_journal_form.learning_journal_forms_prepared_by)
                 .first()
             )
         if learning_journal_form.learning_journal_forms_seen_and_read_by:
             seen_and_read_by_user = (
-                db.session.query(Users)
+                repo.query(Users)
                 .filter(Users.users_id == learning_journal_form.learning_journal_forms_seen_and_read_by)
                 .first()
             )
@@ -1942,7 +1942,7 @@ def generate_concept_paper_pdf(concept_paper_id):
     checked_by_signatory = None
     if concept_paper and concept_paper.concept_paper_forms_approved_by:
         checked_by_signatory = (
-            db.session.query(Signatories)
+            repo.query(Signatories)
             .filter(Signatories.signatory_id == concept_paper.concept_paper_forms_approved_by)
             .first()
         )

@@ -35,6 +35,8 @@ convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "app.py" = ["E402"]
+"api/**/*.py" = ["B008"]
+"tests/test_api.py" = ["E402"]
 
 [tool.ruff.format]
 quote-style = "double"

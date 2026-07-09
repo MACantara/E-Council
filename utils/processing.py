@@ -4,6 +4,8 @@ Data processing functions for E-Council.
 
 from typing import Any
 
+from repositories import repo
+
 
 def process_tally_items(
     documentation_id: int,
@@ -26,14 +28,14 @@ def process_tally_items(
         dissatisfied: List of dissatisfied counts
         extremely_dissatisfied: List of extremely dissatisfied counts
     """
-    from app import TallyItems, db
+    from models import TallyItem
 
     # First, delete all existing tally items
-    TallyItems.query.filter_by(tally_items_documentation_id=documentation_id).delete()
+    repo.query(TallyItem).filter_by(documentation_id=documentation_id).delete()
 
     # Add new tally items
     for i in range(len(tally_names)):
-        new_tally = TallyItems(
+        new_tally = TallyItem(
             tally_items_documentation_id=documentation_id,
             tally_items_name=tally_names[i],
             tally_items_extremely_satisfied=extremely_satisfied[i],
@@ -42,9 +44,9 @@ def process_tally_items(
             tally_items_dissatisfied=dissatisfied[i],
             tally_items_extremely_dissatisfied=extremely_dissatisfied[i],
         )
-        db.session.add(new_tally)
+        repo.add(new_tally)
 
-    db.session.commit()
+    repo.commit()
 
 
 def process_evaluation_forms(documentation_id: int, tally_names: list[str], request: Any) -> None:
@@ -56,10 +58,10 @@ def process_evaluation_forms(documentation_id: int, tally_names: list[str], requ
         tally_names: List of tally item names
         request: Flask request object containing form data
     """
-    from app import EvaluationForm, db
+    from models import EvaluationForm
 
     # First, delete all existing evaluation forms
-    EvaluationForm.query.filter_by(evaluation_form_documentation_id=documentation_id).delete()
+    repo.query(EvaluationForm).filter_by(documentation_id=documentation_id).delete()
 
     # Process each tally item's evaluation forms
     for i, tally_name in enumerate(tally_names):
@@ -81,6 +83,6 @@ def process_evaluation_forms(documentation_id: int, tally_names: list[str], requ
                 evaluation_form_student_year=student_year,
                 evaluation_form_comments=comments,
             )
-            db.session.add(new_evaluation)
+            repo.add(new_evaluation)
 
-    db.session.commit()
+    repo.commit()

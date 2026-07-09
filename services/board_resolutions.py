@@ -33,8 +33,8 @@ from models import (
     Signatories,
     StudentOrganizations,
     Users,
-    db,
 )
+from repositories import repo
 from tasks import generate_ai_content, run_task
 from utils.auth import belongs_to_user_or_department, is_admin
 from utils.helpers import get_pagination_args
@@ -94,16 +94,16 @@ def add_board_resolution():
                 events_semester=semester,
                 events_description=description,
             )
-            db.session.add(new_event)
-            db.session.commit()
+            repo.add(new_event)
+            repo.commit()
             events_id = new_event.events_id
 
             # Link the event to the department of the current user
             departments_events = DepartmentsEvents(
                 departments_id=current_user.users_departments_id, events_id=events_id
             )
-            db.session.add(departments_events)
-            db.session.commit()
+            repo.add(departments_events)
+            repo.commit()
         elif events_id == "None":
             events_id = None
 
@@ -129,8 +129,8 @@ def add_board_resolution():
         new_resolution.student_signatory_ids = student_signatories
 
         # Add the new resolution to the database
-        db.session.add(new_resolution)
-        db.session.commit()
+        repo.add(new_resolution)
+        repo.commit()
 
         flash("Board resolution added successfully!", "success")
         return redirect(url_for("board_resolutions.board_resolutions_overview"))
@@ -143,7 +143,7 @@ def add_board_resolution():
     )
 
     # Query for distinct academic years
-    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
+    academic_years = repo.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     student_organizations = StudentOrganizations.query.all()
@@ -170,8 +170,8 @@ def delete_board_resolution(resolution_id):
         DepartmentsEvents.query.filter_by(events_id=resolution.board_resolutions_events_id).delete()
 
         # Delete the board resolution
-        db.session.delete(resolution)
-        db.session.commit()
+        repo.delete(resolution)
+        repo.commit()
 
         flash("Board resolution deleted successfully.", "success")
         return redirect(url_for("board_resolutions.board_resolutions_overview"))
@@ -213,16 +213,16 @@ def update_board_resolution(resolution_id):
                 events_semester=semester,
                 events_description=description,
             )
-            db.session.add(new_event)
-            db.session.commit()
+            repo.add(new_event)
+            repo.commit()
             events_id = new_event.events_id
 
             # Link the event to the department of the current user
             departments_events = DepartmentsEvents(
                 departments_id=current_user.users_departments_id, events_id=events_id
             )
-            db.session.add(departments_events)
-            db.session.commit()
+            repo.add(departments_events)
+            repo.commit()
         elif events_id == "None":
             events_id = None
 
@@ -244,7 +244,7 @@ def update_board_resolution(resolution_id):
         # Update student signatories as a JSON list of user IDs
         resolution.student_signatory_ids = student_signatories
 
-        db.session.commit()
+        repo.commit()
 
         flash("Board resolution updated successfully!", "success")
         return redirect(url_for("board_resolutions.board_resolutions_overview"))
@@ -257,7 +257,7 @@ def update_board_resolution(resolution_id):
     )
 
     # Query for distinct academic years
-    academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
+    academic_years = repo.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     student_organizations = StudentOrganizations.query.all()
@@ -289,7 +289,7 @@ def update_board_resolution_status(resolution_id):
 
     # Update the board resolution status
     resolution.board_resolutions_status = new_status
-    db.session.commit()
+    repo.commit()
 
     return jsonify(success=True)
 
@@ -397,7 +397,7 @@ def generate_board_resolution_pdf(resolution_id):
 
     # Get student signatories from the JSON list of user IDs
     signatory_users = (
-        db.session.query(Users, StudentOrganizations)
+        repo.query(Users, StudentOrganizations)
         .join(StudentOrganizations, Users.users_student_organization == StudentOrganizations.student_organizations_id)
         .filter(Users.users_id.in_(resolution.student_signatory_ids or []))
         .order_by(StudentOrganizations.student_organizations_name)

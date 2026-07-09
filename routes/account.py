@@ -14,7 +14,8 @@ from werkzeug.security import generate_password_hash
 from extensions import get_serializer
 
 # Import database models from models package
-from models import Departments, EmailVerification, StudentOrganizations, Users, db
+from models import Departments, EmailVerification, StudentOrganizations, Users
+from repositories import repo
 
 # Import email functions from utils.email
 from utils.email import (
@@ -58,7 +59,7 @@ def upload_profile_picture():
         # Update the user's profile picture as a JSON dict
         current_user.profile_picture = {"url": profile_picture_url, "public_id": profile_picture_public_id}
 
-        db.session.commit()
+        repo.commit()
 
         flash("Your profile picture has been updated successfully.", "success")
     else:
@@ -91,7 +92,7 @@ def account_settings():
         if users_role not in Users.users_role.type.enums:
             flash("Invalid role.", "error")
             return redirect(url_for("account.account_settings"))
-        if users_student_organization and not db.session.get(StudentOrganizations, users_student_organization):
+        if users_student_organization and not repo.get(StudentOrganizations, users_student_organization):
             flash("Invalid student organization.", "error")
             return redirect(url_for("account.account_settings"))
         if (
@@ -146,7 +147,7 @@ def account_settings():
         user.users_home_address = users_home_address
         user.users_contact_number = users_contact_number
 
-        db.session.commit()
+        repo.commit()
 
         flash("Your account settings have been updated successfully.", "success")
         return redirect(url_for("account.account_settings"))
@@ -184,8 +185,8 @@ def delete_user_account():
 
     # Delete the user account from the database
     user = Users.query.filter_by(users_id=current_user.users_id).first()
-    db.session.delete(user)
-    db.session.commit()
+    repo.delete(user)
+    repo.commit()
 
     # Log the user out
     logout_user()
@@ -265,14 +266,14 @@ def confirm_new_email(token):
 
     # Update the user's email in the database
     user.users_email = users_new_email
-    db.session.commit()
+    repo.commit()
 
     # Send confirmation email to the new email address
     send_email_change_confirmation(users_old_email, users_new_email)
 
     # Delete the email verification record
-    db.session.delete(email_verification)
-    db.session.commit()
+    repo.delete(email_verification)
+    repo.commit()
 
     flash("Your email has been updated successfully.", "success")
     return redirect(url_for("account.email_settings"))
@@ -312,7 +313,7 @@ def password_security_settings():
 
         # Update the user's password in the database
         current_user.users_password = generate_password_hash(users_password)
-        db.session.commit()
+        repo.commit()
 
         # Send password change update email
         send_password_change_notification_email(current_user.users_email)

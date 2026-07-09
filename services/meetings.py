@@ -20,7 +20,8 @@ from reportlab.platypus import HRFlowable, Image, Paragraph, SimpleDocTemplate, 
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
-from models import MeetingAttendee, MinutesOfTheMeeting, Signatories, StudentOrganizations, Users, db
+from models import MeetingAttendee, MinutesOfTheMeeting, Signatories, StudentOrganizations, Users
+from repositories import repo
 from services import ai
 from utils.auth import belongs_to_user_or_department, is_admin
 from utils.helpers import get_pagination_args
@@ -33,7 +34,7 @@ def minutes_of_the_meeting_overview():
 
     # Base query for minutes of the meeting sorted by date (most recent first)
     query = (
-        db.session.query(MinutesOfTheMeeting, Users.users_first_name, Users.users_last_name)
+        repo.query(MinutesOfTheMeeting, Users.users_first_name, Users.users_last_name)
         .join(Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id)
         .order_by(MinutesOfTheMeeting.minutes_of_the_meeting_date.desc())
     )
@@ -64,7 +65,7 @@ def minutes_of_the_meeting_overview():
 def generate_mom_pdf(minutes_of_the_meeting_id):
     # Get the meeting data with presiding officer
     meeting = (
-        db.session.query(MinutesOfTheMeeting, Users.users_first_name, Users.users_last_name)
+        repo.query(MinutesOfTheMeeting, Users.users_first_name, Users.users_last_name)
         .join(Users, MinutesOfTheMeeting.minutes_of_the_meeting_presiding_officer == Users.users_id)
         .filter(MinutesOfTheMeeting.minutes_of_the_meeting_id == minutes_of_the_meeting_id)
         .first_or_404()
@@ -554,14 +555,14 @@ def add_minutes_of_the_meeting():
         new_meeting.photo_documentation = photo_documentation_list
 
         # Add the new meeting to the database
-        db.session.add(new_meeting)
-        db.session.commit()
+        repo.add(new_meeting)
+        repo.commit()
 
         flash("Minutes of the meeting added successfully!", "success")
         return redirect(url_for("meetings.minutes_of_the_meeting_overview"))
 
     # Query for distinct academic years
-    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
+    academic_years = repo.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     # Query for users to populate the approved by and prepared by fields
@@ -656,12 +657,12 @@ def update_minutes_of_the_meeting(meeting_id):
                     )
             meeting.photo_documentation = new_photo_documentation
 
-        db.session.commit()
+        repo.commit()
         flash("Minutes of the meeting updated successfully!", "success")
         return redirect(url_for("meetings.minutes_of_the_meeting_overview"))
 
     # Query for distinct academic years
-    academic_years = db.session.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
+    academic_years = repo.query(MinutesOfTheMeeting.minutes_of_the_meeting_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     # Query for existing photo documentations and attendees from JSON fields
@@ -703,7 +704,7 @@ def update_minutes_of_the_meeting_status(meeting_id):
 
     # Update the minutes of the meeting status
     meeting.minutes_of_the_meeting_status = new_status
-    db.session.commit()
+    repo.commit()
 
     return jsonify(success=True)
 
@@ -724,8 +725,8 @@ def delete_minutes_of_the_meeting(meeting_id):
                 flash("Error deleting photo from Cloudinary", "error")
 
         # Finally, delete the meeting (attendees are JSON and removed automatically)
-        db.session.delete(meeting)
-        db.session.commit()
+        repo.delete(meeting)
+        repo.commit()
 
         flash("Minutes of the meeting deleted successfully!", "success")
         return redirect(url_for("meetings.minutes_of_the_meeting_overview"))

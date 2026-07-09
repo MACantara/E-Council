@@ -140,15 +140,40 @@ class TestingConfig(Config):
 class DatabaseConfig:
     """Database configuration settings."""
 
-    @staticmethod
-    def get_database_uri():
-        """Get database URI from environment variables."""
-        return os.getenv("SQLALCHEMY_DATABASE_URI")
-
     # SQLAlchemy Configuration
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = (
+        os.getenv("SQLALCHEMY_DATABASE_URI") or os.getenv("DATABASE_URL") or "sqlite:///e_council.db"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False  # Set to True for SQL query logging
+
+    @staticmethod
+    def get_database_uri():
+        """Get database URI from environment variables.
+
+        Supports SQLALCHEMY_DATABASE_URI, DATABASE_URL, and falls back to a local
+        SQLite file so the application can start without any database configuration.
+        """
+        return os.getenv("SQLALCHEMY_DATABASE_URI") or os.getenv("DATABASE_URL") or "sqlite:///e_council.db"
+
+    @staticmethod
+    def get_engine_options(uri=None):
+        """Return SQLAlchemy engine options based on the configured database URI.
+
+        SQLite uses sensible defaults for local development. MySQL and PostgreSQL
+        use connection-pool resilience options (pool_pre_ping and pool_recycle).
+        """
+        uri = uri or DatabaseConfig.get_database_uri()
+        if not uri:
+            return {}
+        if uri.startswith("sqlite"):
+            return {
+                "connect_args": {"check_same_thread": False},
+            }
+        return {
+            "pool_pre_ping": True,
+            "pool_recycle": 3600,
+        }
 
 
 class EmailConfig:

@@ -25,8 +25,8 @@ from models import (
     Signatories,
     StudentOrganizations,
     Users,
-    db,
 )
+from repositories import repo
 from utils.auth import belongs_to_user_or_department, is_admin
 from utils.helpers import get_pagination_args
 
@@ -100,8 +100,8 @@ def add_financial_report():
         )
 
         # Add the new financial report to the database
-        db.session.add(new_financial_report)
-        db.session.commit()
+        repo.add(new_financial_report)
+        repo.commit()
 
         flash("Financial report added successfully!", "success")
         return redirect(url_for("financial.financial_reports_overview"))
@@ -120,7 +120,7 @@ def add_financial_report():
     signatories = Signatories.query.all()
 
     # Query for distinct academic years
-    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
+    academic_years = repo.query(FinancialReports.financial_reports_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     return render_template(
@@ -162,7 +162,7 @@ def update_financial_report(report_id):
         report.financial_reports_recommending_approval_by = financial_reports_recommending_approval_by
         report.financial_reports_approved_by = financial_reports_approved_by
 
-        db.session.commit()
+        repo.commit()
 
         flash("Financial report updated successfully!", "success")
         return redirect(url_for("financial.financial_reports_overview"))
@@ -177,7 +177,7 @@ def update_financial_report(report_id):
     signatories = Signatories.query.all()
 
     # Query for distinct academic years
-    academic_years = db.session.query(FinancialReports.financial_reports_academic_year).distinct().all()
+    academic_years = repo.query(FinancialReports.financial_reports_academic_year).distinct().all()
     academic_years = [year[0] for year in academic_years]
 
     return render_template(
@@ -202,7 +202,7 @@ def update_financial_report_status(report_id):
 
     # Update the financial report status
     report.financial_reports_status = new_status
-    db.session.commit()
+    repo.commit()
 
     return jsonify(success=True)
 
@@ -215,8 +215,8 @@ def delete_financial_report(report_id):
 
     if request.method == "POST":
         # Delete the financial report
-        db.session.delete(report)
-        db.session.commit()
+        repo.delete(report)
+        repo.commit()
 
         flash("Financial report deleted successfully!", "success")
         return redirect(url_for("financial.financial_reports_overview"))
@@ -227,7 +227,7 @@ def delete_financial_report(report_id):
 def generate_financial_report_pdf(financial_report_id):
     # Get financial report with event details
     report = (
-        db.session.query(FinancialReports, Events)
+        repo.query(FinancialReports, Events)
         .outerjoin(Events, FinancialReports.financial_reports_events_id == Events.events_id)
         .filter(FinancialReports.financial_reports_id == financial_report_id)
         .first_or_404()
