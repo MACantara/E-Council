@@ -636,13 +636,24 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/schemas/common.py`, `api/exceptions.py`, `api/dependencies.py`, `api/repositories/`, `services/`, `api/tests/`
 
 **Checklist**
-- [ ] Define reusable Pydantic base classes and response wrappers (`api/schemas/common.py`).
-- [ ] Add pagination, sorting, and filtering schemas reusable by every router.
-- [ ] Add global exception handlers for common API errors (`HTTPException` overrides, validation errors, repository errors).
-- [ ] Add role-based dependencies (e.g., `require_admin`) and ownership helpers.
-- [ ] Add shared file upload dependencies that integrate with the storage abstraction from Phase 4.7.
-- [ ] Add shared FastAPI test fixtures (`api/testclient`, authenticated client, db rollback).
-- [ ] Document shared API patterns in `ARCHITECTURE.md`.
+- [x] Define reusable Pydantic base classes and response wrappers (`api/schemas/common.py`).
+- [x] Add pagination, sorting, and filtering schemas reusable by every router.
+- [x] Add global exception handlers for common API errors (`HTTPException` overrides, validation errors, repository errors).
+- [x] Add role-based dependencies (e.g., `require_admin`) and ownership helpers.
+- [x] Add shared file upload dependencies that integrate with the storage abstraction from Phase 4.7.
+- [x] Add shared FastAPI test fixtures (`api/testclient`, authenticated client, db rollback).
+- [x] Document shared API patterns in `ARCHITECTURE.md`.
+
+**Notes**
+- Implemented `api/schemas/common.py` with `ResponseEnvelope`, `PaginatedResponse`, `PaginationParams`, `PaginationMetadata`, and `OrderEnum`.
+- Added `api/exceptions.py` with `APIException` hierarchy and global handlers for `HTTPException`, `RequestValidationError`, `ValidationError`, and Werkzeug errors.
+- Extended `api/dependencies.py` with `get_pagination_params`, `require_admin`, `require_role`, `get_storage`, `save_upload`, and `check_ownership`.
+- Added `api/repositories/base.py` (`APIBaseRepository`) to bridge the repository layer and FastAPI exception handlers.
+- Created `api/tests/` with `conftest.py` fixtures (`fastapi_client`, `authenticated_client`, `fastapi_db`, `admin_user`) and `test_infrastructure.py`.
+- Added `api.database.set_engine`/`get_engine` so tests can rebind to a per-test SQLite database without re-importing modules.
+- Updated `services/storage/service.py` to honor runtime `STORAGE_PROVIDER` environment variables in FastAPI contexts.
+- Expanded `ARCHITECTURE.md` with the new directory structure and pattern descriptions.
+- All tests pass: `252 passed, 1 skipped` (including the new `api/tests/test_infrastructure.py` tests).
 
 **Acceptance criteria**: New feature routers can rely on common schemas, pagination, file uploads, and role checks without rewriting boilerplate. Shared fixtures run in tests.
 

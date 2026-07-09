@@ -1,15 +1,16 @@
-"""FastAPI dependencies for authentication and database access."""
+"""FastAPI dependencies for authentication, database access, and shared infrastructure."""
 
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Query, UploadFile, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt
 from jose.exceptions import JWTError
 from sqlalchemy.orm import Session
 
 from api.database import get_db
+from api.schemas.common import OrderEnum, PaginationParams
 from api.settings import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     ALGORITHM,
@@ -18,6 +19,7 @@ from api.settings import (
 )
 from models import Users
 from repositories.users import UserRepository
+from services.storage import StorageBackend, StorageError, get_storage as _get_storage_service
 
 security = HTTPBearer(auto_error=False)
 
@@ -78,3 +80,86 @@ def get_current_user(
             detail="User not found",
         )
     return user
+
+
+def is_admin(user: Users) -> bool:
+    """Return True if the user has the Admin role."""
+    return user.users_role == "Admin"
+
+
+def require_admin(current_user: Users = Depends(get_current_user)) -> Users:
+    """Dependency that enforces the current user is an admin."""
+    if not is_admin(current_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return current_user
+
+
+def require_role(*roles: str):
+    """Factory for dependencies that enforce one of the given roles."""
+
+    def _require_role(current_user: Users = Depends(get_current_user)) -> Users:
+        if current_user.users_role not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access restricted to roles: {', '.join(roles)}",
+            )
+        return current_user
+
+    return _require_role
+
+
+def get_pagination_params(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    sort: str | None = Query(None),
+    order: OrderEnum = Query(OrderEnum.asc),
+    search: str | None = Query(None),
+) -> PaginationParams:
+    """Return a PaginationParams instance from query string values."""
+    return PaginationParams(
+        page=page,
+        per_page=per_page,
+        sort=sort,
+        order=order,
+        search=search,
+    )
+
+
+def get_storage() -> StorageBackend:
+    """Return the configured storage backend for the current request."""
+    return _get_storage_service()
+
+
+def save_upload(
+    file: UploadFile,
+    storage: StorageBackend,
+    *,
+    folder: str | None = None,
+    resource_type: str = "auto",
+) -> dict[str, str]:
+    """Save an uploaded file to the configured storage backend.
+
+    Returns a dict with ``url`` and ``public_id`` as returned by the backend.
+    """
+    try:
+        return storage.upload(file.file, folder=folder, resource_type=resource_type)
+    except StorageError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc.message),
+        ) from exc
+
+
+def check_ownership(current_user: Users, owner_id: int) -> None:
+    """Raise a 403 Forbidden if the current user does not own the resource.
+
+    Admins are treated as owners for every resource.
+    """
+    if not is_admin(current_user) and current_user.users_id != owner_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to access this resource",
+        )

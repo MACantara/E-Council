@@ -28,15 +28,24 @@ E-Council/
 ├── api/                            # FastAPI prototype application
 │   ├── __init__.py
 │   ├── database.py                 # SQLAlchemy engine and FastAPI session dependency
-│   ├── dependencies.py             # JWT dependencies and get_current_user
+│   ├── dependencies.py             # JWT, pagination, storage, and role dependencies
+│   ├── exceptions.py               # Shared API exceptions and handlers
 │   ├── main.py                     # FastAPI app factory with lifespan
+│   ├── repositories/               # FastAPI repository wrappers
+│   │   ├── __init__.py
+│   │   └── base.py
 │   ├── routers/
 │   │   ├── __init__.py
 │   │   └── auth.py                 # FastAPI auth prototype endpoints
 │   ├── schemas/
 │   │   ├── __init__.py
-│   │   └── auth.py                 # Pydantic auth schemas
-│   └── settings.py                 # FastAPI-specific settings
+│   │   ├── auth.py                 # Pydantic auth schemas
+│   │   └── common.py               # Shared response/pagination schemas
+│   ├── settings.py                 # FastAPI-specific settings
+│   └── tests/                      # FastAPI test fixtures and infrastructure tests
+│       ├── __init__.py
+│       ├── conftest.py
+│       └── test_infrastructure.py
 ├── config/                         # Configuration management
 │   ├── __init__.py
 │   └── config.py
@@ -324,16 +333,20 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 **Purpose**: A FastAPI prototype that demonstrates the future API/SPA architecture and serves as the starting point for migrating Flask routes to REST endpoints.
 
 **Key components**:
-- `api/main.py` - FastAPI application with lifespan management, SQLAlchemy engine disposal, and router registration.
-- `api/database.py` - SQLAlchemy engine, session factory, and `get_db` dependency for request-scoped sessions.
+- `api/main.py` - FastAPI application with lifespan management, SQLAlchemy engine disposal, router registration, and global exception handlers.
+- `api/database.py` - SQLAlchemy engine, session factory, `get_db` dependency, and `set_engine`/`get_engine` helpers for test isolation.
 - `api/settings.py` - FastAPI-specific configuration derived from the existing Flask config and environment variables.
-- `api/dependencies.py` - JWT `create_access_token`, `create_refresh_token`, `decode_token`, and `get_current_user` dependencies.
+- `api/dependencies.py` - JWT helpers, `get_current_user`, `get_pagination_params`, `get_storage`, `save_upload`, `require_admin`, `require_role`, and `check_ownership`.
 - `api/routers/auth.py` - Prototype auth endpoints (`/api/v1/auth/register`, `/login`, `/refresh`, `/me`).
 - `api/schemas/auth.py` - Pydantic request/response models for auth.
+- `api/schemas/common.py` - Reusable response envelopes, pagination schemas, and `PaginationParams`.
+- `api/exceptions.py` - Shared `APIException` hierarchy and exception handlers for HTTP, validation, and Werkzeug errors.
+- `api/repositories/` - FastAPI-facing repository wrappers (`APIBaseRepository`) reusing `BaseRepository`.
+- `api/tests/` - Shared FastAPI test fixtures (`fastapi_client`, `authenticated_client`, `fastapi_db`, `admin_user`).
 
-**Pattern**: The FastAPI prototype reuses the existing SQLAlchemy models and the repository layer, so it does not duplicate business logic. It is designed to run alongside the Flask application during the migration. New feature routers will be added under `api/routers/` and schemas under `api/schemas/` as migration continues.
+**Pattern**: The FastAPI prototype reuses the existing SQLAlchemy models and the repository layer, so it does not duplicate business logic. Shared infrastructure (pagination, role checks, file uploads, and exception handling) is centralized in `api/dependencies.py`, `api/schemas/common.py`, and `api/exceptions.py` so future feature routers need minimal boilerplate. The `api.database.set_engine` helper lets tests rebind to a test database without re-importing modules. The application is designed to run alongside the Flask application during the migration.
 
-**Tests**: `tests/test_api.py` verifies the FastAPI auth endpoints using `TestClient` and a dedicated SQLite test database.
+**Tests**: `tests/test_api.py` verifies the FastAPI auth endpoints and `api/tests/test_infrastructure.py` covers the shared schemas, dependencies, repositories, and fixtures. The FastAPI test suite is discovered from `pytest.ini` (`testpaths = tests api/tests`).
 
 ### Service Layer (`services/`)
 

@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from api.database import create_tables, engine
+from api.database import create_tables, get_engine
+from api.exceptions import register_exception_handlers
 from api.routers.auth import router as auth_router
 
 
@@ -13,7 +14,7 @@ async def lifespan(app: FastAPI):
     """Create tables on startup and dispose of the engine on shutdown."""
     create_tables()
     yield
-    engine.dispose()
+    get_engine().dispose()
 
 
 app = FastAPI(
@@ -22,5 +23,7 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+register_exception_handlers(app)
 
 app.include_router(auth_router, prefix="/api/v1")

@@ -11,6 +11,11 @@ _original_flask_env = os.environ.get("FLASK_ENV")
 os.environ["FASTAPI_DATABASE_URI"] = "sqlite:///./fastapi_test.db"
 os.environ["FLASK_ENV"] = "testing"
 
+# Re-bind the FastAPI engine so the test database is used even when the module
+# has already been imported by other tests.
+import api.database
+
+api.database.set_engine()
 from api.database import create_tables, engine
 from api.main import app
 from models import db

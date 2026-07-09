@@ -20,6 +20,23 @@ def get_db():
         db.close()
 
 
+def get_engine():
+    """Return the currently configured SQLAlchemy engine."""
+    return engine
+
+
+def set_engine(database_url: str | None = None) -> None:
+    """Replace the global engine and session factory for the given database URL.
+
+    This is intended for tests that need to switch to a test database after the
+    module has already been imported.
+    """
+    global engine, SessionLocal
+    url = database_url or DATABASE_URL
+    engine = create_engine(url, **DatabaseConfig.get_engine_options(url))
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
 def create_tables() -> None:
     """Create all database tables using the shared Flask-SQLAlchemy metadata."""
     from models import db
