@@ -66,7 +66,13 @@ E-Council/
 │   ├── documentation.py
 │   ├── events.py
 │   ├── financial.py
-│   └── meetings.py
+│   ├── meetings.py
+│   └── storage/                    # Storage abstraction layer
+│       ├── __init__.py
+│       ├── backends.py
+│       ├── errors.py
+│       ├── protocol.py
+│       └── service.py
 ├── utils/                          # Utility functions
 │   ├── __init__.py
 │   ├── auth.py
@@ -80,6 +86,7 @@ E-Council/
 │   ├── test_config.py
 │   ├── test_routes.py
 │   ├── test_signup.py
+│   ├── test_storage.py
 │   └── test_utils.py
 ├── templates/                      # Jinja2 templates (feature-based folders)
 │   ├── base.html
@@ -223,6 +230,7 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 
 **Functions**:
 - `handle_cloudinary_error()` - Cloudinary error handler
+- `handle_storage_error()` - Storage backend error handler
 - `register_error_handlers()` - Register error handlers with Flask app
 
 ### Database Models (`models/`)
@@ -293,6 +301,20 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 
 All service modules use the repository layer (`repo`) for persistence and no longer contain direct `db.session` calls.
 
+### Storage Layer (`services/storage/`)
+
+**Purpose**: Abstract file/object storage so the application can upload, delete, and retrieve files without depending on a single vendor (Cloudinary, local filesystem, S3, etc.).
+
+**Key components**:
+- `StorageBackend` (`services/storage/protocol.py`) - Abstract protocol/ABC defining `upload`, `delete`, and `get_url`.
+- `CloudinaryStorage` (`services/storage/backends.py`) - Adapter for Cloudinary uploads.
+- `LocalFilesystemStorage` (`services/storage/backends.py`) - Adapter for local filesystem storage.
+- `MemoryStorage` (`services/storage/backends.py`) - In-memory backend for unit tests.
+- `NullStorage` (`services/storage/backends.py`) - No-op backend for local development or disabled uploads.
+- `get_storage()` (`services/storage/service.py`) - Factory that reads `STORAGE_PROVIDER` from the Flask app config or `StorageConfig` and returns a configured backend.
+
+**Pattern**: Routes and services call `storage = get_storage()` and then `storage.upload(...)`, `storage.delete(...)`, and `storage.get_url(...)` instead of `cloudinary.uploader.upload` or `cloudinary.uploader.destroy`. The active provider is controlled by the `STORAGE_PROVIDER` environment variable (`cloudinary`, `local`, `memory`, or `null`), with `STORAGE_LOCAL_PATH` and `STORAGE_LOCAL_BASE_URL` configuring the local backend.
+
 ### Flask Extensions (`extensions.py`)
 
 **Purpose**: Centralized Flask extension initialization
@@ -307,7 +329,6 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 
 **Functions**:
 - `init_extensions(app)` - Initialize all extensions
-- `configure_cloudinary(app)` - Configure Cloudinary
 - `configure_ai(app)` - Configure Google Gemini AI
 - `get_serializer()` - Get serializer instance
 
@@ -316,7 +337,7 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 **Purpose**: Creates and configures the Flask application instance
 
 **Functions**:
-- `create_app(config_name=None)` - Main application factory; loads config, initializes extensions, registers blueprints, and sets up Cloudinary/Gemini
+- `create_app(config_name=None)` - Main application factory; loads config, initializes extensions, registers blueprints, and configures storage, database, and AI settings
 - `init_database(app)` - Tests the database connection and creates all tables with `db.create_all()`
 
 **Blueprints registered**:

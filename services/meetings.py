@@ -7,8 +7,6 @@ import time
 from datetime import datetime
 from io import BytesIO
 
-import cloudinary
-import cloudinary.uploader
 import requests
 from flask import abort, current_app, flash, jsonify, redirect, render_template, request, send_file, url_for
 from flask_login import current_user
@@ -23,6 +21,7 @@ from werkzeug.utils import secure_filename
 from models import MeetingAttendee, MinutesOfTheMeeting, Signatories, StudentOrganizations, Users
 from repositories import repo
 from services import ai
+from services.storage import get_storage
 from utils.auth import belongs_to_user_or_department, is_admin
 from utils.helpers import get_pagination_args
 
@@ -421,7 +420,7 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
 
         for photo in photos:
             try:
-                # Download image from Cloudinary URL
+                # Download image from storage URL
                 response = requests.get(photo["url"])
                 if response.status_code == 200:
                     # Use BytesIO instead of temporary file
@@ -546,11 +545,12 @@ def add_minutes_of_the_meeting():
         # Set attendees and photo documentation
         new_meeting.attendees = [MeetingAttendee(users_id=int(user_id)) for user_id in attendees if user_id]
         photo_documentation_list = []
+        storage = get_storage()
         for photo_documentation in photo_documentations:
             if photo_documentation:
-                upload_result = cloudinary.uploader.upload(photo_documentation)
+                upload_result = storage.upload(photo_documentation)
                 photo_documentation_list.append(
-                    {"url": upload_result.get("secure_url"), "public_id": upload_result.get("public_id")}
+                    {"url": upload_result.get("url"), "public_id": upload_result.get("public_id")}
                 )
         new_meeting.photo_documentation = photo_documentation_list
 
@@ -638,22 +638,23 @@ def update_minutes_of_the_meeting(meeting_id):
 
         # Handle multiple file uploads to Cloudinary
         if photo_documentations:
-            # Delete existing photos from Cloudinary
+            # Delete existing photos
+            storage = get_storage()
             existing_photos = meeting.photo_documentation or []
             for photo in existing_photos:
                 try:
-                    cloudinary.uploader.destroy(photo["public_id"])
+                    storage.delete(photo["public_id"])
                 except Exception as e:
-                    current_app.logger.error("Error deleting existing photo from Cloudinary: %s", e, exc_info=True)
-                    flash("Error deleting existing photo from Cloudinary", "error")
+                    current_app.logger.error("Error deleting existing photo: %s", e, exc_info=True)
+                    flash("Error deleting existing photo", "error")
 
             # Upload new photos and store as JSON
             new_photo_documentation = []
             for photo_documentation in photo_documentations:
                 if photo_documentation:
-                    upload_result = cloudinary.uploader.upload(photo_documentation)
+                    upload_result = storage.upload(photo_documentation)
                     new_photo_documentation.append(
-                        {"url": upload_result.get("secure_url"), "public_id": upload_result.get("public_id")}
+                        {"url": upload_result.get("url"), "public_id": upload_result.get("public_id")}
                     )
             meeting.photo_documentation = new_photo_documentation
 
@@ -716,13 +717,14 @@ def delete_minutes_of_the_meeting(meeting_id):
         abort(403)
 
     if request.method == "POST":
-        # Delete related photo documentation from Cloudinary
+        # Delete related photo documentation
+        storage = get_storage()
         for photo in meeting.photo_documentation or []:
             try:
-                cloudinary.uploader.destroy(photo["public_id"])
+                storage.delete(photo["public_id"])
             except Exception as e:
-                current_app.logger.error("Error deleting photo from Cloudinary: %s", e, exc_info=True)
-                flash("Error deleting photo from Cloudinary", "error")
+                current_app.logger.error("Error deleting photo: %s", e, exc_info=True)
+                flash("Error deleting photo", "error")
 
         # Finally, delete the meeting (attendees are JSON and removed automatically)
         repo.delete(meeting)

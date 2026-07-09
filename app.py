@@ -23,7 +23,7 @@ except ImportError:
     pass
 
 # Import configuration
-from config import CloudinaryConfig, DatabaseConfig, EmailConfig, get_config
+from config import CloudinaryConfig, DatabaseConfig, EmailConfig, StorageConfig, get_config
 
 # Import extensions
 from extensions import db, init_extensions
@@ -99,6 +99,17 @@ def create_app(config_name=None):
     app.config["MAIL_PASSWORD"] = EmailConfig.MAIL_PASSWORD
     app.config["MAIL_DEFAULT_SENDER"] = (
         os.getenv("MAIL_DEFAULT_SENDER") or app.config.get("MAIL_DEFAULT_SENDER") or EmailConfig.MAIL_DEFAULT_SENDER
+    )
+
+    # Storage configuration
+    app.config["STORAGE_PROVIDER"] = os.getenv("STORAGE_PROVIDER") or getattr(
+        config_class, "STORAGE_PROVIDER", StorageConfig.STORAGE_PROVIDER
+    )
+    app.config["STORAGE_LOCAL_PATH"] = os.getenv("STORAGE_LOCAL_PATH") or getattr(
+        config_class, "STORAGE_LOCAL_PATH", StorageConfig.STORAGE_LOCAL_PATH
+    )
+    app.config["STORAGE_LOCAL_BASE_URL"] = os.getenv("STORAGE_LOCAL_BASE_URL") or getattr(
+        config_class, "STORAGE_LOCAL_BASE_URL", StorageConfig.STORAGE_LOCAL_BASE_URL
     )
 
     # Initialize extensions

@@ -557,7 +557,7 @@ def generate_financial_report_pdf(financial_report_id):
                         )
                     )
 
-                # Get the image from Cloudinary URL
+                # Get the image from the storage URL
                 receipt_image = Image(transaction.receipt_url)
 
                 # Calculate available space (leaving margins)

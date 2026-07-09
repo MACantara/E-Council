@@ -20,8 +20,9 @@ import pytest
 
 
 @pytest.fixture
-def mock_cloudinary_upload(monkeypatch):
+def mock_cloudinary_upload(app, monkeypatch):
     """Mock Cloudinary uploader so uploads do not hit the network."""
+    app.config["STORAGE_PROVIDER"] = "cloudinary"
     fake_result = {
         "secure_url": "https://res.cloudinary.com/test/image.png",
         "public_id": "test_public_id",

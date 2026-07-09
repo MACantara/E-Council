@@ -544,13 +544,13 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `services/storage/` or `repositories/storage/`, `routes/account.py`, `extensions.py`, `config/config.py`
 
 **Checklist**
-- [ ] Define a `StorageBackend` protocol (e.g., `upload`, `delete`, `get_url`).
-- [ ] Implement `CloudinaryStorage`, `LocalFilesystemStorage`, and `S3Storage` (or `MinIOStorage`) adapters.
-- [ ] Move `cloudinary.uploader` calls from `routes/account.py` into the storage service.
-- [ ] Store storage provider configuration in `config/config.py` (e.g., `STORAGE_PROVIDER`, `STORAGE_*` environment variables).
-- [ ] Add a `NullStorage` or in-memory test backend for unit tests.
-- [ ] Update tests to use the test backend without network calls.
-- [ ] Update `ARCHITECTURE.md` and `README.md` with storage configuration.
+- [x] Define a `StorageBackend` protocol (`upload`, `delete`, `get_url`).
+- [x] Implement `CloudinaryStorage`, `LocalFilesystemStorage`, `MemoryStorage`, and `NullStorage` adapters.
+- [x] Move `cloudinary.uploader` calls from `routes/account.py`, `services/events.py`, `services/meetings.py`, and `services/documentation.py` into the storage service.
+- [x] Store storage provider configuration in `config/config.py` (`STORAGE_PROVIDER`, `STORAGE_LOCAL_PATH`, `STORAGE_LOCAL_BASE_URL`, `CLOUDINARY_*` environment variables).
+- [x] Add a `NullStorage` and `MemoryStorage` test backend for unit tests.
+- [x] Update tests to use the test backend without network calls (`TestingConfig.STORAGE_PROVIDER = "memory"`).
+- [x] Update `ARCHITECTURE.md` and `README.md` with storage configuration.
 
 **Acceptance criteria**: The same upload/delete code works regardless of backend. The application can switch storage providers by changing configuration, and tests pass without network access.
 

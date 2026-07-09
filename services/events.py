@@ -3,14 +3,13 @@
 from datetime import datetime
 from types import SimpleNamespace
 
-import cloudinary
-import cloudinary.uploader
 from flask import abort, current_app, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 from models import ConceptPaperForms, Departments, DepartmentsEvents, EventInvitations, Events, Transaction, Users
 from repositories import repo
+from services.storage import get_storage
 from utils.auth import belongs_to_user_or_department
 from utils.email import send_invite_email
 from utils.helpers import get_concept_papers, get_distinct_academic_years
@@ -220,15 +219,14 @@ def delete_event(event_id):
         # Delete related records in the event_invitations table
         EventInvitations.query.filter_by(event_invitations_events_id=event_id).delete()
 
-        # Delete transaction receipts from Cloudinary
+        # Delete transaction receipts
+        storage = get_storage()
         for transaction in event.transactions or []:
             if transaction.receipt_public_id:
                 try:
-                    cloudinary.uploader.destroy(transaction.receipt_public_id)
+                    storage.delete(transaction.receipt_public_id)
                 except Exception as e:
-                    current_app.logger.error(
-                        "Failed to delete transaction receipt from Cloudinary: %s", e, exc_info=True
-                    )
+                    current_app.logger.error("Failed to delete transaction receipt: %s", e, exc_info=True)
 
         # Delete the event
         repo.delete(event)
@@ -263,12 +261,13 @@ def add_transaction(event_id):
         if transaction_category == "Other":
             transaction_category = other_transaction_category
 
-        # Handle file upload to Cloudinary
+        # Handle file upload
         receipt_url = None
         receipt_public_id = None
         if transaction_receipt:
-            upload_result = cloudinary.uploader.upload(transaction_receipt)
-            receipt_url = upload_result.get("secure_url")
+            storage = get_storage()
+            upload_result = storage.upload(transaction_receipt)
+            receipt_url = upload_result.get("url")
             receipt_public_id = upload_result.get("public_id")
 
         # Create a new Transaction record
@@ -323,14 +322,15 @@ def update_transaction(event_id, transaction_id):
         if transaction_category == "Other":
             transaction_category = other_transaction_category
 
-        # Handle file upload to Cloudinary
+        # Handle file upload
         receipt_url = transaction.receipt_url
         receipt_public_id = transaction.receipt_public_id
         if transaction_receipt:
+            storage = get_storage()
             if receipt_public_id:
-                cloudinary.uploader.destroy(receipt_public_id)
-            upload_result = cloudinary.uploader.upload(transaction_receipt)
-            receipt_url = upload_result.get("secure_url")
+                storage.delete(receipt_public_id)
+            upload_result = storage.upload(transaction_receipt)
+            receipt_url = upload_result.get("url")
             receipt_public_id = upload_result.get("public_id")
 
         # Update the transaction record

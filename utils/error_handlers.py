@@ -5,9 +5,11 @@ Error handlers for E-Council.
 import traceback
 from typing import Any
 
-from cloudinary.exceptions import Error
+from cloudinary.exceptions import Error as CloudinaryError
 from flask import flash, redirect, render_template, url_for
 from werkzeug.exceptions import HTTPException
+
+from services.storage import StorageError
 
 
 def handle_cloudinary_error(error: Exception) -> Any:
@@ -24,6 +26,23 @@ def handle_cloudinary_error(error: Exception) -> Any:
 
     current_app.logger.error("Cloudinary error: %s\n%s", error, traceback.format_exc())
     flash("An error occurred while processing images.", "error")
+    return redirect(url_for("documentation.documentation_overview"))
+
+
+def handle_storage_error(error: Exception) -> Any:
+    """
+    Handle storage backend errors.
+
+    Args:
+        error: Storage error exception
+
+    Returns:
+        Redirect with flash message
+    """
+    from flask import current_app
+
+    current_app.logger.error("Storage error: %s\n%s", error, traceback.format_exc())
+    flash("An error occurred while processing files.", "error")
     return redirect(url_for("documentation.documentation_overview"))
 
 
@@ -56,6 +75,7 @@ def register_error_handlers(app: Any) -> None:
     Args:
         app: Flask application instance
     """
-    app.errorhandler(Error)(handle_cloudinary_error)
+    app.errorhandler(CloudinaryError)(handle_cloudinary_error)
+    app.errorhandler(StorageError)(handle_storage_error)
     app.errorhandler(500)(handle_internal_error)
     app.errorhandler(Exception)(handle_internal_error)

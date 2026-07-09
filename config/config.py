@@ -136,6 +136,9 @@ class TestingConfig(Config):
     # Provide a default mail sender for tests so Flask-Mail messages validate
     MAIL_DEFAULT_SENDER = "test@example.com"
 
+    # Use the in-memory storage backend for tests; no network calls
+    STORAGE_PROVIDER = "memory"
+
 
 class DatabaseConfig:
     """Database configuration settings."""
@@ -213,6 +216,15 @@ class CloudinaryConfig:
             api_secret=CloudinaryConfig.CLOUDINARY_API_SECRET,
             secure=CloudinaryConfig.CLOUDINARY_SECURE,
         )
+
+
+class StorageConfig:
+    """Storage abstraction configuration settings."""
+
+    # Storage provider: cloudinary, local, memory, or null
+    STORAGE_PROVIDER = os.getenv("STORAGE_PROVIDER", "cloudinary")
+    STORAGE_LOCAL_PATH = os.getenv("STORAGE_LOCAL_PATH", "uploads")
+    STORAGE_LOCAL_BASE_URL = os.getenv("STORAGE_LOCAL_BASE_URL", "/static/uploads")
 
 
 class AIConfig:

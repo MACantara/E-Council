@@ -67,28 +67,6 @@ def init_extensions(app):
     # Initialize URLSafeTimedSerializer
     serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
-    # Configure Cloudinary
-    configure_cloudinary(app)
-
-
-def configure_cloudinary(app):
-    """
-    Configure Cloudinary with application settings.
-
-    Args:
-        app: Flask application instance
-    """
-    import cloudinary
-
-    from config import CloudinaryConfig
-
-    cloudinary.config(
-        cloud_name=CloudinaryConfig.CLOUDINARY_CLOUD_NAME,
-        api_key=CloudinaryConfig.CLOUDINARY_API_KEY,
-        api_secret=CloudinaryConfig.CLOUDINARY_API_SECRET,
-        secure=CloudinaryConfig.CLOUDINARY_SECURE,
-    )
-
 
 def get_serializer():
     """

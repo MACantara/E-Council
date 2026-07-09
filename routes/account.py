@@ -3,8 +3,6 @@ Account routes blueprint for E-Council.
 Handles user account management, profile settings, email settings, and password security.
 """
 
-import cloudinary
-import cloudinary.uploader
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, logout_user
 from itsdangerous import BadSignature, SignatureExpired
@@ -18,6 +16,7 @@ from models import Departments, EmailVerification, StudentOrganizations, Users
 from repositories import repo
 
 # Import email functions from utils.email
+from services.storage import get_storage
 from utils.email import (
     send_account_deletion_notification_email,
     send_email_change_confirmation,
@@ -46,14 +45,15 @@ def upload_profile_picture():
             flash("Invalid file type. Please upload an image file.", "error")
             return redirect(url_for("account.account"))
 
-        # Delete the previous profile picture from Cloudinary if it exists
+        # Delete the previous profile picture if it exists
+        storage = get_storage()
         existing_profile = current_user.profile_picture or {}
         if existing_profile.get("public_id"):
-            cloudinary.uploader.destroy(existing_profile["public_id"])
+            storage.delete(existing_profile["public_id"])
 
-        # Upload the new profile picture to Cloudinary
-        upload_result = cloudinary.uploader.upload(profile_picture)
-        profile_picture_url = upload_result["secure_url"]
+        # Upload the new profile picture
+        upload_result = storage.upload(profile_picture)
+        profile_picture_url = upload_result["url"]
         profile_picture_public_id = upload_result["public_id"]
 
         # Update the user's profile picture as a JSON dict
@@ -122,14 +122,15 @@ def account_settings():
                 flash("Invalid file type. Please upload an image file.", "error")
                 return redirect(url_for("account.account_settings"))
 
-            # Delete the previous image from Cloudinary if it exists
+            # Delete the previous image if it exists
+            storage = get_storage()
             existing_signature = current_user.signature or {}
             if existing_signature.get("public_id"):
-                cloudinary.uploader.destroy(existing_signature["public_id"])
+                storage.delete(existing_signature["public_id"])
 
-            # Upload the new image to Cloudinary
-            upload_result = cloudinary.uploader.upload(signature_file)
-            signature_url = upload_result["secure_url"]
+            # Upload the new image
+            upload_result = storage.upload(signature_file)
+            signature_url = upload_result["url"]
             signature_public_id = upload_result["public_id"]
 
             # Update the user's signature as a JSON dict
@@ -173,15 +174,16 @@ def delete_user_account():
     # Send account deletion notification email
     send_account_deletion_notification_email(current_user.users_email)
 
-    # Delete the user's signature image from Cloudinary if it exists
+    # Delete the user's signature image if it exists
+    storage = get_storage()
     existing_signature = current_user.signature or {}
     if existing_signature.get("public_id"):
-        cloudinary.uploader.destroy(existing_signature["public_id"])
+        storage.delete(existing_signature["public_id"])
 
-    # Delete the user's profile picture from Cloudinary if it exists
+    # Delete the user's profile picture if it exists
     existing_profile = current_user.profile_picture or {}
     if existing_profile.get("public_id"):
-        cloudinary.uploader.destroy(existing_profile["public_id"])
+        storage.delete(existing_profile["public_id"])
 
     # Delete the user account from the database
     user = Users.query.filter_by(users_id=current_user.users_id).first()

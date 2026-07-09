@@ -199,7 +199,12 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
 - **Flask-Mail** — SMTP email (configured for Gmail by default)
 
 ### File Storage
-- **Cloudinary** — profile pictures and photo documentation
+- **Storage abstraction layer** (`services/storage/`) — profile pictures, signatures, receipts, and photo documentation
+  - Supports `cloudinary`, `local`, `memory`, and `null` providers via the `STORAGE_PROVIDER` environment variable
+  - `CloudinaryStorage` — Cloudinary adapter (default)
+  - `LocalFilesystemStorage` — local filesystem adapter for development and self-hosting
+  - `MemoryStorage` — in-memory backend for unit tests
+  - `NullStorage` — no-op backend
 
 ### AI
 - **google-genai** — Google Gemini integration
@@ -273,7 +278,13 @@ E-Council/
 │   ├── documentation.py
 │   ├── events.py
 │   ├── financial.py
-│   └── meetings.py
+│   ├── meetings.py
+│   └── storage/             # File/object storage abstraction layer
+│       ├── __init__.py
+│       ├── backends.py
+│       ├── errors.py
+│       ├── protocol.py
+│       └── service.py
 ├── run_tests.py           # Test runner helper
 ├── static/                # Static assets
 │   ├── img/
@@ -319,6 +330,7 @@ E-Council/
 │   ├── test_repositories.py
 │   ├── test_routes.py
 │   ├── test_signup.py
+│   ├── test_storage.py
 │   └── test_utils.py
 ├── uploads/               # Runtime upload folder (receipts)
 ├── .env                   # Environment variables (gitignored — see Setup)
@@ -326,7 +338,7 @@ E-Council/
 └── LICENSE                # MIT
 ```
 
-> **Note on architecture:** The application uses a modular Flask blueprint architecture. `app.py` contains the `create_app` factory, and business logic is split into `routes/`, `services/`, `models/`, `repositories/`, `utils/`, and `config/`. The `repositories/` layer is the only layer that touches SQLAlchemy session internals; routes and services use `repo` and `get_repository()` for persistence. Legacy `static/css/` files were removed during the Tailwind CSS 4 migration.
+> **Note on architecture:** The application uses a modular Flask blueprint architecture. `app.py` contains the `create_app` factory, and business logic is split into `routes/`, `services/`, `models/`, `repositories/`, `utils/`, and `config/`. The `repositories/` layer is the only layer that touches SQLAlchemy session internals; routes and services use `repo` and `get_repository()` for persistence. The `services/storage/` layer abstracts file uploads so the same upload/delete code works with Cloudinary, local filesystem, or in-memory backends. Legacy `static/css/` files were removed during the Tailwind CSS 4 migration.
 
 ## Prerequisites
 
@@ -335,7 +347,7 @@ Before setting up the project, make sure you have the following:
 1. **Python 3.9 or higher** — [python.org](https://www.python.org/downloads/)
 2. **pip** — bundled with Python 3.4+
 3. **A database** — SQLite, MySQL, or PostgreSQL (or any SQLAlchemy-compatible engine). SQLite is used by default, so no external server is required for local development.
-4. **A Cloudinary account** — for image hosting (cloud name, API key, and API secret)
+4. **A Cloudinary account** — only required if you set `STORAGE_PROVIDER=cloudinary` (default). For local development you can use `STORAGE_PROVIDER=local` or `STORAGE_PROVIDER=null`.
 5. **A Google Gemini API key** — for AI-assisted document generation
 6. **An SMTP mailbox** — for email verification and notifications (the project is configured for Gmail by default; use a Gmail App Password, not your account password)
 
@@ -395,7 +407,10 @@ Open `.env` and replace every placeholder with your own credentials. The example
 | `SQLALCHEMY_DATABASE_URI` | Yes | Use a local SQLite path (`sqlite:///e_council.db`) or a MySQL URI (e.g. `mysql+pymysql://user:pass@localhost/e_council`) |
 | `MAIL_DEFAULT_SENDER` | Yes | Any email address you control; used as the sender for verification and notification emails |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | Yes for real email | SMTP credentials; for Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) |
-| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Yes for uploads | Create a free account at [Cloudinary](https://cloudinary.com/) and copy the values from the dashboard |
+| `STORAGE_PROVIDER` | No | Object storage backend: `cloudinary` (default), `local`, `memory`, or `null` |
+| `STORAGE_LOCAL_PATH` | No | Local directory for `STORAGE_PROVIDER=local` (default: `uploads`) |
+| `STORAGE_LOCAL_BASE_URL` | No | URL prefix for `STORAGE_PROVIDER=local` (default: `/static/uploads`) |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Yes for Cloudinary uploads | Create a free account at [Cloudinary](https://cloudinary.com/) and copy the values from the dashboard |
 | `GOOGLE_GEMINI_AI_API_KEY` | Yes for AI features | Create a key in [Google AI Studio](https://aistudio.google.com/app/apikey) |
 | `SENTRY_DSN` | No | Optional; create a project at [Sentry](https://sentry.io/) and paste the DSN |
 
@@ -498,6 +513,8 @@ Test files live in the `tests/` directory:
 - `tests/test_repositories.py` — repository abstraction integration tests
 - `tests/test_routes.py` — route tests
 - `tests/test_signup.py` — signup tests
+- `tests/test_storage.py` — storage abstraction layer tests (memory, local, factory)
+- `tests/test_cloudinary.py` — Cloudinary backend route tests (mocked)
 - `tests/test_utils.py` — utility and filter tests
 
 ## License

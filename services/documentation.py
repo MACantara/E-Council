@@ -2,8 +2,6 @@
 
 from datetime import datetime
 
-import cloudinary
-import cloudinary.uploader
 import pandas as pd
 from flask import abort, current_app, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user
@@ -22,6 +20,7 @@ from models import (
     Users,
 )
 from repositories import repo
+from services.storage import get_storage
 from utils.auth import belongs_to_user_or_department, is_admin
 from utils.helpers import allowed_image_file, get_pagination_args
 
@@ -77,6 +76,7 @@ def documentation_overview():
 
 def add_documentation():
     if request.method == "POST":
+        storage = get_storage()
         documentation_events_id = request.form.get("documentation-events-id")
         documentation_status = request.form.get("documentation-status")
         documentation_type = request.form.get("documentation-type")
@@ -176,12 +176,10 @@ def add_documentation():
         for image in request.files.getlist("evaluation-images[]"):
             if image and allowed_image_file(image.filename):
                 try:
-                    upload_result = cloudinary.uploader.upload(
+                    upload_result = storage.upload(
                         image, folder="results_of_the_evaluation_images", resource_type="auto"
                     )
-                    evaluation_images.append(
-                        {"url": upload_result["secure_url"], "public_id": upload_result["public_id"]}
-                    )
+                    evaluation_images.append({"url": upload_result["url"], "public_id": upload_result["public_id"]})
                 except Exception as e:
                     current_app.logger.error("Failed to upload evaluation image: %s", e, exc_info=True)
                     flash(f"Failed to upload evaluation image: {str(e)}", "error")
@@ -191,12 +189,8 @@ def add_documentation():
         for image in request.files.getlist("attendance-images[]"):
             if image and allowed_image_file(image.filename):
                 try:
-                    upload_result = cloudinary.uploader.upload(
-                        image, folder="summary_of_attendance_images", resource_type="auto"
-                    )
-                    attendance_images.append(
-                        {"url": upload_result["secure_url"], "public_id": upload_result["public_id"]}
-                    )
+                    upload_result = storage.upload(image, folder="summary_of_attendance_images", resource_type="auto")
+                    attendance_images.append({"url": upload_result["url"], "public_id": upload_result["public_id"]})
                 except Exception as e:
                     current_app.logger.error("Failed to upload attendance image: %s", e, exc_info=True)
                     flash(f"Failed to upload attendance image: {str(e)}", "error")
@@ -206,12 +200,10 @@ def add_documentation():
         for image in request.files.getlist("photo-documentation-images[]"):
             if image and allowed_image_file(image.filename):
                 try:
-                    upload_result = cloudinary.uploader.upload(
+                    upload_result = storage.upload(
                         image, folder="event_photo_documentation_images", resource_type="auto"
                     )
-                    event_photo_images.append(
-                        {"url": upload_result["secure_url"], "public_id": upload_result["public_id"]}
-                    )
+                    event_photo_images.append({"url": upload_result["url"], "public_id": upload_result["public_id"]})
                 except Exception as e:
                     current_app.logger.error("Failed to upload event photo documentation image: %s", e, exc_info=True)
                     flash(f"Failed to upload event photo documentation image: {str(e)}", "error")
@@ -359,6 +351,7 @@ def update_documentation(documentation_id):
         documentation.documentation_learning_journal_forms_id = learning_journal.learning_journal_forms_id
 
     if request.method == "POST":
+        storage = get_storage()
         documentation_events_id = request.form.get("documentation-events-id")
         documentation_academic_year = request.form.get("documentation-academic-year")
         other_academic_year = request.form.get("other-academic-year")
@@ -434,7 +427,7 @@ def update_documentation(documentation_id):
             for image in evaluation_images:
                 if image.get("public_id") in deleted_ids or image.get("url") in deleted_ids:
                     try:
-                        cloudinary.uploader.destroy(image["public_id"])
+                        storage.delete(image["public_id"])
                     except Exception as e:
                         current_app.logger.error("Error deleting some evaluation images: %s", e, exc_info=True)
                         flash("Error deleting some evaluation images", "error")
@@ -445,10 +438,8 @@ def update_documentation(documentation_id):
         for image in request.files.getlist("evaluation-images[]"):
             if image and allowed_image_file(image.filename):
                 try:
-                    upload_result = cloudinary.uploader.upload(image)
-                    evaluation_images.append(
-                        {"url": upload_result["secure_url"], "public_id": upload_result["public_id"]}
-                    )
+                    upload_result = storage.upload(image)
+                    evaluation_images.append({"url": upload_result["url"], "public_id": upload_result["public_id"]})
                 except Exception as e:
                     current_app.logger.error("Error uploading some evaluation images: %s", e, exc_info=True)
                     flash("Error uploading some evaluation images", "error")
@@ -463,7 +454,7 @@ def update_documentation(documentation_id):
             for image in attendance_images:
                 if image.get("public_id") in deleted_ids or image.get("url") in deleted_ids:
                     try:
-                        cloudinary.uploader.destroy(image["public_id"])
+                        storage.delete(image["public_id"])
                     except Exception as e:
                         current_app.logger.error("Error deleting some attendance images: %s", e, exc_info=True)
                         flash("Error deleting some attendance images", "error")
@@ -474,10 +465,8 @@ def update_documentation(documentation_id):
         for image in request.files.getlist("attendance-images[]"):
             if image and allowed_image_file(image.filename):
                 try:
-                    upload_result = cloudinary.uploader.upload(image)
-                    attendance_images.append(
-                        {"url": upload_result["secure_url"], "public_id": upload_result["public_id"]}
-                    )
+                    upload_result = storage.upload(image)
+                    attendance_images.append({"url": upload_result["url"], "public_id": upload_result["public_id"]})
                 except Exception as e:
                     current_app.logger.error("Error uploading some attendance images: %s", e, exc_info=True)
                     flash("Error uploading some attendance images", "error")
@@ -492,7 +481,7 @@ def update_documentation(documentation_id):
             for image in event_photo_images:
                 if image.get("public_id") in deleted_ids or image.get("url") in deleted_ids:
                     try:
-                        cloudinary.uploader.destroy(image["public_id"])
+                        storage.delete(image["public_id"])
                     except Exception as e:
                         current_app.logger.error("Error deleting some photo documentation images: %s", e, exc_info=True)
                         flash("Error deleting some photo documentation images", "error")
@@ -503,10 +492,8 @@ def update_documentation(documentation_id):
         for image in request.files.getlist("photo-documentation-images[]"):
             if image and allowed_image_file(image.filename):
                 try:
-                    upload_result = cloudinary.uploader.upload(image)
-                    event_photo_images.append(
-                        {"url": upload_result["secure_url"], "public_id": upload_result["public_id"]}
-                    )
+                    upload_result = storage.upload(image)
+                    event_photo_images.append({"url": upload_result["url"], "public_id": upload_result["public_id"]})
                 except Exception as e:
                     current_app.logger.error("Error uploading some photo documentation images: %s", e, exc_info=True)
                     flash("Error uploading some photo documentation images", "error")
@@ -666,12 +653,13 @@ def delete_documentation(documentation_id):
         abort(403)
 
     if request.method == "POST":
+        storage = get_storage()
         try:
-            # Delete associated images from Cloudinary
+            # Delete associated images from storage
             for image in documentation.evaluation_images or []:
                 try:
                     if image.get("public_id"):
-                        cloudinary.uploader.destroy(image["public_id"], resource_type="image")
+                        storage.delete(image["public_id"], resource_type="image")
                 except Exception as e:
                     current_app.logger.error("Error deleting some evaluation images: %s", e, exc_info=True)
                     flash("Error deleting some evaluation images", "error")
@@ -679,7 +667,7 @@ def delete_documentation(documentation_id):
             for image in documentation.attendance_images or []:
                 try:
                     if image.get("public_id"):
-                        cloudinary.uploader.destroy(image["public_id"], resource_type="image")
+                        storage.delete(image["public_id"], resource_type="image")
                 except Exception as e:
                     current_app.logger.error("Error deleting some attendance images: %s", e, exc_info=True)
                     flash("Error deleting some attendance images", "error")
@@ -687,7 +675,7 @@ def delete_documentation(documentation_id):
             for image in documentation.event_photo_images or []:
                 try:
                     if image.get("public_id"):
-                        cloudinary.uploader.destroy(image["public_id"], resource_type="image")
+                        storage.delete(image["public_id"], resource_type="image")
                 except Exception as e:
                     current_app.logger.error(
                         "Error deleting some event photo documentation images: %s", e, exc_info=True
