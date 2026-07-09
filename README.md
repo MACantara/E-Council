@@ -425,6 +425,26 @@ gunicorn -w 4 -b 0.0.0.0:8000 wsgi:application
 
 The `wsgi.py` file creates the app with the `production` configuration. Adjust the number of workers (`-w`) and bind address (`-b`) to match your deployment environment.
 
+### Background Task Queue
+
+Long-running operations (sending emails, generating PDFs, and AI content) are offloaded to a Celery worker. The worker requires a Redis broker.
+
+1. Set the broker URL:
+
+```bash
+export BROKER_URL="redis://localhost:6379/0"
+# Or on Windows (PowerShell):
+$env:BROKER_URL="redis://localhost:6379/0"
+```
+
+2. Start the Celery worker:
+
+```bash
+celery -A tasks worker -l info
+```
+
+For local development without Redis, omit `BROKER_URL`. Tasks will run synchronously as a fallback.
+
 ## Testing
 
 Tests are written with pytest and configured via `pytest.ini`. From the project root with the virtual environment active:

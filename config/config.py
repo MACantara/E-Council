@@ -21,6 +21,11 @@ class Config:
     DEBUG = False
     TESTING = False
 
+    # Celery / Background task queue
+    broker_url = os.getenv("BROKER_URL", "redis://localhost:6379/0")
+    result_backend = os.getenv("RESULT_BACKEND", broker_url)
+    task_always_eager = os.getenv("BROKER_URL") is None
+
     # Upload Configuration
     UPLOAD_FOLDER = "uploads/receipts"
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size

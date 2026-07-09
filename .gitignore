@@ -68,6 +68,9 @@ instance/
 # Temporary test scripts
 tmp_*.py
 
+# Generated PDF files from task queue
+uploads/pdfs/
+
 # Scrapy stuff:
 .scrapy
 

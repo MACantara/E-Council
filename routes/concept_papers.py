@@ -9,6 +9,8 @@ from flask import (
     make_response,
     render_template,
     request,
+    send_file,
+    url_for,
 )
 from flask_login import current_user, login_required
 
@@ -16,10 +18,31 @@ from extensions import get_user_key, limiter
 from models import (
     ConceptPaperForms,
 )
-from services import ai
 from services import concept_papers as concept_paper_service
+from tasks import generate_ai_content, generate_pdf, run_task
 from utils.auth import is_admin
 from utils.helpers import get_pagination_args
+
+
+def _ai_response(result, response_key):
+    """Return an AI result or a queued response for background processing."""
+    if result["ready"]:
+        service_result = result["result"]
+        if not service_result["success"]:
+            return make_response(jsonify({"error": service_result["error"]}), 400)
+        return make_response(jsonify({response_key: service_result["data"]}), 200)
+
+    return make_response(
+        jsonify(
+            {
+                "status": "queued",
+                "task_id": result["task_id"],
+                "result_url": url_for("tasks.task_result", task_id=result["task_id"]),
+            }
+        ),
+        202,
+    )
+
 
 # Create blueprint
 concept_papers_bp = Blueprint("concept_papers", __name__, url_prefix="/concept-papers")
@@ -86,12 +109,12 @@ def generate_concept_body():
         return make_response(jsonify({"error": "Content-Type must be application/json"}), 400)
 
     data = request.json
-    result = ai.generate_concept_paper_body(
-        data.get("subject"), data.get("start_date"), data.get("end_date"), data.get("location")
+    result = run_task(
+        generate_ai_content,
+        "generate_concept_paper_body",
+        [data.get("subject"), data.get("start_date"), data.get("end_date"), data.get("location")],
     )
-    if not result:
-        return make_response(jsonify({"error": result.error}), 400)
-    return make_response(jsonify({"content": result.data}), 200)
+    return _ai_response(result, "content")
 
 
 @concept_papers_bp.route("/generate-descriptions", methods=["POST"])
@@ -101,10 +124,8 @@ def generate_concept_descriptions():
     if not request.is_json:
         return make_response(jsonify({"error": "Content-Type must be application/json"}), 400)
 
-    result = ai.generate_concept_paper_descriptions(request.json.get("subject"))
-    if not result:
-        return make_response(jsonify({"error": result.error}), 400)
-    return make_response(jsonify({"content": result.data}), 200)
+    result = run_task(generate_ai_content, "generate_concept_paper_descriptions", [request.json.get("subject")])
+    return _ai_response(result, "content")
 
 
 @concept_papers_bp.route("/generate-objectives", methods=["POST"])
@@ -114,10 +135,8 @@ def generate_concept_objectives():
     if not request.is_json:
         return make_response(jsonify({"error": "Content-Type must be application/json"}), 400)
 
-    result = ai.generate_concept_paper_objectives(request.json.get("subject"))
-    if not result:
-        return make_response(jsonify({"error": result.error}), 400)
-    return make_response(jsonify({"content": result.data}), 200)
+    result = run_task(generate_ai_content, "generate_concept_paper_objectives", [request.json.get("subject")])
+    return _ai_response(result, "content")
 
 
 @concept_papers_bp.route("/generate-learning-outcomes", methods=["POST"])
@@ -127,10 +146,8 @@ def generate_concept_learning_outcomes():
     if not request.is_json:
         return make_response(jsonify({"error": "Content-Type must be application/json"}), 400)
 
-    result = ai.generate_concept_paper_learning_outcomes(request.json.get("subject"))
-    if not result:
-        return make_response(jsonify({"error": result.error}), 400)
-    return make_response(jsonify({"content": result.data}), 200)
+    result = run_task(generate_ai_content, "generate_concept_paper_learning_outcomes", [request.json.get("subject")])
+    return _ai_response(result, "content")
 
 
 @concept_papers_bp.route("/generate-participants", methods=["POST"])
@@ -140,10 +157,8 @@ def generate_concept_participants():
     if not request.is_json:
         return make_response(jsonify({"error": "Content-Type must be application/json"}), 400)
 
-    result = ai.generate_concept_paper_participants(request.json.get("subject"))
-    if not result:
-        return make_response(jsonify({"error": result.error}), 400)
-    return make_response(jsonify({"content": result.data}), 200)
+    result = run_task(generate_ai_content, "generate_concept_paper_participants", [request.json.get("subject")])
+    return _ai_response(result, "content")
 
 
 @concept_papers_bp.route("/generate-consent", methods=["POST"])
@@ -154,18 +169,40 @@ def generate_concept_consent():
         return make_response(jsonify({"error": "Content-Type must be application/json"}), 400)
 
     data = request.json
-    result = ai.generate_concept_paper_consent(
-        data.get("subject"), data.get("start_date"), data.get("end_date"), data.get("location")
+    result = run_task(
+        generate_ai_content,
+        "generate_concept_paper_consent",
+        [data.get("subject"), data.get("start_date"), data.get("end_date"), data.get("location")],
     )
-    if not result:
-        return make_response(jsonify({"error": result.error}), 400)
-    return make_response(jsonify({"content": result.data}), 200)
+    return _ai_response(result, "content")
 
 
 @concept_papers_bp.route("/generate-pdf/<int:concept_paper_id>")
 @login_required
 def generate_concept_paper_pdf(concept_paper_id):
-    return concept_paper_service.generate_concept_paper_pdf(concept_paper_id)
+    result = run_task(
+        generate_pdf,
+        "services.concept_papers",
+        "generate_concept_paper_pdf",
+        concept_paper_id,
+        current_user.users_id,
+    )
+    if result["ready"]:
+        return send_file(
+            result["result"]["path"],
+            download_name=result["result"]["download_name"],
+            mimetype="application/pdf",
+        )
+    return make_response(
+        jsonify(
+            {
+                "status": "queued",
+                "task_id": result["task_id"],
+                "download_url": url_for("tasks.download_pdf", task_id=result["task_id"]),
+            }
+        ),
+        202,
+    )
 
 
 # Blueprint is ready to be imported and registered in app.py

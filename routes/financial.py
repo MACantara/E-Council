@@ -1,9 +1,9 @@
 from flask import Blueprint
-from flask_login import login_required
+from flask_login import current_user, login_required
 
-# CustomUnderline class for PDF generation
-# Create blueprint with url_prefix='/financial'
+from routes.tasks import pdf_response
 from services import financial as financial_service
+from tasks import generate_pdf, run_task
 
 financial_bp = Blueprint("financial", __name__, url_prefix="/financial")
 
@@ -41,4 +41,11 @@ def delete_financial_report(report_id):
 @financial_bp.route("/generate-financial-report-pdf/<int:financial_report_id>")
 @login_required
 def generate_financial_report_pdf(financial_report_id):
-    return financial_service.generate_financial_report_pdf(financial_report_id)
+    result = run_task(
+        generate_pdf,
+        "services.financial",
+        "generate_financial_report_pdf",
+        financial_report_id,
+        current_user.users_id,
+    )
+    return pdf_response(result)

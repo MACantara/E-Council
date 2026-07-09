@@ -1,8 +1,9 @@
 from flask import Blueprint
-from flask_login import login_required
+from flask_login import current_user, login_required
 
-# Create blueprint
+from routes.tasks import pdf_response
 from services import meetings as meetings_service
+from tasks import generate_pdf, run_task
 
 meetings_bp = Blueprint("meetings", __name__, url_prefix="/meetings")
 
@@ -16,7 +17,14 @@ def minutes_of_the_meeting_overview():
 @meetings_bp.route("/generate-mom-pdf/<int:minutes_of_the_meeting_id>")
 @login_required
 def generate_mom_pdf(minutes_of_the_meeting_id):
-    return meetings_service.generate_mom_pdf(minutes_of_the_meeting_id)
+    result = run_task(
+        generate_pdf,
+        "services.meetings",
+        "generate_mom_pdf",
+        minutes_of_the_meeting_id,
+        current_user.users_id,
+    )
+    return pdf_response(result)
 
 
 @meetings_bp.route("/add-minutes-of-the-meeting", methods=["GET", "POST"])

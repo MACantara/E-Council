@@ -35,7 +35,7 @@ from models import (
     Users,
     db,
 )
-from services import ai
+from tasks import generate_ai_content, run_task
 from utils.auth import belongs_to_user_or_department, is_admin
 from utils.helpers import get_pagination_args
 
@@ -356,16 +356,28 @@ def generate_description():
                 Note: Create a comprehensive list of expense categories appropriate for this specific event"""
 
         current_app.logger.info("Sending request to Gemini API")
-        result = ai.generate_content(prompt)
+        task_result = run_task(generate_ai_content, "generate_content", [prompt])
         current_app.logger.info("Received response from Gemini API")
 
-        if result:
-            description = result.data
-            current_app.logger.info(f"Generated description: {description[:100]}...")
-            return make_response(jsonify({"description": description}), 200)
+        if task_result["ready"]:
+            result = task_result["result"]
+            if result["success"]:
+                description = result["data"]
+                current_app.logger.info(f"Generated description: {description[:100]}...")
+                return make_response(jsonify({"description": description}), 200)
+            current_app.logger.error("Gemini API error: %s", result["error"])
+            return make_response(jsonify({"error": f"AI generation error: {result['error']}"}), 500)
 
-        current_app.logger.error("Gemini API error: %s", result.error)
-        return make_response(jsonify({"error": f"AI generation error: {result.error}"}), 500)
+        return make_response(
+            jsonify(
+                {
+                    "status": "queued",
+                    "task_id": task_result["task_id"],
+                    "result_url": url_for("tasks.task_result", task_id=task_result["task_id"]),
+                }
+            ),
+            202,
+        )
 
     except Exception as e:
         current_app.logger.error(f"Error generating description: {str(e)}")

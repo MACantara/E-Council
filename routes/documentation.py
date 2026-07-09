@@ -4,11 +4,13 @@ Contains all routes related to documentation management.
 """
 
 from flask import Blueprint
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 # Import helper function from utils
 # Create blueprint
+from routes.tasks import pdf_response
 from services import documentation as documentation_service
+from tasks import generate_pdf, run_task
 
 documentation_bp = Blueprint("documentation", __name__, url_prefix="/documentation")
 
@@ -64,4 +66,11 @@ def process_student_excel():
 @documentation_bp.route("/generate-documentation-pdf/<int:documentation_id>")
 @login_required
 def generate_documentation_pdf(documentation_id):
-    return documentation_service.generate_documentation_pdf(documentation_id)
+    result = run_task(
+        generate_pdf,
+        "services.documentation",
+        "generate_documentation_pdf",
+        documentation_id,
+        current_user.users_id,
+    )
+    return pdf_response(result)

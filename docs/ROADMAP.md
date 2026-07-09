@@ -439,15 +439,15 @@ Phase 4 prepares the application for a real production environment and explores 
 
 **Why it matters**: Email sending, PDF generation, and AI generation can block the request and cause timeouts.
 
-**Scope**: `services/email.py`, `services/pdf.py`, `services/ai.py`, `extensions.py`, `requirements.txt`
+**Scope**: `utils/email.py`, `services/ai.py`, `services/*.py` PDF generators, `tasks.py`, `config.py`, `extensions.py`, `requirements.txt`, `README.md`
 
 **Checklist**
-- [ ] Add `celery` or `rq` to `requirements.txt` and a broker (Redis).
-- [ ] Create `tasks.py` with Celery/RQ tasks for `send_email`, `generate_pdf`, `generate_ai_content`.
-- [ ] Update `services/email.py` to queue emails instead of sending synchronously.
-- [ ] Update PDF generation to queue large exports and return a download link or send by email.
-- [ ] Add a local dev fallback that runs tasks synchronously when the broker is not available.
-- [ ] Document how to run the worker.
+- [x] Add `celery` or `rq` to `requirements.txt` and a broker (Redis).
+- [x] Create `tasks.py` with Celery/RQ tasks for `send_email`, `generate_pdf`, `generate_ai_content`.
+- [x] Update `utils/email.py` to queue emails instead of sending synchronously.
+- [x] Update PDF generation to queue large exports and return a download link.
+- [x] Add a local dev fallback that runs tasks synchronously when the broker is not available.
+- [x] Document how to run the worker.
 
 **Acceptance criteria**: AI/PDF/email endpoints no longer block the request. A worker process handles the tasks.
 

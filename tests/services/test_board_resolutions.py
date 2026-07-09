@@ -15,7 +15,7 @@ from tests.factories import BoardResolutionsFactory, SignatoriesFactory
 def mock_board_ai(monkeypatch):
     """Replace the AI service generate_content function for board resolution tests."""
     monkeypatch.setattr(
-        "services.board_resolutions.ai.generate_content",
+        "services.ai.generate_content",
         lambda *args, **kwargs: ServiceResult.ok("Generated AI description"),
     )
 

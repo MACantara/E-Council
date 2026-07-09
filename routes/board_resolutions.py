@@ -1,13 +1,15 @@
 from flask import (
     Blueprint,
 )
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 from extensions import get_user_key, limiter
 
 # Configure Gemini AI
 # Create blueprint
+from routes.tasks import pdf_response
 from services import board_resolutions as board_resolutions_service
+from tasks import generate_pdf, run_task
 
 board_resolutions_bp = Blueprint("board_resolutions", __name__, url_prefix="/board-resolutions")
 
@@ -52,4 +54,11 @@ def generate_description():
 @board_resolutions_bp.route("/generate-board-resolution-pdf/<int:resolution_id>")
 @login_required
 def generate_board_resolution_pdf(resolution_id):
-    return board_resolutions_service.generate_board_resolution_pdf(resolution_id)
+    result = run_task(
+        generate_pdf,
+        "services.board_resolutions",
+        "generate_board_resolution_pdf",
+        resolution_id,
+        current_user.users_id,
+    )
+    return pdf_response(result)

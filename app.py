@@ -39,6 +39,7 @@ from routes.documentation import documentation_bp
 from routes.events import events_bp
 from routes.financial import financial_bp
 from routes.meetings import meetings_bp
+from routes.tasks import tasks_bp
 
 # Import utilities
 from utils import register_error_handlers, register_filters
@@ -97,6 +98,11 @@ def create_app(config_name=None):
     # Initialize extensions
     init_extensions(app)
 
+    # Configure Celery with the same settings as the Flask app
+    from tasks import celery_app as celery
+
+    celery.conf.update(app.config)
+
     # Configure Flask-Login
     from flask_login import LoginManager
 
@@ -136,6 +142,7 @@ def create_app(config_name=None):
     app.register_blueprint(events_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(concept_papers_bp)
+    app.register_blueprint(tasks_bp)
 
     # Initialize serializer for events blueprint
     events_bp.init_serializer(app.config["SECRET_KEY"])
