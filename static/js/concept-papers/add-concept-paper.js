@@ -4,8 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize conditional field toggles
     toggleMultipleConditionalFields('concept-paper-academic-year', [
-        { containerId: 'other-academic-year-input', inputId: 'other-academic-year-input' },
-        { containerId: 'other-academic-year-label', inputId: 'other-academic-year-label' }
+        { containerId: 'other-academic-year-container', inputId: 'other-academic-year-input' }
     ], 'Other');
 
     // Initialize generate buttons
@@ -43,10 +42,11 @@ async function generateDescriptions() {
 function addObjective() {
     const container = document.getElementById('concept-paper-objectives');
     const div = document.createElement('div');
-    div.className = 'input-group';
+    div.className = 'flex items-center gap-2';
     div.innerHTML = `
-    <input type="text" name="concept-paper-objectives" placeholder="Enter Objective" required>
-    <button type="button" class="delete-btn">Delete</button>
+    <input type="text" name="concept-paper-objectives" placeholder="Enter Objective" required
+        class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
+    <button type="button" class="delete-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
 `;
     container.appendChild(div);
 
@@ -105,10 +105,11 @@ async function generateLearningOutcomes() {
 function addLearningOutcome() {
     const container = document.getElementById('concept-paper-learning-outcomes');
     const div = document.createElement('div');
-    div.className = 'input-group';
+    div.className = 'flex items-center gap-2';
     div.innerHTML = `
-    <input type="text" name="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome" required>
-    <button type="button" class="delete-btn">Delete</button>
+    <input type="text" name="concept-paper-learning-outcomes" placeholder="Enter Learning Outcome" required
+        class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
+    <button type="button" class="delete-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
 `;
     container.appendChild(div);
 

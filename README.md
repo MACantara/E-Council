@@ -209,8 +209,9 @@ All versions are pinned in [`requirements.txt`](requirements.txt).
 - **pandas** 2.2.3 / **openpyxl** 3.1.5 — Excel import of student lists
 
 ### Frontend
-- Custom CSS (`static/css/styles.css`)
-- **Bootstrap Icons** 1.8.1
+- **Tailwind CSS 4** — utility-first styling via CDN (`@tailwindcss/browser@4`) with custom theme in `base.html`
+- **Lucide Icons** — icon set via CDN
+- **Jinja2 macros** — reusable form inputs, selects, textareas, buttons, cards, and UI components (`templates/macros/`)
 - **Chart.js** — dashboard charts
 - Vanilla JavaScript (`static/js/`)
 
@@ -242,10 +243,12 @@ E-Council/
 │   ├── minutes-of-the-meeting-overview.html, add-minutes-of-the-meeting.html, update-minutes-of-the-meeting.html
 │   └── ... (delete-*.html confirmation templates)
 ├── static/
-│   ├── css/styles.css     # Application styles
 │   ├── js/                # Per-page vanilla JS (account, add-concept-paper, add-documentation, etc.)
 │   ├── img/               # Logos and hero images
 │   └── uploads/           # Local upload destination (receipts)
+├── templates/
+│   ├── macros/            # Reusable Jinja2 form and UI components (forms.html, ui.html, icons.html, email.html)
+│   └── ...                # Page templates
 ├── tests/
 │   ├── test_routes.py     # Route tests
 │   └── test_signup.py     # Signup tests

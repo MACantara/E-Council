@@ -63,11 +63,28 @@ function updateSignatoryOptions(select, signatories) {
 
 function addNewField(containerId, placeholder) {
     const container = document.getElementById(containerId);
+
+    const div = document.createElement('div');
+    div.className = 'flex items-center gap-2';
+
     const newInput = document.createElement('input');
     newInput.type = 'text';
     newInput.name = containerId;
     newInput.placeholder = `Enter ${placeholder}`;
-    container.appendChild(newInput);
+    newInput.required = true;
+    newInput.className = 'w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white';
+    removeBtn.textContent = 'Delete';
+    removeBtn.addEventListener('click', function () {
+        div.remove();
+    });
+
+    div.appendChild(newInput);
+    div.appendChild(removeBtn);
+    container.appendChild(div);
 }
 
 function addNewTallyItem() {
@@ -119,36 +136,41 @@ function updateFileList(input, filesNameSpan, filesList, includePreview) {
 
 function createFileItem(file, index, input, includePreview) {
     const fileItem = document.createElement('div');
-    fileItem.className = 'selected-file-item';
-    
-    const fileName = document.createElement('span');
-    fileName.textContent = file.name;
-    
-    const removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'remove-file-btn';
-    removeBtn.textContent = '×';
-    removeBtn.addEventListener('click', () => removeFile(index, input));
-    
-    fileItem.appendChild(fileName);
-    
+    fileItem.className = 'selected-file-item flex items-center justify-between gap-3 rounded-lg border border-edge bg-surface-lowered px-3.5 py-2.5';
+
+    const fileInfo = document.createElement('div');
+    fileInfo.className = 'flex items-center gap-3 min-w-0';
+
     if (includePreview && file.type.startsWith('image/')) {
         const preview = createImagePreview(file);
-        fileItem.appendChild(preview);
+        fileInfo.appendChild(preview);
     }
-    
+
+    const fileName = document.createElement('span');
+    fileName.textContent = file.name;
+    fileName.className = 'truncate text-sm text-ink';
+    fileInfo.appendChild(fileName);
+
+    fileItem.appendChild(fileInfo);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-file-btn inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-danger text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white';
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => removeFile(index, input));
+
     fileItem.appendChild(removeBtn);
     return fileItem;
 }
 
 function createImagePreview(file) {
     const previewContainer = document.createElement('div');
-    previewContainer.className = 'file-preview-container';
-    
+    previewContainer.className = 'file-preview-container h-10 w-10 shrink-0 overflow-hidden rounded-lg';
+
     const preview = document.createElement('img');
-    preview.className = 'file-preview';
+    preview.className = 'file-preview h-full w-full object-cover';
     preview.src = URL.createObjectURL(file);
-    
+
     previewContainer.appendChild(preview);
     return previewContainer;
 }
@@ -184,8 +206,8 @@ async function handleExcelUpload(e) {
         const formData = new FormData();
         formData.append('excel_file', file);
 
-        namesList.innerHTML = '<li>Loading...</li>';
-        preview.style.display = 'block';
+        namesList.innerHTML = '<li class="text-sm text-ink-2">Loading...</li>';
+        preview.classList.remove('hidden');
 
         try {
             const response = await fetch('/process-student-excel', {
@@ -199,12 +221,12 @@ async function handleExcelUpload(e) {
             const data = await response.json();
             updateStudentList(data, namesList);
         } catch (error) {
-            namesList.innerHTML = '<li class="error">Failed to process file</li>';
+            namesList.innerHTML = '<li class="text-sm text-danger">Failed to process file</li>';
             console.error('Error:', error);
         }
     } else {
         fileNameSpan.textContent = 'No file chosen';
-        preview.style.display = 'none';
+        preview.classList.add('hidden');
     }
 }
 
@@ -214,10 +236,11 @@ function updateStudentList(data, namesList) {
         data.students.forEach(student => {
             const li = document.createElement('li');
             li.textContent = student;
+            li.className = 'text-sm text-ink-2';
             namesList.appendChild(li);
         });
     } else {
-        namesList.innerHTML = `<li class="error">${data.error}</li>`;
+        namesList.innerHTML = `<li class="text-sm text-danger">${data.error}</li>`;
     }
 }
 
@@ -256,16 +279,19 @@ function syncTallyItems() {
 function addTallyItemToEvaluation(itemName, index, container) {
     const nameRow = document.createElement('tr');
     const ratingsRow = document.createElement('tr');
-    
-    nameRow.innerHTML = `<td colspan="6" class="tally-item-name">${itemName}</td>`;
+
+    nameRow.className = 'tally-item-name bg-surface-lowered';
+    nameRow.innerHTML = `<td colspan="6" class="border-b border-edge px-4 py-2 text-sm font-medium text-ink">${itemName}</td>`;
+
+    const radioClass = 'h-4 w-4 border-edge text-accent focus:ring-accent';
     ratingsRow.innerHTML = `
-        <td><input type="radio" name="eval-tally-${index}" value="5" required></td>
-        <td><input type="radio" name="eval-tally-${index}" value="4"></td>
-        <td><input type="radio" name="eval-tally-${index}" value="3"></td>
-        <td><input type="radio" name="eval-tally-${index}" value="2"></td>
-        <td><input type="radio" name="eval-tally-${index}" value="1"></td>
+        <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="eval-tally-${index}" value="5" required></td>
+        <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="eval-tally-${index}" value="4"></td>
+        <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="eval-tally-${index}" value="3"></td>
+        <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="eval-tally-${index}" value="2"></td>
+        <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="eval-tally-${index}" value="1"></td>
     `;
-    
+
     container.appendChild(nameRow);
     container.appendChild(ratingsRow);
 }

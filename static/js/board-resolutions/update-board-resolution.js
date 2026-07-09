@@ -17,17 +17,13 @@ function initializeUpdateBoardResolutionForm() {
 
 function toggleOtherAcademicYear() {
     const academicYearSelect = document.getElementById('board-resolutions-academic-year');
+    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
     const otherAcademicYearInput = document.getElementById('other-academic-year-input');
-    const otherAcademicYearLabel = document.getElementById('other-academic-year-label');
     if (academicYearSelect.value === 'Other') {
-        otherAcademicYearInput.style.display = 'block';
-        otherAcademicYearInput.required = true;
-        otherAcademicYearLabel.style.display = 'block';
-        otherAcademicYearLabel.required = true;
+        if (otherAcademicYearContainer) otherAcademicYearContainer.style.display = 'block';
+        if (otherAcademicYearInput) otherAcademicYearInput.required = true;
     } else {
-        otherAcademicYearInput.style.display = 'none';
-        otherAcademicYearInput.required = false;
-        otherAcademicYearLabel.style.display = 'none';
-        otherAcademicYearLabel.required = false;
+        if (otherAcademicYearContainer) otherAcademicYearContainer.style.display = 'none';
+        if (otherAcademicYearInput) otherAcademicYearInput.required = false;
     }
 }

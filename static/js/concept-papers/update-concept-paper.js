@@ -50,6 +50,18 @@ function initializeUpdateConceptPaperForm() {
     if (academicYearSelect) {
         academicYearSelect.addEventListener('change', toggleOtherAcademicYear);
     }
+
+    // Initialize existing remove buttons and set initial visibility for Other A.Y.
+    initializeRemoveButtons();
+    toggleOtherAcademicYear();
+}
+
+function initializeRemoveButtons() {
+    document.querySelectorAll('.remove-item-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            this.parentElement.remove();
+        });
+    });
 }
 
 // ============================================
@@ -58,18 +70,14 @@ function initializeUpdateConceptPaperForm() {
 
 function toggleOtherAcademicYear() {
     const academicYearSelect = document.getElementById('concept-paper-academic-year');
+    const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
     const otherAcademicYearInput = document.getElementById('other-academic-year-input');
-    const otherAcademicYearLabel = document.getElementById('other-academic-year-label');
     if (academicYearSelect.value === 'Other') {
-        otherAcademicYearInput.style.display = 'block';
-        otherAcademicYearInput.required = true;
-        otherAcademicYearLabel.style.display = 'block';
-        otherAcademicYearLabel.required = true;
+        if (otherAcademicYearContainer) otherAcademicYearContainer.style.display = 'block';
+        if (otherAcademicYearInput) otherAcademicYearInput.required = true;
     } else {
-        otherAcademicYearInput.style.display = 'none';
-        otherAcademicYearInput.required = false;
-        otherAcademicYearLabel.style.display = 'none';
-        otherAcademicYearLabel.required = false;
+        if (otherAcademicYearContainer) otherAcademicYearContainer.style.display = 'none';
+        if (otherAcademicYearInput) otherAcademicYearInput.required = false;
     }
 }
 
@@ -77,72 +85,57 @@ function toggleOtherAcademicYear() {
 // Dynamic Field Addition Functions
 // ============================================
 
-function addObjective() {
-    const container = document.getElementById('concept-paper-objectives');
+function addDynamicField(containerId, name, placeholder) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const div = document.createElement('div');
+    div.className = 'flex items-center gap-2';
+
     const input = document.createElement('input');
     input.type = 'text';
-    input.name = 'concept-paper-objectives';
-    input.placeholder = 'Enter Objective';
+    input.name = name;
+    input.placeholder = placeholder;
     input.required = true;
-    container.appendChild(input);
+    input.className = 'w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white';
+    removeBtn.textContent = 'Delete';
+    removeBtn.addEventListener('click', function () {
+        div.remove();
+    });
+
+    div.appendChild(input);
+    div.appendChild(removeBtn);
+    container.appendChild(div);
+}
+
+function addObjective() {
+    addDynamicField('concept-paper-objectives', 'concept-paper-objectives', 'Enter Objective');
 }
 
 function addLearningOutcome() {
-    const container = document.getElementById('concept-paper-learning-outcomes');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'concept-paper-learning-outcomes';
-    input.placeholder = 'Enter Learning Outcome';
-    input.required = true;
-    container.appendChild(input);
+    addDynamicField('concept-paper-learning-outcomes', 'concept-paper-learning-outcomes', 'Enter Learning Outcome');
 }
 
 function addStrength() {
-    const container = document.getElementById('activity-strengths');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'activity-strengths';
-    input.placeholder = 'Enter Strength';
-    input.required = true;
-    container.appendChild(input);
+    addDynamicField('activity-strengths', 'activity-strengths', 'Enter Strength');
 }
 
 function addWeakness() {
-    const container = document.getElementById('activity-weaknesses');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'activity-weaknesses';
-    input.placeholder = 'Enter Weakness';
-    input.required = true;
-    container.appendChild(input);
+    addDynamicField('activity-weaknesses', 'activity-weaknesses', 'Enter Weakness');
 }
 
 function addRecommendation() {
-    const container = document.getElementById('activity-recommendations');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'activity-recommendations';
-    input.placeholder = 'Enter Recommendation';
-    input.required = true;
-    container.appendChild(input);
+    addDynamicField('activity-recommendations', 'activity-recommendations', 'Enter Recommendation');
 }
 
 function addObservation() {
-    const container = document.getElementById('learning-journal-observations');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'learning-journal-observations';
-    input.placeholder = 'Enter Observation';
-    input.required = true;
-    container.appendChild(input);
+    addDynamicField('learning-journal-observations', 'learning-journal-observations', 'Enter Observation');
 }
 
 function addLearning() {
-    const container = document.getElementById('learning-journal-learnings');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'learning-journal-learnings';
-    input.placeholder = 'Enter Learning';
-    input.required = true;
-    container.appendChild(input);
+    addDynamicField('learning-journal-learnings', 'learning-journal-learnings', 'Enter Learning');
 }

@@ -1,180 +1,135 @@
 {% extends "base.html" %}
+{% from 'macros.forms.html' import input, select, textarea %}
+{% from 'macros.ui.html' import button, button_link, alert %}
+{% from 'macros.icons.html' import lucide %}
 
 {% block title %}Add Board Resolution{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-2xl space-y-6">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-ink">Add Board Resolution</h1>
+                    <p class="mt-1 text-sm text-ink-2">Create a new board resolution and assign signatories.</p>
+                </div>
+                {{ button_link('Back', url_for('board_resolutions.board_resolutions_overview'), variant='secondary', icon='arrow-left', class='shrink-0') }}
+            </div>
 
-        <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}" class="primary-button fit-content-button">Back to Board
-            Resolutions Overview</a>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="space-y-3">
+                {% for category, message in messages %}
+                {{ alert(message, category) }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
 
-        <!-- Flash messages section for the modal -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin bottom-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('board_resolutions.add_board_resolution') }}" class="rounded-xl border border-edge bg-surface p-6 shadow-sm space-y-5">
+                {{ input('board-resolutions-date', 'board-resolutions-date', label='Date', type='datetime-local', required=true) }}
 
-        <div class="container">
-            <h2>Add Board Resolution</h2>
+                {% call select('board-resolutions-events-id', 'board-resolutions-events-id', label='Event Name', required=true) %}
+                    <option value="" disabled selected>Select Event</option>
+                    <option value="None">None</option>
+                    {% for event in events %}
+                    <option value="{{ event.events_id }}" data-event-name="{{ event.events_name }}">{{ event.events_name }}</option>
+                    {% endfor %}
+                    <option value="Other">Other</option>
+                {% endcall %}
 
-            <form method="POST" enctype="multipart/form-data" action="{{ url_for('board_resolutions.add_board_resolution')}}">
-                <div class="input-pair">
-                    <label for="board-resolutions-date">Date</label>
-                    <input type="datetime-local" name="board-resolutions-date" id="board-resolutions-date" required>
+                <div id="other-event-name-container" style="display:none;">
+                    {{ input('other-event-name', 'other-event-name-input', label='Other Event Name', placeholder='Enter Event Name') }}
                 </div>
 
-                <div class="input-pair">
-                    <label for="board-resolutions-events-id">Event Name</label>
-                    <select name="board-resolutions-events-id" id="board-resolutions-events-id" required>
-                        <option value="" disabled selected>Select Event</option>
-                        <option value="None">None</option>
-                        {% for event in events %}
-                        <option value="{{ event.events_id }}" data-event-name="{{ event.events_name }}">{{
-                            event.events_name }}</option>
-                        {% endfor %}
-                        <option value="Other">Other</option>
-                    </select>
-                    <label for="other-event-name" id="other-event-name-label"
-                        style="display: none; margin-top: 10px;">Other Event Name</label>
-                    <input type="text" name="other-event-name" id="other-event-name-input"
-                        placeholder="Enter Event Name" style="display: none; margin-top: 10px;">
+                {{ input('board-resolutions-title', 'board-resolutions-title', label='Title', placeholder='Title', required=true) }}
+
+                {% call select('board-resolutions-academic-year', 'board-resolutions-academic-year', label='Academic Year', required=true) %}
+                    <option value="" disabled selected>Select Academic Year</option>
+                    {% for year in academic_years %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                    <option value="Other">Other</option>
+                {% endcall %}
+
+                <div id="other-academic-year-container" style="display:none;">
+                    {{ input('other-academic-year', 'other-academic-year-input', label='Other Academic Year', placeholder='Enter Academic Year') }}
                 </div>
 
-                <div class="input-pair">
-                    <label for="board-resolutions-title">Title</label>
-                    <input type="text" name="board-resolutions-title" id="board-resolutions-title" placeholder="Title"
-                        required>
-                </div>
+                {% call select('board-resolutions-semester', 'board-resolutions-semester', label='Semester', required=true) %}
+                    <option value="" disabled selected>Select Semester</option>
+                    <option value="1st Semester">1st Semester</option>
+                    <option value="2nd Semester">2nd Semester</option>
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="board-resolutions-academic-year">Academic Year</label>
-                    <select name="board-resolutions-academic-year" id="board-resolutions-academic-year" required>
-                        <option value="" disabled selected>Select Academic Year</option>
-                        {% for year in academic_years %}
-                        <option value="{{ year }}">{{ year }}</option>
-                        {% endfor %}
-                        <option value="Other">Other</option>
-                    </select>
-                    <div class="input-pair">
-                        <label for="other-academic-year" id="other-academic-year-label"
-                            style="display: none; margin-top: 10px;">Other Academic Year</label>
-                        <input type="text" name="other-academic-year" id="other-academic-year-input"
-                            placeholder="Enter Academic Year" style="display: none;">
-                    </div>
-                </div>
+                {% call select('board-resolutions-status', 'board-resolutions-status', label='Status', required=true) %}
+                    <option value="" disabled selected>Select Status</option>
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Postponed">Postponed</option>
+                    <option value="Done">Done</option>
+                    <option value="Cancelled">Cancelled</option>
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="board-resolutions-semester">Semester</label>
-                    <select name="board-resolutions-semester" id="board-resolutions-semester" required>
-                        <option value="" disabled selected>Select Semester</option>
-                        <option value="1st Semester">1st Semester</option>
-                        <option value="2nd Semester">2nd Semester</option>
-                    </select>
-                </div>
+                {{ input('board-resolutions-total-amount', 'board-resolutions-total-amount', label='Total Amount', type='number', placeholder='Total Amount', required=true, attrs='step="0.01"') }}
 
-                <div class="input-pair">
-                    <label for="board-resolutions-status">Status</label>
-                    <select name="board-resolutions-status" id="board-resolutions-status" required>
-                        <option value="" disabled selected>Select Status</option>
-                        <option value="Upcoming">Upcoming</option>
-                        <option value="Postponed">Postponed</option>
-                        <option value="Done">Done</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
+                {{ textarea('board-resolutions-description', 'board-resolutions-description', label='Description', placeholder='Description', required=true) }}
+                {{ button('Generate Description', type='button', variant='secondary', icon='sparkles', id='generate-description-btn') }}
 
-                <div class="input-pair">
-                    <label for="board-resolutions-total-amount">Total Amount</label>
-                    <input type="number" step="0.01" name="board-resolutions-total-amount"
-                        id="board-resolutions-total-amount" placeholder="Total Amount" required>
-                </div>
-
-                <div class="input-pair">
-                    <label for="board-resolutions-description">Description</label>
-                    <div class="input-group description-group">
-                        <textarea name="board-resolutions-description" id="board-resolutions-description"
-                            placeholder="Description" required></textarea>
-                        <button type="button" class="secondary-button generate-description-btn"
-                            id="generate-description-btn">Generate Description</button>
-                    </div>
-                </div>
-
-                <div class="input-pair">
-                    <label for="board-resolutions-student-signatories">Student Signatories</label>
-                    <div id="board-resolutions-student-signatories">
+                <div class="w-full">
+                    <label class="mb-2 block text-sm font-medium text-ink-2">Student Signatories</label>
+                    <div id="board-resolutions-student-signatories" class="space-y-4 rounded-lg border border-edge bg-surface-lowered p-4">
                         {% for organization in student_organizations %}
-                        <fieldset>
-                            <legend>{{ organization.student_organizations_name }}</legend>
-                            {% for user in organization.users %}
-                            <div>
-                                <input type="checkbox" name="board-resolutions-student-signatories"
-                                    value="{{ user.users_id }}" id="user-{{ user.users_id }}">
-                                <label for="user-{{ user.users_id }}">{{ user.users_first_name }} {{
-                                    user.users_last_name }} - {{ user.users_student_organization_position }}</label>
+                        <fieldset class="space-y-2">
+                            <legend class="mb-2 text-sm font-semibold text-ink">{{ organization.student_organizations_name }}</legend>
+                            <div class="grid gap-2 sm:grid-cols-2">
+                                {% for user in organization.users %}
+                                <label class="flex items-start gap-2 rounded-lg border border-edge p-2 text-sm text-ink-2 transition-colors hover:bg-surface cursor-pointer">
+                                    <input type="checkbox" name="board-resolutions-student-signatories" value="{{ user.users_id }}" id="user-{{ user.users_id }}" class="mt-1 h-4 w-4 rounded border-edge text-accent focus:ring-accent">
+                                    <span>{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</span>
+                                </label>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
                         </fieldset>
                         {% endfor %}
                     </div>
                 </div>
 
-                <div class="input-pair">
-                    <label for="board-resolutions-prepared-by">Prepared By</label>
-                    <select name="board-resolutions-prepared-by" id="board-resolutions-prepared-by" required>
-                        <option value="" disabled selected>Select Preparer</option>
-                        {% for organization in student_organizations %}
-                        <optgroup label="{{ organization.student_organizations_name }}">
-                            {% for user in organization.users %}
-                            <option value="{{ user.users_id }}">
-                                {{ user.users_first_name }} {{ user.users_last_name }} - {{
-                                user.users_student_organization_position }}
-                            </option>
-                            {% endfor %}
-                        </optgroup>
+                {% call select('board-resolutions-prepared-by', 'board-resolutions-prepared-by', label='Prepared By', required=true) %}
+                    <option value="" disabled selected>Select Preparer</option>
+                    {% for organization in student_organizations %}
+                    <optgroup label="{{ organization.student_organizations_name }}">
+                        {% for user in organization.users %}
+                        <option value="{{ user.users_id }}">{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</option>
                         {% endfor %}
-                    </select>
-                </div>
+                    </optgroup>
+                    {% endfor %}
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="board-resolutions-approved-by">Approved By</label>
-                    <select name="board-resolutions-approved-by" id="board-resolutions-approved-by" required>
-                        <option value="" disabled selected>Select Approver</option>
-                        {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">
-                        {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{
-                        signatory.signatory_position }}{% if signatory.signatory_department %}, {{
-                        signatory.signatory_department }}{% endif %}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                {% call select('board-resolutions-approved-by', 'board-resolutions-approved-by', label='Approved By', required=true) %}
+                    <option value="" disabled selected>Select Approver</option>
+                    {% for signatory in signatories %}
+                    <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }}{% if signatory.signatory_department %}, {{ signatory.signatory_department }}{% endif %}</option>
+                    {% endfor %}
+                {% endcall %}
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <div class="horizontal-input-pair">
-                    <a href="{{ url_for('board_resolutions.board_resolutions_overview') }}"
-                        class="secondary-button fit-content-button">Cancel</a>
-                    <button class="primary-button" type="submit">Add Board Resolution</button>
+                <div class="flex flex-wrap items-center justify-end gap-3 pt-2">
+                    {{ button_link('Cancel', url_for('board_resolutions.board_resolutions_overview'), variant='secondary') }}
+                    {{ button('Add Board Resolution', type='submit') }}
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}
 
 {% block script %}
-
 <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
 <script src="{{ url_for('static', filename='js/board-resolutions/add-board-resolution.js') }}"></script>
-
 {% endblock %}

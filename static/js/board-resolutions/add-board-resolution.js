@@ -5,14 +5,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize conditional field toggling
     toggleConditionalField(
         'board-resolutions-academic-year',
-        'other-academic-year-input',
+        'other-academic-year-container',
         'other-academic-year-input',
         'Other'
     );
 
     toggleConditionalField(
         'board-resolutions-events-id',
-        'other-event-name-input',
+        'other-event-name-container',
         'other-event-name-input',
         'Other'
     );

@@ -1,75 +1,70 @@
 {% extends "base.html" %}
+{% from 'macros.forms.html' import input, select, textarea, file_input %}
+{% from 'macros.ui.html' import button, button_link, alert, card %}
+{% from 'macros.icons.html' import lucide %}
 
 {% block title %}Add Minutes of the Meeting{% endblock %}
 
 {% block content %}
 
-<div class="council-overview-container">
+<div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
     {% include "dashboard/council-overview-sidebar.html" %}
 
-    <div class="council-overview-content-container">
-
-        <a href="{{ url_for('meetings.minutes_of_the_meeting_overview') }}" class="primary-button fit-content-button">Back to Minutes of the Meeting Overview</a>
-
-        <!-- Flash messages section for the modal -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="flash-messages center no-top-margin bottom-margin">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
-        <div class="container">
-            <h2>Add Minutes of the Meeting</h2>
-
-            <form method="POST" action="{{ url_for('meetings.add_minutes_of_the_meeting') }}" enctype="multipart/form-data">
-                <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-date">Date</label>
-                    <input type="datetime-local" name="minutes-of-the-meeting-date" id="minutes-of-the-meeting-date" required>
+    <main class="flex-1 overflow-auto p-4 lg:p-8">
+        <div class="mx-auto max-w-3xl space-y-6">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-ink">Add Minutes of the Meeting</h1>
+                    <p class="mt-1 text-sm text-ink-2">Record meeting details, attendees, and documentation.</p>
                 </div>
+                {{ button_link('Back', url_for('meetings.minutes_of_the_meeting_overview'), variant='secondary', icon='arrow-left', class='shrink-0') }}
+            </div>
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-semester">Semester</label>
-                    <select name="minutes-of-the-meeting-semester" id="minutes-of-the-meeting-semester" required>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="space-y-3">
+                {% for category, message in messages %}
+                {{ alert(message, category) }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('meetings.add_minutes_of_the_meeting') }}" class="space-y-6">
+                <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
+
+                {% call card(title='Meeting Details', class='p-0', body_class='space-y-5') %}
+                    {{ input('minutes-of-the-meeting-date', 'minutes-of-the-meeting-date', label='Date', type='datetime-local', required=true) }}
+
+                    {% call select('minutes-of-the-meeting-semester', 'minutes-of-the-meeting-semester', label='Semester', required=true) %}
                         <option value="" disabled selected>Select a Semester</option>
                         <option value="1st Semester">1st Semester</option>
                         <option value="2nd Semester">2nd Semester</option>
-                    </select>
-                </div>
+                    {% endcall %}
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-academic-year">Academic Year</label>
-                    <select name="minutes-of-the-meeting-academic-year" id="minutes-of-the-meeting-academic-year" required>
+                    {% call select('minutes-of-the-meeting-academic-year', 'minutes-of-the-meeting-academic-year', label='Academic Year', required=true) %}
                         <option value="" disabled selected>Select an Academic Year</option>
                         {% for year in academic_years %}
                         <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
                         <option value="Other">Other A.Y.</option>
-                    </select>
-                </div>
+                    {% endcall %}
 
-                <div class="input-pair" id="other-academic-year-container" style="display: none;">
-                    <label for="other-academic-year">Other Academic Year</label>
-                    <input type="text" name="other-academic-year" id="other-academic-year" placeholder="Enter Academic Year">
-                </div>
+                    <div id="other-academic-year-container" class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('other-academic-year', 'other-academic-year', label='Other Academic Year', placeholder='Enter Academic Year') }}
+                    </div>
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-status">Status</label>
-                    <select name="minutes-of-the-meeting-status" id="minutes-of-the-meeting-status" required>
+                    {% call select('minutes-of-the-meeting-status', 'minutes-of-the-meeting-status', label='Status', required=true) %}
                         <option value="" disabled selected>Select a Status</option>
                         <option value="Upcoming">Upcoming</option>
                         <option value="Postponed">Postponed</option>
                         <option value="Done">Done</option>
                         <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
+                    {% endcall %}
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-presiding-officer">Presiding Officer</label>
-                    <select name="minutes-of-the-meeting-presiding-officer" id="minutes-of-the-meeting-presiding-officer" required>
+                {% call card(title='Meeting Information', class='p-0', body_class='space-y-5') %}
+                    {% call select('minutes-of-the-meeting-presiding-officer', 'minutes-of-the-meeting-presiding-officer', label='Presiding Officer', required=true) %}
                         <option value="" disabled selected>Select a Presiding Officer</option>
                         {% for organization in student_organizations %}
                         <optgroup label="{{ organization.student_organizations_name }}">
@@ -80,56 +75,42 @@
                             {% endfor %}
                         </optgroup>
                         {% endfor %}
-                    </select>
-                </div>
+                    {% endcall %}
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-attendees">Attendees</label>
-                    <div id="minutes-of-the-meeting-attendees">
-                        {% for organization in student_organizations %}
-                        <fieldset>
-                            <legend>{{ organization.student_organizations_name }}</legend>
-                            {% for user in organization.users %}
-                            <div>
-                                <label><input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}">
-                                {{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</label>
-                            </div>
+                    <div class="w-full">
+                        <label class="mb-2 block text-sm font-medium text-ink-2">Attendees</label>
+                        <div id="minutes-of-the-meeting-attendees" class="space-y-4 rounded-lg border border-edge bg-surface-lowered p-4">
+                            {% for organization in student_organizations %}
+                            <fieldset class="space-y-2">
+                                <legend class="text-sm font-semibold text-ink">{{ organization.student_organizations_name }}</legend>
+                                <div class="grid gap-2 sm:grid-cols-2">
+                                    {% for user in organization.users %}
+                                    <label class="flex items-start gap-2 rounded-lg border border-edge p-2 text-sm text-ink-2 transition-colors hover:bg-surface cursor-pointer">
+                                        <input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" class="mt-1 h-4 w-4 rounded border-edge text-accent focus:ring-accent">
+                                        <span>{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </fieldset>
                             {% endfor %}
-                        </fieldset>
-                        {% endfor %}
+                        </div>
                     </div>
-                </div>
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-agenda">Agenda</label>
-                    <textarea name="minutes-of-the-meeting-agenda" id="minutes-of-the-meeting-agenda" placeholder="Agenda" required></textarea>
-                </div>
+                    {{ textarea('minutes-of-the-meeting-agenda', 'minutes-of-the-meeting-agenda', label='Agenda', placeholder='Agenda', required=true) }}
 
+                    {{ file_input('meeting-recording', 'meeting-recording', label='Meeting Recording', accept='audio/*,video/*', file_name_id='meeting-recording-file-name') }}
+                    <p class="text-xs text-ink-3">Upload audio (max 9.5 hours) or video (max 2 hours) recording of the meeting.</p>
 
-                <div class="input-pair">
-                    <label for="meeting-recording">Meeting Recording</label>
-                    <input type="file" name="meeting-recording" id="meeting-recording" hidden accept="audio/*,video/*">
-                    <label for="meeting-recording" class="custom-file-upload-input">
-                        <span class="choose-file-text">Choose Files</span>
-                        <span id="meeting-recording-file-name" class="file-name">No files chosen</span>
-                    </label>
-                    <p>Upload audio (max 9.5 hours) or video (max 2 hours) recording of the meeting</p>
-                </div>
+                    {{ input('minutes-of-the-meeting-adjourned', 'minutes-of-the-meeting-adjourned', label='Adjourned', type='datetime-local') }}
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-adjourned">Adjourned</label>
-                    <input type="datetime-local" name="minutes-of-the-meeting-adjourned" id="minutes-of-the-meeting-adjourned">
-                </div>
+                {% call card(title='Approval & Noted By', class='p-0', body_class='space-y-5') %}
+                    <div class="w-full">
+                        {{ input('minutes-of-the-meeting-prepared-by-display', 'minutes-of-the-meeting-prepared-by-display', label='Prepared By', value=current_user.users_first_name + ' ' + current_user.users_last_name + ' - ' + current_user.users_student_organization_position + ' - ' + student_org_name, attrs='readonly') }}
+                        <input type="hidden" name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by" value="{{ current_user.users_id }}">
+                    </div>
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-prepared-by">Prepared By</label>
-                    <input type="text" name="minutes-of-the-meeting-prepared-by-display" id="minutes-of-the-meeting-prepared-by-display" value="{{ current_user.users_first_name }} {{ current_user.users_last_name }} - {{ current_user.users_student_organization_position }} - {{ student_org_name }}" readonly>
-                    <input type="hidden" name="minutes-of-the-meeting-prepared-by" id="minutes-of-the-meeting-prepared-by" value="{{ current_user.users_id }}">
-                </div>
-
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-approved-by">Approved By</label>
-                    <select name="minutes-of-the-meeting-approved-by" id="minutes-of-the-meeting-approved-by">
+                    {% call select('minutes-of-the-meeting-approved-by', 'minutes-of-the-meeting-approved-by', label='Approved By') %}
                         <option value="" disabled selected>Select a User</option>
                         {% for organization_id, members in users|selectattr('users_role', 'equalto', 'Student Council Officer')|groupby('users_student_organization') %}
                         <optgroup label="{{ org_dict[organization_id] }}">
@@ -138,69 +119,62 @@
                             {% endfor %}
                         </optgroup>
                         {% endfor %}
-                    </select>
-                </div>
+                    {% endcall %}
 
-                <div class="input-pair">
-                    <label for="minutes-of-the-meeting-noted-by">Noted By</label>
-                    <select name="minutes-of-the-meeting-noted-by" id="minutes-of-the-meeting-noted-by" required>
+                    {% call select('minutes-of-the-meeting-noted-by', 'minutes-of-the-meeting-noted-by', label='Noted By', required=true) %}
                         <option value="" disabled selected>Select a Signatory</option>
                         {% for signatory in signatories %}
-                        <option value="{{ signatory.signatory_id }}">{{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }} - {{ signatory.signatory_department }}</option>
+                        <option value="{{ signatory.signatory_id }}">
+                            {{ signatory.signatory_first_name }} {{ signatory.signatory_last_name }} - {{ signatory.signatory_position }} - {{ signatory.signatory_department }}
+                        </option>
                         {% endfor %}
                         <option value="add-new-noted-by">Add new signatory</option>
-                    </select>
-                </div>
+                    {% endcall %}
 
-                <!-- New signatory fields for Noted By -->
-                <div class="input-pair" style="display: none;">
-                    <label for="new-noted-by-title">Title</label>
-                    <input type="text" name="new-noted-by-title" id="new-noted-by-title" placeholder="Title">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-noted-by-first-name">First Name</label>
-                    <input type="text" name="new-noted-by-first-name" id="new-noted-by-first-name" placeholder="First Name">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-noted-by-middle-name">Middle Name</label>
-                    <input type="text" name="new-noted-by-middle-name" id="new-noted-by-middle-name" placeholder="Middle Name">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-noted-by-last-name">Last Name</label>
-                    <input type="text" name="new-noted-by-last-name" id="new-noted-by-last-name" placeholder="Last Name">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-noted-by-suffix">Suffix</label>
-                    <input type="text" name="new-noted-by-suffix" id="new-noted-by-suffix" placeholder="Suffix">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-noted-by-position">Position</label>
-                    <input type="text" name="new-noted-by-position" id="new-noted-by-position" placeholder="Position">
-                </div>
-                <div class="input-pair" style="display: none;">
-                    <label for="new-noted-by-department">Department</label>
-                    <input type="text" name="new-noted-by-department" id="new-noted-by-department" placeholder="Department">
-                </div>
+                    <div class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('new-noted-by-title', 'new-noted-by-title', label='Title', placeholder='Title') }}
+                    </div>
+                    <div class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('new-noted-by-first-name', 'new-noted-by-first-name', label='First Name', placeholder='First Name') }}
+                    </div>
+                    <div class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('new-noted-by-middle-name', 'new-noted-by-middle-name', label='Middle Name', placeholder='Middle Name') }}
+                    </div>
+                    <div class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('new-noted-by-last-name', 'new-noted-by-last-name', label='Last Name', placeholder='Last Name') }}
+                    </div>
+                    <div class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('new-noted-by-suffix', 'new-noted-by-suffix', label='Suffix', placeholder='Suffix') }}
+                    </div>
+                    <div class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('new-noted-by-position', 'new-noted-by-position', label='Position', placeholder='Position') }}
+                    </div>
+                    <div class="new-signatory-field flex-col" style="display:none;">
+                        {{ input('new-noted-by-department', 'new-noted-by-department', label='Department', placeholder='Department') }}
+                    </div>
+                {% endcall %}
 
-                <div class="input-pair">
-                    <label for="photo-documentation">Photo Documentation</label>
-                    <input type="file" name="photo-documentation" id="photo-documentation" hidden accept="image/jpeg, image/jpg, image/png" multiple>
-                    <label for="photo-documentation" class="custom-file-upload-input">
-                        <span class="choose-file-text">Choose Files</span>
-                        <span id="photo-documentation-file-name" class="file-name">No files chosen</span>
-                    </label>
-                    <p>Supported file types: .jpeg, .jpg, .png</p>
-                </div>
+                {% call card(title='Photo Documentation', class='p-0', body_class='space-y-5') %}
+                    <div class="w-full">
+                        <label class="mb-1.5 block text-sm font-medium text-ink-2">Photo Documentation</label>
+                        <input type="file" name="photo-documentation" id="photo-documentation" accept="image/jpeg, image/jpg, image/png" multiple class="hidden">
+                        <label for="photo-documentation" class="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm transition-colors hover:bg-surface-lowered">
+                            <span class="font-medium text-ink-2 choose-file-text">Choose Files</span>
+                            <span id="photo-documentation-file-name" class="truncate text-ink-3 file-name">No files chosen</span>
+                        </label>
+                        <p class="mt-1 text-xs text-ink-3">Supported file types: .jpeg, .jpg, .png</p>
+                    </div>
+                {% endcall %}
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <div class="horizontal-button-pair-positioned-right">
-                    <a href="{{ url_for('meetings.minutes_of_the_meeting_overview') }}" class="secondary-button fit-content-button">Cancel</a>
-                    <button class="primary-button" type="submit">Add Minutes of the Meeting</button>
+                <div class="flex flex-wrap items-center justify-end gap-3 pt-2">
+                    {{ button_link('Cancel', url_for('meetings.minutes_of_the_meeting_overview'), variant='secondary') }}
+                    {{ button('Add Minutes', type='submit') }}
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 </div>
 
 {% endblock %}

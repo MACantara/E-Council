@@ -380,17 +380,18 @@ function addDynamicInput(containerId, name, placeholder, type = 'text') {
     if (!container) return;
 
     const div = document.createElement('div');
-    div.className = 'input-group';
+    div.className = 'flex items-center gap-2';
 
     const input = document.createElement('input');
     input.type = type;
     input.name = name;
     input.placeholder = placeholder;
     input.required = true;
+    input.className = 'w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent';
 
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
-    removeBtn.className = 'delete-btn';
+    removeBtn.className = 'inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white';
     removeBtn.textContent = 'Delete';
     removeBtn.addEventListener('click', function () {
         div.remove();
@@ -452,17 +453,18 @@ function populateFieldsFromBulletPoints(containerId, items, name) {
     // Add additional items
     for (let i = 1; i < items.length; i++) {
         const div = document.createElement('div');
-        div.className = 'input-group';
+        div.className = 'flex items-center gap-2';
 
         const input = document.createElement('input');
         input.type = 'text';
         input.name = name;
         input.value = items[i];
         input.required = true;
+        input.className = 'w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent';
 
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
-        removeBtn.className = 'delete-btn';
+        removeBtn.className = 'inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white';
         removeBtn.textContent = 'Delete';
         removeBtn.addEventListener('click', function () {
             div.remove();

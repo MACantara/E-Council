@@ -55,7 +55,10 @@ function toggleNewSignatoryFields(selectElement, prefix) {
     fields.forEach(field => {
         const fieldElement = document.getElementById(`new-${prefix}-${field}`);
         if (fieldElement) {
-            fieldElement.parentElement.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
+            const wrapper = fieldElement.closest('.new-signatory-field');
+            if (wrapper) {
+                wrapper.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
+            }
         }
     });
 }

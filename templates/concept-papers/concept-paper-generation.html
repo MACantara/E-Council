@@ -1,68 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% from 'macros.forms.html' import input, textarea, file_input %}
+{% from 'macros.ui.html' import button, button_link %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concept Paper Form</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
+{% block title %}Concept Paper Form{% endblock %}
 
-<body>
-    <h1>Fill in the Concept Paper Form</h1>
-    <form method="post" enctype="multipart/form-data">
-        <h2>FOR</h2>
-        <input type="text" name="signatory_name_1" placeholder="Signatory Name 1" value="RENO R. RAYEL, DBA">
-        <input type="text" name="signatory_position_1" placeholder="Signatory Position 1" value="School Director">
+{% block content %}
 
-        <h2>THRU</h2>
-        <input type="text" name="signatory_name_2" placeholder="Signatory Name 2" value="MS. KRISTINA ROSE G. CARLOS, RGC, RPm">
-        <input type="text" name="signatory_position_2" placeholder="Signatory Position 2" value="Head">
-        <input type="text" name="signatory_department_2" placeholder="Signatory Department 2" value="Student Affairs & Services">
+<div class="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4 lg:p-8">
+    <div class="w-full max-w-3xl space-y-6 rounded-xl border border-edge bg-surface p-6 shadow-sm lg:p-8">
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-ink">Fill in the Concept Paper Form</h1>
+            <p class="mt-1 text-sm text-ink-2">Generate the concept paper document from the details below.</p>
+        </div>
 
-        <h2>FROM</h2>
-        <input type="text" name="signatory_name_3" placeholder="Signatory Name 3" value="PASTOR ARGUELLES JR., Ph.D.c">
-        <input type="text" name="signatory_position_3" placeholder="Signatory Position 3" value="Dean">
-        <input type="text" name="signatory_department_3" placeholder="Signatory Department 3" value="College of Computer Studies">
+        <form method="post" enctype="multipart/form-data" action="" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <h2>SUBJECT</h2>
-        <input type="text" name="subject_title" placeholder="Subject Title" value="College of Computer Studies Christmas Party 202">
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">FOR</h2>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    {{ input('signatory_name_1', 'signatory_name_1', label='Signatory Name', value='RENO R. RAYEL, DBA') }}
+                    {{ input('signatory_position_1', 'signatory_position_1', label='Signatory Position', value='School Director') }}
+                </div>
+            </section>
 
-        <h2>CONCEPT PAPER FORM</h2>
-        <textarea name="descriptions" placeholder="Descriptions">The College of Computer Studies Officers of the University of Perpetual Help – Molino intends to conduct a Christmas Party for all College of Computer Studies Officers on December 13, 2023, in Main Building Room 203. This Christmas Party aims to make the students’ Christmas special.</textarea>
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">THRU</h2>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    {{ input('signatory_name_2', 'signatory_name_2', label='Signatory Name', value='MS. KRISTINA ROSE G. CARLOS, RGC, RPm') }}
+                    {{ input('signatory_position_2', 'signatory_position_2', label='Signatory Position', value='Head') }}
+                    {{ input('signatory_department_2', 'signatory_department_2', label='Signatory Department', value='Student Affairs & Services') }}
+                </div>
+            </section>
 
-        <h2>OBJECTIVES AND LEARNING OUTCOMES</h2>
-        <input type="text" name="objective_of_the_activity_1" placeholder="Objective of the Activity 1" value="The activity aims to make the students remember and make them feel the presence of Christmas.">
-        <input type="text" name="objective_of_the_activity_2" placeholder="Objective of the Activity 2" value="Christmas Dinner a buffet-style dinner will be served to all attendees.">
-        <input type="text" name="objective_of_the_activity_3" placeholder="Objective of the Activity 3" value="Exchange gifts with student officers will have the opportunity to exchange gifts with their peers.">
-        <input type="text" name="objective_of_the_activity_4" placeholder="Objective of the Activity 4" value="A variety of games will be played, such as bingo, trivia, and karaoke.">
-        <input type="text" name="learning_outcome_1" placeholder="Learning Outcome 1" value="The students will feel the presence of Christmas and remember the birth of our Savior.">
-        <input type="text" name="learning_outcome_2" placeholder="Learning Outcome 2" value="Students will have the opportunity to socialize with their peers and faculty in a festive setting.">
-        <input type="text" name="learning_outcome_3" placeholder="Learning Outcome 3" value="Students will learn about the importance of giving and receiving.">
-        <input type="text" name="learning_outcome_4" placeholder="Learning Outcome 4" value="Students will develop their creative and problem-solving skills.">
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">FROM</h2>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    {{ input('signatory_name_3', 'signatory_name_3', label='Signatory Name', value='PASTOR ARGUELLES JR., Ph.D.c') }}
+                    {{ input('signatory_position_3', 'signatory_position_3', label='Signatory Position', value='Dean') }}
+                    {{ input('signatory_department_3', 'signatory_department_3', label='Signatory Department', value='College of Computer Studies') }}
+                </div>
+            </section>
 
-        <h2>EXPECTED NO. OF PARTICIPANTS</h2>
-        <input type="number" name="number_of_expected_students" placeholder="Number of Expected Students" value="18">
-        <input type="number" name="number_of_expected_faculty" placeholder="Number of Expected Faculty" value="7">
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">SUBJECT</h2>
+                {{ input('subject_title', 'subject_title', label='Subject Title', value='College of Computer Studies Christmas Party 202') }}
+            </section>
 
-        <h2>PREPARED BY</h2>
-        <input type="text" name="prepared_by_name" placeholder="Prepared By Name" value="ANGELO GABRIELLE D. RODRIGUEZ">
-        <input type="text" name="prepared_by_position" placeholder="Prepared By Position" value="President">
-        <input type="text" name="prepared_by_student_council" placeholder="Prepared By Student Council" value="JPCS Council">
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">CONCEPT PAPER FORM</h2>
+                {{ textarea('descriptions', 'descriptions', label='Descriptions', value='The College of Computer Studies Officers of the University of Perpetual Help – Molino intends to conduct a Christmas Party for all College of Computer Studies Officers on December 13, 2023, in Main Building Room 203. This Christmas Party aims to make the students’ Christmas special.', rows=5) }}
+            </section>
 
-        <h2>SIGNED AND REVIEWED BY</h2>
-        <input type="text" name="signed_and_reviewed_by_name" placeholder="Signed and Reviewed By Name" value="MHARTIN JOSHUA B. DEREZ">
-        <input type="text" name="signed_and_reviewed_by_position" placeholder="Signed and Reviewed By Position" value="President">
-        <input type="text" name="signed_and_reviewed_by_student_council" placeholder="Signed and Reviewed By Student Council" value="CCS Council">
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">OBJECTIVES AND LEARNING OUTCOMES</h2>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    {{ input('objective_of_the_activity_1', 'objective_of_the_activity_1', label='Objective 1', value='The activity aims to make the students remember and make them feel the presence of Christmas.') }}
+                    {{ input('objective_of_the_activity_2', 'objective_of_the_activity_2', label='Objective 2', value='Christmas Dinner a buffet-style dinner will be served to all attendees.') }}
+                    {{ input('objective_of_the_activity_3', 'objective_of_the_activity_3', label='Objective 3', value='Exchange gifts with student officers will have the opportunity to exchange gifts with their peers.') }}
+                    {{ input('objective_of_the_activity_4', 'objective_of_the_activity_4', label='Objective 4', value='A variety of games will be played, such as bingo, trivia, and karaoke.') }}
+                    {{ input('learning_outcome_1', 'learning_outcome_1', label='Learning Outcome 1', value='The students will feel the presence of Christmas and remember the birth of our Savior.') }}
+                    {{ input('learning_outcome_2', 'learning_outcome_2', label='Learning Outcome 2', value='Students will have the opportunity to socialize with their peers and faculty in a festive setting.') }}
+                    {{ input('learning_outcome_3', 'learning_outcome_3', label='Learning Outcome 3', value='Students will learn about the importance of giving and receiving.') }}
+                    {{ input('learning_outcome_4', 'learning_outcome_4', label='Learning Outcome 4', value='Students will develop their creative and problem-solving skills.') }}
+                </div>
+            </section>
 
-        <h2>UPLOAD ADDITIONAL CONTEXT</h2>
-        <input type="file" name="additional_context">
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">EXPECTED NO. OF PARTICIPANTS</h2>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    {{ input('number_of_expected_students', 'number_of_expected_students', label='Number of Expected Students', type='number', value='18') }}
+                    {{ input('number_of_expected_faculty', 'number_of_expected_faculty', label='Number of Expected Faculty', type='number', value='7') }}
+                </div>
+            </section>
 
-        <button type="submit">Generate Document</button>
-    </form>
-    {% if download_link %}
-    <a href="{{ url_for('uploads', filename=download_link) }}" download>Download Concept Paper</a>
-    {% endif %}
-</body>
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">PREPARED BY</h2>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    {{ input('prepared_by_name', 'prepared_by_name', label='Name', value='ANGELO GABRIELLE D. RODRIGUEZ') }}
+                    {{ input('prepared_by_position', 'prepared_by_position', label='Position', value='President') }}
+                    {{ input('prepared_by_student_council', 'prepared_by_student_council', label='Student Council', value='JPCS Council') }}
+                </div>
+            </section>
 
-</html>
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">SIGNED AND REVIEWED BY</h2>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    {{ input('signed_and_reviewed_by_name', 'signed_and_reviewed_by_name', label='Name', value='MHARTIN JOSHUA B. DEREZ') }}
+                    {{ input('signed_and_reviewed_by_position', 'signed_and_reviewed_by_position', label='Position', value='President') }}
+                    {{ input('signed_and_reviewed_by_student_council', 'signed_and_reviewed_by_student_council', label='Student Council', value='CCS Council') }}
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h2 class="text-lg font-semibold text-ink">UPLOAD ADDITIONAL CONTEXT</h2>
+                {{ file_input('additional_context', 'additional_context', label='Additional Context') }}
+            </section>
+
+            <div class="flex flex-wrap justify-end gap-3 pt-2">
+                {{ button('Generate Document', type='submit') }}
+            </div>
+        </form>
+
+        {% if download_link %}
+        <div class="flex justify-center">
+            {{ button_link('Download Concept Paper', url_for('uploads', filename=download_link), variant='primary') }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

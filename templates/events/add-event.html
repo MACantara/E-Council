@@ -19,14 +19,14 @@
             <form method="POST" action="{{ url_for('events.add_event') }}" class="space-y-5 rounded-xl border border-edge bg-surface p-6 shadow-sm">
                 <input type="hidden" name="show_modal" id="show_modal" value="{{ 'true' if show_modal else 'false' }}">
 
-                {% call select('creation-method', 'creation-method', label='Creation Method', required=true, class='input-pair') %}
+                {% call select('creation-method', 'creation-method', label='Creation Method', required=true) %}
                     <option value="" disabled selected>Select Creation Method</option>
                     <option value="scratch">Create from Scratch</option>
                     <option value="existing">Create from Existing Concept Paper</option>
                 {% endcall %}
 
                 <div id="concept-paper-container" style="display: none;">
-                    {% call select('concept-paper-forms-id', 'concept-paper-forms-id', label='Concept Paper', class='input-pair') %}
+                    {% call select('concept-paper-forms-id', 'concept-paper-forms-id', label='Concept Paper') %}
                         <option value="" disabled selected>Select Concept Paper</option>
                         {% for concept_paper in concept_papers %}
                         <option value="{{ concept_paper.concept_paper_forms_id }}">{{ concept_paper.concept_paper_forms_subject }}</option>
@@ -34,15 +34,15 @@
                     {% endcall %}
                 </div>
 
-                {{ input('events-name', 'events-name', label='Event Name', placeholder='Event Name', required=true, class='input-pair') }}
+                {{ input('events-name', 'events-name', label='Event Name', placeholder='Event Name', required=true) }}
 
-                {% call select('events-semester', 'events-semester', label='Semester', required=true, class='input-pair') %}
+                {% call select('events-semester', 'events-semester', label='Semester', required=true) %}
                     <option value="" disabled selected>Select a Semester</option>
                     <option value="1st Semester">1st Semester</option>
                     <option value="2nd Semester">2nd Semester</option>
                 {% endcall %}
 
-                {% call select('events-academic-year', 'events-academic-year', label='Academic Year', required=true, class='input-pair') %}
+                {% call select('events-academic-year', 'events-academic-year', label='Academic Year', required=true) %}
                     <option value="" disabled selected>Select an Academic Year</option>
                     {% for year in academic_years %}
                     <option value="{{ year.events_academic_year }}">A.Y. {{ year.events_academic_year }}</option>
@@ -51,15 +51,15 @@
                 {% endcall %}
 
                 <div id="other-academic-year-container" style="display: none;">
-                    {{ input('other-academic-year', 'other-academic-year', label='Other Academic Year', placeholder='Enter Academic Year', class='input-pair') }}
+                    {{ input('other-academic-year', 'other-academic-year', label='Other Academic Year', placeholder='Enter Academic Year') }}
                 </div>
 
-                {{ input('events-start-date-and-time', 'events-start-date-and-time', label='Start Date and Time', type='datetime-local', required=true, class='input-pair') }}
-                {{ input('events-end-date-and-time', 'events-end-date-and-time', label='End Date and Time', type='datetime-local', required=true, class='input-pair') }}
-                {{ input('events-venue', 'events-venue', label='Venue', placeholder='Venue', required=true, class='input-pair') }}
-                {{ input('events-budget', 'events-budget', label='Budget', type='number', placeholder='Budget', required=true, class='input-pair') }}
+                {{ input('events-start-date-and-time', 'events-start-date-and-time', label='Start Date and Time', type='datetime-local', required=true) }}
+                {{ input('events-end-date-and-time', 'events-end-date-and-time', label='End Date and Time', type='datetime-local', required=true) }}
+                {{ input('events-venue', 'events-venue', label='Venue', placeholder='Venue', required=true) }}
+                {{ input('events-budget', 'events-budget', label='Budget', type='number', placeholder='Budget', required=true) }}
 
-                {% call select('events-status', 'events-status', label='Event Status', required=true, class='input-pair') %}
+                {% call select('events-status', 'events-status', label='Event Status', required=true) %}
                     <option value="" disabled selected>Select an Event Status</option>
                     <option value="Upcoming">Upcoming</option>
                     <option value="Postponed">Postponed</option>
@@ -67,8 +67,8 @@
                     <option value="Cancelled">Cancelled</option>
                 {% endcall %}
 
-                {{ textarea('events-description', 'events-description', label='Description', placeholder='Description', required=true, class='input-pair') }}
-                {{ input('events-remarks', 'events-remarks', label='Remarks', placeholder='Remarks (Optional)', class='input-pair') }}
+                {{ textarea('events-description', 'events-description', label='Description', placeholder='Description', required=true) }}
+                {{ input('events-remarks', 'events-remarks', label='Remarks', placeholder='Remarks (Optional)') }}
 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 

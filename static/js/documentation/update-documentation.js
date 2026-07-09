@@ -86,10 +86,10 @@ function updateSelectOptions(selectId, data, valueField, textField, defaultText)
 function addNewField(containerId, name, placeholder) {
     const container = document.getElementById(containerId + '-list');
     const newItem = document.createElement('div');
-    newItem.className = 'dynamic-item';
+    newItem.className = 'dynamic-item flex items-center gap-2';
     newItem.innerHTML = `
-        <input type="text" name="${name}[]" class="form-input" placeholder="Enter ${placeholder}" required>
-        <button type="button" class="remove-item-btn secondary-button">&times;</button>
+        <input type="text" name="${name}[]" class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Enter ${placeholder}" required>
+        <button type="button" class="remove-item-btn inline-flex shrink-0 items-center justify-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">&times;</button>
     `;
     container.appendChild(newItem);
 
@@ -158,7 +158,7 @@ function removeExistingAttendanceImage(button) {
 function removeExistingEventPhotoDocImage(button) {
     const imageItem = button.closest('.selected-file-item');
     const imageId = imageItem.getAttribute('data-image-id');
-    const deletedImagesInput = document.getElementById('deleted-photo-doc-images');
+    const deletedImagesInput = document.getElementById('deleted-event-photo-doc-images');
     const currentDeleted = deletedImagesInput.value ? deletedImagesInput.value.split(',') : [];
     currentDeleted.push(imageId);
     deletedImagesInput.value = currentDeleted.join(',');
@@ -185,10 +185,10 @@ function addNewStudent() {
     const studentList = document.getElementById('evaluation-student-list');
     if (!studentList) return;
     const newStudent = document.createElement('div');
-    newStudent.className = 'dynamic-item';
+    newStudent.className = 'dynamic-item flex items-center gap-2';
     newStudent.innerHTML = `
-        <input type="text" name="student-names[]" placeholder="Enter student name" required>
-        <button type="button" class="remove-item-btn secondary-button">×</button>
+        <input type="text" name="student-names[]" placeholder="Enter student name" class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
+        <button type="button" class="remove-item-btn inline-flex shrink-0 items-center justify-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">×</button>
     `;
     studentList.appendChild(newStudent);
 
@@ -202,13 +202,15 @@ function addNewStudent() {
 function initializeFileUploads() {
     setupFileUpload('evaluation-images', 'evaluation-files-name', 'evaluation-files-list');
     setupFileUpload('attendance-images', 'attendance-files-name', 'attendance-files-list');
-    setupFileUpload('photo-documentation-images', 'photo-doc-files-name', 'photo-doc-files-list', true);
+    setupFileUpload('event-photo-documentation-images', 'event-photo-doc-files-name', 'event-photo-doc-files-list', true);
 }
 
 function setupFileUpload(inputId, nameSpanId, listId, includePreview = false) {
     const input = document.getElementById(inputId);
     const filesNameSpan = document.getElementById(nameSpanId);
     const filesList = document.getElementById(listId);
+
+    if (!input) return;
 
     input.addEventListener('change', function() {
         updateFileList(this, filesNameSpan, filesList, includePreview);
@@ -232,23 +234,28 @@ function updateFileList(input, filesNameSpan, filesList, includePreview) {
 
 function createFileItem(file, index, input, includePreview) {
     const fileItem = document.createElement('div');
-    fileItem.className = 'selected-file-item';
+    fileItem.className = 'selected-file-item flex items-center justify-between gap-3 rounded-lg border border-edge bg-surface-lowered px-3.5 py-2.5';
 
-    const fileName = document.createElement('span');
-    fileName.textContent = file.name;
-
-    const removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'remove-file-btn';
-    removeBtn.textContent = '×';
-    removeBtn.addEventListener('click', () => removeFile(index, input));
-
-    fileItem.appendChild(fileName);
+    const fileInfo = document.createElement('div');
+    fileInfo.className = 'flex items-center gap-3 min-w-0';
 
     if (includePreview && file.type.startsWith('image/')) {
         const preview = createImagePreview(file);
-        fileItem.appendChild(preview);
+        fileInfo.appendChild(preview);
     }
+
+    const fileName = document.createElement('span');
+    fileName.textContent = file.name;
+    fileName.className = 'truncate text-sm text-ink';
+    fileInfo.appendChild(fileName);
+
+    fileItem.appendChild(fileInfo);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-file-btn inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-danger text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white';
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => removeFile(index, input));
 
     fileItem.appendChild(removeBtn);
     return fileItem;
@@ -256,10 +263,10 @@ function createFileItem(file, index, input, includePreview) {
 
 function createImagePreview(file) {
     const previewContainer = document.createElement('div');
-    previewContainer.className = 'file-preview-container';
+    previewContainer.className = 'file-preview-container h-10 w-10 shrink-0 overflow-hidden rounded-lg';
 
     const preview = document.createElement('img');
-    preview.className = 'file-preview';
+    preview.className = 'file-preview h-full w-full object-cover';
     preview.src = URL.createObjectURL(file);
 
     previewContainer.appendChild(preview);
@@ -301,20 +308,22 @@ function initializeTallySystem() {
 function syncTallyItems() {
     const tallyRows = document.querySelectorAll('.tally-table tbody tr');
     const evaluationTallyContainer = document.querySelector('.evaluation-tally-table tbody');
+    if (!evaluationTallyContainer) return;
 
     evaluationTallyContainer.innerHTML = '';
 
+    const radioClass = 'h-4 w-4 border-edge text-accent focus:ring-accent';
     tallyRows.forEach((row, index) => {
         const nameInput = row.querySelector('input[type="text"]');
         if (nameInput) {
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <td>${nameInput.value || `Item ${index + 1}`}</td>
-                <td><input type="radio" name="rating-${index}" value="1" required></td>
-                <td><input type="radio" name="rating-${index}" value="2"></td>
-                <td><input type="radio" name="rating-${index}" value="3"></td>
-                <td><input type="radio" name="rating-${index}" value="4"></td>
-                <td><input type="radio" name="rating-${index}" value="5"></td>
+                <td class="border-b border-edge px-3 py-2 text-sm text-ink">${nameInput.value || `Item ${index + 1}`}</td>
+                <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="rating-${index}" value="1" required></td>
+                <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="rating-${index}" value="2"></td>
+                <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="rating-${index}" value="3"></td>
+                <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="rating-${index}" value="4"></td>
+                <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="${radioClass}" name="rating-${index}" value="5"></td>
             `;
             evaluationTallyContainer.appendChild(newRow);
         }
