@@ -89,14 +89,14 @@ Phase 1 focuses on low-risk cleanup that improves security, documentation, and p
 **Scope**: `app.py` or `extensions.py`
 
 **Checklist**
-- [ ] Add an `after_request` handler in `app.py` (or use `Flask-Talisman`) that sets:
+- [x] Add an `after_request` handler in `app.py` (or use `Flask-Talisman`) that sets:
   - `X-Frame-Options: DENY`
   - `X-Content-Type-Options: nosniff`
   - `Referrer-Policy: strict-origin-when-cross-origin`
   - `Strict-Transport-Security` (when `SESSION_COOKIE_SECURE` is True)
   - `Content-Security-Policy` (start with `default-src 'self'; script-src 'self' 'unsafe-inline' ...` for CDNs, then tighten)
-- [ ] Add tests in `tests/test_security.py` asserting the headers are present on `GET /` and `GET /auth/login`.
-- [ ] Run the app and verify headers in browser dev tools.
+- [x] Add tests in `tests/test_security.py` asserting the headers are present on `GET /` and `GET /auth/login`.
+- [x] Run the app and verify headers in browser dev tools.
 
 **Acceptance criteria**: Every response includes the above headers; tests pass.
 

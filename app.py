@@ -139,11 +139,33 @@ def create_app(config_name=None):
     # Initialize serializer for events blueprint
     events_bp.init_serializer(app.config["SECRET_KEY"])
     
+    # Register security headers handler
+    @app.after_request
+    def set_security_headers(response):
+        response.headers.set("X-Frame-Options", "DENY")
+        response.headers.set("X-Content-Type-Options", "nosniff")
+        response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+        if app.config.get("SESSION_COOKIE_SECURE"):
+            response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: https://res.cloudinary.com; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self';"
+        )
+        response.headers.set("Content-Security-Policy", csp)
+        return response
+
     # Register index route
     @app.route("/")
     def index():
         return render_template("index.html")
-    
+
     return app
 
 
