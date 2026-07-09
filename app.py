@@ -66,7 +66,11 @@ def create_app(config_name=None):
     
     # Load configuration from the selected class
     app.config.from_object(config_class)
-    
+
+    # Run any configuration-specific initialization (e.g. production logging)
+    if hasattr(config_class, 'init_app'):
+        config_class.init_app(app)
+
     # Override SECRET_KEY with environment variable
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or app.config.get("SECRET_KEY")
     
@@ -184,19 +188,19 @@ def init_database(app):
         try:
             with db.engine.connect() as conn:
                 conn.execute(text('SELECT 1'))
-            print('Database connection successful.')
+            app.logger.info('Database connection successful.')
         except Exception as e:
-            print(f'Database connection failed: {e}')
+            app.logger.error('Database connection failed: %s', e, exc_info=True)
             return False
 
         try:
             # Import all models so db.create_all() registers every table
             import models
             db.create_all()
-            print('Database tables created/verified successfully.')
+            app.logger.info('Database tables created/verified successfully.')
             return True
         except Exception as e:
-            print(f'Failed to create database tables: {e}')
+            app.logger.error('Failed to create database tables: %s', e, exc_info=True)
             return False
 
 

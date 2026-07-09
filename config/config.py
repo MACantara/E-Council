@@ -3,7 +3,9 @@ Configuration classes for E-Council application.
 Provides environment-specific configuration management.
 """
 
+import logging
 import os
+from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -67,6 +69,40 @@ class ProductionConfig(Config):
 
     # Use Redis for rate limiting in production if available
     RATELIMIT_STORAGE_URI = os.getenv('REDIS_URL', 'memory://')
+
+    @staticmethod
+    def init_app(app):
+        """Initialize production configuration, logging, and optional Sentry."""
+        Config.init_app(app)
+
+        # Ensure logs directory exists and configure rotating file handler
+        logs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
+        os.makedirs(logs_dir, exist_ok=True)
+        file_handler = RotatingFileHandler(
+            os.path.join(logs_dir, 'app.log'),
+            maxBytes=10 * 1024 * 1024,
+            backupCount=10,
+        )
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        app.logger.setLevel(logging.INFO)
+
+        # Optionally initialize Sentry if DSN is configured
+        sentry_dsn = os.getenv('SENTRY_DSN')
+        if sentry_dsn:
+            try:
+                import sentry_sdk
+                from sentry_sdk.integrations.flask import FlaskIntegration
+                sentry_sdk.init(
+                    dsn=sentry_dsn,
+                    integrations=[FlaskIntegration()],
+                    traces_sample_rate=0.1,
+                )
+            except ImportError:
+                app.logger.warning('SENTRY_DSN is set but sentry-sdk is not installed')
 
 
 class TestingConfig(Config):

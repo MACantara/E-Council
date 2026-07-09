@@ -2,32 +2,62 @@
 Error handlers for E-Council.
 """
 
-from flask import flash, redirect, url_for
+import traceback
+from flask import flash, redirect, render_template, url_for
+from werkzeug.exceptions import HTTPException
 from cloudinary.exceptions import Error
 
 
 def handle_cloudinary_error(error):
     """
     Handle Cloudinary errors.
-    
+
     Args:
         error: Cloudinary error exception
-        
+
     Returns:
         Redirect with flash message
     """
     from flask import current_app
-    
-    current_app.logger.error(f"Cloudinary error: {str(error)}")
+
+    current_app.logger.error(
+        "Cloudinary error: %s\n%s", error, traceback.format_exc()
+    )
     flash("An error occurred while processing images.", "error")
-    return redirect(url_for('documentation_overview'))
+    return redirect(url_for('documentation.documentation_overview'))
+
+
+def handle_internal_error(error):
+    """
+    Handle unhandled/internal errors by logging the exception and showing a
+    user-friendly 500 page without exposing tracebacks.
+
+    Args:
+        error: Exception that was raised
+
+    Returns:
+        Response or tuple of rendered template and 500 status code
+    """
+    from flask import current_app
+
+    # Let non-500 HTTP exceptions (e.g. 403, 404, 429) use their normal
+    # responses instead of being rendered as a 500 page.
+    if isinstance(error, HTTPException) and error.code != 500:
+        return error.get_response()
+
+    current_app.logger.error(
+        "Unhandled internal error: %s\n%s", error, traceback.format_exc()
+    )
+    return render_template("500.html"), 500
 
 
 def register_error_handlers(app):
     """
     Register all error handlers with the Flask app.
-    
+
     Args:
         app: Flask application instance
     """
     app.errorhandler(Error)(handle_cloudinary_error)
+    app.errorhandler(500)(handle_internal_error)
+    app.errorhandler(Exception)(handle_internal_error)

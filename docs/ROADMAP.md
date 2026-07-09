@@ -215,12 +215,12 @@ Phase 2 builds the infrastructure needed for safer, faster development: validati
 **Scope**: `app.py`, `utils/error_handlers.py`, `config/config.py`
 
 **Checklist**
-- [ ] Replace `print()` in `app.py` `init_database` with `app.logger.info/error`.
-- [ ] Add a `logs/` directory and configure `RotatingFileHandler` in production config.
-- [ ] Add `current_app.logger.error()` calls in `utils/error_handlers.py` and route `try/except` blocks.
-- [ ] Add a global 500 handler in `utils/error_handlers.py` that logs the exception and returns a user-friendly message.
-- [ ] (Optional) Add Sentry SDK initialization in `config/config.py` `ProductionConfig`.
-- [ ] Add tests verifying logging calls are made on database failure and Cloudinary errors.
+- [x] Replace `print()` in `app.py` `init_database` with `app.logger.info/error`.
+- [x] Add a `logs/` directory and configure `RotatingFileHandler` in production config.
+- [x] Add `current_app.logger.error()` calls in `utils/error_handlers.py` and route `try/except` blocks.
+- [x] Add a global 500 handler in `utils/error_handlers.py` that logs the exception and returns a user-friendly message.
+- [x] (Optional) Add Sentry SDK initialization in `config/config.py` `ProductionConfig`.
+- [x] Add tests verifying logging calls are made on database failure and Cloudinary errors.
 
 **Acceptance criteria**: No `print()` statements in `app.py`. Errors are logged with tracebacks. A 500 page does not expose stack traces.
 

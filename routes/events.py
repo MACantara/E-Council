@@ -1,6 +1,6 @@
 import os
 from types import SimpleNamespace
-from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, abort
+from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, abort, current_app
 from flask_login import login_required, current_user
 from utils.auth import belongs_to_user_or_department, is_admin
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -218,7 +218,9 @@ def delete_event(event_id):
                 try:
                     cloudinary.uploader.destroy(transaction['receipt_public_id'])
                 except Exception as e:
-                    pass
+                    current_app.logger.error(
+                        "Failed to delete transaction receipt from Cloudinary: %s", e, exc_info=True
+                    )
 
         # Delete the event
         db.session.delete(event)

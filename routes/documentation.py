@@ -3,7 +3,7 @@ Documentation routes blueprint for E-Council.
 Contains all routes related to documentation management.
 """
 
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, send_file, abort
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, send_file, abort, current_app
 from flask_login import login_required, current_user
 from utils.auth import belongs_to_user_or_department, is_admin
 from sqlalchemy import or_
@@ -177,6 +177,9 @@ def add_documentation():
                         'public_id': upload_result['public_id']
                     })
                 except Exception as e:
+                    current_app.logger.error(
+                        "Failed to upload evaluation image: %s", e, exc_info=True
+                    )
                     flash(f"Failed to upload evaluation image: {str(e)}", "error")
 
         # Build attendance images JSON list
@@ -194,6 +197,9 @@ def add_documentation():
                         'public_id': upload_result['public_id']
                     })
                 except Exception as e:
+                    current_app.logger.error(
+                        "Failed to upload attendance image: %s", e, exc_info=True
+                    )
                     flash(f"Failed to upload attendance image: {str(e)}", "error")
 
         # Build event photo documentation images JSON list
@@ -211,6 +217,9 @@ def add_documentation():
                         'public_id': upload_result['public_id']
                     })
                 except Exception as e:
+                    current_app.logger.error(
+                        "Failed to upload event photo documentation image: %s", e, exc_info=True
+                    )
                     flash(f"Failed to upload event photo documentation image: {str(e)}", "error")
 
         # Build evaluation student names JSON list from Excel file
@@ -229,6 +238,9 @@ def add_documentation():
                     if name_column:
                         evaluation_student_names = df[name_column].dropna().tolist()
                 except Exception as e:
+                    current_app.logger.error(
+                        "Failed to process student list: %s", e, exc_info=True
+                    )
                     flash(f"Failed to process student list: {str(e)}", "error")
 
         # Create a new documentation entry with JSON fields
@@ -384,6 +396,9 @@ def update_documentation(documentation_id):
                     try:
                         cloudinary.uploader.destroy(image['public_id'])
                     except Exception as e:
+                        current_app.logger.error(
+                            "Error deleting some evaluation images: %s", e, exc_info=True
+                        )
                         flash('Error deleting some evaluation images', 'error')
                 else:
                     filtered_images.append(image)
@@ -398,6 +413,9 @@ def update_documentation(documentation_id):
                         'public_id': upload_result['public_id']
                     })
                 except Exception as e:
+                    current_app.logger.error(
+                        "Error uploading some evaluation images: %s", e, exc_info=True
+                    )
                     flash('Error uploading some evaluation images', 'error')
         documentation.evaluation_images = evaluation_images
 
@@ -412,6 +430,9 @@ def update_documentation(documentation_id):
                     try:
                         cloudinary.uploader.destroy(image['public_id'])
                     except Exception as e:
+                        current_app.logger.error(
+                            "Error deleting some attendance images: %s", e, exc_info=True
+                        )
                         flash('Error deleting some attendance images', 'error')
                 else:
                     filtered_images.append(image)
@@ -426,6 +447,9 @@ def update_documentation(documentation_id):
                         'public_id': upload_result['public_id']
                     })
                 except Exception as e:
+                    current_app.logger.error(
+                        "Error uploading some attendance images: %s", e, exc_info=True
+                    )
                     flash('Error uploading some attendance images', 'error')
         documentation.attendance_images = attendance_images
 
@@ -440,6 +464,9 @@ def update_documentation(documentation_id):
                     try:
                         cloudinary.uploader.destroy(image['public_id'])
                     except Exception as e:
+                        current_app.logger.error(
+                            "Error deleting some photo documentation images: %s", e, exc_info=True
+                        )
                         flash('Error deleting some photo documentation images', 'error')
                 else:
                     filtered_images.append(image)
@@ -454,6 +481,9 @@ def update_documentation(documentation_id):
                         'public_id': upload_result['public_id']
                     })
                 except Exception as e:
+                    current_app.logger.error(
+                        "Error uploading some photo documentation images: %s", e, exc_info=True
+                    )
                     flash('Error uploading some photo documentation images', 'error')
         documentation.event_photo_images = event_photo_images
 
@@ -605,6 +635,9 @@ def delete_documentation(documentation_id):
                     if image.get('public_id'):
                         cloudinary.uploader.destroy(image['public_id'], resource_type="image")
                 except Exception as e:
+                    current_app.logger.error(
+                        "Error deleting some evaluation images: %s", e, exc_info=True
+                    )
                     flash('Error deleting some evaluation images', 'error')
 
             for image in (documentation.attendance_images or []):
@@ -612,6 +645,9 @@ def delete_documentation(documentation_id):
                     if image.get('public_id'):
                         cloudinary.uploader.destroy(image['public_id'], resource_type="image")
                 except Exception as e:
+                    current_app.logger.error(
+                        "Error deleting some attendance images: %s", e, exc_info=True
+                    )
                     flash('Error deleting some attendance images', 'error')
 
             for image in (documentation.event_photo_images or []):
@@ -619,6 +655,9 @@ def delete_documentation(documentation_id):
                     if image.get('public_id'):
                         cloudinary.uploader.destroy(image['public_id'], resource_type="image")
                 except Exception as e:
+                    current_app.logger.error(
+                        "Error deleting some event photo documentation images: %s", e, exc_info=True
+                    )
                     flash('Error deleting some event photo documentation images', 'error')
 
             # Delete the documentation entry (JSON data is removed automatically with the record)
@@ -628,6 +667,9 @@ def delete_documentation(documentation_id):
             flash('Documentation deleted successfully!', 'success')
             return redirect(url_for('documentation.documentation_overview'))
         except Exception as e:
+            current_app.logger.error(
+                "Failed to delete documentation: %s", e, exc_info=True
+            )
             db.session.rollback()
             flash('Failed to delete documentation.', 'error')
 
@@ -728,6 +770,9 @@ def process_student_excel():
         })
 
     except Exception as e:
+        current_app.logger.error(
+            "Failed to process Excel file: %s", e, exc_info=True
+        )
         return jsonify({'success': False, 'error': 'Failed to process Excel file'})
 
 

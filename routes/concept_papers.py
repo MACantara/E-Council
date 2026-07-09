@@ -564,8 +564,11 @@ def generate_concept_body():
             formatted_start = start_date_obj.strftime('%B %d, %Y at %I:%M %p')
             formatted_end = end_date_obj.strftime('%B %d, %Y at %I:%M %p')
         except ValueError as e:
+            current_app.logger.error(
+                "Invalid date format in generate body: %s", e, exc_info=True
+            )
             return make_response(jsonify({'error': 'Invalid date format'}), 400)
-        
+
         prompt = f"""Generate a formal body text for a concept paper with the following details:
         Event: {subject}
         Date and Time: From {formatted_start} to {formatted_end}
@@ -746,8 +749,11 @@ def generate_concept_consent():
             formatted_start = start_date_obj.strftime('%B %d, %Y at %I:%M %p')
             formatted_end = end_date_obj.strftime('%B %d, %Y at %I:%M %p')
         except ValueError as e:
+            current_app.logger.error(
+                "Invalid date format in generate consent: %s", e, exc_info=True
+            )
             return make_response(jsonify({'error': 'Invalid date format'}), 400)
-        
+
         prompt = f"""Generate a parent/guardian consent form content for {subject}.
         
         Event Details:

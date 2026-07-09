@@ -4,7 +4,7 @@ import requests
 import tempfile
 import time
 
-from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file, abort
+from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, send_file, abort, current_app
 from flask_login import login_required, current_user
 from utils.auth import belongs_to_user_or_department, is_admin
 from sqlalchemy import or_
@@ -431,6 +431,9 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
                     elements.append(Spacer(1, 12))
                     
             except Exception as e:
+                current_app.logger.error(
+                    "Failed to load photo for PDF generation: %s", e, exc_info=True
+                )
                 # If image fails to load, fall back to URL
                 elements.append(Paragraph(
                     f'• {photo["url"]}',
@@ -524,6 +527,9 @@ def add_minutes_of_the_meeting():
                 notes = f"{notes}\n\nAI-Generated Summary:\n{ai_generated_notes}" if notes else ai_generated_notes
 
             except Exception as e:
+                current_app.logger.error(
+                    "Error processing recording with AI: %s", e, exc_info=True
+                )
                 flash(f'Error processing recording with AI: {str(e)}', 'error')
                 return redirect(request.url)
 
@@ -638,6 +644,9 @@ def update_minutes_of_the_meeting(meeting_id):
                 try:
                     cloudinary.uploader.destroy(photo['public_id'])
                 except Exception as e:
+                    current_app.logger.error(
+                        "Error deleting existing photo from Cloudinary: %s", e, exc_info=True
+                    )
                     flash('Error deleting existing photo from Cloudinary', 'error')
 
             # Upload new photos and store as JSON
@@ -710,6 +719,9 @@ def delete_minutes_of_the_meeting(meeting_id):
             try:
                 cloudinary.uploader.destroy(photo['public_id'])
             except Exception as e:
+                current_app.logger.error(
+                    "Error deleting photo from Cloudinary: %s", e, exc_info=True
+                )
                 flash('Error deleting photo from Cloudinary', 'error')
 
         # Finally, delete the meeting (attendees are JSON and removed automatically)
