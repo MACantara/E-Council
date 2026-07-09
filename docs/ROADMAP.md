@@ -69,12 +69,12 @@ Phase 1 focuses on low-risk cleanup that improves security, documentation, and p
 **Scope**: `models/user.py`, `.env`, `.gitignore`
 
 **Checklist**
-- [ ] Remove `users_password` from `Users.__repr__` in `models/user.py`.
-- [ ] Verify `.env` is in `.gitignore` and not tracked by git.
-- [ ] If `.env` was committed, run `git rm --cached .env` and commit the change.
-- [ ] Create `.env.example` with placeholder values and add it to the repo.
-- [ ] Add `.env` to `.gitignore` if missing.
-- [ ] Search `git log --all -- .env` to confirm no historical exposure.
+- [x] Remove `users_password` from `Users.__repr__` in `models/user.py`.
+- [x] Verify `.env` is in `.gitignore` and not tracked by git.
+- [x] If `.env` was committed, run `git rm --cached .env` and commit the change.
+- [x] Create `.env.example` with placeholder values and add it to the repo.
+- [x] Add `.env` to `.gitignore` if missing.
+- [x] Search `git log --all -- .env` to confirm no historical exposure.
 
 **Acceptance criteria**: `Users.__repr__` never prints the password. `.env` is not in the git index and `.env.example` exists.
 

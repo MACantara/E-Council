@@ -76,7 +76,7 @@ class Users(db.Model, UserMixin):
         return str(self.users_id)
 
     def __repr__(self):
-        return f"Users({self.users_id}, {self.profile_picture}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_departments_id}, {self.users_role}, {self.users_student_organization}, {self.users_student_organization_position}, {self.users_password}, {self.users_email_verified}, {self.users_home_address}, {self.users_contact_number}, {self.signature})"
+        return f"Users({self.users_id}, {self.users_first_name}, {self.users_last_name}, {self.users_username}, {self.users_email}, {self.users_role}, {self.users_email_verified})"
 
 
 class EmailVerification(db.Model):
