@@ -110,6 +110,7 @@ class LearningJournalForms(db.Model):
     __tablename__ = 'learning_journal_forms'
 
     learning_journal_forms_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    learning_journal_forms_concept_paper_forms_id = db.Column(db.Integer, db.ForeignKey('concept_paper_forms.concept_paper_forms_id'), nullable=True)
     learning_journal_forms_name = db.Column(db.String(255), nullable=False)
     learning_journal_forms_date = db.Column(db.Date, nullable=False)
     learning_journal_forms_time = db.Column(db.Time, nullable=False)
@@ -120,6 +121,7 @@ class LearningJournalForms(db.Model):
     observations = db.Column(db.JSON, nullable=False, default=list)
     learnings = db.Column(db.JSON, nullable=False, default=list)
 
+    concept_paper_form = db.relationship('ConceptPaperForms', backref='learning_journal_forms')
     prepared_by_user = db.relationship('Users', foreign_keys=[learning_journal_forms_prepared_by])
 
     def __repr__(self):

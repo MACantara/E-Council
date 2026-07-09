@@ -118,3 +118,14 @@ def admin_user(app_context):
     db.session.commit()
 
     return user
+
+
+@pytest.fixture
+def auth_client(client, app_context, sample_user):
+    """Return a test client that is authenticated as sample_user."""
+    response = client.post('/auth/login', data={
+        'users-username-email': sample_user.users_username,
+        'users-password': 'Password123!'
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    return client

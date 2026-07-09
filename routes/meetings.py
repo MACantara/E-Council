@@ -481,6 +481,9 @@ def add_minutes_of_the_meeting():
         date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
         adjourned = datetime.strptime(adjourned, '%Y-%m-%dT%H:%M') if adjourned else None
 
+        # Initialize notes for optional AI processing
+        notes = None
+
         # Process meeting recording with Gemini Pro if provided
         meeting_recording = request.files.get('meeting-recording')
         if meeting_recording:
