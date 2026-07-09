@@ -11,7 +11,9 @@ class TallyItem(db.Model):
     __tablename__ = "tally_items"
 
     tally_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    documentation_id = db.Column(db.Integer, db.ForeignKey("documentation.documentation_id"), nullable=False, index=True)
+    documentation_id = db.Column(
+        db.Integer, db.ForeignKey("documentation.documentation_id"), nullable=False, index=True
+    )
     name = db.Column(db.String(255), nullable=False)
     extremely_satisfied = db.Column(db.Integer, nullable=False, default=0)
     satisfied = db.Column(db.Integer, nullable=False, default=0)

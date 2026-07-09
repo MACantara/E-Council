@@ -3,6 +3,7 @@ Database models package for E-Council.
 This package contains all database models organized by feature.
 """
 
+from models.activity_report_item import ActivityReportItem
 from models.base import db
 from models.board_resolution import BoardResolutions
 from models.concept_paper import (
@@ -17,8 +18,8 @@ from models.concept_paper import (
 # Import all models for easy access
 from models.department import Departments, StudentOrganizations
 from models.documentation import Documentation
-from models.event import DepartmentsEvents, EventInvitations, Events
 from models.evaluation_form import EvaluationForm
+from models.event import DepartmentsEvents, EventInvitations, Events
 from models.financial import FinancialReports
 from models.learning_outcome import LearningOutcome
 from models.meeting import MinutesOfTheMeeting, Signatories
@@ -27,7 +28,6 @@ from models.objective import Objective
 from models.tally_item import TallyItem
 from models.transaction import Transaction
 from models.user import EmailVerification, LoginAttempts, PasswordReset, Users
-from models.activity_report_item import ActivityReportItem
 
 __all__ = [
     # Base

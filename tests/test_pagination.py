@@ -4,11 +4,10 @@ Pagination tests for E-Council overview routes.
 
 import os
 import sys
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import pytest
 from extensions import db
 
 

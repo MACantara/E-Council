@@ -57,7 +57,9 @@ class EventInvitations(db.Model):
     event_invitations_events_id = db.Column(db.Integer, db.ForeignKey("events.events_id"), nullable=False, index=True)
     event_invitations_email = db.Column(db.String(255), nullable=False)
     event_invitations_token = db.Column(db.String(64), nullable=False)
-    event_invitations_created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False, index=True)
+    event_invitations_created_at = db.Column(
+        db.DateTime, default=db.func.current_timestamp(), nullable=False, index=True
+    )
 
     # Relationship to Events model
     event = db.relationship("Events", backref="event_invitations")

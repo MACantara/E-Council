@@ -24,7 +24,9 @@ class Users(db.Model, UserMixin):
     users_email = db.Column(db.String(100), unique=True, nullable=False)
 
     # Changed users_department to reference the Departments model
-    users_departments_id = db.Column(db.Integer, db.ForeignKey("departments.departments_id"), nullable=False, index=True)
+    users_departments_id = db.Column(
+        db.Integer, db.ForeignKey("departments.departments_id"), nullable=False, index=True
+    )
 
     users_role = db.Column(
         db.Enum("Student Council Officer", "Faculty", "Staff", "Admin", name="role_enum"), nullable=False, index=True

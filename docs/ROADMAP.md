@@ -423,11 +423,11 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `wsgi.py`, `requirements.txt`, `README.md`, `Dockerfile` (optional)
 
 **Checklist**
-- [ ] Add `gunicorn` to `requirements.txt`.
-- [ ] Create `wsgi.py` with `from app import create_app; application = create_app("production")`.
-- [ ] Document the production command: `gunicorn -w 4 -b 0.0.0.0:8000 wsgi:application`.
+- [x] Add `gunicorn` to `requirements.txt`.
+- [x] Create `wsgi.py` with `from app import create_app; application = create_app("production")`.
+- [x] Document the production command: `gunicorn -w 4 -b 0.0.0.0:8000 wsgi:application`.
 - [ ] (Optional) Add `Dockerfile` and `docker-compose.yml` for local development and deployment.
-- [ ] Add a CI smoke test that starts the WSGI container and hits `/`.
+- [x] Add a CI smoke test that starts the WSGI container and hits `/`.
 
 **Acceptance criteria**: `gunicorn wsgi:application` starts without errors and serves the app.
 

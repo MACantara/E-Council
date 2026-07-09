@@ -50,12 +50,8 @@ def events_overview():
 
     for event in events:
         transactions = event.transactions or []
-        total_income = sum(
-            safe_decimal_conversion(t.total or 0) for t in transactions if t.type == "Income"
-        )
-        total_expense = sum(
-            safe_decimal_conversion(t.total or 0) for t in transactions if t.type == "Expense"
-        )
+        total_income = sum(safe_decimal_conversion(t.total or 0) for t in transactions if t.type == "Income")
+        total_expense = sum(safe_decimal_conversion(t.total or 0) for t in transactions if t.type == "Expense")
         events_budget = safe_decimal_conversion(event.events_budget) if event.events_budget else Decimal("0.00")
         remaining_budget = total_income - total_expense + events_budget if isinstance(events_budget, Decimal) else "N/A"
 

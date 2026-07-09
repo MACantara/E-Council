@@ -386,13 +386,11 @@ def update_concept_paper(paper_id):
             activity_report.activity_report_forms_contact_numbers = activity_report_contact_numbers
             activity_report.activity_report_forms_prepared_by = activity_report_prepared_by
             activity_report.activity_report_forms_noted_by = activity_report_noted_by
-            activity_report.activity_report_items = [
-                ActivityReportItem(item_type="strength", item_text=s) for s in activity_strengths if s
-            ] + [
-                ActivityReportItem(item_type="weakness", item_text=w) for w in activity_weaknesses if w
-            ] + [
-                ActivityReportItem(item_type="recommendation", item_text=r) for r in activity_recommendations if r
-            ]
+            activity_report.activity_report_items = (
+                [ActivityReportItem(item_type="strength", item_text=s) for s in activity_strengths if s]
+                + [ActivityReportItem(item_type="weakness", item_text=w) for w in activity_weaknesses if w]
+                + [ActivityReportItem(item_type="recommendation", item_text=r) for r in activity_recommendations if r]
+            )
 
             # Single commit at the end for better performance
             db.session.commit()
@@ -1560,7 +1558,9 @@ def generate_concept_paper_pdf(concept_paper_id):
     if activity_report:
         strengths = [item.item_text for item in activity_report.activity_report_items if item.item_type == "strength"]
         weaknesses = [item.item_text for item in activity_report.activity_report_items if item.item_type == "weakness"]
-        recommendations = [item.item_text for item in activity_report.activity_report_items if item.item_type == "recommendation"]
+        recommendations = [
+            item.item_text for item in activity_report.activity_report_items if item.item_type == "recommendation"
+        ]
 
     # Create base evaluation table structure
     evaluation_data = [

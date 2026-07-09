@@ -14,14 +14,22 @@ class FinancialReports(db.Model):
     financial_reports_semester = db.Column(db.String(50), nullable=False, index=True)
     financial_reports_status = db.Column(db.String(50), nullable=False, index=True)
     financial_reports_events_id = db.Column(db.Integer, db.ForeignKey("events.events_id"), nullable=True, index=True)
-    financial_reports_departments_id = db.Column(db.Integer, db.ForeignKey("departments.departments_id"), nullable=True, index=True)
+    financial_reports_departments_id = db.Column(
+        db.Integer, db.ForeignKey("departments.departments_id"), nullable=True, index=True
+    )
     financial_reports_title = db.Column(db.String(255), nullable=False)
-    financial_reports_audited_and_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True)
-    financial_reports_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
+    financial_reports_audited_and_prepared_by = db.Column(
+        db.Integer, db.ForeignKey("users.users_id"), nullable=True, index=True
+    )
+    financial_reports_noted_by = db.Column(
+        db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True
+    )
     financial_reports_recommending_approval_by = db.Column(
         db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True
     )
-    financial_reports_approved_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
+    financial_reports_approved_by = db.Column(
+        db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True
+    )
 
     # Relationships - using string references to avoid circular imports
     events = db.relationship("Events", back_populates="financial_reports")

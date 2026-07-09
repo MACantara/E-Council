@@ -258,13 +258,11 @@ def add_documentation():
         )
 
         # Add child activity report items
-        new_documentation.activity_report_items = [
-            ActivityReportItem(item_type="strength", item_text=s) for s in activity_strengths if s
-        ] + [
-            ActivityReportItem(item_type="weakness", item_text=w) for w in activity_weaknesses if w
-        ] + [
-            ActivityReportItem(item_type="recommendation", item_text=r) for r in activity_recommendations if r
-        ]
+        new_documentation.activity_report_items = (
+            [ActivityReportItem(item_type="strength", item_text=s) for s in activity_strengths if s]
+            + [ActivityReportItem(item_type="weakness", item_text=w) for w in activity_weaknesses if w]
+            + [ActivityReportItem(item_type="recommendation", item_text=r) for r in activity_recommendations if r]
+        )
 
         # Add child tally items
         for tally in tally_items:
@@ -398,13 +396,11 @@ def update_documentation(documentation_id):
         strengths = [s.strip() for s in request.form.getlist("activity-strengths[]") if s.strip()]
         weaknesses = [w.strip() for w in request.form.getlist("activity-weaknesses[]") if w.strip()]
         recommendations = [r.strip() for r in request.form.getlist("activity-recommendations[]") if r.strip()]
-        documentation.activity_report_items = [
-            ActivityReportItem(item_type="strength", item_text=s) for s in strengths
-        ] + [
-            ActivityReportItem(item_type="weakness", item_text=w) for w in weaknesses
-        ] + [
-            ActivityReportItem(item_type="recommendation", item_text=r) for r in recommendations
-        ]
+        documentation.activity_report_items = (
+            [ActivityReportItem(item_type="strength", item_text=s) for s in strengths]
+            + [ActivityReportItem(item_type="weakness", item_text=w) for w in weaknesses]
+            + [ActivityReportItem(item_type="recommendation", item_text=r) for r in recommendations]
+        )
 
         # Update Learning Journal fields
         learning_journal.learning_journal_forms_name_of_student = request.form.get(
@@ -527,11 +523,15 @@ def update_documentation(documentation_id):
         documentation.tally_items = [
             TallyItem(
                 name=tally_items_names[i],
-                extremely_satisfied=int(tally_items_extremely_satisfied[i]) if i < len(tally_items_extremely_satisfied) else 0,
+                extremely_satisfied=int(tally_items_extremely_satisfied[i])
+                if i < len(tally_items_extremely_satisfied)
+                else 0,
                 satisfied=int(tally_items_satisfied[i]) if i < len(tally_items_satisfied) else 0,
                 neutral=int(tally_items_neutral[i]) if i < len(tally_items_neutral) else 0,
                 dissatisfied=int(tally_items_dissatisfied[i]) if i < len(tally_items_dissatisfied) else 0,
-                extremely_dissatisfied=int(tally_items_extremely_dissatisfied[i]) if i < len(tally_items_extremely_dissatisfied) else 0,
+                extremely_dissatisfied=int(tally_items_extremely_dissatisfied[i])
+                if i < len(tally_items_extremely_dissatisfied)
+                else 0,
             )
             for i in range(len(tally_items_names))
             if tally_items_names[i].strip()

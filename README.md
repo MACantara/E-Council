@@ -415,6 +415,16 @@ The server runs on `http://0.0.0.0:5000` with debug mode enabled. Open your brow
 http://127.0.0.1:5000/
 ```
 
+### Production
+
+For production, use the WSGI entry point with **gunicorn** instead of the Flask development server:
+
+```bash
+gunicorn -w 4 -b 0.0.0.0:8000 wsgi:application
+```
+
+The `wsgi.py` file creates the app with the `production` configuration. Adjust the number of workers (`-w`) and bind address (`-b`) to match your deployment environment.
+
 ## Testing
 
 Tests are written with pytest and configured via `pytest.ini`. From the project root with the virtual environment active:

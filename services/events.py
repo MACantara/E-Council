@@ -290,9 +290,7 @@ def add_transaction(event_id):
         return redirect(url_for("dashboard.event_dashboard", event_id=event_id))
 
     # Build distinct transaction categories from all Transaction records
-    transaction_categories = sorted(
-        {t.category for ev in Events.query.all() for t in ev.transactions if t.category}
-    )
+    transaction_categories = sorted({t.category for ev in Events.query.all() for t in ev.transactions if t.category})
 
     return render_template("events/add-transaction.html", event=event, transaction_categories=transaction_categories)
 
@@ -352,15 +350,15 @@ def update_transaction(event_id, transaction_id):
         return redirect(url_for("dashboard.event_dashboard", event_id=event_id))
 
     # Build distinct transaction categories from all Transaction records
-    transaction_categories = sorted(
-        {t.category for ev in Events.query.all() for t in ev.transactions if t.category}
-    )
+    transaction_categories = sorted({t.category for ev in Events.query.all() for t in ev.transactions if t.category})
 
     # Provide a template-compatible object with old TransactionHistory attribute names
     transaction_obj = SimpleNamespace(
         transaction_id=transaction.transaction_id,
         transaction_name=transaction.transaction_name,
-        transaction_date=transaction.transaction_date.strftime("%Y-%m-%dT%H:%M") if transaction.transaction_date else None,
+        transaction_date=transaction.transaction_date.strftime("%Y-%m-%dT%H:%M")
+        if transaction.transaction_date
+        else None,
         transaction_unit_amount=transaction.unit_amount,
         transaction_unit_price=transaction.unit_price,
         transaction_total=transaction.total,

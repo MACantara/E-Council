@@ -16,7 +16,9 @@ class Documentation(db.Model):
     documentation_academic_year = db.Column(db.String(50), nullable=True, index=True)
     documentation_semester = db.Column(db.String(50), nullable=True, index=True)
     documentation_status = db.Column(db.String(50), nullable=True, index=True)
-    documentation_departments_id = db.Column(db.Integer, db.ForeignKey("departments.departments_id"), nullable=True, index=True)
+    documentation_departments_id = db.Column(
+        db.Integer, db.ForeignKey("departments.departments_id"), nullable=True, index=True
+    )
     documentation_type = db.Column(db.String(50), nullable=True)
     documentation_activity_report_forms_id = db.Column(
         db.Integer, db.ForeignKey("activity_report_forms.activity_report_forms_id"), nullable=True, index=True
@@ -25,7 +27,9 @@ class Documentation(db.Model):
     documentation_learning_journal_forms_id = db.Column(
         db.Integer, db.ForeignKey("learning_journal_forms.learning_journal_forms_id"), nullable=True, index=True
     )
-    documentation_checked_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
+    documentation_checked_by = db.Column(
+        db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True
+    )
     documentation_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True, index=True)
     documentation_date_of_submission = db.Column(db.DateTime, nullable=True, index=True)
     documentation_rating = db.Column(db.Float, nullable=True)
@@ -41,15 +45,9 @@ class Documentation(db.Model):
     checked_by_signatory = db.relationship("Signatories", foreign_keys=[documentation_checked_by])
     noted_by_signatory = db.relationship("Signatories", foreign_keys=[documentation_noted_by])
     department = db.relationship("Departments", foreign_keys=[documentation_departments_id])
-    tally_items = db.relationship(
-        "TallyItem", backref="documentation", cascade="all, delete-orphan"
-    )
-    evaluation_forms = db.relationship(
-        "EvaluationForm", backref="documentation", cascade="all, delete-orphan"
-    )
-    activity_report_items = db.relationship(
-        "ActivityReportItem", backref="documentation", cascade="all, delete-orphan"
-    )
+    tally_items = db.relationship("TallyItem", backref="documentation", cascade="all, delete-orphan")
+    evaluation_forms = db.relationship("EvaluationForm", backref="documentation", cascade="all, delete-orphan")
+    activity_report_items = db.relationship("ActivityReportItem", backref="documentation", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Documentation {self.documentation_id}: {self.documentation_type}>"
