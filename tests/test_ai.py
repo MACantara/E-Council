@@ -22,7 +22,7 @@ def mock_model(monkeypatch):
     """Replace the module-level Gemini model with a mocked instance."""
     mock = MagicMock()
     mock.generate_content.return_value = MagicMock(text="Generated AI content")
-    monkeypatch.setattr("routes.concept_papers.model", mock)
+    monkeypatch.setattr("services.ai._model", lambda: mock)
     monkeypatch.setattr("routes.board_resolutions.model", mock)
     return mock
 
