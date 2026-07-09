@@ -20,7 +20,7 @@ from reportlab.platypus import HRFlowable, Image, Paragraph, SimpleDocTemplate, 
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
-from models import MinutesOfTheMeeting, Signatories, StudentOrganizations, Users, db
+from models import MeetingAttendee, MinutesOfTheMeeting, Signatories, StudentOrganizations, Users, db
 from services import ai
 from utils.auth import belongs_to_user_or_department, is_admin
 
@@ -70,9 +70,8 @@ def generate_mom_pdf(minutes_of_the_meeting_id):
     if not belongs_to_user_or_department(meeting[0], current_user):
         abort(403)
 
-    # Get attendees from the JSON list of user IDs
-    attendees = [Users.query.get(user_id) for user_id in meeting[0].attendees or []]
-    attendees = [a for a in attendees if a]
+    # Get attendees from the MeetingAttendee child records
+    attendees = [attendee.user for attendee in meeting[0].attendees if attendee.user]
 
     # Get photo documentation from the JSON list
     photos = meeting[0].photo_documentation or []
@@ -540,8 +539,8 @@ def add_minutes_of_the_meeting():
             minutes_of_the_meeting_noted_by=noted_by,
         )
 
-        # Set JSON fields for attendees and photo documentation
-        new_meeting.attendees = attendees
+        # Set attendees and photo documentation
+        new_meeting.attendees = [MeetingAttendee(users_id=int(user_id)) for user_id in attendees if user_id]
         photo_documentation_list = []
         for photo_documentation in photo_documentations:
             if photo_documentation:
@@ -630,8 +629,8 @@ def update_minutes_of_the_meeting(meeting_id):
         meeting.minutes_of_the_meeting_prepared_by = prepared_by
         meeting.minutes_of_the_meeting_noted_by = noted_by
 
-        # Update attendees as a JSON list of user IDs
-        meeting.attendees = attendees
+        # Update attendees as child records
+        meeting.attendees = [MeetingAttendee(users_id=int(user_id)) for user_id in attendees if user_id]
 
         # Handle multiple file uploads to Cloudinary
         if photo_documentations:
@@ -671,8 +670,8 @@ def update_minutes_of_the_meeting(meeting_id):
     # Query for signatories to populate the presiding officer and noted by fields
     signatories = Signatories.query.all()
 
-    # Existing attendees is the JSON list
-    meeting_attendees = meeting.attendees or []
+    # Existing attendees is a list of user IDs
+    meeting_attendees = [attendee.users_id for attendee in meeting.attendees]
 
     # Query for student organizations and their members
     student_organizations = StudentOrganizations.query.all()

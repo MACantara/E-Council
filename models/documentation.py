@@ -30,15 +30,10 @@ class Documentation(db.Model):
     documentation_date_of_submission = db.Column(db.DateTime, nullable=True)
     documentation_rating = db.Column(db.Float, nullable=True)
     documentation_comments_suggestions = db.Column(db.Text, nullable=True)
-    tally_items = db.Column(db.JSON, nullable=False, default=list)
     evaluation_images = db.Column(db.JSON, nullable=False, default=list)
-    evaluation_forms = db.Column(db.JSON, nullable=False, default=list)
     attendance_images = db.Column(db.JSON, nullable=False, default=list)
     evaluation_student_names = db.Column(db.JSON, nullable=False, default=list)
     event_photo_images = db.Column(db.JSON, nullable=False, default=list)
-    activity_strengths = db.Column(db.JSON, nullable=False, default=list)
-    activity_weaknesses = db.Column(db.JSON, nullable=False, default=list)
-    activity_recommendations = db.Column(db.JSON, nullable=False, default=list)
 
     # Relationships - using string references to avoid circular imports
     events = db.relationship("Events", back_populates="documentation")
@@ -46,6 +41,15 @@ class Documentation(db.Model):
     checked_by_signatory = db.relationship("Signatories", foreign_keys=[documentation_checked_by])
     noted_by_signatory = db.relationship("Signatories", foreign_keys=[documentation_noted_by])
     department = db.relationship("Departments", foreign_keys=[documentation_departments_id])
+    tally_items = db.relationship(
+        "TallyItem", backref="documentation", cascade="all, delete-orphan"
+    )
+    evaluation_forms = db.relationship(
+        "EvaluationForm", backref="documentation", cascade="all, delete-orphan"
+    )
+    activity_report_items = db.relationship(
+        "ActivityReportItem", backref="documentation", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<Documentation {self.documentation_id}: {self.documentation_type}>"

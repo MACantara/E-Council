@@ -18,9 +18,16 @@ from models.concept_paper import (
 from models.department import Departments, StudentOrganizations
 from models.documentation import Documentation
 from models.event import DepartmentsEvents, EventInvitations, Events
+from models.evaluation_form import EvaluationForm
 from models.financial import FinancialReports
+from models.learning_outcome import LearningOutcome
 from models.meeting import MinutesOfTheMeeting, Signatories
+from models.meeting_attendee import MeetingAttendee
+from models.objective import Objective
+from models.tally_item import TallyItem
+from models.transaction import Transaction
 from models.user import EmailVerification, LoginAttempts, PasswordReset, Users
+from models.activity_report_item import ActivityReportItem
 
 __all__ = [
     # Base
@@ -37,6 +44,7 @@ __all__ = [
     "Events",
     "DepartmentsEvents",
     "EventInvitations",
+    "Transaction",
     # Concept paper models
     "ConceptPaperForms",
     "ExcuseLetterForms",
@@ -44,8 +52,13 @@ __all__ = [
     "PersonnelInChargeForms",
     "LearningJournalForms",
     "ParentGuardianConsentForms",
+    "Objective",
+    "LearningOutcome",
+    "ActivityReportItem",
     # Documentation models
     "Documentation",
+    "TallyItem",
+    "EvaluationForm",
     # Financial models
     "FinancialReports",
     # Board resolution models
@@ -53,4 +66,5 @@ __all__ = [
     # Meeting models
     "MinutesOfTheMeeting",
     "Signatories",
+    "MeetingAttendee",
 ]

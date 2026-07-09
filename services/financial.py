@@ -377,9 +377,9 @@ def generate_financial_report_pdf(financial_report_id):
     story.append(Paragraph("II. Collection and Expenses", section_header_style))
     story.append(Spacer(1, 10))
 
-    # Get transactions for this event from the JSON list
-    transactions = sorted(event.transactions or [], key=lambda t: t.get("date", ""))
-    total_expenses = sum(float(t.get("total") or 0) for t in transactions)
+    # Get transactions for this event from the related Transaction records
+    transactions = sorted(event.transactions or [], key=lambda t: t.transaction_date or 0)
+    total_expenses = sum(float(t.total or 0) for t in transactions)
     budget = float(event.events_budget)
     remaining_money = budget - total_expenses
 
@@ -406,10 +406,10 @@ def generate_financial_report_pdf(financial_report_id):
 
     # Add expenses
     for transaction in transactions:
-        transaction_total = float(transaction.get("total") or 0)
+        transaction_total = float(transaction.total or 0)
         table_data.append(
             [
-                Paragraph(transaction.get("name", ""), styles["Normal"]),
+                Paragraph(transaction.transaction_name or "", styles["Normal"]),
                 Paragraph(f"₱{transaction_total:,.2f}", amount_style),
             ]
         )
@@ -541,7 +541,7 @@ def generate_financial_report_pdf(financial_report_id):
     if transactions:
         # Add each receipt image
         for idx, transaction in enumerate(transactions, 1):
-            if transaction.get("receipt_url"):
+            if transaction.receipt_url:
                 # Add receipt number if there are multiple receipts
                 if len(transactions) > 1:
                     story.append(
@@ -554,7 +554,7 @@ def generate_financial_report_pdf(financial_report_id):
                     )
 
                 # Get the image from Cloudinary URL
-                receipt_image = Image(transaction.get("receipt_url"))
+                receipt_image = Image(transaction.receipt_url)
 
                 # Calculate available space (leaving margins)
                 available_width = letter[0] - 2 * inch

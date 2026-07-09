@@ -67,8 +67,8 @@
                     <tbody class="divide-y divide-edge">
                         {% for transaction in transactions %}
                         <tr>
-                            <td class="py-2 pr-4">{{ transaction.date }}</td>
-                            <td class="py-2 pr-4">{{ transaction.name }}</td>
+                            <td class="py-2 pr-4">{{ transaction.transaction_date.strftime('%Y-%m-%d %H:%M') if transaction.transaction_date else '' }}</td>
+                            <td class="py-2 pr-4">{{ transaction.transaction_name }}</td>
                             <td class="py-2 pr-4 text-right">{{ transaction.unit_amount }}</td>
                             <td class="py-2 pr-4 text-right">₱ {{ "{:,.2f}".format(transaction.unit_price) }}</td>
                             <td class="py-2 pr-4 text-right">₱ {{ "{:,.2f}".format(transaction.total) }}</td>
@@ -82,7 +82,7 @@
                                 {% endif %}
                             </td>
                             <td class="py-2 pr-4">
-                                {{ button_link('Update', url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.id), variant='ghost', class='py-1.5 px-3 text-xs justify-center') }}
+                                {{ button_link('Update', url_for('events.update_transaction', event_id=event.events_id, transaction_id=transaction.transaction_id), variant='ghost', class='py-1.5 px-3 text-xs justify-center') }}
                             </td>
                         </tr>
                         {% else %}

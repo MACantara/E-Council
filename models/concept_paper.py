@@ -36,8 +36,6 @@ class ConceptPaperForms(db.Model):
     concept_paper_forms_expected_number_of_participants = db.Column(db.Text, nullable=True)
     concept_paper_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
     concept_paper_forms_signed_and_reviewed_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
-    objectives = db.Column(db.JSON, nullable=False, default=list)
-    learning_outcomes = db.Column(db.JSON, nullable=False, default=list)
 
     # Relationships - using string references to avoid circular imports
     endorsed_by_signatory = db.relationship("Signatories", foreign_keys=[concept_paper_forms_endorsed_by])
@@ -48,6 +46,12 @@ class ConceptPaperForms(db.Model):
     prepared_by_user = db.relationship("Users", foreign_keys=[concept_paper_forms_prepared_by])
     signed_and_reviewed_by_user = db.relationship("Users", foreign_keys=[concept_paper_forms_signed_and_reviewed_by])
     department = db.relationship("Departments", foreign_keys=[concept_paper_forms_departments_id])
+    objectives = db.relationship(
+        "Objective", backref="concept_paper_form", cascade="all, delete-orphan"
+    )
+    learning_outcomes = db.relationship(
+        "LearningOutcome", backref="concept_paper_form", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<ConceptPaperForms {self.concept_paper_forms_id}: {self.concept_paper_forms_subject}>"
@@ -93,11 +97,11 @@ class ActivityReportForms(db.Model):
     activity_report_forms_prepared_by = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=True)
     activity_report_forms_noted_by = db.Column(db.Integer, db.ForeignKey("signatories.signatory_id"), nullable=True)
     activity_report_date_submission = db.Column(db.Date, nullable=True)
-    strengths = db.Column(db.JSON, nullable=False, default=list)
-    weaknesses = db.Column(db.JSON, nullable=False, default=list)
-    recommendations = db.Column(db.JSON, nullable=False, default=list)
 
     concept_paper_form = db.relationship("ConceptPaperForms", backref="activity_report_forms")
+    activity_report_items = db.relationship(
+        "ActivityReportItem", backref="activity_report_form", cascade="all, delete-orphan"
+    )
     personnel_in_charge_form = db.relationship("PersonnelInChargeForms", backref="activity_report_forms")
     prepared_by_user = db.relationship("Users", foreign_keys=[activity_report_forms_prepared_by])
     noted_by_signatory = db.relationship("Signatories", foreign_keys=[activity_report_forms_noted_by])

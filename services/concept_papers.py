@@ -31,12 +31,15 @@ from reportlab.platypus import (
 
 from models import (
     ActivityReportForms,
+    ActivityReportItem,
     ConceptPaperForms,
     DepartmentsEvents,
     Documentation,
     Events,
     ExcuseLetterForms,
     LearningJournalForms,
+    LearningOutcome,
+    Objective,
     ParentGuardianConsentForms,
     PersonnelInChargeForms,
     Signatories,
@@ -113,9 +116,15 @@ def create_concept_paper():
             concept_paper_forms_endorsed_by=concept_paper_endorsed_by,
             concept_paper_forms_recommending_approval_by=concept_paper_recommending_approval_by,
             concept_paper_forms_approved_by=concept_paper_approved_by,
-            objectives=concept_paper_objectives,
-            learning_outcomes=concept_paper_learning_outcomes,
         )
+
+        # Add child objectives and learning outcomes
+        for obj in concept_paper_objectives:
+            if obj:
+                new_concept_paper.objectives.append(Objective(objective_text=obj))
+        for outcome in concept_paper_learning_outcomes:
+            if outcome:
+                new_concept_paper.learning_outcomes.append(LearningOutcome(learning_outcome_text=outcome))
 
         # Add the new concept paper to the database
         db.session.add(new_concept_paper)
@@ -323,11 +332,11 @@ def update_concept_paper(paper_id):
         concept_paper.concept_paper_forms_recommending_approval_by = concept_paper_recommending_approval_by
         concept_paper.concept_paper_forms_approved_by = concept_paper_approved_by
 
-        # Update objectives of the activity as a JSON list
-        concept_paper.objectives = [obj for obj in concept_paper_objectives if obj]
-
-        # Update learning outcomes as a JSON list
-        concept_paper.learning_outcomes = [outcome for outcome in concept_paper_learning_outcomes if outcome]
+        # Update objectives and learning outcomes via child records
+        concept_paper.objectives = [Objective(objective_text=obj) for obj in concept_paper_objectives if obj]
+        concept_paper.learning_outcomes = [
+            LearningOutcome(learning_outcome_text=outcome) for outcome in concept_paper_learning_outcomes if outcome
+        ]
 
         # Update observations as a JSON list
         learning_journal.observations = [obs for obs in concept_paper_observations if obs]
@@ -377,9 +386,13 @@ def update_concept_paper(paper_id):
             activity_report.activity_report_forms_contact_numbers = activity_report_contact_numbers
             activity_report.activity_report_forms_prepared_by = activity_report_prepared_by
             activity_report.activity_report_forms_noted_by = activity_report_noted_by
-            activity_report.strengths = [s for s in activity_strengths if s]
-            activity_report.weaknesses = [w for w in activity_weaknesses if w]
-            activity_report.recommendations = [r for r in activity_recommendations if r]
+            activity_report.activity_report_items = [
+                ActivityReportItem(item_type="strength", item_text=s) for s in activity_strengths if s
+            ] + [
+                ActivityReportItem(item_type="weakness", item_text=w) for w in activity_weaknesses if w
+            ] + [
+                ActivityReportItem(item_type="recommendation", item_text=r) for r in activity_recommendations if r
+            ]
 
             # Single commit at the end for better performance
             db.session.commit()
@@ -504,9 +517,16 @@ def update_concept_paper(paper_id):
     # Query for signatories
     signatories = Signatories.query.all()
 
-    # Fetch objectives of the activity and learning outcomes as JSON lists
+    # Fetch objectives of the activity and learning outcomes
     objectives_of_the_activity = concept_paper.objectives or []
     learning_outcomes = concept_paper.learning_outcomes or []
+
+    # Fetch activity report items
+    activity_report = concept_paper.activity_report_forms[0] if concept_paper.activity_report_forms else None
+    activity_report_items = activity_report.activity_report_items if activity_report else []
+    strengths = [item.item_text for item in activity_report_items if item.item_type == "strength"]
+    weaknesses = [item.item_text for item in activity_report_items if item.item_type == "weakness"]
+    recommendations = [item.item_text for item in activity_report_items if item.item_type == "recommendation"]
 
     # Fetch noted by college dean and noted by head of sas for the personnel in charge form
     noted_by_college_dean = (
@@ -526,6 +546,9 @@ def update_concept_paper(paper_id):
         parent_guardian_consent_form=parent_guardian_consent_form,
         noted_by_college_dean=noted_by_college_dean,
         noted_by_sas=noted_by_sas,
+        strengths=strengths,
+        weaknesses=weaknesses,
+        recommendations=recommendations,
     )
 
 
@@ -1535,9 +1558,9 @@ def generate_concept_paper_pdf(concept_paper_id):
 
     # Query activity data if activity report exists
     if activity_report:
-        strengths = activity_report.strengths or []
-        weaknesses = activity_report.weaknesses or []
-        recommendations = activity_report.recommendations or []
+        strengths = [item.item_text for item in activity_report.activity_report_items if item.item_type == "strength"]
+        weaknesses = [item.item_text for item in activity_report.activity_report_items if item.item_type == "weakness"]
+        recommendations = [item.item_text for item in activity_report.activity_report_items if item.item_type == "recommendation"]
 
     # Create base evaluation table structure
     evaluation_data = [

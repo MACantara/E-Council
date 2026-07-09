@@ -82,15 +82,13 @@
                     <div class="w-full">
                         <label class="mb-2 block text-sm font-medium text-ink-2">Activity Strengths</label>
                         <div id="strengths-list" class="space-y-2">
-                            {% if documentation.activity_strengths %}
-                            {% for strength in documentation.activity_strengths %}
+                            {% for strength in strengths %}
                             <div class="dynamic-item flex items-center gap-2">
                                 <input type="text" name="activity-strengths[]" value="{{ strength }}" placeholder="Enter strength" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center justify-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">×</button>
                             </div>
                             {% endfor %}
-                            {% endif %}
                         </div>
                         {{ button('Add Strength', type='button', variant='secondary', attrs='id="add-strength-btn"') }}
                     </div>
@@ -98,15 +96,13 @@
                     <div class="w-full">
                         <label class="mb-2 block text-sm font-medium text-ink-2">Activity Weaknesses</label>
                         <div id="weaknesses-list" class="space-y-2">
-                            {% if documentation.activity_weaknesses %}
-                            {% for weakness in documentation.activity_weaknesses %}
+                            {% for weakness in weaknesses %}
                             <div class="dynamic-item flex items-center gap-2">
                                 <input type="text" name="activity-weaknesses[]" value="{{ weakness }}" placeholder="Enter weakness" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center justify-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">×</button>
                             </div>
                             {% endfor %}
-                            {% endif %}
                         </div>
                         {{ button('Add Weakness', type='button', variant='secondary', attrs='id="add-weakness-btn"') }}
                     </div>
@@ -114,15 +110,13 @@
                     <div class="w-full">
                         <label class="mb-2 block text-sm font-medium text-ink-2">Activity Recommendations</label>
                         <div id="recommendations-list" class="space-y-2">
-                            {% if documentation.activity_recommendations %}
-                            {% for recommendation in documentation.activity_recommendations %}
+                            {% for recommendation in recommendations %}
                             <div class="dynamic-item flex items-center gap-2">
                                 <input type="text" name="activity-recommendations[]" value="{{ recommendation }}" placeholder="Enter recommendation" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center justify-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">×</button>
                             </div>
                             {% endfor %}
-                            {% endif %}
                         </div>
                         {{ button('Add Recommendation', type='button', variant='secondary', attrs='id="add-recommendation-btn"') }}
                     </div>
@@ -303,11 +297,11 @@
                                 {% for form in evaluation_forms %}
                                 <tr>
                                     <td class="border-b border-edge px-3 py-2 text-sm text-ink">{{ form.name }}</td>
-                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="1" {% if form.rating == 1 %}checked{% endif %} required></td>
-                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="2" {% if form.rating == 2 %}checked{% endif %}></td>
-                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="3" {% if form.rating == 3 %}checked{% endif %}></td>
-                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="4" {% if form.rating == 4 %}checked{% endif %}></td>
-                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="5" {% if form.rating == 5 %}checked{% endif %}></td>
+                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="1" {% if form.rating == '1' %}checked{% endif %} required></td>
+                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="2" {% if form.rating == '2' %}checked{% endif %}></td>
+                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="3" {% if form.rating == '3' %}checked{% endif %}></td>
+                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="4" {% if form.rating == '4' %}checked{% endif %}></td>
+                                    <td class="border-b border-edge px-3 py-2 text-center"><input type="radio" class="h-4 w-4 border-edge text-accent focus:ring-accent" name="rating-{{ loop.index0 }}" value="5" {% if form.rating == '5' %}checked{% endif %}></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

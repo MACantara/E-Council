@@ -86,7 +86,7 @@
                                 <div class="grid gap-2 sm:grid-cols-2">
                                     {% for user in organization.users %}
                                     <label class="flex items-start gap-2 rounded-lg border border-edge p-2 text-sm text-ink-2 transition-colors hover:bg-surface cursor-pointer">
-                                        <input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" {% if user.users_id in meeting.attendees %}checked{% endif %} class="mt-1 h-4 w-4 rounded border-edge text-accent focus:ring-accent">
+                                        <input type="checkbox" name="minutes-of-the-meeting-attendees" value="{{ user.users_id }}" {% if user.users_id in meeting_attendees %}checked{% endif %} class="mt-1 h-4 w-4 rounded border-edge text-accent focus:ring-accent">
                                         <span>{{ user.users_first_name }} {{ user.users_last_name }} - {{ user.users_student_organization_position }}</span>
                                     </label>
                                     {% endfor %}

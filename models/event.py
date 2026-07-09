@@ -22,12 +22,12 @@ class Events(db.Model):
     events_status = db.Column(db.String(50), nullable=True)
     events_description = db.Column(db.Text, nullable=True)
     events_remarks = db.Column(db.String(255), nullable=True)
-    transactions = db.Column(db.JSON, nullable=False, default=list)
 
     # Relationships to related models
     board_resolutions = db.relationship("BoardResolutions", back_populates="events")
     documentation = db.relationship("Documentation", back_populates="events")
     financial_reports = db.relationship("FinancialReports", back_populates="events")
+    transactions = db.relationship("Transaction", backref="event", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Events({self.events_id}, {self.events_name}, {self.events_semester}, {self.events_academic_year}, {self.events_start_date_and_time}, {self.events_end_date_and_time}, {self.events_venue}, {self.events_budget}, {self.events_status}, {self.events_description}, {self.events_remarks}, {self.events_concept_paper_forms_id})"

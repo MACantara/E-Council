@@ -357,15 +357,15 @@ Phase 3 moves business logic out of route handlers and into services, improves t
 **Scope**: `models/concept_paper.py`, `models/documentation.py`, `models/event.py`, `models/meeting.py`, `routes/*.py`
 
 **Checklist**
-- [ ] Create `models/tally_item.py` with `TallyItem` and migrate `Documentation.tally_items` to a child table.
-- [ ] Create `models/evaluation_form.py` for evaluation forms.
-- [ ] Create `models/activity_report_strength.py`, `activity_report_weakness.py`, `activity_report_recommendation.py` or a single `ActivityReportItem` table with a `type` column.
-- [ ] Create `models/transaction.py` and migrate `Events.transactions` JSON.
-- [ ] Create `models/meeting_attendee.py` for `MinutesOfTheMeeting.attendees`.
-- [ ] Create `models/learning_outcome.py` and `models/objective.py` for `ConceptPaperForms` JSON lists.
-- [ ] Generate Flask-Migrate migrations for each new table.
-- [ ] Update route/service logic to insert/update child records instead of dumping JSON.
-- [ ] Update templates to render child lists and add/remove rows via JS.
+- [x] Create `models/tally_item.py` with `TallyItem` and migrate `Documentation.tally_items` to a child table.
+- [x] Create `models/evaluation_form.py` for evaluation forms.
+- [x] Create `models/activity_report_strength.py`, `activity_report_weakness.py`, `activity_report_recommendation.py` or a single `ActivityReportItem` table with a `type` column.
+- [x] Create `models/transaction.py` and migrate `Events.transactions` JSON.
+- [x] Create `models/meeting_attendee.py` for `MinutesOfTheMeeting.attendees`.
+- [x] Create `models/learning_outcome.py` and `models/objective.py` for `ConceptPaperForms` JSON lists.
+- [x] Generate Flask-Migrate migrations for each new table.
+- [x] Update route/service logic to insert/update child records instead of dumping JSON.
+- [x] Update templates to render child lists and add/remove rows via JS.
 
 **Acceptance criteria**: No `db.JSON` is used for data that needs to be queried or aggregated. Foreign keys enforce relationships. Migrations apply cleanly.
 

@@ -50,10 +50,10 @@ def events_overview():
     for event in events:
         transactions = event.transactions or []
         total_income = sum(
-            safe_decimal_conversion(t.get("total") or 0) for t in transactions if t.get("type") == "Income"
+            safe_decimal_conversion(t.total or 0) for t in transactions if t.type == "Income"
         )
         total_expense = sum(
-            safe_decimal_conversion(t.get("total") or 0) for t in transactions if t.get("type") == "Expense"
+            safe_decimal_conversion(t.total or 0) for t in transactions if t.type == "Expense"
         )
         events_budget = safe_decimal_conversion(event.events_budget) if event.events_budget else Decimal("0.00")
         remaining_budget = total_income - total_expense + events_budget if isinstance(events_budget, Decimal) else "N/A"
@@ -86,21 +86,21 @@ def event_dashboard(event_id):
     if not belongs_to_user_or_department(event, current_user):
         abort(403)
 
-    # Fetch the transactions for the given event from the JSON list, sorted by most recent
-    transactions = sorted((event.transactions or []), key=lambda t: t.get("date", ""), reverse=True)
+    # Fetch the transactions for the given event from related Transaction records, sorted by most recent
+    transactions = sorted((event.transactions or []), key=lambda t: t.transaction_date or 0, reverse=True)
 
     # Aggregate top 5 income transactions grouped by category
     income_by_category = defaultdict(float)
     expense_by_category = defaultdict(float)
     for t in event.transactions or []:
         try:
-            total = float(t.get("total") or 0)
+            total = float(t.total or 0)
         except (TypeError, ValueError):
             total = 0.0
-        if t.get("type") == "Income":
-            income_by_category[t.get("category")] += total
-        elif t.get("type") == "Expense":
-            expense_by_category[t.get("category")] += total
+        if t.type == "Income":
+            income_by_category[t.category] += total
+        elif t.type == "Expense":
+            expense_by_category[t.category] += total
 
     top5_income = sorted(income_by_category.items(), key=lambda x: x[1], reverse=True)[:5]
     top5_expense = sorted(expense_by_category.items(), key=lambda x: x[1], reverse=True)[:5]

@@ -28,6 +28,7 @@ from models import (
     Events,
     FinancialReports,
     LearningJournalForms,
+    MeetingAttendee,
     MinutesOfTheMeeting,
     PersonnelInChargeForms,
     Signatories,
@@ -269,7 +270,7 @@ class MinutesOfTheMeetingFactory(BaseFactory):
 
     @factory.post_generation
     def set_attendees(self, create, extracted, **kwargs):
-        """Set the attendees JSON list to include the prepared_by user."""
+        """Create MeetingAttendee records for the prepared_by user."""
         if create:
-            self.attendees = [self.prepared_by_user.users_id]
+            self.attendees = [MeetingAttendee(users_id=self.prepared_by_user.users_id)]
             db.session.commit()

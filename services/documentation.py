@@ -11,11 +11,14 @@ from sqlalchemy import or_
 
 from models import (
     ActivityReportForms,
+    ActivityReportItem,
     ConceptPaperForms,
     Documentation,
+    EvaluationForm,
     Events,
     LearningJournalForms,
     Signatories,
+    TallyItem,
     Users,
     db,
 )
@@ -223,7 +226,7 @@ def add_documentation():
                     current_app.logger.error("Failed to process student list: %s", e, exc_info=True)
                     flash(f"Failed to process student list: {str(e)}", "error")
 
-        # Create a new documentation entry with JSON fields
+        # Create a new documentation entry
         new_documentation = Documentation(
             documentation_events_id=documentation_events_id,
             documentation_academic_year=documentation_academic_year,
@@ -239,16 +242,33 @@ def add_documentation():
             documentation_date_of_submission=documentation_date_of_submission,
             documentation_rating=documentation_rating,
             documentation_comments_suggestions=documentation_comments_suggestions,
-            activity_strengths=activity_strengths,
-            activity_weaknesses=activity_weaknesses,
-            activity_recommendations=activity_recommendations,
-            tally_items=tally_items,
             evaluation_images=evaluation_images,
             attendance_images=attendance_images,
             event_photo_images=event_photo_images,
             evaluation_student_names=evaluation_student_names,
-            evaluation_forms=[],
         )
+
+        # Add child activity report items
+        new_documentation.activity_report_items = [
+            ActivityReportItem(item_type="strength", item_text=s) for s in activity_strengths if s
+        ] + [
+            ActivityReportItem(item_type="weakness", item_text=w) for w in activity_weaknesses if w
+        ] + [
+            ActivityReportItem(item_type="recommendation", item_text=r) for r in activity_recommendations if r
+        ]
+
+        # Add child tally items
+        for tally in tally_items:
+            new_documentation.tally_items.append(
+                TallyItem(
+                    name=tally["name"],
+                    extremely_satisfied=tally["extremely_satisfied"],
+                    satisfied=tally["satisfied"],
+                    neutral=tally["neutral"],
+                    dissatisfied=tally["dissatisfied"],
+                    extremely_dissatisfied=tally["extremely_dissatisfied"],
+                )
+            )
 
         db.session.add(new_documentation)
         db.session.commit()
@@ -365,15 +385,16 @@ def update_documentation(documentation_id):
         documentation.documentation_noted_by = documentation_noted_by
         documentation.documentation_date_of_submission = documentation_date_of_submission
 
-        # Update strengths, weaknesses, and recommendations as JSON lists
-        documentation.activity_strengths = [
-            s.strip() for s in request.form.getlist("activity-strengths[]") if s.strip()
-        ]
-        documentation.activity_weaknesses = [
-            w.strip() for w in request.form.getlist("activity-weaknesses[]") if w.strip()
-        ]
-        documentation.activity_recommendations = [
-            r.strip() for r in request.form.getlist("activity-recommendations[]") if r.strip()
+        # Update strengths, weaknesses, and recommendations as child records
+        strengths = [s.strip() for s in request.form.getlist("activity-strengths[]") if s.strip()]
+        weaknesses = [w.strip() for w in request.form.getlist("activity-weaknesses[]") if w.strip()]
+        recommendations = [r.strip() for r in request.form.getlist("activity-recommendations[]") if r.strip()]
+        documentation.activity_report_items = [
+            ActivityReportItem(item_type="strength", item_text=s) for s in strengths
+        ] + [
+            ActivityReportItem(item_type="weakness", item_text=w) for w in weaknesses
+        ] + [
+            ActivityReportItem(item_type="recommendation", item_text=r) for r in recommendations
         ]
 
         # Update Learning Journal fields
@@ -486,7 +507,7 @@ def update_documentation(documentation_id):
                     flash("Error uploading some photo documentation images", "error")
         documentation.event_photo_images = event_photo_images
 
-        # Update tally items as a JSON list
+        # Update tally items as child records
         tally_items_names = request.form.getlist("tally-items-name[]")
         tally_items_extremely_satisfied = request.form.getlist("tally-items-extremely-satisfied-rating-total[]")
         tally_items_satisfied = request.form.getlist("tally-items-satisfied-rating-total[]")
@@ -494,31 +515,28 @@ def update_documentation(documentation_id):
         tally_items_dissatisfied = request.form.getlist("tally-items-dissatisfied-rating-total[]")
         tally_items_extremely_dissatisfied = request.form.getlist("tally-items-extremely-dissatisfied-rating-total[]")
 
-        tally_items = []
-        for i in range(len(tally_items_names)):
-            if tally_items_names[i].strip():
-                tally_items.append(
-                    {
-                        "name": tally_items_names[i],
-                        "extremely_satisfied": int(tally_items_extremely_satisfied[i]),
-                        "satisfied": int(tally_items_satisfied[i]),
-                        "neutral": int(tally_items_neutral[i]),
-                        "dissatisfied": int(tally_items_dissatisfied[i]),
-                        "extremely_dissatisfied": int(tally_items_extremely_dissatisfied[i]),
-                    }
-                )
-        documentation.tally_items = tally_items
+        documentation.tally_items = [
+            TallyItem(
+                name=tally_items_names[i],
+                extremely_satisfied=int(tally_items_extremely_satisfied[i]) if i < len(tally_items_extremely_satisfied) else 0,
+                satisfied=int(tally_items_satisfied[i]) if i < len(tally_items_satisfied) else 0,
+                neutral=int(tally_items_neutral[i]) if i < len(tally_items_neutral) else 0,
+                dissatisfied=int(tally_items_dissatisfied[i]) if i < len(tally_items_dissatisfied) else 0,
+                extremely_dissatisfied=int(tally_items_extremely_dissatisfied[i]) if i < len(tally_items_extremely_dissatisfied) else 0,
+            )
+            for i in range(len(tally_items_names))
+            if tally_items_names[i].strip()
+        ]
 
-        # Update evaluation forms as a JSON list
-        evaluation_form_names = request.form.getlist("evaluation-form-name[]")
-        evaluation_form_ratings = request.form.getlist("evaluation-form-rating[]")
-
-        evaluation_forms = []
-        for i in range(len(evaluation_form_names)):
-            if evaluation_form_names[i].strip():
-                rating = evaluation_form_ratings[i] if i < len(evaluation_form_ratings) else None
-                evaluation_forms.append({"name": evaluation_form_names[i], "rating": rating})
-        documentation.evaluation_forms = evaluation_forms
+        # Update evaluation form ratings while preserving existing form names
+        existing_evaluation_forms = documentation.evaluation_forms or []
+        documentation.evaluation_forms = [
+            EvaluationForm(
+                name=form.name,
+                rating=request.form.get(f"rating-{i}"),
+            )
+            for i, form in enumerate(existing_evaluation_forms)
+        ]
 
         # Update student list as a JSON list
         documentation.evaluation_student_names = [
@@ -595,7 +613,7 @@ def update_documentation(documentation_id):
     if documentation.documentation_learning_journal_forms_id:
         learning_journal = LearningJournalForms.query.get(documentation.documentation_learning_journal_forms_id)
 
-    # Use JSON fields directly
+    # Use child objects for normalized data
     tally_items = documentation.tally_items or []
     evaluation_images = documentation.evaluation_images or []
     attendance_images = documentation.attendance_images or []
@@ -604,9 +622,9 @@ def update_documentation(documentation_id):
     evaluation_student_list = documentation.evaluation_student_names or []
     learnings = learning_journal.learnings if learning_journal else []
     observations = learning_journal.observations if learning_journal else []
-    strengths = documentation.activity_strengths or []
-    weaknesses = documentation.activity_weaknesses or []
-    recommendations = documentation.activity_recommendations or []
+    strengths = [item for item in documentation.activity_report_items if item.item_type == "strength"]
+    weaknesses = [item for item in documentation.activity_report_items if item.item_type == "weakness"]
+    recommendations = [item for item in documentation.activity_report_items if item.item_type == "recommendation"]
 
     return render_template(
         "documentation/update-documentation.html",

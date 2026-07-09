@@ -185,21 +185,19 @@
                     <div class="w-full">
                         <label class="mb-2 block text-sm font-medium text-ink-2">Strengths</label>
                         <div id="activity-strengths" class="space-y-2">
-                            {% if concept_paper.activity_report_forms %}
-                            {% for strength in concept_paper.activity_report_forms[0].strengths %}
+                            {% for strength in strengths %}
                             <div class="flex items-center gap-2">
                                 <input type="text" name="activity-strengths" value="{{ strength }}" placeholder="Enter Strength" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
                             </div>
-                            {% endfor %}
                             {% else %}
                             <div class="flex items-center gap-2">
                                 <input type="text" name="activity-strengths" placeholder="Enter Strength" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
                             </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
                         {{ button('Add Strength', type='button', variant='secondary', attrs='id="add-strength-btn"') }}
                     </div>
@@ -207,21 +205,19 @@
                     <div class="w-full">
                         <label class="mb-2 block text-sm font-medium text-ink-2">Weaknesses</label>
                         <div id="activity-weaknesses" class="space-y-2">
-                            {% if concept_paper.activity_report_forms %}
-                            {% for weakness in concept_paper.activity_report_forms[0].weaknesses %}
+                            {% for weakness in weaknesses %}
                             <div class="flex items-center gap-2">
                                 <input type="text" name="activity-weaknesses" value="{{ weakness }}" placeholder="Enter Weakness" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
                             </div>
-                            {% endfor %}
                             {% else %}
                             <div class="flex items-center gap-2">
                                 <input type="text" name="activity-weaknesses" placeholder="Enter Weakness" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
                             </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
                         {{ button('Add Weakness', type='button', variant='secondary', attrs='id="add-weakness-btn"') }}
                     </div>
@@ -229,21 +225,19 @@
                     <div class="w-full">
                         <label class="mb-2 block text-sm font-medium text-ink-2">Recommendations</label>
                         <div id="activity-recommendations" class="space-y-2">
-                            {% if concept_paper.activity_report_forms %}
-                            {% for recommendation in concept_paper.activity_report_forms[0].recommendations %}
+                            {% for recommendation in recommendations %}
                             <div class="flex items-center gap-2">
                                 <input type="text" name="activity-recommendations" value="{{ recommendation }}" placeholder="Enter Recommendation" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
                             </div>
-                            {% endfor %}
                             {% else %}
                             <div class="flex items-center gap-2">
                                 <input type="text" name="activity-recommendations" placeholder="Enter Recommendation" required
                                     class="w-full rounded-lg border border-edge bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent">
                                 <button type="button" class="remove-item-btn inline-flex shrink-0 items-center rounded-lg border border-danger px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white">Delete</button>
                             </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
                         {{ button('Add Recommendation', type='button', variant='secondary', attrs='id="add-recommendation-btn"') }}
                     </div>
