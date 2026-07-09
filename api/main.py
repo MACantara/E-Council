@@ -6,6 +6,8 @@ from fastapi import FastAPI
 
 from api.database import create_tables, get_engine
 from api.exceptions import register_exception_handlers
+from api.routers.account import router as account_router
+from api.routers.admin import router as admin_router
 from api.routers.auth import router as auth_router
 
 
@@ -27,3 +29,5 @@ app = FastAPI(
 register_exception_handlers(app)
 
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(account_router, prefix="/api/v1")
+app.include_router(admin_router, prefix="/api/v1")

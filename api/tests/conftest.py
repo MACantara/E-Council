@@ -9,44 +9,67 @@ import pytest
 from fastapi.testclient import TestClient
 
 # Set environment variables before the FastAPI app or its dependencies are imported.
-os.environ["FASTAPI_DATABASE_URI"] = "sqlite:///./test_fastapi_common.db"
+# Use an in-memory SQLite database with StaticPool so tests run quickly.
+os.environ["FASTAPI_DATABASE_URI"] = "sqlite:///:memory:"
 os.environ["STORAGE_PROVIDER"] = "memory"
+os.environ["EMAIL_PROVIDER"] = "memory"
 
 import api.database
 
-api.database.set_engine()
-
-from api.database import SessionLocal, create_tables, engine
-from api.dependencies import create_access_token
+from api.dependencies import create_access_token, reset_email_backend
 from api.main import app
 from models import Departments, Users, db
 
 
+_MEMORY_DATABASE_URI = "sqlite:///:memory:"
+
+
+def _rebind_engine():
+    """Rebind the global API database engine to the in-memory test database."""
+    os.environ["FASTAPI_DATABASE_URI"] = _MEMORY_DATABASE_URI
+    api.database.set_engine(_MEMORY_DATABASE_URI)
+
+
+@pytest.fixture
+def email_backend():
+    """Reset and expose the cached email backend for assertions."""
+    reset_email_backend()
+    from api.dependencies import get_email
+
+    backend = get_email()
+    backend.clear()
+    return backend
+
+
 @pytest.fixture
 def fastapi_client():
-    """FastAPI TestClient with a fresh database for each test."""
-    create_tables()
+    """FastAPI TestClient with a fresh in-memory database for each test."""
+    _rebind_engine()
+    api.database.create_tables()
     with TestClient(app) as client:
         yield client
-    db.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
 def fastapi_db():
     """A SQLAlchemy session that is rolled back after the test."""
-    create_tables()
-    session = SessionLocal()
+    _rebind_engine()
+    api.database.create_tables()
+    session = api.database.SessionLocal()
     try:
         yield session
     finally:
         session.rollback()
         session.close()
-        db.metadata.drop_all(bind=engine)
+        db.metadata.drop_all(bind=api.database.get_engine())
 
 
 @pytest.fixture
-def fastapi_user(fastapi_client):
-    """A registered user created through the FastAPI auth API."""
+def fastapi_user(fastapi_client, fastapi_db):
+    """A registered and verified user created through the FastAPI auth API."""
+    from api.emails import verify_email_token
+    from models import EmailVerification
+
     response = fastapi_client.post(
         "/api/v1/auth/register",
         json={
@@ -55,11 +78,19 @@ def fastapi_user(fastapi_client):
             "users_username": "fastapiuser",
             "users_email": "fastapi@example.com",
             "users_password": "Password123!",
-            "users_role": "Student Council Officer",
+            "users_repeat_password": "Password123!",
+            "users_role": "Faculty",
             "users_department_name": "FastAPI Test Department",
         },
     )
     assert response.status_code == 201
+
+    verification = fastapi_db.query(EmailVerification).filter_by(
+        email_verification_new_email="fastapi@example.com"
+    ).first()
+    assert verification is not None
+    verify_email_token(fastapi_db, verification.email_verification_token)
+
     return response.json()
 
 
@@ -100,6 +131,9 @@ def authenticated_client(fastapi_client, fastapi_user):
 
         def delete(self, *args, **kwargs):
             return self.client.delete(*args, **self._headers(kwargs))
+
+        def request(self, method, *args, **kwargs):
+            return self.client.request(method, *args, **self._headers(kwargs))
 
     return _AuthenticatedClient(fastapi_client, token)
 

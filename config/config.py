@@ -8,6 +8,7 @@ import os
 from logging.handlers import RotatingFileHandler
 
 from dotenv import load_dotenv
+from sqlalchemy.pool import StaticPool
 
 # Load environment variables from .env file
 load_dotenv()
@@ -171,6 +172,11 @@ class DatabaseConfig:
         uri = uri or DatabaseConfig.get_database_uri()
         if not uri:
             return {}
+        if uri.startswith("sqlite:///:memory:"):
+            return {
+                "poolclass": StaticPool,
+                "connect_args": {"check_same_thread": False},
+            }
         if uri.startswith("sqlite"):
             return {
                 "connect_args": {"check_same_thread": False},

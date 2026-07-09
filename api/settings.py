@@ -2,7 +2,7 @@
 
 import os
 
-from config import DatabaseConfig, get_config
+from config import DatabaseConfig, EmailConfig, get_config
 
 FLASK_ENV = os.getenv("FLASK_ENV", "development")
 _flask_config = get_config(FLASK_ENV)
@@ -18,3 +18,10 @@ if DATABASE_URL.startswith("mysql://"):
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+
+# Base URL used for verification and password reset links.
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
+# Email provider used by the FastAPI API when no Flask app context is available.
+EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", EmailConfig.EMAIL_PROVIDER)

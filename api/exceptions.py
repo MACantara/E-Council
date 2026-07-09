@@ -73,11 +73,28 @@ class UnprocessableEntityError(APIException):
         super().__init__(status_code=422, detail=detail, headers=headers)
 
 
+def _make_json_serializable(value: Any) -> Any:
+    """Recursively convert non-JSON-serializable values to strings."""
+    if isinstance(value, dict):
+        return {k: _make_json_serializable(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_make_json_serializable(v) for v in value]
+    if isinstance(value, tuple):
+        return [_make_json_serializable(v) for v in value]
+    try:
+        # If value is not an exception, attempt standard serialization.
+        if isinstance(value, BaseException):
+            return str(value)
+        return value
+    except Exception:
+        return str(value)
+
+
 def _error_response(status_code: int, detail: str, errors: list[Any] | None = None) -> dict[str, Any]:
     return {
         "success": False,
         "detail": detail,
-        "errors": errors or [detail],
+        "errors": _make_json_serializable(errors) if errors else [detail],
     }
 
 

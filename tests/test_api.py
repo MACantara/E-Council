@@ -10,15 +10,17 @@ from fastapi.testclient import TestClient
 _original_flask_env = os.environ.get("FLASK_ENV")
 os.environ["FASTAPI_DATABASE_URI"] = "sqlite:///./fastapi_test.db"
 os.environ["FLASK_ENV"] = "testing"
+os.environ["EMAIL_PROVIDER"] = "memory"
 
 # Re-bind the FastAPI engine so the test database is used even when the module
 # has already been imported by other tests.
 import api.database
-
-api.database.set_engine()
-from api.database import create_tables, engine
+from api.emails import verify_email_token
 from api.main import app
-from models import db
+from models import EmailVerification, db
+
+
+_FILE_DATABASE_URI = "sqlite:///./fastapi_test.db"
 
 if _original_flask_env is None:
     os.environ.pop("FLASK_ENV", None)
@@ -28,10 +30,11 @@ else:
 
 def _create_client():
     """Create a test client with fresh tables."""
-    create_tables()
+    api.database.set_engine(_FILE_DATABASE_URI)
+    api.database.create_tables()
     with TestClient(app) as client:
         yield client
-    db.metadata.drop_all(bind=engine)
+    db.metadata.drop_all(bind=api.database.get_engine())
 
 
 class TestFastAPIAuth:
@@ -43,8 +46,8 @@ class TestFastAPIAuth:
         yield from _create_client()
 
     def _register_user(self, client, username, email):
-        """Helper to register a new user."""
-        return client.post(
+        """Helper to register a new user and verify the account."""
+        response = client.post(
             "/api/v1/auth/register",
             json={
                 "users_first_name": "Test",
@@ -52,10 +55,22 @@ class TestFastAPIAuth:
                 "users_username": username,
                 "users_email": email,
                 "users_password": "Password123!",
-                "users_role": "Student Council Officer",
+                "users_repeat_password": "Password123!",
+                "users_role": "Faculty",
                 "users_department_name": "FastAPI Test Department",
             },
         )
+        if response.status_code == 201:
+            db_session = api.database.SessionLocal()
+            try:
+                verification = db_session.query(EmailVerification).filter_by(
+                    email_verification_new_email=email
+                ).first()
+                if verification:
+                    verify_email_token(db_session, verification.email_verification_token)
+            finally:
+                db_session.close()
+        return response
 
     def test_register(self, client):
         """A user can register through the FastAPI auth endpoint."""

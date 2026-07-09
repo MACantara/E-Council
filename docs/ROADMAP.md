@@ -668,12 +668,27 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/routers/auth.py`, `api/routers/account.py`, `api/schemas/auth.py`, `api/schemas/account.py`, `api/dependencies.py`, `repositories/users.py`, `services/email/`
 
 **Checklist**
-- [ ] Reimplement the Flask `routes/auth.py` flows in FastAPI: signup, login, logout, refresh token, forgot password, reset password, email verification.
-- [ ] Reimplement `routes/account.py` as FastAPI account endpoints: profile, password change, account settings.
-- [ ] Add admin user management endpoints (list, promote, deactivate) previously in `routes/admin.py`.
-- [ ] Reuse the abstracted email service from Phase 4.8 for password reset and verification emails.
-- [ ] Ensure password hashing and validation match the Flask implementation.
-- [ ] Add comprehensive tests covering auth/account/admin flows.
+- [x] Reimplement the Flask `routes/auth.py` flows in FastAPI: signup, login, logout, refresh token, forgot password, reset password, email verification.
+- [x] Reimplement `routes/account.py` as FastAPI account endpoints: profile, password change, account settings.
+- [x] Add admin user management endpoints (list, promote, deactivate) previously in `routes/admin.py`.
+- [x] Reuse the abstracted email service from Phase 4.8 for password reset and verification emails.
+- [x] Ensure password hashing and validation match the Flask implementation.
+- [x] Add comprehensive tests covering auth/account/admin flows.
+
+**Notes**
+- Extended `api/schemas/auth.py` with `users_repeat_password`, `users_student_organization`, `users_student_organization_position`, `users_home_address`, `users_contact_number`, and verification/reset token schemas.
+- Added `api/schemas/account.py` (settings update, password change, email change) and `api/schemas/admin.py` (role update, paginated user list).
+- Implemented `api/routers/auth.py` with `/register`, `/login`, `/logout`, `/refresh`, `/resend-verification`, `/verify-email`, `/forgot-password`, `/reset-password`, and `/me`.
+- Implemented `api/routers/account.py` with profile, settings, password, email, profile-picture/signature upload, and account deletion.
+- Implemented `api/routers/admin.py` with list users, update role, deactivate, and delete user endpoints.
+- Added `api/emails.py` helpers that reuse `services.email` and `itsdangerous` for verification, password reset, and email change flows.
+- Updated `api/dependencies.py` with `get_email` (cached singleton) and `get_request_ip` for login attempt tracking.
+- Updated `api/main.py` to wire `account` and `admin` routers.
+- Updated `services/email/service.py` to support Flask-less usage by reading `EMAIL_PROVIDER` from environment variables.
+- Added `api/settings.py` `API_BASE_URL`, `FRONTEND_URL`, and `EMAIL_PROVIDER` defaults.
+- Added `api/tests/test_auth.py`, `api/tests/test_account.py`, and `api/tests/test_admin.py` covering the new flows.
+- Switched `api/tests/conftest.py` to `sqlite:///:memory:` with `StaticPool` and fixed engine isolation so `api/tests` and `tests/test_api.py` can run together.
+- All FastAPI tests pass: `57 passed` across `api/tests/` and `tests/test_api.py`.
 
 **Acceptance criteria**: Full parity with `routes/auth.py` and `routes/account.py`. Admins can manage users. Token-based auth is used by all subsequent FastAPI endpoints.
 

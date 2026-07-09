@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import Depends, HTTPException, Query, UploadFile, status
+from fastapi import Depends, HTTPException, Query, Request, UploadFile, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt
 from jose.exceptions import JWTError
@@ -19,6 +19,7 @@ from api.settings import (
 )
 from models import Users
 from repositories.users import UserRepository
+from services.email import EmailBackend, get_email as _get_email_service
 from services.storage import StorageBackend, StorageError, get_storage as _get_storage_service
 
 security = HTTPBearer(auto_error=False)
@@ -163,3 +164,32 @@ def check_ownership(current_user: Users, owner_id: int) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource",
         )
+
+
+_email_backend: EmailBackend | None = None
+
+
+def get_email() -> EmailBackend:
+    """Return the configured email backend for the current request.
+
+    The backend is cached so the same instance is used by all endpoints and
+    test fixtures can inspect the messages sent through it.
+    """
+    global _email_backend
+    if _email_backend is None:
+        _email_backend = _get_email_service()
+    return _email_backend
+
+
+def reset_email_backend() -> None:
+    """Reset the cached email backend. Intended for test fixtures."""
+    global _email_backend
+    _email_backend = None
+
+
+def get_request_ip(request: Request) -> str:
+    """Return the client IP address from the request."""
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "127.0.0.1"
