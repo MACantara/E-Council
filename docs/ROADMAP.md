@@ -601,36 +601,14 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.10 Abstract PDF generation
-
-**Why it matters**: PDF rendering is tightly coupled to ReportLab in `services/concept_papers.py`, `services/board_resolutions.py`, `services/documentation.py`, `services/financial.py`, and `services/meetings.py`. An abstraction allows switching to WeasyPrint, an external PDF service, or HTML-based rendering without touching routes or business logic.
-
-**Scope**: `services/pdf/`, `services/concept_papers.py`, `services/board_resolutions.py`, `services/documentation.py`, `services/financial.py`, `services/meetings.py`, `services/pdf.py`, `config/config.py`
-
-**Checklist**
-- [ ] Define a `PDFRenderer` protocol (e.g., `render_from_html(html)`, `render_from_template(template, context)`).
-- [ ] Implement a `ReportLabRenderer` that wraps the current ReportLab code.
-- [ ] Implement a `WeasyPrintRenderer` or `HTMLRenderer` as an alternative.
-- [ ] Extract per-document PDF generation into renderer classes or templates.
-- [ ] Add `PDF_RENDERER` and renderer-specific environment variables to `config/config.py`.
-- [ ] Keep shared helpers (Folio size, headers, footers) in `services/pdf/`.
-- [ ] Update tests to use a stub or in-memory renderer.
-- [ ] Update documentation with PDF renderer configuration.
-
-**Acceptance criteria**: Switching the PDF renderer does not require changes to routes or business logic. All PDF tests pass with a stub renderer.
-
-**Effort**: Large
-
----
-
-### 4.11 Migrate to FastAPI backend + SPA
+### 4.10 Migrate to FastAPI backend + SPA
 
 **Why it matters**: FastAPI offers high-performance async endpoints, automatic OpenAPI documentation, and Pydantic-native validation. A fully decoupled FastAPI backend serves as the API layer for the SPA and future mobile clients.
 
 **Scope**: New `api/` with FastAPI, `services/`, `repositories/`, `config/`
 
 **Checklist**
-- [ ] Complete Phases 4.6 through 4.10 before starting.
+- [ ] Complete Phases 4.6 through 4.9 before starting.
 - [ ] Set up FastAPI project structure (`api/main.py`, `api/routers/`, `api/services/`, `api/repositories/`).
 - [ ] Create Pydantic request/response models for all resources (users, events, concept papers, documents, financial reports, meetings, board resolutions).
 - [ ] Reimplement authentication and authorization with FastAPI dependencies and JWT tokens.
@@ -645,14 +623,14 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.12 Migrate to React + TypeScript frontend
+### 4.11 Migrate to React + TypeScript frontend
 
 **Why it matters**: A modern React frontend with TypeScript provides type-safe UI components, a better development experience, and full decoupling from the backend. It also enables richer interactivity and a shared component library.
 
 **Scope**: New `frontend/` with React + TypeScript + Tailwind CSS
 
 **Checklist**
-- [ ] Complete Phase 4.11 (FastAPI backend + SPA) before starting.
+- [ ] Complete Phase 4.10 (FastAPI backend + SPA) before starting.
 - [ ] Create a React frontend with TypeScript and Vite (or a similar build tool).
 - [ ] Port templates to React components/pages, preserving the Tailwind CSS 4 design system and existing macro behavior.
 - [ ] Build shared React components (Button, Card, Input, Select, etc.) to replace the Jinja2 macro system.
@@ -667,7 +645,7 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.13 Seed sample users and data for testing and demos
+### 4.12 Seed sample users and data for testing and demos
 
 **Why it matters**: A fresh environment currently has no users, departments, events, or documents, which makes manual and end-to-end testing tedious. A seeding layer creates representative sample data so developers and testers can verify workflows immediately without relying on manually created records.
 
@@ -689,7 +667,7 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.14 Document and update documentation for all changes
+### 4.13 Document and update documentation for all changes
 
 **Why it matters**: As the codebase has changed significantly (database abstraction, repository pattern, FastAPI prototype, service abstractions, seeding, and UI updates), the existing documentation must be audited and updated to match the current architecture. Complete documentation ensures the system is maintainable, the hand-off is smooth, and new contributors can set up and run the project without confusion.
 
@@ -724,7 +702,6 @@ Phase 4 prepares the application for a real production environment and explores 
 | 2026-07-09 | Abstract object storage | Currently coupled to Cloudinary; abstraction enables S3, MinIO, Azure Blob, and local storage |
 | 2026-07-09 | Abstract email delivery | Currently tied to SMTP via Flask-Mail; abstraction enables SendGrid, Mailgun, SES, and test backends |
 | 2026-07-09 | Abstract AI service | Currently hard-coded to Google Gemini; abstraction enables OpenAI, Anthropic, and local models |
-| 2026-07-09 | Abstract PDF generation | Currently coupled to ReportLab; abstraction enables WeasyPrint, HTML rendering, and external services |
 | 2026-07-09 | Migrate backend to FastAPI | High-performance async API, automatic OpenAPI docs, and Pydantic validation |
 | 2026-07-09 | Migrate frontend to React + TypeScript + Tailwind CSS | Type-safe UI components and full decoupling from the backend |
 | 2026-07-09 | Seed sample users and data | Fresh environments have no records; seeding accelerates manual and E2E testing |
@@ -743,7 +720,7 @@ For each recommendation:
 - **2026-07-09**: Created initial roadmap from `docs/IMPROVEMENT_ANALYSIS.md`.
 - **2026-07-09**: Migrated AI SDK from `google-generativeai` to `google-genai` (Phase 3.2); all AI generation endpoints and tests updated.
 - **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
-- **2026-07-09**: Added object storage, email, AI, and PDF abstraction layers to Phase 4; migration phases renumbered to 4.11 and 4.12.
-- **2026-07-09**: Added Phase 4.13 for seeding sample users and data for testing and demos.
-- **2026-07-09**: Added Phase 4.14 for documenting and updating all project documentation.
+- **2026-07-09**: Added object storage, email, and AI abstraction layers to Phase 4; migration phases renumbered to 4.10 and 4.11.
+- **2026-07-09**: Added Phase 4.12 for seeding sample users and data for testing and demos.
+- **2026-07-09**: Added Phase 4.13 for documenting and updating all project documentation.
 - **2026-07-09**: Completed Phase 4.6 database abstraction layer. Added `BaseRepository`, `repo`, and `get_repository()` in `repositories/`; refactored `routes/`, `services/`, `utils/`, and `forms/` to use the repository layer; updated `DatabaseConfig` to support SQLite, MySQL, and PostgreSQL; added `tests/test_repositories.py` integration tests; updated `ARCHITECTURE.md` and `README.md`.
