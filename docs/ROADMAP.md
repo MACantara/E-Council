@@ -498,18 +498,19 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ### 4.5 Evaluate API + SPA architecture
 
-**Why it matters**: A REST API would enable future mobile apps, integrations, and a more interactive frontend.
+**Why it matters**: A REST API would enable future mobile apps, integrations, and a more interactive frontend. Given that the long-term target is a FastAPI backend, this evaluation should validate FastAPI as the API layer for the SPA rather than building a Flask-based API that will be replaced later.
 
-**Scope**: `api/` (new), `templates/` (future), research
+**Scope**: `api/` (new FastAPI prototype), `templates/` (future), research
 
 **Checklist**
 - [ ] Document current data flows and identify REST resource boundaries.
-- [ ] Prototype `api/v1/concept_papers` using Flask-RESTX or Flask-Smorest.
-- [ ] Add JWT or session-based API authentication.
+- [ ] Prototype `api/v1/concept_papers` using FastAPI, with Pydantic request/response models.
+- [ ] Add JWT-based API authentication for the FastAPI prototype.
+- [ ] Evaluate how FastAPI integrates with the existing SQLAlchemy repository layer from Phase 4.6.
 - [ ] Decide whether to migrate the entire UI or keep server-rendered pages for the MVP.
-- [ ] Create an architecture decision record (ADR) in `docs/adr/001-api-vs-ssr.md`.
+- [ ] Create an architecture decision record (ADR) in `docs/adr/001-api-vs-ssr.md` that selects FastAPI + SPA for the long-term architecture.
 
-**Acceptance criteria**: A decision is documented and, if approved, a small API prototype is available.
+**Acceptance criteria**: A decision is documented and, if approved, a small FastAPI API prototype is available.
 
 **Effort**: Large (research/prototype), Extra Large (full migration)
 
