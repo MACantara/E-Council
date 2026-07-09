@@ -1,5 +1,7 @@
 # E-Council — Integrated Student Council Management System Powered by AI
 
+![CI](https://github.com/MACantara/E-Council/actions/workflows/ci.yml/badge.svg)
+
 > An AI-powered central hub for student council operations — managing events, documents, finances, and reports smarter, faster, and with less administrative overhead.
 
 E-Council is a Flask-based web application that digitizes and centralizes the administrative work of a student council — from event planning and concept papers to post-event documentation, financial tracking, board resolutions, and meeting minutes — in a single, authenticated platform with AI-assisted drafting and one-click PDF generation.

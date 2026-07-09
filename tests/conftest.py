@@ -2,12 +2,13 @@
 Shared test configuration and fixtures for E-Council tests.
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Add the directory containing app.py to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import create_app
 from extensions import db, limiter
@@ -16,7 +17,7 @@ from extensions import db, limiter
 @pytest.fixture
 def app():
     """Create a fresh Flask application configured for testing."""
-    app = create_app('testing')
+    app = create_app("testing")
     # Disable rate limiting by default so non-rate-limit tests are not affected.
     # Rate-limit tests explicitly enable it.
     limiter.enabled = False
@@ -46,13 +47,13 @@ def app_context(app):
 @pytest.fixture
 def sample_user(app_context):
     """Create a sample user for testing."""
-    from models import Users, Departments
-    
+    from models import Departments, Users
+
     # Create a department first
     department = Departments(departments_name="Test Department")
     db.session.add(department)
     db.session.commit()
-    
+
     # Create a user
     user = Users(
         users_first_name="Test",
@@ -61,19 +62,19 @@ def sample_user(app_context):
         users_email="test@example.com",
         users_departments_id=department.departments_id,
         users_role="Student Council Officer",
-        users_email_verified=1
+        users_email_verified=1,
     )
     user.set_password("Password123!")
     db.session.add(user)
     db.session.commit()
-    
+
     return user
 
 
 @pytest.fixture
 def other_user(app_context):
     """Create another user and department for cross-department tests."""
-    from models import Users, Departments
+    from models import Departments, Users
 
     other_department = Departments(departments_name="Other Department")
     db.session.add(other_department)
@@ -86,7 +87,7 @@ def other_user(app_context):
         users_email="other@example.com",
         users_departments_id=other_department.departments_id,
         users_role="Student Council Officer",
-        users_email_verified=1
+        users_email_verified=1,
     )
     user.set_password("Password123!")
     db.session.add(user)
@@ -98,7 +99,7 @@ def other_user(app_context):
 @pytest.fixture
 def admin_user(app_context):
     """Create an admin user for authorization tests."""
-    from models import Users, Departments
+    from models import Departments, Users
 
     department = Departments(departments_name="Admin Department")
     db.session.add(department)
@@ -111,7 +112,7 @@ def admin_user(app_context):
         users_email="admin@example.com",
         users_departments_id=department.departments_id,
         users_role="Admin",
-        users_email_verified=1
+        users_email_verified=1,
     )
     user.set_password("Password123!")
     db.session.add(user)
@@ -123,9 +124,10 @@ def admin_user(app_context):
 @pytest.fixture
 def auth_client(client, app_context, sample_user):
     """Return a test client that is authenticated as sample_user."""
-    response = client.post('/auth/login', data={
-        'users-username-email': sample_user.users_username,
-        'users-password': 'Password123!'
-    }, follow_redirects=True)
+    response = client.post(
+        "/auth/login",
+        data={"users-username-email": sample_user.users_username, "users-password": "Password123!"},
+        follow_redirects=True,
+    )
     assert response.status_code == 200
     return client

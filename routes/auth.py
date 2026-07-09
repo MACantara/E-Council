@@ -4,56 +4,50 @@ Handles user registration, login, logout, password reset, and email verification
 """
 
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask_login import login_user, logout_user, login_required, current_user
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from markupsafe import Markup
-
-# Import database models from models package
-from models import (
-    db,
-    Users,
-    StudentOrganizations,
-    EmailVerification,
-    PasswordReset,
-    LoginAttempts,
-    Departments
-)
-
-# Import email functions from utils.email
-from utils.email import send_verification_email, send_reset_password_email
-
-# Import authentication forms
-from forms.auth import SignupForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
-from extensions import limiter
-from flask_limiter.util import get_remote_address
 
 # Import current app to get SECRET_KEY for serializer
-from flask import current_app
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask_limiter.util import get_remote_address
+from flask_login import login_required, login_user, logout_user
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+from markupsafe import Markup
+
+from extensions import limiter
+
+# Import authentication forms
+from forms.auth import ForgotPasswordForm, LoginForm, ResetPasswordForm, SignupForm
+
+# Import database models from models package
+from models import Departments, EmailVerification, LoginAttempts, PasswordReset, StudentOrganizations, Users, db
+
+# Import email functions from utils.email
+from utils.email import send_reset_password_email, send_verification_email
+
 
 # Initialize URLSafeTimedSerializer
 def get_serializer():
     return URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
 
+
 # Create blueprint with url_prefix='/auth'
-auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 def _flash_form_errors(form):
     """Flash form validation errors, grouping required field errors."""
     has_required = False
-    for field_name, errors in form.errors.items():
+    for _field_name, errors in form.errors.items():
         for error in errors:
             # Treat any input-required style message as a generic required-field error
             if isinstance(error, str) and error.lower() in {
-                'this field is required.',
-                'input is required.',
+                "this field is required.",
+                "input is required.",
             }:
                 has_required = True
             else:
-                flash(error, 'error')
+                flash(error, "error")
     if has_required:
-        flash('All fields are required.', 'error')
+        flash("All fields are required.", "error")
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
@@ -61,8 +55,7 @@ def _flash_form_errors(form):
 def signup():
     department_choices = [(d.departments_name, d.departments_name) for d in Departments.query.all()]
     organization_choices = [
-        (str(o.student_organizations_id), o.student_organizations_name)
-        for o in StudentOrganizations.query.all()
+        (str(o.student_organizations_id), o.student_organizations_name) for o in StudentOrganizations.query.all()
     ]
 
     form = SignupForm(
@@ -106,7 +99,7 @@ def signup():
 def confirm_email(token):
     s = get_serializer()
     try:
-        email = s.loads(token, salt='email-confirm', max_age=3600)
+        email = s.loads(token, salt="email-confirm", max_age=3600)
     except SignatureExpired:
         flash("The email confirmation link has expired.", "error")
         return redirect(url_for("auth.signup"))
@@ -168,9 +161,16 @@ def login():
         if user:
             if user.users_email_verified == 0:
                 # Generate verification link with 'next' parameter
-                verification_link = url_for('auth.send_verification_email_route', users_email=user.users_email, next='login', _external=True)
-                
-                flash(Markup(f"Please verify your email before logging in. <a href='{verification_link}'>Click here to resend the verification email.</a>"), "error")
+                verification_link = url_for(
+                    "auth.send_verification_email_route", users_email=user.users_email, next="login", _external=True
+                )
+
+                flash(
+                    Markup(
+                        f"Please verify your email before logging in. <a href='{verification_link}'>Click here to resend the verification email.</a>"
+                    ),
+                    "error",
+                )
                 return redirect(url_for("auth.login"))
 
             if user.check_password(users_password):
@@ -179,10 +179,7 @@ def login():
                 if login_attempt:
                     login_attempt.login_attempt_count = 0
                 else:
-                    login_attempt = LoginAttempts(
-                        login_attempt_ip_address=ip_address,
-                        login_attempt_count=0
-                    )
+                    login_attempt = LoginAttempts(login_attempt_ip_address=ip_address, login_attempt_count=0)
                     db.session.add(login_attempt)
                 db.session.commit()
                 return redirect(url_for("dashboard.council_overview"))
@@ -191,10 +188,7 @@ def login():
         if login_attempt:
             login_attempt.login_attempt_count += 1
         else:
-            login_attempt = LoginAttempts(
-                login_attempt_ip_address=ip_address,
-                login_attempt_count=1
-            )
+            login_attempt = LoginAttempts(login_attempt_ip_address=ip_address, login_attempt_count=1)
             db.session.add(login_attempt)
         db.session.commit()
 
@@ -217,13 +211,12 @@ def login():
 
 @auth_bp.route("/send_verification_email/<users_email>")
 def send_verification_email_route(users_email):
-    next_route = request.args.get('next', 'login')  # Default to 'login' if 'next' is not provided
+    next_route = request.args.get("next", "login")  # Default to 'login' if 'next' is not provided
     user = Users.query.filter_by(users_email=users_email).first_or_404()
     if user.users_email_verified == 0:
         # Check for existing email verification records
         existing_verification = EmailVerification.query.filter_by(
-            email_verification_users_id=user.users_id,
-            email_verification_new_email=users_email
+            email_verification_users_id=user.users_id, email_verification_new_email=users_email
         ).first()
 
         if existing_verification:
@@ -235,7 +228,7 @@ def send_verification_email_route(users_email):
         flash("This email is already verified.", "info")
 
     # Redirect to the appropriate route based on the 'next' query parameter
-    if next_route == 'email_settings':
+    if next_route == "email_settings":
         return redirect(url_for("account.email_settings"))
     else:
         return redirect(url_for("auth.login"))
@@ -259,12 +252,13 @@ def forgot_password():
         user = Users.query.filter_by(users_email=users_email).first()
         if user:
             # Check for existing password reset records
-            existing_reset = PasswordReset.query.filter_by(
-                password_reset_users_id=user.users_id
-            ).first()
+            existing_reset = PasswordReset.query.filter_by(password_reset_users_id=user.users_id).first()
 
             if existing_reset:
-                flash("A password reset email has already been sent to this email address. Please check your email.", "error")
+                flash(
+                    "A password reset email has already been sent to this email address. Please check your email.",
+                    "error",
+                )
                 return redirect(url_for("auth.login"))
 
             send_reset_password_email(user.users_email)
@@ -281,7 +275,7 @@ def forgot_password():
 
 
 @auth_bp.route("/reset-password/<selector>/<token>", methods=["GET", "POST"])
-@limiter.limit("5 per minute", key_func=lambda: request.view_args.get('token', get_remote_address()))
+@limiter.limit("5 per minute", key_func=lambda: request.view_args.get("token", get_remote_address()))
 def reset_password(selector, token):
     password_reset = PasswordReset.query.filter_by(password_reset_selector=selector).first()
 
@@ -291,7 +285,7 @@ def reset_password(selector, token):
         return redirect(url_for("auth.login"))
 
     # Convert password_reset_expires to a datetime object
-    expires = datetime.strptime(password_reset.password_reset_expires, '%Y-%m-%d %H:%M:%S.%f')
+    expires = datetime.strptime(password_reset.password_reset_expires, "%Y-%m-%d %H:%M:%S.%f")
 
     # Check if the token matches and is not expired
     if password_reset.password_reset_token != token or expires < datetime.utcnow():

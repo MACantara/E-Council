@@ -4,61 +4,53 @@ This package contains all database models organized by feature.
 """
 
 from models.base import db
+from models.board_resolution import BoardResolutions
+from models.concept_paper import (
+    ActivityReportForms,
+    ConceptPaperForms,
+    ExcuseLetterForms,
+    LearningJournalForms,
+    ParentGuardianConsentForms,
+    PersonnelInChargeForms,
+)
 
 # Import all models for easy access
 from models.department import Departments, StudentOrganizations
-from models.user import Users, EmailVerification, PasswordReset, LoginAttempts
-from models.event import Events, DepartmentsEvents, EventInvitations
-from models.concept_paper import (
-    ConceptPaperForms,
-    ExcuseLetterForms,
-    ActivityReportForms,
-    PersonnelInChargeForms,
-    LearningJournalForms,
-    ParentGuardianConsentForms
-)
 from models.documentation import Documentation
+from models.event import DepartmentsEvents, EventInvitations, Events
 from models.financial import FinancialReports
-from models.board_resolution import BoardResolutions
 from models.meeting import MinutesOfTheMeeting, Signatories
+from models.user import EmailVerification, LoginAttempts, PasswordReset, Users
 
 __all__ = [
     # Base
-    'db',
-
+    "db",
     # Department models
-    'Departments',
-    'StudentOrganizations',
-
+    "Departments",
+    "StudentOrganizations",
     # User models
-    'Users',
-    'EmailVerification',
-    'PasswordReset',
-    'LoginAttempts',
-
+    "Users",
+    "EmailVerification",
+    "PasswordReset",
+    "LoginAttempts",
     # Event models
-    'Events',
-    'DepartmentsEvents',
-    'EventInvitations',
-
+    "Events",
+    "DepartmentsEvents",
+    "EventInvitations",
     # Concept paper models
-    'ConceptPaperForms',
-    'ExcuseLetterForms',
-    'ActivityReportForms',
-    'PersonnelInChargeForms',
-    'LearningJournalForms',
-    'ParentGuardianConsentForms',
-
+    "ConceptPaperForms",
+    "ExcuseLetterForms",
+    "ActivityReportForms",
+    "PersonnelInChargeForms",
+    "LearningJournalForms",
+    "ParentGuardianConsentForms",
     # Documentation models
-    'Documentation',
-
+    "Documentation",
     # Financial models
-    'FinancialReports',
-
+    "FinancialReports",
     # Board resolution models
-    'BoardResolutions',
-
+    "BoardResolutions",
     # Meeting models
-    'MinutesOfTheMeeting',
-    'Signatories',
+    "MinutesOfTheMeeting",
+    "Signatories",
 ]

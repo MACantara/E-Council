@@ -3,11 +3,11 @@ User and authentication-related models for E-Council.
 """
 
 from datetime import datetime
+
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Enum
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from models.base import db
-from models.department import Departments, StudentOrganizations
 
 
 class Users(db.Model, UserMixin):
@@ -24,36 +24,37 @@ class Users(db.Model, UserMixin):
     users_email = db.Column(db.String(100), unique=True, nullable=False)
 
     # Changed users_department to reference the Departments model
-    users_departments_id = db.Column(db.Integer, db.ForeignKey('departments.departments_id'), nullable=False)
+    users_departments_id = db.Column(db.Integer, db.ForeignKey("departments.departments_id"), nullable=False)
 
-    users_role = db.Column(db.Enum(
-        'Student Council Officer',
-        'Faculty',
-        'Staff',
-        'Admin',
-        name='role_enum'
-    ), nullable=False)
+    users_role = db.Column(
+        db.Enum("Student Council Officer", "Faculty", "Staff", "Admin", name="role_enum"), nullable=False
+    )
 
-    users_student_organization = db.Column(db.Integer, db.ForeignKey('student_organizations.student_organizations_id'), nullable=True)
+    users_student_organization = db.Column(
+        db.Integer, db.ForeignKey("student_organizations.student_organizations_id"), nullable=True
+    )
 
-    users_student_organization_position = db.Column(db.Enum(
-        'President',
-        'Vice President',
-        'Secretary',
-        'Treasurer',
-        'Auditor',
-        'Business Manager',
-        'Public Relations Officer',
-        '1st Year IT Representative',
-        '1st Year CS Representative',
-        '2nd Year IT Representative',
-        '2nd Year CS Representative',
-        '3rd Year IT Representative',
-        '3rd Year CS Representative',
-        '4th Year IT Representative',
-        '4th Year CS Representative',
-        name='position_enum'
-    ), nullable=True)
+    users_student_organization_position = db.Column(
+        db.Enum(
+            "President",
+            "Vice President",
+            "Secretary",
+            "Treasurer",
+            "Auditor",
+            "Business Manager",
+            "Public Relations Officer",
+            "1st Year IT Representative",
+            "1st Year CS Representative",
+            "2nd Year IT Representative",
+            "2nd Year CS Representative",
+            "3rd Year IT Representative",
+            "3rd Year CS Representative",
+            "4th Year IT Representative",
+            "4th Year CS Representative",
+            name="position_enum",
+        ),
+        nullable=True,
+    )
 
     users_home_address = db.Column(db.String(255), nullable=True)
     users_contact_number = db.Column(db.String(20), nullable=True)
@@ -62,7 +63,7 @@ class Users(db.Model, UserMixin):
     users_email_verified = db.Column(db.Integer, nullable=False)
 
     # Relationship to Departments
-    department = db.relationship('Departments', backref='users')
+    department = db.relationship("Departments", backref="users")
 
     student_organization = db.relationship("StudentOrganizations", backref="users")
 
@@ -83,24 +84,24 @@ class EmailVerification(db.Model):
     __tablename__ = "email_verification"
 
     email_verification_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    email_verification_users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=False)
+    email_verification_users_id = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=False)
     email_verification_token = db.Column(db.String(255), nullable=False)
     email_verification_new_email = db.Column(db.String(100), nullable=False)
     email_verification_created_at = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
-    user = db.relationship('Users', backref=db.backref('email_verifications', lazy=True))
+    user = db.relationship("Users", backref=db.backref("email_verifications", lazy=True))
 
 
 class PasswordReset(db.Model):
     __tablename__ = "password_reset"
 
     password_reset_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    password_reset_users_id = db.Column(db.Integer, db.ForeignKey('users.users_id'), nullable=False)
+    password_reset_users_id = db.Column(db.Integer, db.ForeignKey("users.users_id"), nullable=False)
     password_reset_selector = db.Column(db.String(255), nullable=False)
     password_reset_token = db.Column(db.String(255), nullable=False)
     password_reset_expires = db.Column(db.DateTime, nullable=False)
 
-    user = db.relationship('Users', backref=db.backref('password_resets', lazy=True))
+    user = db.relationship("Users", backref=db.backref("password_resets", lazy=True))
 
 
 class LoginAttempts(db.Model):
@@ -109,4 +110,6 @@ class LoginAttempts(db.Model):
     login_attempt_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     login_attempt_ip_address = db.Column(db.String(45), nullable=False)
     login_attempt_count = db.Column(db.Integer, nullable=False, default=0)
-    login_attempt_last_attempt_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    login_attempt_last_attempt_time = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )

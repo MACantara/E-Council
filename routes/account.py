@@ -3,30 +3,29 @@ Account routes blueprint for E-Council.
 Handles user account management, profile settings, email settings, and password security.
 """
 
-from flask import Blueprint, request, flash, redirect, url_for, render_template
-from flask_login import login_required, current_user, logout_user
-from itsdangerous import SignatureExpired, BadSignature
-from werkzeug.security import generate_password_hash
-
 import cloudinary
 import cloudinary.uploader
-
-# Import database models from models package
-from models import db, Users, Departments, StudentOrganizations, EmailVerification
-
-# Import email functions from utils.email
-from utils.email import (
-    send_account_deletion_notification_email,
-    send_new_email_verification,
-    send_email_change_notification,
-    send_email_change_confirmation,
-    send_password_change_notification_email
-)
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, logout_user
+from itsdangerous import BadSignature, SignatureExpired
+from werkzeug.security import generate_password_hash
 
 # Import serializer from extensions
 from extensions import get_serializer
 
-account_bp = Blueprint('account', __name__, url_prefix='/account')
+# Import database models from models package
+from models import Departments, EmailVerification, StudentOrganizations, Users, db
+
+# Import email functions from utils.email
+from utils.email import (
+    send_account_deletion_notification_email,
+    send_email_change_confirmation,
+    send_email_change_notification,
+    send_new_email_verification,
+    send_password_change_notification_email,
+)
+
+account_bp = Blueprint("account", __name__, url_prefix="/account")
 
 
 @account_bp.route("/")
@@ -39,17 +38,17 @@ def account():
 @login_required
 def upload_profile_picture():
     profile_picture = request.files.get("profile-picture")
-    if (profile_picture):
+    if profile_picture:
         # Server-side validation for image file types
-        valid_image_types = ['image/jpeg', 'image/png', 'image/jpg']
-        if (profile_picture.mimetype not in valid_image_types):
+        valid_image_types = ["image/jpeg", "image/png", "image/jpg"]
+        if profile_picture.mimetype not in valid_image_types:
             flash("Invalid file type. Please upload an image file.", "error")
             return redirect(url_for("account.account"))
 
         # Delete the previous profile picture from Cloudinary if it exists
         existing_profile = current_user.profile_picture or {}
-        if existing_profile.get('public_id'):
-            cloudinary.uploader.destroy(existing_profile['public_id'])
+        if existing_profile.get("public_id"):
+            cloudinary.uploader.destroy(existing_profile["public_id"])
 
         # Upload the new profile picture to Cloudinary
         upload_result = cloudinary.uploader.upload(profile_picture)
@@ -57,7 +56,7 @@ def upload_profile_picture():
         profile_picture_public_id = upload_result["public_id"]
 
         # Update the user's profile picture as a JSON dict
-        current_user.profile_picture = {'url': profile_picture_url, 'public_id': profile_picture_public_id}
+        current_user.profile_picture = {"url": profile_picture_url, "public_id": profile_picture_public_id}
 
         db.session.commit()
 
@@ -95,7 +94,10 @@ def account_settings():
         if users_student_organization and not db.session.get(StudentOrganizations, users_student_organization):
             flash("Invalid student organization.", "error")
             return redirect(url_for("account.account_settings"))
-        if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
+        if (
+            users_student_organization_position
+            and users_student_organization_position not in Users.users_student_organization_position.type.enums
+        ):
             flash("Invalid student organization position.", "error")
             return redirect(url_for("account.account_settings"))
 
@@ -114,15 +116,15 @@ def account_settings():
         signature_file = request.files.get("users-signature")
         if signature_file:
             # Server-side validation for image file types
-            valid_image_types = ['image/jpeg', 'image/jpg', 'image/png']
+            valid_image_types = ["image/jpeg", "image/jpg", "image/png"]
             if signature_file.mimetype not in valid_image_types:
                 flash("Invalid file type. Please upload an image file.", "error")
                 return redirect(url_for("account.account_settings"))
 
             # Delete the previous image from Cloudinary if it exists
             existing_signature = current_user.signature or {}
-            if existing_signature.get('public_id'):
-                cloudinary.uploader.destroy(existing_signature['public_id'])
+            if existing_signature.get("public_id"):
+                cloudinary.uploader.destroy(existing_signature["public_id"])
 
             # Upload the new image to Cloudinary
             upload_result = cloudinary.uploader.upload(signature_file)
@@ -130,7 +132,7 @@ def account_settings():
             signature_public_id = upload_result["public_id"]
 
             # Update the user's signature as a JSON dict
-            current_user.signature = {'url': signature_url, 'public_id': signature_public_id}
+            current_user.signature = {"url": signature_url, "public_id": signature_public_id}
 
         # Update the user's information in the database
         user = Users.query.filter_by(users_id=current_user.users_id).first()
@@ -152,7 +154,9 @@ def account_settings():
     # Query all departments and student organizations to pass to the template
     departments = Departments.query.all()
     student_organizations = StudentOrganizations.query.all()
-    return render_template("account/account-settings.html", departments=departments, student_organizations=student_organizations)
+    return render_template(
+        "account/account-settings.html", departments=departments, student_organizations=student_organizations
+    )
 
 
 @account_bp.route("/delete-user-account", methods=["POST"])
@@ -170,13 +174,13 @@ def delete_user_account():
 
     # Delete the user's signature image from Cloudinary if it exists
     existing_signature = current_user.signature or {}
-    if existing_signature.get('public_id'):
-        cloudinary.uploader.destroy(existing_signature['public_id'])
+    if existing_signature.get("public_id"):
+        cloudinary.uploader.destroy(existing_signature["public_id"])
 
     # Delete the user's profile picture from Cloudinary if it exists
     existing_profile = current_user.profile_picture or {}
-    if existing_profile.get('public_id'):
-        cloudinary.uploader.destroy(existing_profile['public_id'])
+    if existing_profile.get("public_id"):
+        cloudinary.uploader.destroy(existing_profile["public_id"])
 
     # Delete the user account from the database
     user = Users.query.filter_by(users_id=current_user.users_id).first()
@@ -224,7 +228,10 @@ def email_settings():
         # Send verification email to the new email address
         send_new_email_verification(users_new_email)
 
-        flash("A verification email has been sent to your new email address. Please check your email to confirm the change.", "success")
+        flash(
+            "A verification email has been sent to your new email address. Please check your email to confirm the change.",
+            "success",
+        )
         return redirect(url_for("account.email_settings"))
 
     return render_template("account/email-settings.html")
@@ -235,7 +242,7 @@ def email_settings():
 def confirm_new_email(token):
     try:
         s = get_serializer()
-        users_new_email = s.loads(token, salt='email-change', max_age=3600)
+        users_new_email = s.loads(token, salt="email-change", max_age=3600)
     except SignatureExpired:
         flash("The email confirmation link has expired.", "error")
         return redirect(url_for("account.email_settings"))
@@ -299,14 +306,14 @@ def password_security_settings():
             flash("Password must contain at least one number.", "error")
             return redirect(url_for("account.password_security_settings"))
 
-        if not any(char in "!@#$%^&*(),.?\":{}|<>" for char in users_password):
+        if not any(char in '!@#$%^&*(),.?":{}|<>' for char in users_password):
             flash("Password must contain at least one special character.", "error")
             return redirect(url_for("account.password_security_settings"))
 
         # Update the user's password in the database
         current_user.users_password = generate_password_hash(users_password)
         db.session.commit()
-        
+
         # Send password change update email
         send_password_change_notification_email(current_user.users_email)
 

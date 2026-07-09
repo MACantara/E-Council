@@ -259,16 +259,18 @@ Phase 2 builds the infrastructure needed for safer, faster development: validati
 **Scope**: `pyproject.toml`, `requirements.txt`, all `*.py` files
 
 **Checklist**
-- [ ] Add `ruff` and `mypy` to `requirements.txt` (or `requirements-dev.txt`).
-- [ ] Create `pyproject.toml` with ruff rules and mypy configuration.
-- [ ] Run `ruff check .` and `ruff format .` and fix all style issues.
-- [ ] Add type hints to `utils/*.py` and `models/*.py` first.
-- [ ] Add a GitHub Actions workflow `.github/workflows/ci.yml` that runs `ruff`, `mypy`, and `pytest`.
-- [ ] Add a badge to `README.md`.
+- [x] Add `ruff` and `mypy` to `requirements.txt`.
+- [x] Create `pyproject.toml` with ruff rules and mypy configuration.
+- [x] Run `ruff check .` and `ruff format .` and fix all style issues.
+- [x] Add type hints to `utils/*.py` and `models/*.py` first.
+- [x] Add a GitHub Actions workflow `.github/workflows/ci.yml` that runs `ruff`, `mypy`, and `pytest`.
+- [x] Add a badge to `README.md`.
 
-**Acceptance criteria**: CI passes with `ruff`, `mypy`, and `pytest` green.
+**Acceptance criteria**: `ruff check .`, `ruff format --check .`, `mypy`, and `pytest -q` all pass locally and in CI.
 
 **Effort**: Medium
+
+**Notes**: `mypy` is configured to check `models` and `utils` first while skipping `app`, `extensions`, `routes`, and `config` due to dynamic Flask-SQLAlchemy typing. Full-project type checking will be enabled in a future phase.
 
 ---
 

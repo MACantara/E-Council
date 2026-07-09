@@ -5,8 +5,9 @@ Application factory pattern with modular structure
 
 import os
 import sys
-from flask import Flask, render_template
+
 from dotenv import load_dotenv
+from flask import Flask, render_template
 from sqlalchemy import text
 
 # Load environment variables from .env file
@@ -16,64 +17,63 @@ load_dotenv()
 # This ensures the application runs on Windows without requiring mysqlclient.
 try:
     import pymysql
+
     pymysql.install_as_MySQLdb()
 except ImportError:
     pass
 
 # Import configuration
-from config import get_config, DatabaseConfig, EmailConfig, CloudinaryConfig, AIConfig
+from config import AIConfig, CloudinaryConfig, DatabaseConfig, EmailConfig, get_config
 
 # Import extensions
-from extensions import init_extensions, db
-
-# Import utilities
-from utils import register_filters, register_error_handlers
-from utils.auth import load_user, unauthorized
-
-# Import blueprints
-from routes.account import account_bp
-from routes.dashboard import dashboard_bp
-from routes.documentation import documentation_bp
-from routes.financial import financial_bp
-from routes.meetings import meetings_bp
-from routes.board_resolutions import board_resolutions_bp
-from routes.events import events_bp
-from routes.auth import auth_bp
-from routes.concept_papers import concept_papers_bp
+from extensions import db, init_extensions
 
 # Import models for backward compatibility
-from models import Users
+# Import blueprints
+from routes.account import account_bp
+from routes.auth import auth_bp
+from routes.board_resolutions import board_resolutions_bp
+from routes.concept_papers import concept_papers_bp
+from routes.dashboard import dashboard_bp
+from routes.documentation import documentation_bp
+from routes.events import events_bp
+from routes.financial import financial_bp
+from routes.meetings import meetings_bp
+
+# Import utilities
+from utils import register_error_handlers, register_filters
+from utils.auth import load_user, unauthorized
 
 
 def create_app(config_name=None):
     """
     Application factory function that creates and configures the Flask app.
-    
+
     Args:
         config_name: Configuration environment name (development, production, testing)
                     If None, uses FLASK_ENV or defaults to development
-    
+
     Returns:
         Configured Flask application instance
     """
     # Create Flask app
     app = Flask(__name__, template_folder="templates")
-    
+
     # Determine the configuration class
     if config_name is None:
-        config_name = os.getenv('FLASK_ENV', 'development')
+        config_name = os.getenv("FLASK_ENV", "development")
     config_class = get_config(config_name)
-    
+
     # Load configuration from the selected class
     app.config.from_object(config_class)
 
     # Run any configuration-specific initialization (e.g. production logging)
-    if hasattr(config_class, 'init_app'):
+    if hasattr(config_class, "init_app"):
         config_class.init_app(app)
 
     # Override SECRET_KEY with environment variable
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or app.config.get("SECRET_KEY")
-    
+
     # Database configuration: use config class URI if defined, otherwise environment
     app.config["SQLALCHEMY_DATABASE_URI"] = getattr(
         config_class, "SQLALCHEMY_DATABASE_URI", DatabaseConfig.get_database_uri()
@@ -81,10 +81,8 @@ def create_app(config_name=None):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = getattr(
         config_class, "SQLALCHEMY_TRACK_MODIFICATIONS", DatabaseConfig.SQLALCHEMY_TRACK_MODIFICATIONS
     )
-    app.config["SQLALCHEMY_ECHO"] = getattr(
-        config_class, "SQLALCHEMY_ECHO", DatabaseConfig.SQLALCHEMY_ECHO
-    )
-    
+    app.config["SQLALCHEMY_ECHO"] = getattr(config_class, "SQLALCHEMY_ECHO", DatabaseConfig.SQLALCHEMY_ECHO)
+
     # Mail configuration
     app.config["MAIL_SERVER"] = EmailConfig.MAIL_SERVER
     app.config["MAIL_PORT"] = EmailConfig.MAIL_PORT
@@ -93,42 +91,44 @@ def create_app(config_name=None):
     app.config["MAIL_USERNAME"] = EmailConfig.MAIL_USERNAME
     app.config["MAIL_PASSWORD"] = EmailConfig.MAIL_PASSWORD
     app.config["MAIL_DEFAULT_SENDER"] = EmailConfig.MAIL_DEFAULT_SENDER
-    
+
     # Initialize extensions
     init_extensions(app)
-    
+
     # Configure Flask-Login
     from flask_login import LoginManager
+
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
     login_manager.user_loader(load_user)
     login_manager.unauthorized_handler(unauthorized)
-    
+
     # Configure Cloudinary
     import cloudinary
+
     cloudinary.config(
         cloud_name=CloudinaryConfig.CLOUDINARY_CLOUD_NAME,
         api_key=CloudinaryConfig.CLOUDINARY_API_KEY,
         api_secret=CloudinaryConfig.CLOUDINARY_API_SECRET,
-        secure=CloudinaryConfig.CLOUDINARY_SECURE
+        secure=CloudinaryConfig.CLOUDINARY_SECURE,
     )
-    
+
     # Configure Gemini AI
     import google.generativeai as genai
-    from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
     genai.configure(api_key=AIConfig.GOOGLE_GEMINI_AI_API_KEY)
-    
+
     # Initialize upload folder
-    UPLOAD_FOLDER = 'uploads/receipts'
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    
+    upload_folder = "uploads/receipts"
+    os.makedirs(upload_folder, exist_ok=True)
+
     # Register custom Jinja2 filters
     register_filters(app)
-    
+
     # Register error handlers
     register_error_handlers(app)
-    
+
     # Register blueprints
     app.register_blueprint(account_bp)
     app.register_blueprint(dashboard_bp)
@@ -139,10 +139,10 @@ def create_app(config_name=None):
     app.register_blueprint(events_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(concept_papers_bp)
-    
+
     # Initialize serializer for events blueprint
     events_bp.init_serializer(app.config["SECRET_KEY"])
-    
+
     # Register security headers handler
     @app.after_request
     def set_security_headers(response):
@@ -176,10 +176,10 @@ def create_app(config_name=None):
 def init_database(app):
     """
     Test the database connection and create all tables if they don't exist.
-    
+
     Args:
         app: Flask application instance
-        
+
     Returns:
         bool: True if the database is reachable and tables are created/verified,
               False otherwise.
@@ -187,20 +187,19 @@ def init_database(app):
     with app.app_context():
         try:
             with db.engine.connect() as conn:
-                conn.execute(text('SELECT 1'))
-            app.logger.info('Database connection successful.')
+                conn.execute(text("SELECT 1"))
+            app.logger.info("Database connection successful.")
         except Exception as e:
-            app.logger.error('Database connection failed: %s', e, exc_info=True)
+            app.logger.error("Database connection failed: %s", e, exc_info=True)
             return False
 
         try:
             # Import all models so db.create_all() registers every table
-            import models
             db.create_all()
-            app.logger.info('Database tables created/verified successfully.')
+            app.logger.info("Database tables created/verified successfully.")
             return True
         except Exception as e:
-            app.logger.error('Failed to create database tables: %s', e, exc_info=True)
+            app.logger.error("Failed to create database tables: %s", e, exc_info=True)
             return False
 
 

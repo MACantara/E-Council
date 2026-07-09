@@ -1,35 +1,44 @@
-from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify, make_response, send_file, abort, current_app
-from flask_login import login_required, current_user
-from utils.auth import belongs_to_user_or_department, is_admin
-from sqlalchemy import or_
-from extensions import limiter, get_user_key
-from io import BytesIO
 from datetime import datetime
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageTemplate, Frame, HRFlowable, Flowable, PageBreak
-from reportlab.pdfgen import canvas
-from reportlab.lib.enums import TA_RIGHT
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.fonts import addMapping
+from io import BytesIO
 
 import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
+from flask_login import current_user, login_required
+from google.generativeai.types import HarmBlockThreshold, HarmCategory
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import (
+    Image,
+    Paragraph,
+    SimpleDocTemplate,
+    Spacer,
+)
+from sqlalchemy import or_
 
 from config import AIConfig
+from extensions import get_user_key, limiter
 from models import (
-    db,
     BoardResolutions,
+    DepartmentsEvents,
     Events,
-    Departments,
-    Users,
     Signatories,
     StudentOrganizations,
-    DepartmentsEvents
+    Users,
+    db,
 )
+from utils.auth import belongs_to_user_or_department, is_admin
 
 # Configure Gemini AI
 genai.configure(api_key=AIConfig.GOOGLE_GEMINI_AI_API_KEY)
@@ -43,75 +52,83 @@ safety_settings = {
 }
 
 # Create blueprint
-board_resolutions_bp = Blueprint('board_resolutions', __name__, url_prefix='/board-resolutions')
+board_resolutions_bp = Blueprint("board_resolutions", __name__, url_prefix="/board-resolutions")
 
 
 @board_resolutions_bp.route("/board-resolutions-overview")
 @login_required
 def board_resolutions_overview():
     # Determine the sorting order
-    sort_by_date = request.args.get('sort_by_date', 'recent-to-old')
+    sort_by_date = request.args.get("sort_by_date", "recent-to-old")
 
     # Admins can view all board resolutions; others only see their own department's or ones they prepared
     if is_admin(current_user):
         board_resolutions = BoardResolutions.query.order_by(BoardResolutions.board_resolutions_date.desc()).all()
     else:
-        board_resolutions = BoardResolutions.query.filter(
-            or_(
-                BoardResolutions.board_resolutions_departments_id == current_user.users_departments_id,
-                BoardResolutions.board_resolutions_prepared_by == current_user.users_id
+        board_resolutions = (
+            BoardResolutions.query.filter(
+                or_(
+                    BoardResolutions.board_resolutions_departments_id == current_user.users_departments_id,
+                    BoardResolutions.board_resolutions_prepared_by == current_user.users_id,
+                )
             )
-        ).order_by(BoardResolutions.board_resolutions_date.desc()).all()
+            .order_by(BoardResolutions.board_resolutions_date.desc())
+            .all()
+        )
 
-    return render_template("board-resolutions/board-resolutions-overview.html", board_resolutions=board_resolutions, sort_by_date=sort_by_date)
+    return render_template(
+        "board-resolutions/board-resolutions-overview.html",
+        board_resolutions=board_resolutions,
+        sort_by_date=sort_by_date,
+    )
 
 
-@board_resolutions_bp.route('/add-board-resolution', methods=['GET', 'POST'])
+@board_resolutions_bp.route("/add-board-resolution", methods=["GET", "POST"])
 @login_required
 def add_board_resolution():
-    if request.method == 'POST':
-        events_id = request.form.get('board-resolutions-events-id')
-        other_event_name = request.form.get('other-event-name')
-        title = request.form.get('board-resolutions-title')
-        description = request.form.get('board-resolutions-description')
-        total_amount = request.form.get('board-resolutions-total-amount')
-        academic_year = request.form.get('board-resolutions-academic-year')
-        other_academic_year = request.form.get('other-academic-year')
-        semester = request.form.get('board-resolutions-semester')
-        status = request.form.get('board-resolutions-status')
-        date = request.form.get('board-resolutions-date')
-        prepared_by = request.form.get('board-resolutions-prepared-by')
-        approved_by = request.form.get('board-resolutions-approved-by')
-        student_signatories = request.form.getlist('board-resolutions-student-signatories')
+    if request.method == "POST":
+        events_id = request.form.get("board-resolutions-events-id")
+        other_event_name = request.form.get("other-event-name")
+        title = request.form.get("board-resolutions-title")
+        description = request.form.get("board-resolutions-description")
+        total_amount = request.form.get("board-resolutions-total-amount")
+        academic_year = request.form.get("board-resolutions-academic-year")
+        other_academic_year = request.form.get("other-academic-year")
+        semester = request.form.get("board-resolutions-semester")
+        status = request.form.get("board-resolutions-status")
+        date = request.form.get("board-resolutions-date")
+        prepared_by = request.form.get("board-resolutions-prepared-by")
+        approved_by = request.form.get("board-resolutions-approved-by")
+        student_signatories = request.form.getlist("board-resolutions-student-signatories")
 
         # Use the value from the "Other" input field if "Other" is selected for academic year
-        if academic_year == 'Other':
+        if academic_year == "Other":
             academic_year = other_academic_year
 
         # Handle the "Other" option for event name
-        if events_id == 'Other':
+        if events_id == "Other":
             # Create a new event with the provided name
             new_event = Events(
                 events_name=other_event_name,
                 events_academic_year=academic_year,
                 events_semester=semester,
-                events_description=description)
+                events_description=description,
+            )
             db.session.add(new_event)
             db.session.commit()
             events_id = new_event.events_id
 
             # Link the event to the department of the current user
             departments_events = DepartmentsEvents(
-                departments_id=current_user.users_departments_id,
-                events_id=events_id
+                departments_id=current_user.users_departments_id, events_id=events_id
             )
             db.session.add(departments_events)
             db.session.commit()
-        elif events_id == 'None':
+        elif events_id == "None":
             events_id = None
 
         # Convert date to datetime object
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+        date = datetime.strptime(date, "%Y-%m-%dT%H:%M")
 
         # Create a new board resolution
         new_resolution = BoardResolutions(
@@ -125,7 +142,7 @@ def add_board_resolution():
             board_resolutions_status=status,
             board_resolutions_date=date,
             board_resolutions_prepared_by=prepared_by,
-            board_resolutions_approved_by=approved_by
+            board_resolutions_approved_by=approved_by,
         )
 
         # Add student signatories as a JSON list of user IDs
@@ -135,12 +152,15 @@ def add_board_resolution():
         db.session.add(new_resolution)
         db.session.commit()
 
-        flash('Board resolution added successfully!', 'success')
-        return redirect(url_for('board_resolutions.board_resolutions_overview'))
+        flash("Board resolution added successfully!", "success")
+        return redirect(url_for("board_resolutions.board_resolutions_overview"))
 
     # Query for events that are not yet linked to any board resolutions
-    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
-                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
+    events = (
+        Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id)
+        .filter(BoardResolutions.board_resolutions_events_id is None)
+        .all()
+    )
 
     # Query for distinct academic years
     academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
@@ -149,7 +169,13 @@ def add_board_resolution():
     student_organizations = StudentOrganizations.query.all()
     signatories = Signatories.query.all()
 
-    return render_template('board-resolutions/add-board-resolution.html', events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories)
+    return render_template(
+        "board-resolutions/add-board-resolution.html",
+        events=events,
+        academic_years=academic_years,
+        student_organizations=student_organizations,
+        signatories=signatories,
+    )
 
 
 @board_resolutions_bp.route("/delete-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
@@ -175,7 +201,7 @@ def delete_board_resolution(resolution_id):
     return render_template("board-resolutions/delete-board-resolution.html", resolution=resolution)
 
 
-@board_resolutions_bp.route('/update-board-resolution/<int:resolution_id>', methods=['GET', 'POST'])
+@board_resolutions_bp.route("/update-board-resolution/<int:resolution_id>", methods=["GET", "POST"])
 @login_required
 def update_board_resolution(resolution_id):
     resolution = BoardResolutions.query.get_or_404(resolution_id)
@@ -183,49 +209,49 @@ def update_board_resolution(resolution_id):
     if not belongs_to_user_or_department(resolution, current_user):
         abort(403)
 
-    if request.method == 'POST':
-        events_id = request.form.get('board-resolutions-events-id')
-        other_event_name = request.form.get('other-event-name')
-        title = request.form.get('board-resolutions-title')
-        description = request.form.get('board-resolutions-description')
-        total_amount = request.form.get('board-resolutions-total-amount')
-        academic_year = request.form.get('board-resolutions-academic-year')
-        other_academic_year = request.form.get('other-academic-year')
-        semester = request.form.get('board-resolutions-semester')
-        status = request.form.get('board-resolutions-status')
-        date = request.form.get('board-resolutions-date')
-        prepared_by = request.form.get('board-resolutions-prepared-by')
-        approved_by = request.form.get('board-resolutions-approved-by')
-        student_signatories = request.form.getlist('board-resolutions-student-signatories')
+    if request.method == "POST":
+        events_id = request.form.get("board-resolutions-events-id")
+        other_event_name = request.form.get("other-event-name")
+        title = request.form.get("board-resolutions-title")
+        description = request.form.get("board-resolutions-description")
+        total_amount = request.form.get("board-resolutions-total-amount")
+        academic_year = request.form.get("board-resolutions-academic-year")
+        other_academic_year = request.form.get("other-academic-year")
+        semester = request.form.get("board-resolutions-semester")
+        status = request.form.get("board-resolutions-status")
+        date = request.form.get("board-resolutions-date")
+        prepared_by = request.form.get("board-resolutions-prepared-by")
+        approved_by = request.form.get("board-resolutions-approved-by")
+        student_signatories = request.form.getlist("board-resolutions-student-signatories")
 
         # Use the value from the "Other" input field if "Other" is selected for academic year
-        if academic_year == 'Other':
+        if academic_year == "Other":
             academic_year = other_academic_year
 
         # Handle the "Other" option for event name
-        if events_id == 'Other':
+        if events_id == "Other":
             # Create a new event with the provided name
             new_event = Events(
                 events_name=other_event_name,
                 events_academic_year=academic_year,
                 events_semester=semester,
-                events_description=description)
+                events_description=description,
+            )
             db.session.add(new_event)
             db.session.commit()
             events_id = new_event.events_id
 
             # Link the event to the department of the current user
             departments_events = DepartmentsEvents(
-                departments_id=current_user.users_departments_id,
-                events_id=events_id
+                departments_id=current_user.users_departments_id, events_id=events_id
             )
             db.session.add(departments_events)
             db.session.commit()
-        elif events_id == 'None':
+        elif events_id == "None":
             events_id = None
 
         # Convert date to datetime object
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+        date = datetime.strptime(date, "%Y-%m-%dT%H:%M")
 
         # Update the board resolution
         resolution.board_resolutions_events_id = events_id
@@ -244,12 +270,15 @@ def update_board_resolution(resolution_id):
 
         db.session.commit()
 
-        flash('Board resolution updated successfully!', 'success')
-        return redirect(url_for('board_resolutions.board_resolutions_overview'))
+        flash("Board resolution updated successfully!", "success")
+        return redirect(url_for("board_resolutions.board_resolutions_overview"))
 
     # Query for events that are not yet linked to any board resolutions
-    events = Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id) \
-                        .filter(BoardResolutions.board_resolutions_events_id == None).all()
+    events = (
+        Events.query.outerjoin(BoardResolutions, Events.events_id == BoardResolutions.board_resolutions_events_id)
+        .filter(BoardResolutions.board_resolutions_events_id is None)
+        .all()
+    )
 
     # Query for distinct academic years
     academic_years = db.session.query(BoardResolutions.board_resolutions_academic_year).distinct().all()
@@ -261,14 +290,22 @@ def update_board_resolution(resolution_id):
     # Query for existing student signatories
     existing_signatories = resolution.student_signatory_ids or []
 
-    return render_template('board-resolutions/update-board-resolution.html', resolution=resolution, events=events, academic_years=academic_years, student_organizations=student_organizations, signatories=signatories, existing_signatories=existing_signatories)
+    return render_template(
+        "board-resolutions/update-board-resolution.html",
+        resolution=resolution,
+        events=events,
+        academic_years=academic_years,
+        student_organizations=student_organizations,
+        signatories=signatories,
+        existing_signatories=existing_signatories,
+    )
 
 
 @board_resolutions_bp.route("/update-board-resolution-status/<int:resolution_id>", methods=["POST"])
 @login_required
 def update_board_resolution_status(resolution_id):
     data = request.get_json()
-    new_status = data.get('status')
+    new_status = data.get("status")
 
     # Find the board resolution by ID
     resolution = BoardResolutions.query.get_or_404(resolution_id)
@@ -283,32 +320,34 @@ def update_board_resolution_status(resolution_id):
     return jsonify(success=True)
 
 
-@board_resolutions_bp.route('/generate-description', methods=['POST'])
+@board_resolutions_bp.route("/generate-description", methods=["POST"])
 @login_required
 @limiter.limit("10 per minute", key_func=get_user_key)
 def generate_description():
     if not request.is_json:
-        return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
+        return make_response(jsonify({"error": "Content-Type must be application/json"}), 400)
 
     try:
         data = request.json
         if not data:
-            return make_response(jsonify({'error': 'No JSON data provided'}), 400)
+            return make_response(jsonify({"error": "No JSON data provided"}), 400)
 
-        event_name = data.get('event_name')
-        title = data.get('title')
-        date = data.get('date')
-        total_amount = data.get('total_amount')
+        event_name = data.get("event_name")
+        title = data.get("title")
+        date = data.get("date")
+        total_amount = data.get("total_amount")
 
         if not event_name or not title:
-            return make_response(jsonify({'error': 'Missing event_name or title'}), 400)
+            return make_response(jsonify({"error": "Missing event_name or title"}), 400)
 
-        current_app.logger.info(f"Generating description for event: {event_name}, title: {title}, date: {date}, amount: {total_amount}")
+        current_app.logger.info(
+            f"Generating description for event: {event_name}, title: {title}, date: {date}, amount: {total_amount}"
+        )
 
         # Convert date to proper format
         try:
             if date:
-                date_obj = datetime.strptime(date, '%Y-%m-%dT%H:%M')
+                date_obj = datetime.strptime(date, "%Y-%m-%dT%H:%M")
                 formatted_date = f"Signed this {date_obj.day}th of {date_obj.strftime('%B')} in the name of the Lord Jesus Christ {date_obj.year}"
             else:
                 formatted_date = "Signed this 13th of May in the name of the Lord Jesus Christ 2024"  # Default date
@@ -347,30 +386,27 @@ def generate_description():
 
         current_app.logger.info("Sending request to Gemini API")
         try:
-            response = model.generate_content(
-                prompt,
-                safety_settings=safety_settings
-            )
+            response = model.generate_content(prompt, safety_settings=safety_settings)
             current_app.logger.info("Received response from Gemini API")
 
-            if response and hasattr(response, 'text'):
+            if response and hasattr(response, "text"):
                 description = response.text.strip()
                 current_app.logger.info(f"Generated description: {description[:100]}...")
-                return make_response(jsonify({'description': description}), 200)
+                return make_response(jsonify({"description": description}), 200)
             else:
                 current_app.logger.error("Invalid response format from Gemini API")
-                return make_response(jsonify({'error': 'Invalid response from AI model'}), 500)
+                return make_response(jsonify({"error": "Invalid response from AI model"}), 500)
 
         except Exception as gemini_error:
             current_app.logger.error(f"Gemini API error: {str(gemini_error)}")
-            return make_response(jsonify({'error': f'AI generation error: {str(gemini_error)}'}), 500)
+            return make_response(jsonify({"error": f"AI generation error: {str(gemini_error)}"}), 500)
 
     except Exception as e:
         current_app.logger.error(f"Error generating description: {str(e)}")
-        return make_response(jsonify({'error': str(e)}), 500)
+        return make_response(jsonify({"error": str(e)}), 500)
 
 
-@board_resolutions_bp.route('/generate-board-resolution-pdf/<int:resolution_id>')
+@board_resolutions_bp.route("/generate-board-resolution-pdf/<int:resolution_id>")
 @login_required
 def generate_board_resolution_pdf(resolution_id):
     # Get the resolution data
@@ -384,14 +420,13 @@ def generate_board_resolution_pdf(resolution_id):
     approved_by = Signatories.query.get(resolution.board_resolutions_approved_by)
 
     # Get student signatories from the JSON list of user IDs
-    signatory_users = db.session.query(
-        Users,
-        StudentOrganizations
-    )\
-        .join(StudentOrganizations, Users.users_student_organization == StudentOrganizations.student_organizations_id)\
-        .filter(Users.users_id.in_(resolution.student_signatory_ids or []))\
-        .order_by(StudentOrganizations.student_organizations_name)\
+    signatory_users = (
+        db.session.query(Users, StudentOrganizations)
+        .join(StudentOrganizations, Users.users_student_organization == StudentOrganizations.student_organizations_id)
+        .filter(Users.users_id.in_(resolution.student_signatory_ids or []))
+        .order_by(StudentOrganizations.student_organizations_name)
         .all()
+    )
 
     # Maintain tuple structure (signatory_placeholder, user, org) for downstream code
     student_signatories = [(None, user, org) for user, org in signatory_users]
@@ -404,17 +439,17 @@ def generate_board_resolution_pdf(resolution_id):
 
         # Add header images with manual positioning
         # PERPS header - left side
-        header_perps = Image('./static/img/logos/HEADER-PERPS.png', width=325, height=75)
+        header_perps = Image("./static/img/logos/HEADER-PERPS.png", width=325, height=75)
         perps_x = doc.leftMargin - 35
         header_perps.drawOn(canvas, perps_x, doc.height + doc.topMargin)
 
         # CCS Logo - center
-        header_ccs = Image('./static/img/logos/CCS-LOGO.png', width=35, height=50)
-        ccs_x = doc.leftMargin + (doc.width - 35)/2 + 125
+        header_ccs = Image("./static/img/logos/CCS-LOGO.png", width=35, height=50)
+        ccs_x = doc.leftMargin + (doc.width - 35) / 2 + 125
         header_ccs.drawOn(canvas, ccs_x, doc.height + doc.topMargin + 15)
 
         # ISO Logo - right side
-        header_iso = Image('./static/img/logos/ISO.png', width=100, height=50)
+        header_iso = Image("./static/img/logos/ISO.png", width=100, height=50)
         iso_x = doc.leftMargin + doc.width - 80
         header_iso.drawOn(canvas, iso_x, doc.height + doc.topMargin + 15)
 
@@ -422,11 +457,11 @@ def generate_board_resolution_pdf(resolution_id):
         canvas.setFont("Helvetica-Bold", 10)
         text = "College of Computer Studies"
         text_width = canvas.stringWidth(text, "Helvetica-Bold", 10)
-        text_x = iso_x + (50 - text_width)/2
+        text_x = iso_x + (50 - text_width) / 2
         canvas.drawString(text_x, doc.height + doc.topMargin, text)
 
         # Add red line after text
-        canvas.setStrokeColorRGB(0x8c/255, 0x04/255, 0x04/255)  # #8c0404
+        canvas.setStrokeColorRGB(0x8C / 255, 0x04 / 255, 0x04 / 255)  # #8c0404
         canvas.setLineWidth(2)
         line_y = doc.height + doc.topMargin - 10
         line_length = 510
@@ -461,14 +496,7 @@ def generate_board_resolution_pdf(resolution_id):
         canvas.restoreState()
 
     # Create the PDF document
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=letter,
-        rightMargin=72,
-        leftMargin=72,
-        topMargin=110,
-        bottomMargin=72
-    )
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=110, bottomMargin=72)
 
     # Create the story (content) for the PDF
     story = []
@@ -476,31 +504,16 @@ def generate_board_resolution_pdf(resolution_id):
 
     # Add title
     title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=12,
-        alignment=1,
-        spaceBefore=5,
-        spaceAfter=-15
+        "CustomTitle", parent=styles["Heading1"], fontSize=12, alignment=1, spaceBefore=5, spaceAfter=-15
     )
 
     # Add the academic year subtitle
     academic_year_style = ParagraphStyle(
-        'AcademicYear',
-        parent=styles['Heading1'],
-        fontSize=11,
-        alignment=1,
-        spaceAfter=20
+        "AcademicYear", parent=styles["Heading1"], fontSize=11, alignment=1, spaceAfter=20
     )
 
     # Add resolution title style
-    resolution_style = ParagraphStyle(
-        'Resolution',
-        parent=styles['Heading1'],
-        fontSize=12,
-        alignment=1,
-        spaceAfter=20
-    )
+    resolution_style = ParagraphStyle("Resolution", parent=styles["Heading1"], fontSize=12, alignment=1, spaceAfter=20)
 
     story.append(Paragraph("College of Computer Studies Council", title_style))
     story.append(Paragraph(f"A.Y. {resolution.board_resolutions_academic_year}", academic_year_style))
@@ -508,12 +521,12 @@ def generate_board_resolution_pdf(resolution_id):
 
     # Create a style for the main content
     content_style = ParagraphStyle(
-        'Content',
-        parent=styles['Normal'],
+        "Content",
+        parent=styles["Normal"],
         fontSize=12,
         leading=14,
         alignment=4,  # Justified alignment
-        firstLineIndent=36  # Add indentation for paragraph
+        firstLineIndent=36,  # Add indentation for paragraph
     )
 
     # Add resolution details
@@ -521,13 +534,7 @@ def generate_board_resolution_pdf(resolution_id):
     story.append(Spacer(1, 15))
 
     # Add signatories section
-    signature_style = ParagraphStyle(
-        'Signature',
-        parent=styles['Normal'],
-        fontSize=12,
-        alignment=0,
-        spaceAfter=20
-    )
+    signature_style = ParagraphStyle("Signature", parent=styles["Normal"], fontSize=12, alignment=0, spaceAfter=20)
 
     # Student signatories
     # Group signatories by organization
@@ -539,18 +546,13 @@ def generate_board_resolution_pdf(resolution_id):
 
     # Create styles for organization headers and signatures
     org_header_style = ParagraphStyle(
-        'OrgHeader',
-        parent=styles['Normal'],
-        fontSize=12,
-        alignment=0,
-        fontName='Helvetica-Bold',
-        spaceAfter=10
+        "OrgHeader", parent=styles["Normal"], fontSize=12, alignment=0, fontName="Helvetica-Bold", spaceAfter=10
     )
 
     # Organization acronyms mapping
     org_acronyms = {
-        'College of Computer Studies - Student Council': 'CCSC',
-        'Junior Philippine Computer Society': 'JPCS'
+        "College of Computer Studies - Student Council": "CCSC",
+        "Junior Philippine Computer Society": "JPCS",
     }
 
     # Add grouped signatories to the story
@@ -559,7 +561,7 @@ def generate_board_resolution_pdf(resolution_id):
         story.append(Paragraph(org_name, org_header_style))
 
         # Add signatories for this organization
-        for signatory, user in signatories:
+        for _signatory, user in signatories:
             # Make name bold using <b> tag
             signature_text = f"<b>{user.users_first_name} {user.users_last_name}</b>"
             if user.users_student_organization_position:  # Add position if available
@@ -574,7 +576,7 @@ def generate_board_resolution_pdf(resolution_id):
     story.append(Paragraph("Prepared by:", signature_style))
     prepared_by_text = f"<b>{prepared_by.users_first_name} {prepared_by.users_last_name}</b>"
     if prepared_by.users_student_organization_position:
-        org_acronym = org_acronyms.get('College of Computer Studies - Student Council', 'CCSC')
+        org_acronym = org_acronyms.get("College of Computer Studies - Student Council", "CCSC")
         prepared_by_text += f"<br/><i>{org_acronym}, {prepared_by.users_student_organization_position}</i>"
     story.append(Paragraph(prepared_by_text, signature_style))
     story.append(Spacer(1, 20))
@@ -590,9 +592,4 @@ def generate_board_resolution_pdf(resolution_id):
 
     # Prepare the response
     buffer.seek(0)
-    return send_file(
-        buffer,
-        download_name=f'Board_Resolution_{resolution_id}.pdf',
-        mimetype='application/pdf'
-    )
-
+    return send_file(buffer, download_name=f"Board_Resolution_{resolution_id}.pdf", mimetype="application/pdf")

@@ -3,12 +3,14 @@ Error handlers for E-Council.
 """
 
 import traceback
+from typing import Any
+
+from cloudinary.exceptions import Error
 from flask import flash, redirect, render_template, url_for
 from werkzeug.exceptions import HTTPException
-from cloudinary.exceptions import Error
 
 
-def handle_cloudinary_error(error):
+def handle_cloudinary_error(error: Exception) -> Any:
     """
     Handle Cloudinary errors.
 
@@ -20,14 +22,12 @@ def handle_cloudinary_error(error):
     """
     from flask import current_app
 
-    current_app.logger.error(
-        "Cloudinary error: %s\n%s", error, traceback.format_exc()
-    )
+    current_app.logger.error("Cloudinary error: %s\n%s", error, traceback.format_exc())
     flash("An error occurred while processing images.", "error")
-    return redirect(url_for('documentation.documentation_overview'))
+    return redirect(url_for("documentation.documentation_overview"))
 
 
-def handle_internal_error(error):
+def handle_internal_error(error: Exception) -> Any:
     """
     Handle unhandled/internal errors by logging the exception and showing a
     user-friendly 500 page without exposing tracebacks.
@@ -45,13 +45,11 @@ def handle_internal_error(error):
     if isinstance(error, HTTPException) and error.code != 500:
         return error.get_response()
 
-    current_app.logger.error(
-        "Unhandled internal error: %s\n%s", error, traceback.format_exc()
-    )
+    current_app.logger.error("Unhandled internal error: %s\n%s", error, traceback.format_exc())
     return render_template("500.html"), 500
 
 
-def register_error_handlers(app):
+def register_error_handlers(app: Any) -> None:
     """
     Register all error handlers with the Flask app.
 

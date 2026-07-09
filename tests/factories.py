@@ -5,33 +5,34 @@ Uses factory_boy to create test data quickly. Factories are designed to be
 used within a Flask application/test request context.
 """
 
-import sys
 import os
+import sys
 
 # Add the directory containing app.py to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from datetime import datetime
 
 import factory
 from factory.alchemy import SQLAlchemyModelFactory
 from factory.fuzzy import FuzzyChoice
-from datetime import datetime
 
 from extensions import db
 from models import (
-    Users,
-    Departments,
-    StudentOrganizations,
-    Events,
-    DepartmentsEvents,
-    ConceptPaperForms,
     ActivityReportForms,
-    LearningJournalForms,
-    PersonnelInChargeForms,
-    Documentation,
-    FinancialReports,
     BoardResolutions,
+    ConceptPaperForms,
+    Departments,
+    DepartmentsEvents,
+    Documentation,
+    Events,
+    FinancialReports,
+    LearningJournalForms,
     MinutesOfTheMeeting,
+    PersonnelInChargeForms,
     Signatories,
+    StudentOrganizations,
+    Users,
 )
 
 
@@ -94,9 +95,9 @@ class UsersFactory(BaseFactory):
     department = factory.SubFactory(DepartmentsFactory)
 
     @factory.post_generation
-    def set_password(obj, create, extracted, **kwargs):
+    def set_password(self, create, extracted, **kwargs):
         """Hash the user's password after creation."""
-        obj.set_password("Password123!")
+        self.set_password("Password123!")
         if create:
             db.session.commit()
 
@@ -267,8 +268,8 @@ class MinutesOfTheMeetingFactory(BaseFactory):
     noted_by_signatory = factory.SubFactory(SignatoriesFactory)
 
     @factory.post_generation
-    def set_attendees(obj, create, extracted, **kwargs):
+    def set_attendees(self, create, extracted, **kwargs):
         """Set the attendees JSON list to include the prepared_by user."""
         if create:
-            obj.attendees = [obj.prepared_by_user.users_id]
+            self.attendees = [self.prepared_by_user.users_id]
             db.session.commit()
