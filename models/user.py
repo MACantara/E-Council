@@ -75,6 +75,11 @@ class Users(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.users_password, password)
 
+    @property
+    def users_department_name(self):
+        """Return the department name for API response serialization."""
+        return self.department.departments_name if self.department else None
+
     def get_id(self):
         return str(self.users_id)
 

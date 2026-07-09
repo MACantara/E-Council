@@ -65,6 +65,10 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 
+# SQLite database files used by FastAPI prototype and tests
+*.db
+*.db-journal
+
 # Temporary test scripts
 tmp_*.py
 

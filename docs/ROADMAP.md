@@ -503,12 +503,12 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/` (new FastAPI prototype), `templates/` (future), research
 
 **Checklist**
-- [ ] Document current data flows and identify REST resource boundaries.
-- [ ] Prototype `api/v1/auth` using FastAPI, with Pydantic request/response models for user registration, login, and token refresh.
-- [ ] Add JWT-based API authentication for the FastAPI prototype.
-- [ ] Evaluate how FastAPI integrates with the existing SQLAlchemy repository layer from Phase 4.6.
-- [ ] Decide whether to migrate the entire UI or keep server-rendered pages for the MVP.
-- [ ] Create an architecture decision record (ADR) in `docs/adr/001-api-vs-ssr.md` that selects FastAPI + SPA for the long-term architecture.
+- [x] Document current data flows and identify REST resource boundaries.
+- [x] Prototype `api/v1/auth` using FastAPI, with Pydantic request/response models for user registration, login, and token refresh.
+- [x] Add JWT-based API authentication for the FastAPI prototype.
+- [x] Evaluate how FastAPI integrates with the existing SQLAlchemy repository layer from Phase 4.6.
+- [x] Decide whether to migrate the entire UI or keep server-rendered pages for the MVP.
+- [x] Create an architecture decision record (ADR) in `docs/adr/001-api-vs-ssr.md` that selects FastAPI + SPA for the long-term architecture.
 
 **Acceptance criteria**: A decision is documented and, if approved, a small FastAPI API prototype is available.
 
