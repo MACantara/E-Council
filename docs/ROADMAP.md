@@ -689,6 +689,30 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
+### 4.14 Document and update documentation for all changes
+
+**Why it matters**: As the codebase has changed significantly (database abstraction, repository pattern, FastAPI prototype, service abstractions, seeding, and UI updates), the existing documentation must be audited and updated to match the current architecture. Complete documentation ensures the system is maintainable, the hand-off is smooth, and new contributors can set up and run the project without confusion.
+
+**Scope**: `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, `HAND-OVER.md`, `TESTING.md`, `docs/adr/`, API docs, `docs/ROADMAP.md`
+
+**Checklist**
+- [ ] Audit all documentation files against the current codebase and identify stale or missing sections.
+- [ ] Update `README.md` with current setup steps, environment variables, dependency installation, and run commands (including FastAPI, Celery, and Tailwind CSS).
+- [ ] Update `ARCHITECTURE.md` with the repository pattern, service abstractions, FastAPI entry point, and directory structure.
+- [ ] Update `DESIGN.md` with the current Tailwind CSS 4 design system, shared components, and macro/component mapping.
+- [ ] Update `HAND-OVER.md` with deployment, environment configuration, and operational runbook notes.
+- [ ] Update `TESTING.md` with the full test suite commands, fixtures, and how to run FastAPI and E2E tests.
+- [ ] Add or update ADRs for any new major architectural decisions made during Phase 4.
+- [ ] Document API endpoints (using FastAPI's OpenAPI docs as a source) and how to authenticate.
+- [ ] Verify that all environment variables in `.env.example` (or `.env`) are documented.
+- [ ] Add a final changelog entry and ensure the roadmap decision log is complete.
+
+**Acceptance criteria**: Every architectural change in Phase 4 is reflected in documentation. A new developer can clone the repository, follow the README, and start a fully functional local environment with tests passing.
+
+**Effort**: Medium
+
+---
+
 ## Appendix: Decision log
 
 | Date | Decision | Rationale |
@@ -704,6 +728,7 @@ Phase 4 prepares the application for a real production environment and explores 
 | 2026-07-09 | Migrate backend to FastAPI | High-performance async API, automatic OpenAPI docs, and Pydantic validation |
 | 2026-07-09 | Migrate frontend to React + TypeScript + Tailwind CSS | Type-safe UI components and full decoupling from the backend |
 | 2026-07-09 | Seed sample users and data | Fresh environments have no records; seeding accelerates manual and E2E testing |
+| 2026-07-09 | Document and update all documentation | Large architectural changes require docs to stay accurate for hand-off and new contributors |
 
 ## Appendix: Definition of done
 
@@ -720,4 +745,5 @@ For each recommendation:
 - **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
 - **2026-07-09**: Added object storage, email, AI, and PDF abstraction layers to Phase 4; migration phases renumbered to 4.11 and 4.12.
 - **2026-07-09**: Added Phase 4.13 for seeding sample users and data for testing and demos.
+- **2026-07-09**: Added Phase 4.14 for documenting and updating all project documentation.
 - **2026-07-09**: Completed Phase 2.5 test coverage and fixtures (124 tests passing, 1 skipped `generate_concept_paper_pdf`).
