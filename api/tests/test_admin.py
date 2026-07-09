@@ -20,6 +20,37 @@ class TestAdmin:
         response = authenticated_client.get("/api/v1/admin/users")
         assert response.status_code == 403
 
+    def test_get_user(self, fastapi_client, admin_user, fastapi_user):
+        user_id = fastapi_user["users_id"]
+        response = fastapi_client.get(
+            f"/api/v1/admin/users/{user_id}",
+            headers=_admin_headers(admin_user),
+        )
+        assert response.status_code == 200
+        assert response.json()["users_id"] == user_id
+
+    def test_get_user_not_found(self, fastapi_client, admin_user):
+        response = fastapi_client.get(
+            "/api/v1/admin/users/99999",
+            headers=_admin_headers(admin_user),
+        )
+        assert response.status_code == 404
+
+    def test_activate_user(self, fastapi_client, admin_user, fastapi_user, fastapi_db):
+        user_id = fastapi_user["users_id"]
+        user = fastapi_db.query(Users).filter_by(users_id=user_id).first()
+        user.users_email_verified = 0
+        fastapi_db.commit()
+
+        response = fastapi_client.put(
+            f"/api/v1/admin/users/{user_id}/activate",
+            headers=_admin_headers(admin_user),
+        )
+        assert response.status_code == 200
+
+        user = fastapi_db.query(Users).filter_by(users_id=user_id).first()
+        assert user.users_email_verified == 1
+
     def test_list_users(self, fastapi_client, admin_user, fastapi_user):
         response = fastapi_client.get("/api/v1/admin/users", headers=_admin_headers(admin_user))
         assert response.status_code == 200

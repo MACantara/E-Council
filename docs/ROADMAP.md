@@ -838,13 +838,23 @@ Phase 4 prepares the application for a real production environment and explores 
 
 **Why it matters**: Documentation uploads, downloads, and organization records are a separate workflow from the other features. This phase focuses on file handling and metadata CRUD.
 
-**Scope**: `api/routers/documentation.py`, `api/schemas/documentation.py`, `services/documentation.py`, `services/storage/`
+**Scope**: `api/routers/documentation.py`, `api/schemas/documentation.py`, `api/services/documentation.py`, `services/storage/`
 
 **Checklist**
-- [ ] Add document CRUD endpoints under `/api/v1/documentation/`.
-- [ ] Add document upload endpoints using the storage abstraction.
-- [ ] Add download endpoints that return signed or direct URLs depending on storage backend.
-- [ ] Add tests for upload, download, and metadata CRUD.
+- [x] Add document CRUD endpoints under `/api/v1/documentation/`.
+- [x] Add document upload endpoints using the storage abstraction.
+- [x] Add download endpoints that return signed or direct URLs depending on storage backend.
+- [x] Add tests for upload, download, and metadata CRUD.
+
+**Notes**
+- Created `api/schemas/documentation.py` with `DocumentationCreate`, `DocumentationUpdate`, `DocumentationResponse`, `DocumentationStatusUpdate`, `ImageItem`, `TallyItem`, `EvaluationForm`, `FileUploadResponse`, `DownloadUrlResponse`, and related form schemas.
+- Created `api/routers/documentation.py` with endpoints for CRUD, status updates, PDF export, per-file upload/download, related-form lookup, activity report details, and student-list Excel parsing.
+- Added `api/services/documentation.py` with a `generate_documentation_pdf` helper for PDF export.
+- Wired `api/routers/documentation.py` into `api/main.py` under `/api/v1/documentation`.
+- Updated `services/storage/service.py` to cache the `MemoryStorage` backend so uploaded files remain available across requests during tests.
+- Fixed `api/routers/documentation.py` file download route to use `{public_id:path}` so storage public IDs with slashes match correctly.
+- Added `api/tests/test_documentation.py` covering CRUD, status updates, file upload, file download URL generation, PDF export, department scoping, and unauthorized access.
+- All `api/tests/test_documentation.py` tests pass (`13 passed`).
 
 **Acceptance criteria**: Feature parity with `routes/documentation.py` and the document functions in `services/documentation.py`.
 

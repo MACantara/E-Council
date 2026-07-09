@@ -29,6 +29,22 @@ def _apply_user_search(query, search: str | None):
     )
 
 
+@router.get("/users/{user_id}", response_model=UserResponse)
+def get_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: Users = Depends(require_admin),
+):
+    """Get a single user by id (admin only)."""
+    user = db.query(Users).filter_by(users_id=user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return user
+
+
 @router.get("/users", response_model=UserListResponse)
 def list_users(
     params: PaginationParams = Depends(get_pagination_params),
@@ -98,6 +114,25 @@ def delete_user(
     db.delete(user)
     db.commit()
     return MessageResponse(message="User deleted successfully")
+
+
+@router.put("/users/{user_id}/activate", response_model=MessageResponse)
+def activate_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: Users = Depends(require_admin),
+):
+    """Activate a user by setting their email verification to 1 (admin only)."""
+    user = db.query(Users).filter_by(users_id=user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    user.users_email_verified = 1
+    db.commit()
+    return MessageResponse(message="User activated successfully")
 
 
 @router.put("/users/{user_id}/deactivate", response_model=MessageResponse)

@@ -25,7 +25,9 @@ def _serialize_value(value: object) -> object:
         return json.loads(json.dumps(value, default=str))
     if hasattr(value, "isoformat"):
         return value.isoformat()
-    return value
+    if isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
 
 
 def _get_primary_key_value(obj: object) -> object | None:
