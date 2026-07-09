@@ -400,11 +400,11 @@ Phase 3 moves business logic out of route handlers and into services, improves t
 **Scope**: `app.py`, `migrations/` (new)
 
 **Checklist**
-- [ ] Run `flask db init` to create the `migrations/` directory.
-- [ ] Run `flask db migrate -m "Initial schema"` and `flask db upgrade`.
-- [ ] Remove `db.create_all()` from `app.py` `init_database` or make it test-only.
-- [ ] Update `README.md` setup instructions to use `flask db upgrade`.
-- [ ] Add a CI step that runs `flask db upgrade` and `flask db downgrade` to verify migrations.
+- [x] Run `flask db init` to create the `migrations/` directory.
+- [x] Run `flask db migrate -m "Initial schema"` and `flask db upgrade`.
+- [x] Remove `db.create_all()` from `app.py` `init_database` or make it test-only.
+- [x] Update `README.md` setup instructions to use `flask db upgrade`.
+- [x] Add a CI step that runs `flask db upgrade` and `flask db downgrade` to verify migrations.
 
 **Acceptance criteria**: `flask db upgrade` creates the schema. `app.py` no longer calls `db.create_all()` in production.
 

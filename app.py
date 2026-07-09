@@ -172,31 +172,26 @@ def create_app(config_name=None):
 
 def init_database(app):
     """
-    Test the database connection and create all tables if they don't exist.
+    Test the database connection.
+
+    Tables are created by Flask-Migrate (``flask db upgrade``) rather than
+    ``db.create_all()``. This function only verifies that the configured
+    database is reachable.
 
     Args:
         app: Flask application instance
 
     Returns:
-        bool: True if the database is reachable and tables are created/verified,
-              False otherwise.
+        bool: True if the database is reachable, False otherwise.
     """
     with app.app_context():
         try:
             with db.engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
             app.logger.info("Database connection successful.")
-        except Exception as e:
-            app.logger.error("Database connection failed: %s", e, exc_info=True)
-            return False
-
-        try:
-            # Import all models so db.create_all() registers every table
-            db.create_all()
-            app.logger.info("Database tables created/verified successfully.")
             return True
         except Exception as e:
-            app.logger.error("Failed to create database tables: %s", e, exc_info=True)
+            app.logger.error("Database connection failed: %s", e, exc_info=True)
             return False
 
 

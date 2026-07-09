@@ -29,6 +29,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Verify migrations
+        env:
+          FLASK_APP: app.py
+        run: |
+          flask db upgrade
+          flask db downgrade base
+          flask db upgrade
+
       - name: Run ruff check
         run: ruff check .
 

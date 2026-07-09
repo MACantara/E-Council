@@ -391,19 +391,13 @@ Open `.env` and replace every placeholder with your own credentials. The example
 
 ### 6. Initialize the Database Schema
 
-With the `.env` file in place and the virtual environment active, run the application once to create the tables:
+With the `.env` file in place and the virtual environment active, apply the existing Flask-Migrate migrations to create the tables:
 
 ```bash
-python app.py
-```
-
-Or, if you prefer Flask-Migrate, initialize and apply migrations first:
-
-```bash
-flask db init
-flask db migrate -m "Initial schema"
 flask db upgrade
 ```
+
+Migrations are versioned in the `migrations/` directory. For a fresh database, this will create the full schema. For an existing database, it will apply any pending migrations.
 
 ## Running the Application
 
