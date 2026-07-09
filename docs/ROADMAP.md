@@ -537,14 +537,100 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.7 Migrate to FastAPI backend + SPA
+### 4.7 Abstract object storage layer
+
+**Why it matters**: The application currently uploads profile pictures and signatures directly to Cloudinary (`cloudinary.uploader.upload`, `cloudinary.uploader.destroy`). This hard-codes a single vendor and makes it hard to test, run locally, or migrate to S3, MinIO, or Azure Blob. A storage abstraction layer lets the application switch object storage providers without touching routes or services.
+
+**Scope**: `services/storage/` or `repositories/storage/`, `routes/account.py`, `extensions.py`, `config/config.py`
+
+**Checklist**
+- [ ] Define a `StorageBackend` protocol (e.g., `upload`, `delete`, `get_url`).
+- [ ] Implement `CloudinaryStorage`, `LocalFilesystemStorage`, and `S3Storage` (or `MinIOStorage`) adapters.
+- [ ] Move `cloudinary.uploader` calls from `routes/account.py` into the storage service.
+- [ ] Store storage provider configuration in `config/config.py` (e.g., `STORAGE_PROVIDER`, `STORAGE_*` environment variables).
+- [ ] Add a `NullStorage` or in-memory test backend for unit tests.
+- [ ] Update tests to use the test backend without network calls.
+- [ ] Update `ARCHITECTURE.md` and `README.md` with storage configuration.
+
+**Acceptance criteria**: The same upload/delete code works regardless of backend. The application can switch storage providers by changing configuration, and tests pass without network access.
+
+**Effort**: Large
+
+---
+
+### 4.8 Abstract email delivery
+
+**Why it matters**: `utils/email.py` and `tasks.py` send email through Flask-Mail/SMTP and render templates with Jinja2. This is tied to SMTP and makes it hard to support SendGrid, Mailgun, Amazon SES, or to test in isolation. An email abstraction layer makes the application email-provider-agnostic.
+
+**Scope**: `services/email/`, `utils/email.py`, `tasks.py`, `config/config.py`, `templates/email/`
+
+**Checklist**
+- [ ] Define an `EmailBackend` protocol (`send`, `send_template`, `send_batch`).
+- [ ] Implement `SmtpEmailBackend`, `SendgridEmailBackend`, `MailgunEmailBackend`, `ConsoleEmailBackend` (dev), and `InMemoryEmailBackend` (tests).
+- [ ] Move `send_email_task` and Flask-Mail `Message` usage into `services/email/`.
+- [ ] Add provider-agnostic config in `config/config.py` (e.g., `EMAIL_PROVIDER`, `EMAIL_*` environment variables).
+- [ ] Update `utils/email.py` to use the new backend.
+- [ ] Update tests to use `InMemoryEmailBackend` and assert emails are sent.
+- [ ] Document supported email providers and configuration.
+
+**Acceptance criteria**: The application can switch email providers by changing a config value. Tests run without a real SMTP server.
+
+**Effort**: Large
+
+---
+
+### 4.9 Abstract AI service
+
+**Why it matters**: `services/ai.py` is hard-coded to Google Gemini. Prompts, safety settings, and client initialization are all provider-specific. Supporting OpenAI, Anthropic, or a local model requires an abstraction that hides the provider behind a common interface.
+
+**Scope**: `services/ai/`, `services/concept_papers.py`, `services/board_resolutions.py`, `config/config.py`
+
+**Checklist**
+- [ ] Define an `AIProvider` protocol (`generate_text`, `upload_file`).
+- [ ] Implement `GeminiProvider`, `OpenAIProvider`, `AnthropicProvider`, and `MockAIProvider` for tests.
+- [ ] Move provider-specific safety settings and client setup into the adapters.
+- [ ] Add `AI_PROVIDER` and model-specific environment variables to `config/config.py`.
+- [ ] Refactor `services/ai.py` to dispatch to the configured provider.
+- [ ] Update services that call AI to use the provider interface.
+- [ ] Add tests that use the mock provider.
+- [ ] Update documentation with supported AI providers and model configuration.
+
+**Acceptance criteria**: Switching the `AI_PROVIDER` environment variable changes the model without changing business logic code. All AI-related tests pass with the mock provider.
+
+**Effort**: Large
+
+---
+
+### 4.10 Abstract PDF generation
+
+**Why it matters**: PDF rendering is tightly coupled to ReportLab in `services/concept_papers.py`, `services/board_resolutions.py`, `services/documentation.py`, `services/financial.py`, and `services/meetings.py`. An abstraction allows switching to WeasyPrint, an external PDF service, or HTML-based rendering without touching routes or business logic.
+
+**Scope**: `services/pdf/`, `services/concept_papers.py`, `services/board_resolutions.py`, `services/documentation.py`, `services/financial.py`, `services/meetings.py`, `services/pdf.py`, `config/config.py`
+
+**Checklist**
+- [ ] Define a `PDFRenderer` protocol (e.g., `render_from_html(html)`, `render_from_template(template, context)`).
+- [ ] Implement a `ReportLabRenderer` that wraps the current ReportLab code.
+- [ ] Implement a `WeasyPrintRenderer` or `HTMLRenderer` as an alternative.
+- [ ] Extract per-document PDF generation into renderer classes or templates.
+- [ ] Add `PDF_RENDERER` and renderer-specific environment variables to `config/config.py`.
+- [ ] Keep shared helpers (Folio size, headers, footers) in `services/pdf/`.
+- [ ] Update tests to use a stub or in-memory renderer.
+- [ ] Update documentation with PDF renderer configuration.
+
+**Acceptance criteria**: Switching the PDF renderer does not require changes to routes or business logic. All PDF tests pass with a stub renderer.
+
+**Effort**: Large
+
+---
+
+### 4.11 Migrate to FastAPI backend + SPA
 
 **Why it matters**: FastAPI offers high-performance async endpoints, automatic OpenAPI documentation, and Pydantic-native validation. A fully decoupled FastAPI backend serves as the API layer for the SPA and future mobile clients.
 
 **Scope**: New `api/` with FastAPI, `services/`, `repositories/`, `config/`
 
 **Checklist**
-- [ ] Complete Phase 4.6 (database abstraction layer) and Phase 4.5 (API/SPA evaluation) before starting.
+- [ ] Complete Phases 4.6 through 4.10 before starting.
 - [ ] Set up FastAPI project structure (`api/main.py`, `api/routers/`, `api/services/`, `api/repositories/`).
 - [ ] Create Pydantic request/response models for all resources (users, events, concept papers, documents, financial reports, meetings, board resolutions).
 - [ ] Reimplement authentication and authorization with FastAPI dependencies and JWT tokens.
@@ -559,14 +645,14 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.8 Migrate to React + TypeScript frontend
+### 4.12 Migrate to React + TypeScript frontend
 
 **Why it matters**: A modern React frontend with TypeScript provides type-safe UI components, a better development experience, and full decoupling from the backend. It also enables richer interactivity and a shared component library.
 
 **Scope**: New `frontend/` with React + TypeScript + Tailwind CSS
 
 **Checklist**
-- [ ] Complete Phase 4.7 (FastAPI backend + SPA) before starting.
+- [ ] Complete Phase 4.11 (FastAPI backend + SPA) before starting.
 - [ ] Create a React frontend with TypeScript and Vite (or a similar build tool).
 - [ ] Port templates to React components/pages, preserving the Tailwind CSS 4 design system and existing macro behavior.
 - [ ] Build shared React components (Button, Card, Input, Select, etc.) to replace the Jinja2 macro system.
@@ -589,6 +675,10 @@ Phase 4 prepares the application for a real production environment and explores 
 | 2026-07-09 | Use Flask-WTF for forms | Tight integration with Jinja2 and built-in CSRF |
 | 2026-07-09 | Keep server-side rendering for now | Faster to secure current UI; evaluate API separately |
 | 2026-07-09 | Introduce a database abstraction layer | Makes the system database-agnostic and eases migration to FastAPI |
+| 2026-07-09 | Abstract object storage | Currently coupled to Cloudinary; abstraction enables S3, MinIO, Azure Blob, and local storage |
+| 2026-07-09 | Abstract email delivery | Currently tied to SMTP via Flask-Mail; abstraction enables SendGrid, Mailgun, SES, and test backends |
+| 2026-07-09 | Abstract AI service | Currently hard-coded to Google Gemini; abstraction enables OpenAI, Anthropic, and local models |
+| 2026-07-09 | Abstract PDF generation | Currently coupled to ReportLab; abstraction enables WeasyPrint, HTML rendering, and external services |
 | 2026-07-09 | Migrate backend to FastAPI | High-performance async API, automatic OpenAPI docs, and Pydantic validation |
 | 2026-07-09 | Migrate frontend to React + TypeScript + Tailwind CSS | Type-safe UI components and full decoupling from the backend |
 
@@ -605,5 +695,5 @@ For each recommendation:
 - **2026-07-09**: Created initial roadmap from `docs/IMPROVEMENT_ANALYSIS.md`.
 - **2026-07-09**: Migrated AI SDK from `google-generativeai` to `google-genai` (Phase 3.2); all AI generation endpoints and tests updated.
 - **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
-- **2026-07-09**: Split Phase 4.7 into 4.7 (FastAPI backend + SPA) and 4.8 (React + TypeScript frontend).
+- **2026-07-09**: Added object storage, email, AI, and PDF abstraction layers to Phase 4; migration phases renumbered to 4.11 and 4.12.
 - **2026-07-09**: Completed Phase 2.5 test coverage and fixtures (124 tests passing, 1 skipped `generate_concept_paper_pdf`).
