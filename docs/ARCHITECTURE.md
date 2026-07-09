@@ -17,6 +17,7 @@ This document describes the architecture of the E-Council application following 
 - **Clear separation**: Templates, static assets, utilities, configuration, and business logic are separated
 - **Refactoring complete**: The monolithic `app.py` was reduced to an application factory; remaining improvements are tracked in `docs/ROADMAP.md`
 - **Tailwind CSS 4 migration complete**: Legacy custom CSS files were removed and the UI uses Tailwind utility classes and shared Jinja2 macros
+- **FastAPI prototype in progress**: A FastAPI API prototype exists in `api/` with JWT auth, Pydantic schemas, and a lifespan-managed app. It reuses the existing SQLAlchemy models and repository layer.
 
 ## Directory Structure
 
@@ -24,6 +25,18 @@ This document describes the architecture of the E-Council application following 
 E-Council/
 ├── app.py                          # Application factory (entry point)
 ├── extensions.py                   # Flask extensions initialization
+├── api/                            # FastAPI prototype application
+│   ├── __init__.py
+│   ├── database.py                 # SQLAlchemy engine and FastAPI session dependency
+│   ├── dependencies.py             # JWT dependencies and get_current_user
+│   ├── main.py                     # FastAPI app factory with lifespan
+│   ├── routers/
+│   │   ├── __init__.py
+│   │   └── auth.py                 # FastAPI auth prototype endpoints
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── auth.py                 # Pydantic auth schemas
+│   └── settings.py                 # FastAPI-specific settings
 ├── config/                         # Configuration management
 │   ├── __init__.py
 │   └── config.py
@@ -305,6 +318,22 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 - `UserRepository` (`repositories/users.py`) - Existing user-specific repository with eager department loading.
 
 **Pattern**: Routes and services call `repo.query(Model)`, `repo.add(obj)`, `repo.commit()`, etc., instead of `db.session.query(Model)` or `Model.query`. This makes the application database-agnostic: switching to PostgreSQL, MySQL, or another SQLAlchemy-compatible engine requires no route or service changes.
+
+### FastAPI API Prototype (`api/`)
+
+**Purpose**: A FastAPI prototype that demonstrates the future API/SPA architecture and serves as the starting point for migrating Flask routes to REST endpoints.
+
+**Key components**:
+- `api/main.py` - FastAPI application with lifespan management, SQLAlchemy engine disposal, and router registration.
+- `api/database.py` - SQLAlchemy engine, session factory, and `get_db` dependency for request-scoped sessions.
+- `api/settings.py` - FastAPI-specific configuration derived from the existing Flask config and environment variables.
+- `api/dependencies.py` - JWT `create_access_token`, `create_refresh_token`, `decode_token`, and `get_current_user` dependencies.
+- `api/routers/auth.py` - Prototype auth endpoints (`/api/v1/auth/register`, `/login`, `/refresh`, `/me`).
+- `api/schemas/auth.py` - Pydantic request/response models for auth.
+
+**Pattern**: The FastAPI prototype reuses the existing SQLAlchemy models and the repository layer, so it does not duplicate business logic. It is designed to run alongside the Flask application during the migration. New feature routers will be added under `api/routers/` and schemas under `api/schemas/` as migration continues.
+
+**Tests**: `tests/test_api.py` verifies the FastAPI auth endpoints using `TestClient` and a dedicated SQLite test database.
 
 ### Service Layer (`services/`)
 
@@ -668,10 +697,10 @@ The current refactoring has established a solid foundation for future improvemen
 - **Future**: Move remaining cloud/AI configuration out of `app.py` and into `services/` or `extensions.py`
 - **Approach**: See `docs/ROADMAP.md` Phase 3
 
-#### 4. Tech Stack Migration (Foundation Ready)
-- **Current**: Modular structure, clear separation
-- **Future**: Easier migration to React/FastAPI or similar
-- **Approach**: API-first design, gradual frontend migration
+#### 4. Tech Stack Migration (Prototype Active)
+- **Current**: FastAPI prototype is active in `api/` with JWT auth and a reusable router/schema structure
+- **Future**: Complete migration of Flask routes to FastAPI endpoints, then migrate the frontend to React/TypeScript
+- **Approach**: API-first design, migrate feature-by-feature (see `docs/ROADMAP.md` Phases 4.10-4.20)
 
 ### Migration Strategy
 

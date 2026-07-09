@@ -608,15 +608,20 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/main.py`, `api/database.py`, `api/settings.py`, `api/dependencies.py`, `api/routers/auth.py`, `api/schemas/auth.py`
 
 **Checklist**
-- [ ] Complete Phases 4.6 through 4.9 before starting.
-- [ ] Set up the FastAPI package structure (`api/`, `api/routers/`, `api/schemas/`, `api/dependencies.py`, `api/settings.py`).
-- [ ] Add `lifespan` management in `api/main.py` to create tables on startup and dispose the SQLAlchemy engine on shutdown.
-- [ ] Add a database session dependency (`get_db`) in `api/database.py`.
-- [ ] Add JWT dependencies (`create_access_token`, `create_refresh_token`, `decode_token`, `get_current_user`) in `api/dependencies.py`.
-- [ ] Implement prototype auth endpoints (`/api/v1/auth/register`, `/login`, `/refresh`, `/me`) in `api/routers/auth.py`.
-- [ ] Add Pydantic schemas for auth in `api/schemas/auth.py`.
-- [ ] Add unit/integration tests for the FastAPI auth prototype.
-- [ ] Update `ARCHITECTURE.md` with the FastAPI prototype and the plan to migrate feature-by-feature.
+- [x] Complete Phases 4.6 through 4.9 before starting.
+- [x] Set up the FastAPI package structure (`api/`, `api/routers/`, `api/schemas/`, `api/dependencies.py`, `api/settings.py`).
+- [x] Add `lifespan` management in `api/main.py` to create tables on startup and dispose the SQLAlchemy engine on shutdown.
+- [x] Add a database session dependency (`get_db`) in `api/database.py`.
+- [x] Add JWT dependencies (`create_access_token`, `create_refresh_token`, `decode_token`, `get_current_user`) in `api/dependencies.py`.
+- [x] Implement prototype auth endpoints (`/api/v1/auth/register`, `/login`, `/refresh`, `/me`) in `api/routers/auth.py`.
+- [x] Add Pydantic schemas for auth in `api/schemas/auth.py`.
+- [x] Add unit/integration tests for the FastAPI auth prototype.
+- [x] Update `ARCHITECTURE.md` with the FastAPI prototype and the plan to migrate feature-by-feature.
+
+**Notes**
+- All FastAPI auth tests in `tests/test_api.py` pass (`7 passed`).
+- `uvicorn api.main:app --reload` starts the application successfully.
+- The Flask application remains untouched and continues to work unchanged.
 
 **Acceptance criteria**: `uvicorn api.main:app --reload` starts successfully. The auth endpoints register users, issue tokens, and return the current user. The existing Flask application continues to work unchanged.
 
@@ -922,4 +927,5 @@ For each recommendation:
 - **2026-07-09**: Added a seeding phase for sample users and data for testing and demos.
 - **2026-07-09**: Added a documentation-update phase for all project documentation.
 - **2026-07-10**: Split Phase 4.10 (FastAPI backend + SPA) into individual FastAPI migration phases (4.10 through 4.20) and renumbered React frontend, seeding, and documentation phases to 4.21, 4.22, and 4.23.
+- **2026-07-10**: Completed Phase 4.10 FastAPI prototype. Verified `api/main.py`, `api/database.py`, `api/dependencies.py`, `api/routers/auth.py`, `api/schemas/auth.py`, and `tests/test_api.py` are functional. Updated `ARCHITECTURE.md` with FastAPI prototype documentation.
 - **2026-07-09**: Completed Phase 4.6 database abstraction layer. Added `BaseRepository`, `repo`, and `get_repository()` in `repositories/`; refactored `routes/`, `services/`, `utils/`, and `forms/` to use the repository layer; updated `DatabaseConfig` to support SQLite, MySQL, and PostgreSQL; added `tests/test_repositories.py` integration tests; updated `ARCHITECTURE.md` and `README.md`.
