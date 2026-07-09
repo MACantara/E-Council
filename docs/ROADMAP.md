@@ -732,11 +732,22 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/routers/events.py`, `api/schemas/events.py`, `services/events.py`
 
 **Checklist**
-- [ ] Add event CRUD endpoints under `/api/v1/events/`.
-- [ ] Add event status update endpoints.
-- [ ] Add transaction endpoints for event budgets (`add-transaction`, `update-transaction`).
-- [ ] Add invite and accept-invite endpoints.
-- [ ] Add tests for event CRUD, transactions, and invitations.
+- [x] Add event CRUD endpoints under `/api/v1/events/`.
+- [x] Add event status update endpoints.
+- [x] Add transaction endpoints for event budgets (`add-transaction`, `update-transaction`).
+- [x] Add invite and accept-invite endpoints.
+- [x] Add tests for event CRUD, transactions, and invitations.
+
+**Notes**
+- Added `api/schemas/events.py` with request/response models for `Events`, `Transactions`, and event invitations.
+- Implemented `api/routers/events.py` with `GET /api/v1/events`, `POST /api/v1/events`, `GET /api/v1/events/{id}`, `PUT /api/v1/events/{id}`, `DELETE /api/v1/events/{id}`, `PUT /api/v1/events/{id}/status`, `POST /api/v1/events/{id}/transactions`, `PUT /api/v1/events/{id}/transactions/{transaction_id}`, `POST /api/v1/events/{id}/invitations`, `POST /api/v1/events/invitations/accept`, and `POST /api/v1/events/invitations/reject`.
+- Implemented `api/services/events.py` for sending event invitation emails with a signed token and storing the invitation record.
+- Wired `api/routers/events.py` into `api/main.py`.
+- Event creation supports both "scratch" and "existing" concept paper modes.
+- Transactions support an optional receipt upload with multipart form data and a JSON payload field.
+- Invitations verify signed tokens and manage `DepartmentsEvents` associations on accept/reject.
+- Added `api/tests/test_events.py` covering CRUD, status updates, concept paper creation, transactions, invitations, and department scoping.
+- All FastAPI tests pass: `87 passed` across `api/tests/` and `tests/test_api.py`.
 
 **Acceptance criteria**: Feature parity with `routes/events.py` and the event functions in `services/events.py`.
 
