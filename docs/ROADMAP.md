@@ -791,12 +791,14 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/routers/board_resolutions.py`, `api/schemas/board_resolutions.py`, `services/board_resolutions.py`, `services/ai/`
 
 **Checklist**
-- [ ] Add board resolution CRUD endpoints under `/api/v1/board-resolutions/`.
-- [ ] Add status workflow endpoints.
-- [ ] Add AI generation endpoints using the abstracted AI service.
-- [ ] Add export/PDF generation endpoints.
-- [ ] Add pagination and department scoping.
-- [ ] Add tests for CRUD, AI generation, and export workflows.
+- [x] Add board resolution CRUD endpoints under `/api/v1/board-resolutions/`.
+- [x] Add status workflow endpoints.
+- [x] Add AI generation endpoints using the abstracted AI service.
+- [x] Add export/PDF generation endpoints.
+- [x] Add pagination and department scoping.
+- [x] Add tests for CRUD, AI generation, and export workflows.
+
+**Notes**: Implemented `api/routers/board_resolutions.py`, `api/schemas/board_resolutions.py`, `api/services/board_resolutions.py`, and `api/tests/test_board_resolutions.py`. The router is wired into `api/main.py` and provides CRUD, status, AI description generation, and PDF export endpoints. PDF generation mirrors the Flask `services/board_resolutions.py` layout. Department scoping is applied to list/read/write operations. The AI endpoint uses the shared `services.ai` `generate_content` helper.
 
 **Acceptance criteria**: Feature parity with `routes/board_resolutions.py`. All board resolution workflows work through REST endpoints.
 
@@ -808,14 +810,23 @@ Phase 4 prepares the application for a real production environment and explores 
 
 **Why it matters**: Financial reports, budgets, and receipt uploads are sensitive operations. A dedicated phase ensures the new API handles file uploads, receipt storage, and transaction reporting safely.
 
-**Scope**: `api/routers/financial.py`, `api/schemas/financial.py`, `services/financial.py`, `services/storage/`
+**Scope**: `api/routers/financial.py`, `api/schemas/financial.py`, `api/services/financial.py`, `services/storage/`
 
 **Checklist**
-- [ ] Add financial report CRUD endpoints under `/api/v1/financial/`.
-- [ ] Add budget and transaction endpoints.
-- [ ] Add receipt upload endpoints using the storage abstraction from Phase 4.7.
-- [ ] Add reporting and aggregation endpoints (e.g., budget vs. actuals).
-- [ ] Add tests for financial reports, transactions, and receipts.
+- [x] Add financial report CRUD endpoints under `/api/v1/financial/`.
+- [x] Add budget and transaction endpoints.
+- [x] Add receipt upload endpoints using the storage abstraction from Phase 4.7.
+- [x] Add reporting and aggregation endpoints (e.g., budget vs. actuals).
+- [x] Add tests for financial reports, transactions, and receipts.
+
+**Notes**
+- Added `api/schemas/financial.py` with Pydantic models for `FinancialReports`, transactions, and budget summary.
+- Implemented `api/routers/financial.py` with CRUD, status updates, budget summary, transactions, receipt uploads, and PDF export.
+- Implemented `api/services/financial.py` for synchronous PDF generation using ReportLab.
+- Wired the new router into `api/main.py` under `/api/v1/financial`.
+- Added `api/tests/test_financial.py` covering CRUD, status updates, summary, transactions, receipt uploads, PDF export, and department scoping.
+- All `api/tests/test_financial.py` tests pass (`17 passed`).
+- The full `api/tests` suite has 2 pre-existing failures in `api/tests/test_documentation.py` (`ImageItem not JSON serializable`), which are unrelated to this phase and are tracked under Phase 4.18.
 
 **Acceptance criteria**: Feature parity with `routes/financial.py` and the financial functions in `services/financial.py`.
 
@@ -848,11 +859,26 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `api/routers/admin.py`, `api/routers/dashboard.py`, `api/schemas/admin.py`, `services/audit.py`, `models/audit.py`
 
 **Checklist**
-- [ ] Add admin dashboard endpoints (user stats, recent activity, counts by resource).
-- [ ] Add audit log endpoints with pagination and filtering.
-- [ ] Add user/role management endpoints if not already covered in Phase 4.12.
-- [ ] Add dashboard endpoints consumed by the home/admin dashboard.
-- [ ] Add tests for admin and audit endpoints.
+- [x] Add admin dashboard endpoints (user stats, recent activity, counts by resource).
+- [x] Add audit log endpoints with pagination and filtering.
+- [x] Add user/role management endpoints if not already covered in Phase 4.12.
+- [x] Add dashboard endpoints consumed by the home/admin dashboard.
+- [x] Add tests for admin and audit endpoints.
+
+**Notes**
+- Added `services/audit.py` with `get_dashboard_stats`, `get_audit_logs`, `get_recent_activity`, `log_action`, and `get_user_stats`/`get_resource_counts` helpers.
+- Created `api/routers/dashboard.py` under `/api/v1/admin` with:
+  - `GET /admin/dashboard` returning user stats, resource counts, and recent activity.
+  - `GET /admin/audit-logs` with pagination and optional `user_id`, `action`, `entity_type`, and `search` filters.
+  - `GET /admin/audit-logs/{audit_log_id}` for a single audit log.
+- Extended `api/schemas/admin.py` with `AuditLogResponse`, `AuditLogListResponse`, `UserStats`, and `DashboardStatsResponse`.
+- Extended `api/routers/admin.py` with `GET /admin/users/{user_id}` and `PUT /admin/users/{user_id}/activate` for full user management parity.
+- Wired `api/routers/dashboard.py` into `api/main.py`.
+- Added `api/tests/test_dashboard.py` covering dashboard, audit log listing, filtering, search, pagination, and detail retrieval.
+- Added tests for `get_user` and `activate_user` in `api/tests/test_admin.py`.
+- Fixed `models/audit.py` `_serialize_value` to stringify non-JSON objects (e.g., `ImageItem`) instead of raising `StatementError`.
+- Fixed `api/routers/documentation.py` file download route to use `{public_id:path}` so storage public IDs with slashes match correctly.
+- All FastAPI tests pass: `150 passed` in `api/tests/` (including `api/tests/test_dashboard.py` and `api/tests/test_admin.py`), and the full legacy suite remains green (`238 passed, 1 skipped`).
 
 **Acceptance criteria**: Feature parity with `routes/admin.py` and `routes/dashboard.py`. Admin users can query audit logs and dashboard statistics.
 
@@ -984,4 +1010,5 @@ For each recommendation:
 - **2026-07-09**: Added a documentation-update phase for all project documentation.
 - **2026-07-10**: Split Phase 4.10 (FastAPI backend + SPA) into individual FastAPI migration phases (4.10 through 4.20) and renumbered React frontend, seeding, and documentation phases to 4.21, 4.22, and 4.23.
 - **2026-07-10**: Completed Phase 4.10 FastAPI prototype. Verified `api/main.py`, `api/database.py`, `api/dependencies.py`, `api/routers/auth.py`, `api/schemas/auth.py`, and `tests/test_api.py` are functional. Updated `ARCHITECTURE.md` with FastAPI prototype documentation.
+- **2026-07-10**: Completed Phase 4.17 FastAPI financial endpoints. Added `api/routers/financial.py`, `api/schemas/financial.py`, `api/services/financial.py`, and `api/tests/test_financial.py`. Wired router into `api/main.py`. All 17 new tests pass; 2 pre-existing `api/tests/test_documentation.py` failures remain unrelated to this phase.
 - **2026-07-09**: Completed Phase 4.6 database abstraction layer. Added `BaseRepository`, `repo`, and `get_repository()` in `repositories/`; refactored `routes/`, `services/`, `utils/`, and `forms/` to use the repository layer; updated `DatabaseConfig` to support SQLite, MySQL, and PostgreSQL; added `tests/test_repositories.py` integration tests; updated `ARCHITECTURE.md` and `README.md`.
