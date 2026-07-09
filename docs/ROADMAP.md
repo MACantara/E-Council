@@ -281,7 +281,7 @@ Phase 2 builds the infrastructure needed for safer, faster development: validati
 **Scope**: `.env.example`, `README.md`, `HAND-OVER.md`, `docs/ARCHITECTURE.md`
 
 **Checklist**
-- [ ] Create or update `.env.example` with all required environment variables:
+- [x] Create or update `.env.example` with all required environment variables:
   - `SECRET_KEY`
   - `FLASK_ENV`
   - `SQLALCHEMY_DATABASE_URI`
@@ -289,12 +289,12 @@ Phase 2 builds the infrastructure needed for safer, faster development: validati
   - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
   - `GOOGLE_GEMINI_AI_API_KEY`
   - `SENTRY_DSN` (optional)
-- [ ] Group variables by service in `.env.example` and add comments describing each one.
-- [ ] Document how to obtain each external service key (Cloudinary, Google Gemini, SMTP provider, Sentry).
-- [ ] Add environment setup instructions to `README.md` under `Setup & Configuration`.
-- [ ] Update `HAND-OVER.md` or `ARCHITECTURE.md` with a list of mandatory vs. optional environment variables.
-- [ ] Update `README.md` setup instructions to copy `.env.example` to `.env` before running the app.
-- [ ] Verify CI workflow can still run without a real `.env` file.
+- [x] Group variables by service in `.env.example` and add comments describing each one.
+- [x] Document how to obtain each external service key (Cloudinary, Google Gemini, SMTP provider, Sentry).
+- [x] Add environment setup instructions to `README.md` under `Setup & Configuration`.
+- [x] Update `HAND-OVER.md` or `ARCHITECTURE.md` with a list of mandatory vs. optional environment variables.
+- [x] Update `README.md` setup instructions to copy `.env.example` to `.env` before running the app.
+- [x] Verify CI workflow can still run without a real `.env` file.
 
 **Acceptance criteria**: A new contributor can clone the repo, copy `.env.example` to `.env`, fill in the keys, and run the app/tests. `README.md` explains every required variable and how to get it.
 

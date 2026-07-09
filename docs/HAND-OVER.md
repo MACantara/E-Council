@@ -123,7 +123,29 @@ Example card:
 
 ---
 
-## 🔧 Notes from the latest session
+## � Environment variables
+
+All runtime configuration is loaded from environment variables. A complete, commented example is provided in `.env.example`.
+
+### Required for any environment
+- `SECRET_KEY` — Flask secret key for sessions and tokens.
+- `SQLALCHEMY_DATABASE_URI` — Database connection URI (SQLite or MySQL).
+- `MAIL_DEFAULT_SENDER` — Email address used as the sender for system emails.
+
+### Required for features
+- `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USE_SSL`, `MAIL_USERNAME`, `MAIL_PASSWORD` — SMTP settings for sending emails.
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — Cloudinary for image uploads.
+- `GOOGLE_GEMINI_AI_API_KEY` — Google Gemini for AI-assisted document generation.
+
+### Optional
+- `SENTRY_DSN` — Sentry DSN for error tracking.
+- `FLASK_ENV` — `development`, `testing`, or `production` (defaults to `development`).
+
+Copy `.env.example` to `.env`, fill in the values, and restart the application. The `.env` file is gitignored and must never be committed.
+
+---
+
+## �🔧 Notes from the latest session
 
 - `templates/account/account-settings.html` was corrected so the delete-account cancel button id matches `account-settings.js` (`cancel-delete-user-account-button`).
 - `static/js/account/password-security-settings.js` was converted from Bootstrap `bi-*` icons to Lucide `x-circle`/`check-circle` icon spans toggled with `.hidden`.

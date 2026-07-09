@@ -367,34 +367,27 @@ CREATE DATABASE `e-council`;
 
 ### 5. Configure Environment Variables
 
-Create a `.env` file in the project root (this file is gitignored) and populate it with your own credentials. The application reads the following variables:
+Copy the provided example file to a local `.env` file (this file is gitignored and should never be committed):
 
-```dotenv
-# Flask
-SECRET_KEY="<your-secret-key>"
-
-# Database
-SQLALCHEMY_DATABASE_URI="mysql://<user>:<password>@localhost/e-council"
-
-# Email (SMTP — Gmail by default)
-MAIL_SERVER="smtp.gmail.com"
-MAIL_PORT="587"
-MAIL_USE_TLS="True"
-MAIL_USE_SSL="False"
-MAIL_USERNAME="<your-gmail-address>"
-MAIL_PASSWORD="<your-gmail-app-password>"
-MAIL_DEFAULT_SENDER="<sender-email>"
-
-# Cloudinary
-CLOUDINARY_CLOUD_NAME="<your-cloud-name>"
-CLOUDINARY_API_KEY="<your-api-key>"
-CLOUDINARY_API_SECRET="<your-api-secret>"
-
-# Google Gemini AI
-GOOGLE_GEMINI_AI_API_KEY="<your-gemini-api-key>"
+```bash
+cp .env.example .env
 ```
 
+Open `.env` and replace every placeholder with your own credentials. The example file is organized by service and describes each variable. At minimum, set the following:
+
+| Variable | Required? | How to get it |
+|----------|-----------|---------------|
+| `SECRET_KEY` | Yes | Generate locally with `python -c "import secrets; print(secrets.token_hex(32))"` |
+| `SQLALCHEMY_DATABASE_URI` | Yes | Use a local SQLite path (`sqlite:///e_council.db`) or a MySQL URI (e.g. `mysql+pymysql://user:pass@localhost/e_council`) |
+| `MAIL_DEFAULT_SENDER` | Yes | Any email address you control; used as the sender for verification and notification emails |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` | Yes for real email | SMTP credentials; for Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Yes for uploads | Create a free account at [Cloudinary](https://cloudinary.com/) and copy the values from the dashboard |
+| `GOOGLE_GEMINI_AI_API_KEY` | Yes for AI features | Create a key in [Google AI Studio](https://aistudio.google.com/app/apikey) |
+| `SENTRY_DSN` | No | Optional; create a project at [Sentry](https://sentry.io/) and paste the DSN |
+
 > **Security:** Never commit your `.env` file. It is listed in `.gitignore`. Use App Passwords for Gmail rather than your account password, and rotate any keys if they have ever been exposed.
+
+> **Running tests:** The CI pipeline runs with a minimal set of environment variables (`SECRET_KEY`, `SQLALCHEMY_DATABASE_URI`, `MAIL_DEFAULT_SENDER`). You can run the test suite locally with the same minimal `.env` or with a real `.env` file.
 
 ### 6. Initialize the Database Schema
 

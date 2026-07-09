@@ -141,6 +141,14 @@ E-Council/
 - Security settings per environment
 - Easy configuration switching
 
+**Environment variables**:
+All runtime secrets and service credentials are read from environment variables. A complete example is in `.env.example` (do not commit `.env`).
+- **Required core**: `SECRET_KEY`, `SQLALCHEMY_DATABASE_URI`, `MAIL_DEFAULT_SENDER`
+- **Feature-required**: `MAIL_*`, `CLOUDINARY_*`, `GOOGLE_GEMINI_AI_API_KEY`
+- **Optional**: `SENTRY_DSN`, `FLASK_ENV`
+
+The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_CSRF_ENABLED = False`) so the test suite can run without a real `.env` file. The CI pipeline sets `SECRET_KEY`, `SQLALCHEMY_DATABASE_URI`, and `MAIL_DEFAULT_SENDER` to satisfy the app-level tests.
+
 ### Utility Functions (`utils/`)
 
 #### `utils/email.py`
