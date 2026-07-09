@@ -10,18 +10,24 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app import create_app
-from extensions import db
+from extensions import db, limiter
 
 
 @pytest.fixture
 def app():
     """Create a fresh Flask application configured for testing."""
     app = create_app('testing')
+    # Disable rate limiting by default so non-rate-limit tests are not affected.
+    # Rate-limit tests explicitly enable it.
+    limiter.enabled = False
+    limiter.reset()
     with app.app_context():
         db.create_all()
     yield app
     with app.app_context():
         db.drop_all()
+    limiter.enabled = False
+    limiter.reset()
 
 
 @pytest.fixture

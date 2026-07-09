@@ -25,7 +25,13 @@ class Config:
     # CSRF Protection
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
-    
+
+    # Rate limiting
+    RATELIMIT_ENABLED = True
+    RATELIMIT_STORAGE_URI = 'memory://'
+    RATELIMIT_STRATEGY = 'fixed-window'
+    RATELIMIT_DEFAULT = '1000 per minute'
+
     # Session Configuration
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
     SESSION_COOKIE_HTTPONLY = True
@@ -51,25 +57,32 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     """Production environment configuration."""
-    
+
     DEBUG = False
     TESTING = False
-    
+
     # Production-specific security settings
     SESSION_COOKIE_SECURE = True  # Requires HTTPS
     SESSION_COOKIE_SAMESITE = 'Strict'
 
+    # Use Redis for rate limiting in production if available
+    RATELIMIT_STORAGE_URI = os.getenv('REDIS_URL', 'memory://')
+
 
 class TestingConfig(Config):
     """Testing environment configuration."""
-    
+
     DEBUG = True
     TESTING = True
-    
+
     # Testing-specific overrides
     WTF_CSRF_ENABLED = False  # Disable CSRF for testing
     SESSION_COOKIE_SECURE = False
-    
+
+    # Rate limiting is enabled but disabled at runtime in conftest.py by default;
+    # rate-limit tests explicitly enable it.
+    RATELIMIT_ENABLED = True
+
     # Use an in-memory SQLite database for tests
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     SQLALCHEMY_TRACK_MODIFICATIONS = False

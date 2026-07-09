@@ -6,6 +6,7 @@ Handles all concept paper related routes including CRUD operations and PDF gener
 from flask import Blueprint, request, flash, redirect, url_for, render_template, make_response, jsonify, send_file, abort, current_app
 from utils.auth import belongs_to_user_or_department, is_admin
 from flask_login import login_required, current_user
+from extensions import limiter, get_user_key
 from io import BytesIO
 from datetime import datetime
 from string import ascii_lowercase
@@ -541,6 +542,7 @@ def delete_concept_paper(paper_id):
 
 @concept_papers_bp.route('/generate-body', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute", key_func=get_user_key)
 def generate_concept_body():
     if not request.is_json:
         return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
@@ -588,6 +590,7 @@ def generate_concept_body():
 
 @concept_papers_bp.route('/generate-descriptions', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute", key_func=get_user_key)
 def generate_concept_descriptions():
     if not request.is_json:
         return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
@@ -622,6 +625,7 @@ def generate_concept_descriptions():
 
 @concept_papers_bp.route('/generate-objectives', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute", key_func=get_user_key)
 def generate_concept_objectives():
     if not request.is_json:
         return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
@@ -654,6 +658,7 @@ def generate_concept_objectives():
 
 @concept_papers_bp.route('/generate-learning-outcomes', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute", key_func=get_user_key)
 def generate_concept_learning_outcomes():
     if not request.is_json:
         return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
@@ -686,6 +691,7 @@ def generate_concept_learning_outcomes():
 
 @concept_papers_bp.route('/generate-participants', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute", key_func=get_user_key)
 def generate_concept_participants():
     if not request.is_json:
         return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
@@ -718,6 +724,7 @@ def generate_concept_participants():
 
 @concept_papers_bp.route('/generate-consent', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute", key_func=get_user_key)
 def generate_concept_consent():
     if not request.is_json:
         return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)

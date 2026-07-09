@@ -5,9 +5,11 @@ Centralizes extension configuration and initialization.
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_mail import Mail
 from flask_wtf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from itsdangerous import URLSafeTimedSerializer
 
 # Initialize extensions without binding to app
@@ -16,7 +18,19 @@ migrate = Migrate()
 login_manager = LoginManager()
 mail = Mail()
 csrf = CSRFProtect()
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[],
+    storage_uri='memory://',
+)
 serializer = None  # Will be initialized with app config
+
+
+def get_user_key():
+    """Return a per-user rate limit key or fallback to remote address."""
+    if current_user and current_user.is_authenticated:
+        return str(current_user.users_id)
+    return get_remote_address()
 
 
 def init_extensions(app):
@@ -45,7 +59,11 @@ def init_extensions(app):
     
     # Initialize CSRF Protection
     csrf.init_app(app)
-    
+
+    # Initialize Flask-Limiter
+    limiter.init_app(app)
+    limiter.enabled = app.config.get('RATELIMIT_ENABLED', True)
+
     # Initialize URLSafeTimedSerializer
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     

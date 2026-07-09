@@ -25,6 +25,8 @@ from utils.email import send_verification_email, send_reset_password_email
 
 # Import authentication forms
 from forms.auth import SignupForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
+from extensions import limiter
+from flask_limiter.util import get_remote_address
 
 # Import current app to get SECRET_KEY for serializer
 from flask import current_app
@@ -55,6 +57,7 @@ def _flash_form_errors(form):
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
+@limiter.limit("3 per hour")
 def signup():
     department_choices = [(d.departments_name, d.departments_name) for d in Departments.query.all()]
     organization_choices = [
@@ -134,6 +137,7 @@ def confirm_email(token):
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def login():
     form = LoginForm()
 
@@ -246,6 +250,7 @@ def logout():
 
 
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
+@limiter.limit("3 per hour")
 def forgot_password():
     form = ForgotPasswordForm()
 
@@ -276,6 +281,7 @@ def forgot_password():
 
 
 @auth_bp.route("/reset-password/<selector>/<token>", methods=["GET", "POST"])
+@limiter.limit("5 per minute", key_func=lambda: request.view_args.get('token', get_remote_address()))
 def reset_password(selector, token):
     password_reset = PasswordReset.query.filter_by(password_reset_selector=selector).first()
 

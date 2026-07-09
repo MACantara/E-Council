@@ -189,18 +189,18 @@ Phase 2 builds the infrastructure needed for safer, faster development: validati
 **Scope**: `routes/auth.py`, `routes/concept_papers.py`, `routes/board_resolutions.py`, `routes/meetings.py`, `config/config.py`, `requirements.txt`
 
 **Checklist**
-- [ ] Add `Flask-Limiter` to `requirements.txt`.
-- [ ] Configure `Flask-Limiter` in `extensions.py` with a default in-memory storage for local dev and Redis/Redis extension for production.
-- [ ] Add limits to auth routes:
+- [x] Add `Flask-Limiter` to `requirements.txt`.
+- [x] Configure `Flask-Limiter` in `extensions.py` with a default in-memory storage for local dev and Redis/Redis extension for production.
+- [x] Add limits to auth routes:
   - `/auth/login`: 5 per minute per IP
   - `/auth/signup`: 3 per hour per IP
   - `/auth/forgot-password`: 3 per hour per IP
   - `/auth/reset-password`: 5 per minute per token
-- [ ] Add limits to AI generation routes:
-  - `/concept-papers/add` generate buttons: 10 per minute per user
+- [x] Add limits to AI generation routes:
+  - `/concept-papers/*` generate buttons: 10 per minute per user
   - `/board-resolutions/generate-description`: 10 per minute per user
-- [ ] Use `LoginAttempts` data to enforce temporary account lockout after 5 failed attempts.
-- [ ] Add tests for rate limiting using `flask` test client and time mocks.
+- [x] Use `LoginAttempts` data to enforce temporary account lockout after 5 failed attempts.
+- [x] Add tests for rate limiting using `flask` test client and `LoginAttempts` fixtures.
 
 **Acceptance criteria**: Excessive requests to auth and AI endpoints return `429 Too Many Requests`. `pytest` passes and does not fail due to rate limits (use test configuration).
 

@@ -2,6 +2,7 @@ from flask import Blueprint, request, flash, redirect, url_for, render_template,
 from flask_login import login_required, current_user
 from utils.auth import belongs_to_user_or_department, is_admin
 from sqlalchemy import or_
+from extensions import limiter, get_user_key
 from io import BytesIO
 from datetime import datetime
 from reportlab.lib import colors
@@ -284,6 +285,7 @@ def update_board_resolution_status(resolution_id):
 
 @board_resolutions_bp.route('/generate-description', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute", key_func=get_user_key)
 def generate_description():
     if not request.is_json:
         return make_response(jsonify({'error': 'Content-Type must be application/json'}), 400)
