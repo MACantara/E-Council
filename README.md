@@ -227,7 +227,10 @@ E-Council/
 │   └── config.py
 ├── docs/                  # Project documentation
 │   ├── ARCHITECTURE.md
+│   ├── DESIGN.md
+│   ├── HAND-OVER.md
 │   ├── IMPROVEMENT_ANALYSIS.md
+│   ├── PROGRESS.md
 │   ├── ROADMAP.md
 │   └── TESTING.md
 ├── extensions.py          # Flask extensions (SQLAlchemy, Login, Mail, CSRF, serializer)
