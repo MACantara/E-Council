@@ -31,6 +31,7 @@ from extensions import db, init_extensions
 # Import models for backward compatibility
 # Import blueprints
 from routes.account import account_bp
+from routes.admin import admin_bp
 from routes.auth import auth_bp
 from routes.board_resolutions import board_resolutions_bp
 from routes.concept_papers import concept_papers_bp
@@ -134,6 +135,7 @@ def create_app(config_name=None):
 
     # Register blueprints
     app.register_blueprint(account_bp)
+    app.register_blueprint(admin_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(documentation_bp)
     app.register_blueprint(financial_bp)

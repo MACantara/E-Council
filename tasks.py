@@ -11,6 +11,8 @@ import os
 from celery import Celery, Task
 from flask import has_app_context
 
+from services.base import log_action
+
 # Broker configuration from environment. When no broker is configured, tasks run
 # in eager/synchronous mode so the app and tests still work without Redis.
 broker_url = os.getenv("BROKER_URL", "redis://localhost:6379/0")
@@ -158,6 +160,13 @@ def generate_pdf(self, module_name, function_name, record_id, user_id):
     output_path = os.path.join(output_dir, f"{task_id}.pdf")
     with open(output_path, "wb") as pdf_file:
         pdf_file.write(pdf_bytes)
+
+    log_action(
+        "generate_pdf",
+        f"{module_name}.{function_name}",
+        record_id,
+        {"status": "success", "path": output_path, "download_name": download_name},
+    )
 
     return {"path": output_path, "download_name": download_name}
 

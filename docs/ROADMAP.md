@@ -483,12 +483,12 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `models/audit.py`, `routes/`, `services/`, `templates/admin/`
 
 **Checklist**
-- [ ] Create `models/audit.py` with `AuditLog` (timestamp, user_id, action, entity_type, entity_id, changes).
-- [ ] Add a `log_action` helper in `services/base.py`.
-- [ ] Log every create, update, delete, status change, and PDF generation.
-- [ ] Add an admin route `/admin/audit-log` restricted to users with `Admin` role.
-- [ ] Create a paginated audit log template for admins.
-- [ ] Add tests verifying audit records are created on key actions.
+- [x] Create `models/audit.py` with `AuditLog` (timestamp, user_id, action, entity_type, entity_id, changes).
+- [x] Add a `log_action` helper in `services/base.py`.
+- [x] Log every create, update, delete, status change, and PDF generation.
+- [x] Add an admin route `/admin/audit-log` restricted to users with `Admin` role.
+- [x] Create a paginated audit log template for admins.
+- [x] Add tests verifying audit records are created on key actions.
 
 **Acceptance criteria**: Every state-changing action creates an `AuditLog` record. Admins can view the log.
 

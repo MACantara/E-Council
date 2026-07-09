@@ -4,6 +4,7 @@ This package contains all database models organized by feature.
 """
 
 from models.activity_report_item import ActivityReportItem
+from models.audit import AuditLog
 from models.base import db
 from models.board_resolution import BoardResolutions
 from models.concept_paper import (
@@ -40,6 +41,8 @@ __all__ = [
     "EmailVerification",
     "PasswordReset",
     "LoginAttempts",
+    # Audit models
+    "AuditLog",
     # Event models
     "Events",
     "DepartmentsEvents",
