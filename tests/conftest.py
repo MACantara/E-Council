@@ -12,6 +12,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import create_app
 from extensions import db, limiter
+from services.ai.providers import MockAIProvider
+
+
+@pytest.fixture
+def mock_ai(app):
+    """Install a MockAIProvider on the app for network-free tests."""
+    provider = MockAIProvider()
+    app.config["AI_BACKEND"] = provider
+    return provider
 
 
 @pytest.fixture

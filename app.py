@@ -23,7 +23,7 @@ except ImportError:
     pass
 
 # Import configuration
-from config import CloudinaryConfig, DatabaseConfig, EmailConfig, StorageConfig, get_config
+from config import AIConfig, CloudinaryConfig, DatabaseConfig, EmailConfig, StorageConfig, get_config
 
 # Import extensions
 from extensions import db, init_extensions
@@ -120,6 +120,20 @@ def create_app(config_name=None):
     )
     app.config["STORAGE_LOCAL_BASE_URL"] = os.getenv("STORAGE_LOCAL_BASE_URL") or getattr(
         config_class, "STORAGE_LOCAL_BASE_URL", StorageConfig.STORAGE_LOCAL_BASE_URL
+    )
+
+    # AI provider configuration
+    app.config["AI_PROVIDER"] = os.getenv("AI_PROVIDER") or getattr(config_class, "AI_PROVIDER", AIConfig.AI_PROVIDER)
+    app.config["GOOGLE_GEMINI_AI_API_KEY"] = os.getenv("GOOGLE_GEMINI_AI_API_KEY") or AIConfig.GOOGLE_GEMINI_AI_API_KEY
+    app.config["GEMINI_MODEL"] = os.getenv("GEMINI_MODEL") or AIConfig.GEMINI_MODEL
+    app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY") or AIConfig.OPENAI_API_KEY
+    app.config["OPENAI_MODEL"] = os.getenv("OPENAI_MODEL") or AIConfig.OPENAI_MODEL
+    app.config["ANTHROPIC_API_KEY"] = os.getenv("ANTHROPIC_API_KEY") or AIConfig.ANTHROPIC_API_KEY
+    app.config["ANTHROPIC_MODEL"] = os.getenv("ANTHROPIC_MODEL") or AIConfig.ANTHROPIC_MODEL
+    app.config["LOCAL_AI_BASE_URL"] = os.getenv("LOCAL_AI_BASE_URL") or AIConfig.LOCAL_AI_BASE_URL
+    app.config["LOCAL_AI_MODEL"] = os.getenv("LOCAL_AI_MODEL") or AIConfig.LOCAL_AI_MODEL
+    app.config["MOCK_AI_RESPONSE"] = os.getenv("MOCK_AI_RESPONSE") or getattr(
+        config_class, "MOCK_AI_RESPONSE", AIConfig.MOCK_AI_RESPONSE
     )
 
     # Initialize extensions

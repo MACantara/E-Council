@@ -136,9 +136,10 @@ class TestingConfig(Config):
     # Provide a default mail sender for tests so Flask-Mail messages validate
     MAIL_DEFAULT_SENDER = "test@example.com"
 
-    # Use the in-memory storage and email backends for tests; no network calls
+    # Use the in-memory storage and email backends and the mock AI provider for tests; no network calls
     STORAGE_PROVIDER = "memory"
     EMAIL_PROVIDER = "memory"
+    AI_PROVIDER = "mock"
 
 
 class DatabaseConfig:
@@ -243,38 +244,27 @@ class StorageConfig:
 class AIConfig:
     """AI configuration settings."""
 
+    # Provider selection: gemini, openai, anthropic, local, mock
+    AI_PROVIDER = os.getenv("AI_PROVIDER", "gemini")
+
     # Google Gemini AI Configuration
     GOOGLE_GEMINI_AI_API_KEY = os.getenv("GOOGLE_GEMINI_AI_API_KEY")
-    GEMINI_MODEL = "gemini-1.5-flash"
+    GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 
-    @staticmethod
-    def _safety_settings():
-        """Return default safety settings as google-genai SafetySetting objects."""
-        from google.genai import types
+    # OpenAI Configuration
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-        return [
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-        ]
+    # Anthropic Configuration
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+    ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022")
 
-    @staticmethod
-    def configure():
-        """Return the default safety settings for Google Gemini requests."""
-        return AIConfig._safety_settings()
+    # Local / Ollama Configuration
+    LOCAL_AI_BASE_URL = os.getenv("LOCAL_AI_BASE_URL", "http://localhost:11434/v1")
+    LOCAL_AI_MODEL = os.getenv("LOCAL_AI_MODEL", "llama3")
+
+    # Mock provider response for tests
+    MOCK_AI_RESPONSE = os.getenv("MOCK_AI_RESPONSE", "Generated AI content")
 
 
 class LoginConfig:

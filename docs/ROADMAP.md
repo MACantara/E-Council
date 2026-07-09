@@ -586,14 +586,14 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `services/ai/`, `services/concept_papers.py`, `services/board_resolutions.py`, `config/config.py`
 
 **Checklist**
-- [ ] Define an `AIProvider` protocol (`generate_text`, `upload_file`).
-- [ ] Implement `GeminiProvider`, `OpenAIProvider`, `AnthropicProvider`, and `MockAIProvider` for tests.
-- [ ] Move provider-specific safety settings and client setup into the adapters.
-- [ ] Add `AI_PROVIDER` and model-specific environment variables to `config/config.py`.
-- [ ] Refactor `services/ai.py` to dispatch to the configured provider.
-- [ ] Update services that call AI to use the provider interface.
-- [ ] Add tests that use the mock provider.
-- [ ] Update documentation with supported AI providers and model configuration.
+- [x] Define an `AIProvider` protocol (`generate_text`, `upload_file`).
+- [x] Implement `GeminiProvider`, `OpenAIProvider`, `AnthropicProvider`, `LocalAIProvider`, and `MockAIProvider` for tests.
+- [x] Move provider-specific safety settings and client setup into the adapters.
+- [x] Add `AI_PROVIDER` and model-specific environment variables to `config/config.py`.
+- [x] Refactor `services/ai.py` into `services/ai/` and dispatch to the configured provider via `get_ai()`.
+- [x] Update services that call AI to use `services.ai.generate_content()` and the provider interface.
+- [x] Add tests that use `MockAIProvider` in `tests/test_ai.py` and `tests/services/test_ai_service.py`.
+- [x] Update documentation with supported AI providers and model configuration in `ARCHITECTURE.md`, `README.md`, and `.env.example`.
 
 **Acceptance criteria**: Switching the `AI_PROVIDER` environment variable changes the model without changing business logic code. All AI-related tests pass with the mock provider.
 

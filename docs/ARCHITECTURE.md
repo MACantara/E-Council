@@ -67,19 +67,28 @@ E-Council/
 │   ├── events.py
 │   ├── financial.py
 │   ├── meetings.py
-│   ├── storage/                    # Storage abstraction layer
+│   ├── ai/                          # AI generation abstraction layer
+│   │   ├── __init__.py
+│   │   ├── errors.py
+│   │   ├── helpers.py
+│   │   ├── prompts.py
+│   │   ├── protocol.py
+│   │   ├── providers.py
+│   │   ├── service.py
+│   │   └── generation.py
+│   ├── email/                       # Email abstraction layer
 │   │   ├── __init__.py
 │   │   ├── backends.py
 │   │   ├── errors.py
 │   │   ├── protocol.py
-│   │   └── service.py
-│   └── email/                      # Email abstraction layer
+│   │   ├── service.py
+│   │   └── tasks.py
+│   └── storage/                     # Storage abstraction layer
 │       ├── __init__.py
 │       ├── backends.py
 │       ├── errors.py
 │       ├── protocol.py
-│       ├── service.py
-│       └── tasks.py
+│       └── service.py
 ├── utils/                          # Utility functions
 │   ├── __init__.py
 │   ├── auth.py
@@ -338,6 +347,25 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 
 **Pattern**: `utils/email.py` renders templates and calls `send_email_task.apply_async(...)` to queue a message. The Celery task uses the configured `EmailBackend` to deliver the message. The active provider is controlled by `EMAIL_PROVIDER` (`smtp`, `console`, `memory`, `sendgrid`, `mailgun`, or `null`).
 
+### AI Layer (`services/ai/`)
+
+**Purpose**: Abstract AI text generation so the application can generate concept paper content and board resolution descriptions without depending on a single provider (Google Gemini, OpenAI, Anthropic, or local models).
+
+**Key components**:
+- `AIProvider` (`services/ai/protocol.py`) - Abstract protocol/ABC defining `generate_text` and `upload_file`.
+- `GeminiProvider` (`services/ai/providers.py`) - Adapter for Google Gemini.
+- `OpenAIProvider` (`services/ai/providers.py`) - Adapter for OpenAI.
+- `AnthropicProvider` (`services/ai/providers.py`) - Adapter for Anthropic.
+- `LocalAIProvider` (`services/ai/providers.py`) - Adapter for local OpenAI-compatible endpoints (e.g. Ollama).
+- `MockAIProvider` (`services/ai/providers.py`) - No-op provider for unit tests and offline development.
+- `get_ai()` (`services/ai/service.py`) - Factory that reads `AI_PROVIDER` from the Flask app config and returns a configured provider.
+- `generate_content()` / `upload_file()` (`services/ai/service.py`) - High-level functions that call the active provider.
+- `generation.py` (`services/ai/generation.py`) - Concept-paper-specific generation helpers.
+- `prompts.py` (`services/ai/prompts.py`) - Reusable prompt templates.
+- `helpers.py` (`services/ai/helpers.py`) - Shared utilities such as date formatting.
+
+**Pattern**: Business logic and Celery tasks call `services.ai.generate_content(...)` or `generate_concept_paper_body(...)` which route to `get_ai().generate_text(...)`. The active provider is controlled by `AI_PROVIDER` (`gemini`, `openai`, `anthropic`, `local`, or `mock`), with provider-specific API keys and model names configured through `app.config`.
+
 ### Flask Extensions (`extensions.py`)
 
 **Purpose**: Centralized Flask extension initialization
@@ -352,7 +380,6 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 
 **Functions**:
 - `init_extensions(app)` - Initialize all extensions
-- `configure_ai(app)` - Configure Google Gemini AI
 - `get_serializer()` - Get serializer instance
 
 ### Application Factory (`app.py`)

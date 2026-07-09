@@ -212,7 +212,12 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
   - `NullStorage` — no-op backend
 
 ### AI
-- **google-genai** — Google Gemini integration
+- **AI abstraction layer** (`services/ai/`) — provider-agnostic text generation
+  - Supports `gemini`, `openai`, `anthropic`, `local`, and `mock` providers via the `AI_PROVIDER` environment variable
+  - `GeminiProvider` — Google Gemini adapter
+  - `OpenAIProvider` / `AnthropicProvider` — OpenAI and Anthropic API adapters
+  - `LocalAIProvider` — local OpenAI-compatible endpoint (e.g. Ollama)
+  - `MockAIProvider` — no-op provider for tests and offline development
 
 ### PDF & Data Processing
 - **ReportLab** — PDF generation
@@ -284,19 +289,28 @@ E-Council/
 │   ├── events.py
 │   ├── financial.py
 │   ├── meetings.py
+│   ├── ai/                  # AI generation abstraction layer
+│   │   ├── __init__.py
+│   │   ├── errors.py
+│   │   ├── helpers.py
+│   │   ├── prompts.py
+│   │   ├── protocol.py
+│   │   ├── providers.py
+│   │   ├── service.py
+│   │   └── generation.py
+│   ├── email/               # Email delivery abstraction layer
+│   │   ├── __init__.py
+│   │   ├── backends.py
+│   │   ├── errors.py
+│   │   ├── protocol.py
+│   │   ├── service.py
+│   │   └── tasks.py
 │   └── storage/             # File/object storage abstraction layer
 │       ├── __init__.py
 │       ├── backends.py
 │       ├── errors.py
 │       ├── protocol.py
 │       └── service.py
-│   └── email/               # Email delivery abstraction layer
-│       ├── __init__.py
-│       ├── backends.py
-│       ├── errors.py
-│       ├── protocol.py
-│       ├── service.py
-│       └── tasks.py
 ├── run_tests.py           # Test runner helper
 ├── static/                # Static assets
 │   ├── img/
@@ -426,7 +440,11 @@ Open `.env` and replace every placeholder with your own credentials. The example
 | `STORAGE_LOCAL_PATH` | No | Local directory for `STORAGE_PROVIDER=local` (default: `uploads`) |
 | `STORAGE_LOCAL_BASE_URL` | No | URL prefix for `STORAGE_PROVIDER=local` (default: `/static/uploads`) |
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Yes for Cloudinary uploads | Create a free account at [Cloudinary](https://cloudinary.com/) and copy the values from the dashboard |
-| `GOOGLE_GEMINI_AI_API_KEY` | Yes for AI features | Create a key in [Google AI Studio](https://aistudio.google.com/app/apikey) |
+| `AI_PROVIDER` | No | AI backend: `gemini` (default), `openai`, `anthropic`, `local`, or `mock` |
+| `GOOGLE_GEMINI_AI_API_KEY` | Yes for `gemini` | Create a key in [Google AI Studio](https://aistudio.google.com/app/apikey) |
+| `OPENAI_API_KEY` | Yes for `openai` | Create a key in [OpenAI Platform](https://platform.openai.com/) |
+| `ANTHROPIC_API_KEY` | Yes for `anthropic` | Create a key in [Anthropic Console](https://console.anthropic.com/) |
+| `LOCAL_AI_BASE_URL` / `LOCAL_AI_MODEL` | No | Local OpenAI-compatible endpoint (e.g. Ollama at `http://localhost:11434/v1`) |
 | `SENTRY_DSN` | No | Optional; create a project at [Sentry](https://sentry.io/) and paste the DSN |
 
 > **Security:** Never commit your `.env` file. It is listed in `.gitignore`. Use App Passwords for Gmail rather than your account password, and rotate any keys if they have ever been exposed.
@@ -531,6 +549,8 @@ Test files live in the `tests/` directory:
 - `tests/test_storage.py` — storage abstraction layer tests (memory, local, factory)
 - `tests/test_cloudinary.py` — Cloudinary backend route tests (mocked)
 - `tests/test_email.py` — email abstraction layer tests (in-memory backend, factory)
+- `tests/test_ai.py` — AI generation route tests (mock provider)
+- `tests/services/test_ai_service.py` — AI service and provider abstraction tests
 - `tests/test_utils.py` — utility and filter tests
 
 ## License
