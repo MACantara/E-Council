@@ -467,7 +467,7 @@ Phase 4 prepares the application for a real production environment and explores 
 - [x] Configure Tailwind via CSS-based `@source` and `@theme` directives.
 - [x] Add npm scripts `build:css` and `watch:css`.
 - [x] Update `templates/base.html` to load the bundled `static/css/output.css` instead of the CDN.
-- [ ] Update CI to build CSS before running tests.
+- [x] Update CI to build CSS before running tests.
 - [x] Update `README.md` with build instructions.
 
 **Acceptance criteria**: `npm run build:css` produces a minified `static/css/output.css`. The app works without internet CSS.
