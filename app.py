@@ -90,7 +90,9 @@ def create_app(config_name=None):
     app.config["MAIL_USE_SSL"] = EmailConfig.MAIL_USE_SSL
     app.config["MAIL_USERNAME"] = EmailConfig.MAIL_USERNAME
     app.config["MAIL_PASSWORD"] = EmailConfig.MAIL_PASSWORD
-    app.config["MAIL_DEFAULT_SENDER"] = EmailConfig.MAIL_DEFAULT_SENDER
+    app.config["MAIL_DEFAULT_SENDER"] = (
+        os.getenv("MAIL_DEFAULT_SENDER") or app.config.get("MAIL_DEFAULT_SENDER") or EmailConfig.MAIL_DEFAULT_SENDER
+    )
 
     # Initialize extensions
     init_extensions(app)

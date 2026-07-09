@@ -128,6 +128,9 @@ class TestingConfig(Config):
     # Provide a default secret key for tests so tokens/serializers work without env vars
     SECRET_KEY = "test-secret-key"
 
+    # Provide a default mail sender for tests so Flask-Mail messages validate
+    MAIL_DEFAULT_SENDER = "test@example.com"
+
 
 class DatabaseConfig:
     """Database configuration settings."""
