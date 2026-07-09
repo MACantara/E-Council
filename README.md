@@ -174,89 +174,140 @@ A per-event dashboard displaying key financial insights:
 
 ## Tech Stack
 
-All versions are pinned in [`requirements.txt`](requirements.txt).
+All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or update versions there as needed.
 
 ### Backend
-- **Python** (3.9+ recommended)
-- **Flask** 3.0.3 — web framework
-- **Jinja2** 3.1.4 — templating
+- **Python** — 3.9+
+- **Flask** — web framework
+- **Jinja2** — templating
 
 ### Database
 - **MySQL** — primary datastore (database name: `e-council`)
-- **Flask-SQLAlchemy** 3.1.1 — ORM
-- **Flask-Migrate** 4.0.7 / **Alembic** 1.13.2 — schema migrations
-- **mysqlclient** 2.2.4 / **PyMySQL** 1.1.1 — MySQL drivers
+- **Flask-SQLAlchemy** — ORM
+- **Flask-Migrate** — schema migrations (Alembic)
+- **PyMySQL** — MySQL driver, installed as a `MySQLdb` fallback
 
 ### Authentication & Security
-- **Flask-Login** 0.6.3 — session-based auth
-- **Flask-Bcrypt** 1.0.1 / **bcrypt** 4.2.0 — password hashing
-- **Flask-WTF** 1.2.2 — CSRF protection
-- **Werkzeug** 3.0.4 — password hashing utilities
-- **itsdangerous** — signed tokens for email verification & password reset
+- **Flask-Login** — session-based authentication
+- **Werkzeug** — password hashing and WSGI utilities
+- **Flask-WTF** — CSRF protection
+- **itsdangerous** — signed tokens for email verification and password reset
 
 ### Email
-- **Flask-Mail** 0.10.0 — SMTP email (configured for Gmail by default)
+- **Flask-Mail** — SMTP email (configured for Gmail by default)
 
 ### File Storage
-- **Cloudinary** 1.41.0 — profile pictures and photo documentation
+- **Cloudinary** — profile pictures and photo documentation
 
 ### AI
-- **google-generativeai** 0.8.3 — Google Gemini 1.5 Flash, used for AI-assisted drafting of concept paper sections and board resolution descriptions
+- **google-generativeai** — Google Gemini integration (deprecated; migration to `google-genai` is tracked in `docs/ROADMAP.md`)
 
 ### PDF & Data Processing
-- **ReportLab** 4.2.5 — primary PDF generation engine
-- **WeasyPrint** 60.2 / **pdfkit** 1.0.0 — supplementary PDF tooling
-- **pandas** 2.2.3 / **openpyxl** 3.1.5 — Excel import of student lists
+- **ReportLab** — PDF generation
+- **pandas** / **openpyxl** — Excel import of student lists
 
 ### Frontend
 - **Tailwind CSS 4** — utility-first styling via CDN (`@tailwindcss/browser@4`) with custom theme in `base.html`
 - **Lucide Icons** — icon set via CDN
-- **Jinja2 macros** — reusable form inputs, selects, textareas, buttons, cards, and UI components (`templates/macros/`)
+- **Jinja2 macros** — reusable form and UI components (`templates/macros/`)
 - **Chart.js** — dashboard charts
 - Vanilla JavaScript (`static/js/`)
 
 ### Testing & Tooling
-- **pytest** 8.3.3 — test runner (config in `pytest.ini`)
-- **python-dotenv** 1.0.1 — environment variable loading
+- **pytest** — test runner (config in `pytest.ini`)
+- **python-dotenv** — environment variable loading
 
 ## Project Structure
 
 ```
 E-Council/
-├── app.py                 # Flask application (monolith): ~40 SQLAlchemy models, ~80 routes
-├── requirements.txt       # Pinned Python dependencies
+├── app.py                 # Application factory (entry point) — creates app and registers extensions/blueprints
+├── config/                # Environment-specific configuration
+│   ├── __init__.py
+│   └── config.py
+├── docs/                  # Project documentation
+│   ├── ARCHITECTURE.md
+│   ├── IMPROVEMENT_ANALYSIS.md
+│   ├── ROADMAP.md
+│   └── TESTING.md
+├── extensions.py          # Flask extensions (SQLAlchemy, Login, Mail, CSRF, serializer)
+├── fonts/                 # Fonts used in PDF generation
+├── models/                # Database models
+│   ├── __init__.py
+│   ├── base.py
+│   ├── board_resolution.py
+│   ├── concept_paper.py
+│   ├── department.py
+│   ├── documentation.py
+│   ├── event.py
+│   ├── financial.py
+│   ├── meeting.py
+│   └── user.py
 ├── pytest.ini             # pytest configuration
+├── requirements.txt       # Python dependencies
+├── routes/                # Flask blueprints
+│   ├── __init__.py
+│   ├── account.py
+│   ├── auth.py
+│   ├── board_resolutions.py
+│   ├── concept_papers.py
+│   ├── dashboard.py
+│   ├── documentation.py
+│   ├── events.py
+│   ├── financial.py
+│   └── meetings.py
+├── run_tests.py           # Test runner helper
+├── static/                # Static assets
+│   ├── img/
+│   │   ├── heroes/
+│   │   └── logos/
+│   ├── js/
+│   │   ├── account/
+│   │   ├── auth/
+│   │   ├── board-resolutions/
+│   │   ├── charts-theme.js
+│   │   ├── concept-papers/
+│   │   ├── dashboard/
+│   │   ├── documentation/
+│   │   ├── events/
+│   │   ├── financial-reports/
+│   │   ├── minutes-of-meeting/
+│   │   ├── navbar.js
+│   │   ├── shared/
+│   │   ├── theme.js
+│   │   └── utils.js
+│   └── uploads/           # Local upload destination (receipts)
+├── templates/             # Jinja2 HTML templates
+│   ├── base.html          # Shared layout
+│   ├── index.html         # Landing page
+│   ├── macros/            # Reusable form and UI components
+│   │   ├── email.html
+│   │   ├── forms.html
+│   │   ├── icons.html
+│   │   └── ui.html
+│   ├── account/
+│   ├── auth/
+│   ├── board-resolutions/
+│   ├── concept-papers/
+│   ├── dashboard/
+│   ├── documentation/
+│   ├── email/
+│   ├── events/
+│   ├── financial-reports/
+│   └── minutes-of-meeting/
+├── tests/                 # pytest tests
+│   ├── conftest.py
+│   ├── test_config.py
+│   ├── test_routes.py
+│   ├── test_signup.py
+│   └── test_utils.py
+├── uploads/               # Runtime upload folder (receipts)
 ├── .env                   # Environment variables (gitignored — see Setup)
 ├── .gitignore
-├── LICENSE                # MIT
-├── templates/             # Jinja2 HTML templates
-│   ├── base.html          # Shared layout (header, nav, CSRF meta)
-│   ├── index.html         # Landing page
-│   ├── signup.html, login.html, forgot-password.html, reset-password.html
-│   ├── account.html, account-settings.html, email-settings.html, password-security-settings.html
-│   ├── council-overview.html, council-overview-sidebar.html
-│   ├── events-overview.html, add-event.html, update-event.html, event-dashboard.html
-│   ├── concept-papers-overview.html, add-concept-paper.html, update-concept-paper.html
-│   ├── documentation-overview.html, add-documentation.html, update-documentation.html
-│   ├── financial-reports-overview.html, add-financial-report.html, update-financial-report.html
-│   ├── board-resolutions-overview.html, add-board-resolution.html, update-board-resolution.html
-│   ├── minutes-of-the-meeting-overview.html, add-minutes-of-the-meeting.html, update-minutes-of-the-meeting.html
-│   └── ... (delete-*.html confirmation templates)
-├── static/
-│   ├── js/                # Per-page vanilla JS (account, add-concept-paper, add-documentation, etc.)
-│   ├── img/               # Logos and hero images
-│   └── uploads/           # Local upload destination (receipts)
-├── templates/
-│   ├── macros/            # Reusable Jinja2 form and UI components (forms.html, ui.html, icons.html, email.html)
-│   └── ...                # Page templates
-├── tests/
-│   ├── test_routes.py     # Route tests
-│   └── test_signup.py     # Signup tests
-├── uploads/               # Runtime upload folder (receipts)
-└── fonts/                 # Fonts used in PDF generation
+└── LICENSE                # MIT
 ```
 
-> **Note on architecture:** The Flask application currently lives in a single `app.py` file (~8,700 lines) containing all models, routes, email helpers, AI-generation endpoints, and PDF-generation logic. Templates and static assets are split out into their respective directories.
+> **Note on architecture:** The application now uses a modular Flask blueprint architecture. `app.py` contains the `create_app` factory, and business logic is split into `routes/`, `models/`, `utils/`, and `config/`. Legacy `static/css/` files were removed during the Tailwind CSS 4 migration.
 
 ## Prerequisites
 
@@ -342,9 +393,17 @@ GOOGLE_GEMINI_AI_API_KEY="<your-gemini-api-key>"
 
 ### 6. Initialize the Database Schema
 
-With the `.env` file in place and the virtual environment active, apply the database migrations:
+With the `.env` file in place and the virtual environment active, run the application once to create the tables:
 
 ```bash
+python app.py
+```
+
+Or, if you prefer Flask-Migrate, initialize and apply migrations first:
+
+```bash
+flask db init
+flask db migrate -m "Initial schema"
 flask db upgrade
 ```
 
@@ -374,8 +433,11 @@ pytest
 
 Test files live in the `tests/` directory:
 
+- `tests/conftest.py` — shared fixtures and app setup
+- `tests/test_config.py` — configuration tests
 - `tests/test_routes.py` — route tests
 - `tests/test_signup.py` — signup tests
+- `tests/test_utils.py` — utility and filter tests
 
 ## License
 

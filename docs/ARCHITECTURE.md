@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the architecture of the E-Council application following the comprehensive refactoring completed in [current date]. The application has been transformed from a monolithic structure to a well-organized, modular architecture while maintaining full functionality.
+This document describes the architecture of the E-Council application following the comprehensive refactoring completed in 2026-07-09. The application has been transformed from a monolithic structure to a well-organized, modular architecture while maintaining full functionality.
 
 ## Architecture Summary
 
@@ -13,89 +13,107 @@ This document describes the architecture of the E-Council application following 
 - **Tight coupling**: Components interdependent
 
 ### Current State
-- **Modular structure**: Multiple focused modules and packages
-- **Clear separation**: Templates, assets, utilities, configuration separated
-- **Foundation established**: Ready for future enhancements and migration
-- **70% refactoring complete**: Significant improvements while maintaining stability
+- **Modular structure**: Flask blueprints in `routes/`, models in `models/`, utilities in `utils/`, and configuration in `config/`
+- **Clear separation**: Templates, static assets, utilities, configuration, and business logic are separated
+- **Refactoring complete**: The monolithic `app.py` was reduced to an application factory; remaining improvements are tracked in `docs/ROADMAP.md`
+- **Tailwind CSS 4 migration complete**: Legacy custom CSS files were removed and the UI uses Tailwind utility classes and shared Jinja2 macros
 
 ## Directory Structure
 
 ```
 E-Council/
-├── app.py                          # Main application (8,703 lines - to be gradually refactored)
+├── app.py                          # Application factory (entry point)
 ├── extensions.py                   # Flask extensions initialization
-├── app_factory.py                  # Application factory pattern foundation
-├── .env                            # Environment variables
-├── static/
-│   ├── css/
-│   │   ├── styles.css             # Main stylesheet (1,468 lines)
-│   │   ├── auth/                  # Authentication styles (future)
-│   │   ├── account/               # Account styles (future)
-│   │   ├── dashboard/             # Dashboard styles (future)
-│   │   ├── events/                # Events styles (future)
-│   │   ├── concept-papers/        # Concept papers styles (future)
-│   │   ├── documentation/         # Documentation styles (future)
-│   │   ├── financial-reports/     # Financial reports styles (future)
-│   │   ├── board-resolutions/     # Board resolutions styles (future)
-│   │   └── minutes-of-meeting/    # Minutes of meeting styles (future)
+├── config/                         # Configuration management
+│   ├── __init__.py
+│   └── config.py
+├── docs/                           # Documentation
+│   ├── ARCHITECTURE.md
+│   ├── IMPROVEMENT_ANALYSIS.md
+│   ├── ROADMAP.md
+│   └── TESTING.md
+├── models/                         # Database models (20 SQLAlchemy models)
+│   ├── __init__.py
+│   ├── base.py
+│   ├── board_resolution.py
+│   ├── concept_paper.py
+│   ├── department.py
+│   ├── documentation.py
+│   ├── event.py
+│   ├── financial.py
+│   ├── meeting.py
+│   └── user.py
+├── routes/                         # Flask blueprints
+│   ├── __init__.py
+│   ├── account.py
+│   ├── auth.py
+│   ├── board_resolutions.py
+│   ├── concept_papers.py
+│   ├── dashboard.py
+│   ├── documentation.py
+│   ├── events.py
+│   ├── financial.py
+│   └── meetings.py
+├── utils/                          # Utility functions
+│   ├── __init__.py
+│   ├── auth.py
+│   ├── email.py
+│   ├── error_handlers.py
+│   ├── filters.py
+│   ├── helpers.py
+│   └── processing.py
+├── tests/                          # pytest test suite
+│   ├── conftest.py
+│   ├── test_config.py
+│   ├── test_routes.py
+│   ├── test_signup.py
+│   └── test_utils.py
+├── templates/                      # Jinja2 templates (feature-based folders)
+│   ├── base.html
+│   ├── index.html
+│   ├── macros/
+│   │   ├── email.html
+│   │   ├── forms.html
+│   │   ├── icons.html
+│   │   └── ui.html
+│   ├── account/
+│   ├── auth/
+│   ├── board-resolutions/
+│   ├── concept-papers/
+│   ├── dashboard/
+│   ├── documentation/
+│   ├── email/
+│   ├── events/
+│   ├── financial-reports/
+│   └── minutes-of-meeting/
+├── static/                         # Static assets
+│   ├── img/
+│   │   ├── heroes/
+│   │   └── logos/
 │   ├── js/
-│   │   ├── account/               # Account JavaScript (account.js, account-settings.js)
-│   │   ├── board-resolutions/     # Board resolutions JavaScript
-│   │   ├── concept-papers/        # Concept papers JavaScript
-│   │   ├── documentation/         # Documentation JavaScript
-│   │   ├── shared/                # Shared JavaScript utilities (future)
-│   │   ├── auth/                  # Authentication JavaScript (future)
-│   │   ├── dashboard/             # Dashboard JavaScript (future)
-│   │   ├── events/                # Events JavaScript (future)
-│   │   ├── financial-reports/     # Financial reports JavaScript (future)
-│   │   └── minutes-of-meeting/    # Minutes of meeting JavaScript (future)
-│   └── img/
-│       ├── logos/                 # Logo files (CCS-LOGO.png, ISO.png, HEADER-PERPS.png)
-│       ├── heroes/                # Hero images (home-page-hero-image.png)
-├── templates/
-│   ├── base.html                  # Base template with layout
-│   ├── index.html                 # Landing page
-│   ├── auth/                      # Authentication templates (4 files)
-│   │   ├── login.html
-│   │   ├── signup.html
-│   │   ├── forgot-password.html
-│   │   └── reset-password.html
-│   ├── account/                   # Account management templates (5 files)
-│   │   ├── account.html
-│   │   ├── account-settings.html
-│   │   ├── account-settings-sidebar.html
-│   │   ├── email-settings.html
-│   │   └── password-security-settings.html
-│   ├── dashboard/                 # Dashboard templates (2 files)
-│   │   ├── council-overview.html
-│   │   └── council-overview-sidebar.html
-│   ├── events/                    # Events templates (8 files)
-│   ├── concept-papers/            # Concept papers templates (5 files)
-│   ├── documentation/             # Documentation templates (4 files)
-│   ├── financial-reports/         # Financial reports templates (4 files)
-│   ├── board-resolutions/         # Board resolutions templates (4 files)
-│   └── minutes-of-meeting/        # Minutes of meeting templates (4 files)
-├── models/                        # Database models (foundation established)
-│   ├── __init__.py               # Model imports (future)
-│   ├── base.py                   # Base model class and common imports
-│   ├── department.py             # Department and StudentOrganization models
-│   ├── user.py                   # User, EmailVerification, PasswordReset, LoginAttempts
-│   ├── event.py                  # Events, DepartmentsEvents, EventInvitations, TransactionHistory
-│   └── concept_paper.py          # ConceptPaperForms and related models (partial)
-├── config/                        # Configuration management
-│   ├── __init__.py               # Package initialization
-│   └── config.py                 # Configuration classes
-├── utils/                         # Utility functions
-│   ├── __init__.py               # Utility imports and exports
-│   ├── email.py                  # Email sending functions (8 functions)
-│   ├── filters.py                # Jinja2 custom filters (7 filters)
-│   ├── helpers.py                # General helper functions (4 functions)
-│   ├── processing.py             # Data processing functions (2 functions)
-│   ├── auth.py                   # Authentication helpers (3 functions)
-│   └── error_handlers.py         # Error handlers (1 handler)
-├── routes/                        # Route blueprints (foundation established)
-│   └── auth.py                   # Authentication routes (extracted, not integrated)
-└── PROGRESS.md                    # Refactoring progress tracking
+│   │   ├── account/
+│   │   ├── auth/
+│   │   ├── board-resolutions/
+│   │   ├── charts-theme.js
+│   │   ├── concept-papers/
+│   │   ├── dashboard/
+│   │   ├── documentation/
+│   │   ├── events/
+│   │   ├── financial-reports/
+│   │   ├── minutes-of-meeting/
+│   │   ├── navbar.js
+│   │   ├── shared/
+│   │   ├── theme.js
+│   │   └── utils.js
+│   └── uploads/                    # Local upload destination (receipts)
+├── uploads/                        # Runtime upload folder (receipts)
+├── fonts/                          # Fonts used in PDF generation
+├── requirements.txt                # Python dependencies
+├── pytest.ini                     # pytest configuration
+├── run_tests.py                   # Test runner helper
+├── .env                           # Environment variables (gitignored)
+├── .gitignore
+└── LICENSE                        # MIT
 ```
 
 ## Module Descriptions
@@ -244,17 +262,28 @@ E-Council/
 - `configure_ai(app)` - Configure Google Gemini AI
 - `get_serializer()` - Get serializer instance
 
-### Application Factory (`app_factory.py`)
+### Application Factory (`app.py`)
 
-**Purpose**: Application factory pattern foundation
+**Purpose**: Creates and configures the Flask application instance
 
 **Functions**:
-- `create_app(config_name=None)` - Main application factory
-- `init_current_app(app)` - Bridge function for gradual migration
+- `create_app(config_name=None)` - Main application factory; loads config, initializes extensions, registers blueprints, and sets up Cloudinary/Gemini
+- `init_database(app)` - Tests the database connection and creates all tables with `db.create_all()`
+
+**Blueprints registered**:
+- `account_bp` - Account and profile routes
+- `auth_bp` - Authentication (signup, login, logout, email/password reset)
+- `board_resolutions_bp` - Board resolution CRUD and PDF generation
+- `concept_papers_bp` - Concept paper CRUD, AI generation, and PDF generation
+- `dashboard_bp` - Council overview and dashboard
+- `documentation_bp` - Post-event documentation and PDF generation
+- `events_bp` - Event management, transactions, and invitations
+- `financial_bp` - Financial reports and PDF generation
+- `meetings_bp` - Minutes of the meeting and PDF generation
 
 ## Database Schema
 
-### Current Models (36 total)
+### Current Models (20 total)
 
 #### Core Models
 - `Users` - User accounts with authentication
@@ -270,44 +299,29 @@ E-Council/
 - `Events` - Events and activities
 - `DepartmentsEvents` - Department-event relationships
 - `EventInvitations` - Event invitations
-- `TransactionHistory` - Financial transactions
 
 #### Concept Paper Models
 - `ConceptPaperForms` - Concept paper submissions
-- `ObjectivesOfTheActivity` - Activity objectives
-- `LearningOutcomes` - Learning outcomes
 - `ExcuseLetterForms` - Excuse letters
 - `ActivityReportForms` - Activity reports
 - `PersonnelInChargeForms` - Personnel assignments
 - `LearningJournalForms` - Learning journals
-- `Observations` - Activity observations
-- `Learnings` - Activity learnings
 - `ParentGuardianConsentForms` - Parent/guardian consents
 
 #### Documentation Models
 - `Documentation` - Activity documentation
-- `ActivityStrengths` - Activity strengths
-- `ActivityWeaknesses` - Activity weaknesses
-- `ActivityRecommendations` - Activity recommendations
-- `TallyItems` - Survey tally items
-- `ResultsOfTheEvaluationImages` - Evaluation images
-- `EvaluationForm` - Evaluation forms
-- `SummaryOfAttendanceImages` - Attendance images
-- `EvaluationListOfStudentNames` - Student name lists
-- `EventPhotoDocumentationImages` - Event photos
 
 #### Financial Models
 - `FinancialReports` - Financial reports
 
 #### Board Resolution Models
 - `BoardResolutions` - Board resolutions
-- `BoardResolutionsStudentSignatories` - Resolution signatories
 
 #### Meeting Models
 - `MinutesOfTheMeeting` - Meeting minutes
-- `Signatories` - Meeting signatories
-- `MinutesOfTheMeetingPhotoDocumentation` - Meeting photos
-- `MinutesOfTheMeetingAttendees` - Meeting attendees
+- `Signatories` - Shared signatory records used across concept papers, documentation, financial reports, and meetings
+
+> **Note:** Collections such as objectives, learning outcomes, strengths, weaknesses, recommendations, tally items, evaluation forms, attendance images, student names, event photos, and meeting attendees are currently stored as `JSON` fields on the parent models. Future improvements may normalize these into dedicated child tables; see `docs/ROADMAP.md` Phase 3.3.
 
 ## Route Structure
 
@@ -520,20 +534,20 @@ GOOGLE_GEMINI_AI_API_KEY="your-gemini-api-key"
 ### Foundation Established
 The current refactoring has established a solid foundation for future improvements:
 
-#### 1. Model Separation (Foundation Ready)
-- **Current**: 5 model files created, 31 models remain in app.py
-- **Future**: Gradual migration of remaining models
-- **Approach**: Extract models by feature area, test thoroughly
+#### 1. Model Separation (Complete)
+- **Current**: All models are in `models/` with feature-based modules
+- **Future**: Potential normalization of JSON collections into child tables
+- **Approach**: See `docs/ROADMAP.md` Phase 3.3
 
-#### 2. Route Modularization (Foundation Ready)
-- **Current**: routes/ directory created, auth blueprint extracted
-- **Future**: Extract routes to blueprint modules
-- **Approach**: Extract by feature area, register blueprints in factory
+#### 2. Route Modularization (Complete)
+- **Current**: All routes are in `routes/` as Flask blueprints
+- **Future**: Extract business logic into a `services/` layer
+- **Approach**: See `docs/ROADMAP.md` Phase 3.1
 
-#### 3. Application Factory Pattern (Foundation Ready)
-- **Current**: extensions.py and app_factory.py created
-- **Future**: Complete migration to factory pattern
-- **Approach**: Use init_current_app() bridge, gradual migration
+#### 3. Application Factory Pattern (Complete)
+- **Current**: `app.py` uses `create_app()` and registers all blueprints and extensions
+- **Future**: Move remaining cloud/AI configuration out of `app.py` and into `services/` or `extensions.py`
+- **Approach**: See `docs/ROADMAP.md` Phase 3
 
 #### 4. Tech Stack Migration (Foundation Ready)
 - **Current**: Modular structure, clear separation
@@ -659,10 +673,10 @@ The current refactoring has established a solid foundation for future improvemen
 ## Performance Optimization
 
 ### Current Performance Considerations
-- Single large app.py file (8,703 lines)
-- All models loaded at startup
+- Some route modules (e.g., `routes/concept_papers.py`) are still large and mix business logic
+- All models are loaded at startup
 - No caching implemented
-- No query optimization
+- No query optimization or pagination on overview routes
 
 ### Recommended Optimizations
 
@@ -716,9 +730,12 @@ The current refactoring has established a solid foundation for future improvemen
 
 ### Current Documentation
 - ARCHITECTURE.md (this file)
+- IMPROVEMENT_ANALYSIS.md (improvement findings)
+- ROADMAP.md (prioritized action plan)
 - PROGRESS.md (refactoring progress)
-- REFACTORING_ANALYSIS.md (original analysis)
-- Code docstrings in new modules
+- DESIGN.md (design system)
+- HAND-OVER.md (redesign hand-over notes)
+- Code docstrings in modules
 
 ### Recommended Additional Documentation
 - API documentation (if API endpoints added)
@@ -729,15 +746,13 @@ The current refactoring has established a solid foundation for future improvemen
 
 ## Conclusion
 
-The E-Council application has undergone significant refactoring, achieving 70% completion of the planned improvements. The application now has:
+The E-Council application has undergone significant refactoring, and the modular blueprint/model structure is now complete. The remaining improvement work is documented in `docs/ROADMAP.md`. The application now has:
 
 - **Well-organized structure** with clear separation of concerns
 - **Modular architecture** that's easier to maintain and extend
 - **Configuration management** for different environments
 - **Utility functions** extracted and reusable
 - **Foundation established** for future improvements
-
-The remaining 30% involves complex refactoring (model separation and route modularization) that can be approached gradually as needed, using the solid foundation that has been established.
 
 The application is now in a much better state for:
 - **Maintenance**: Easier to locate and modify code

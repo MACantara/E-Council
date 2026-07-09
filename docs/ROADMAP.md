@@ -49,12 +49,12 @@ Phase 1 focuses on low-risk cleanup that improves security, documentation, and p
 **Scope**: `README.md`, `HAND-OVER.md`, `ARCHITECTURE.md`, `PROGRESS.md`
 
 **Checklist**
-- [ ] Update `README.md` project structure to list the actual packages (`routes/`, `models/`, `utils/`, `config/`, etc.).
-- [ ] Remove or correct the sentence in `README.md` that calls `app.py` a single monolith.
-- [ ] Update `ARCHITECTURE.md` percentages and "Current State" to reflect completed blueprint/model refactor.
-- [ ] Reconcile `PROGRESS.md` unchecked deferred items with reality; convert them into this roadmap or mark them done.
-- [ ] Update `HAND-OVER.md`: remove the "still use legacy custom CSS" claim if `static/css/` no longer exists and document forms are already Tailwind-based.
-- [ ] Update `HAND-OVER.md` "What is NOT done" list to match the remaining actual work.
+- [x] Update `README.md` project structure to list the actual packages (`routes/`, `models/`, `utils/`, `config/`, etc.).
+- [x] Remove or correct the sentence in `README.md` that calls `app.py` a single monolith.
+- [x] Update `ARCHITECTURE.md` percentages and "Current State" to reflect completed blueprint/model refactor.
+- [x] Reconcile `PROGRESS.md` unchecked deferred items with reality; convert them into this roadmap or mark them done.
+- [x] Update `HAND-OVER.md`: remove the "still use legacy custom CSS" claim if `static/css/` no longer exists and document forms are already Tailwind-based.
+- [x] Update `HAND-OVER.md` "What is NOT done" list to match the remaining actual work.
 
 **Acceptance criteria**: A new contributor can read `README.md` and `ARCHITECTURE.md` and understand the current layout without encountering contradictions.
 

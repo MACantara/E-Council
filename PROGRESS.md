@@ -3,12 +3,14 @@
 ## Refactoring Overview
 **Goal:** Refactor existing Flask monolith into modular, maintainable architecture while preserving current functionality and tech stack.
 
-**Current State:** Flask monolith (8,700+ lines in single app.py) with flat template structure  
-**Target State:** Modular Flask application with organized code structure and feature-based template organization
+**Current State:** Modular Flask application with feature-based blueprints (`routes/`), models (`models/`), utilities (`utils/`), and templates (`templates/`). The legacy `static/css/` directory has been removed and the UI uses Tailwind CSS 4 with shared Jinja2 macros.  
+**Target State:** Modular Flask application with organized code structure and feature-based template organization — **achieved**.
 
 **Strategy:** Incremental refactoring with continuous functionality preservation  
-**Tech Stack:** Flask + Jinja2 + Vanilla JS + MySQL (maintained)  
-**Timeline:** 4-6 weeks
+**Tech Stack:** Flask + Jinja2 + Tailwind CSS 4 + Vanilla JS + MySQL (maintained)  
+**Timeline:** 4-6 weeks — completed
+
+**Note:** Ongoing improvements and future work are now tracked in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ---
 

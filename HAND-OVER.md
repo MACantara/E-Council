@@ -56,59 +56,7 @@
 
 ## ⏳ What is NOT done
 
-### 1. Document add/update/delete forms
-These files still use legacy custom CSS classes (`council-overview-container`, `input-pair`, `primary-button`, `secondary-button`, etc.):
-
-- **Concept papers**
-  - `templates/concept-papers/add-concept-paper.html`
-  - `templates/concept-papers/update-concept-paper.html`
-  - `templates/concept-papers/delete-concept-paper.html`
-  - `templates/concept-papers/concept-paper-generation.html`
-- **Documentation**
-  - `templates/documentation/add-documentation.html`
-  - `templates/documentation/update-documentation.html`
-  - `templates/documentation/delete-documentation.html`
-- **Financial reports**
-  - `templates/financial-reports/add-financial-report.html`
-  - `templates/financial-reports/update-financial-report.html`
-  - `templates/financial-reports/delete-financial-report.html`
-- **Board resolutions**
-  - `templates/board-resolutions/add-board-resolution.html`
-  - `templates/board-resolutions/update-board-resolution.html`
-  - `templates/board-resolutions/delete-board-resolution.html`
-- **Minutes of the meeting**
-  - `templates/minutes-of-meeting/add-minutes-of-the-meeting.html`
-  - `templates/minutes-of-meeting/update-minutes-of-the-meeting.html`
-  - `templates/minutes-of-meeting/delete-minutes-of-the-meeting.html`
-
-### 2. Custom CSS to purge
-The `static/css/` directory still contains legacy selectors that should be replaced by Tailwind utilities. Files to review and largely delete:
-
-- `static/css/base.css` (5.5 KB)
-- `static/css/components/`
-  - `buttons.css`
-  - `cards.css`
-  - `forms.css`
-  - `modals.css`
-  - `tables.css`
-- `static/css/layouts/`
-  - `grid.css`
-  - `header.css`
-  - `sidebar.css`
-- `static/css/pages/`
-  - `auth.css`
-  - `dashboard.css`
-  - `documentation.css`
-
-Some of these may still be loaded by `static/css/styles.css`.
-
-### 3. JS hook classes that may still need a CSS home
-A few class names are still used only as JavaScript hooks and no longer need styled rules:
-
-- `show-password-button` — used in auth and `password-security-settings.js` to find toggle buttons.
-- `input-pair` — used in `add-event.js` to hide/show fields via `closest('.input-pair')`.
-
-When custom CSS is purged, these classes can remain as unstyled JS hooks.
+No outstanding redesign work remains. The document add/update/delete forms have been converted to Tailwind CSS and the shared macro system, the legacy `static/css/` directory has been removed, and JS-only classes (`show-password-button`, `input-pair`) remain as unstyled hooks. Ongoing improvements are now tracked in `docs/ROADMAP.md`.
 
 ---
 
@@ -118,8 +66,10 @@ Goal: reduce custom CSS to near zero. Use Tailwind utility classes and arbitrary
 
 ### Recommended approach
 
-1. **Finish the document forms first.**
-   - Use the `input`, `select`, `textarea`, `file_input`, `button`, `button_link`, and `card` macros.
+The Tailwind CSS 4 migration and macro rollout are complete. The legacy `static/css/` directory has been removed and all listed forms use Tailwind utilities and the shared macros. Future template work should follow `DESIGN.md` tokens and the existing macro patterns.
+
+1. **Use the shared macros for new forms**
+   - `input`, `select`, `textarea`, `file_input`, `button`, `button_link`, and `card` from `templates/macros/`.
    - Wrap forms with the sidebar layout pattern already established:
      ```html
      <div class="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
@@ -131,16 +81,12 @@ Goal: reduce custom CSS to near zero. Use Tailwind utility classes and arbitrary
        </main>
      </div>
      ```
-2. **Audit and purge `static/css/`**
-   - Once no template references old classes, remove the legacy component/page CSS.
-   - Keep a minimal `styles.css` if still needed for a few global resets, or merge it into `base.css`.
-   - Use Tailwind `@theme`/`@layer` directives in `base.html` for any remaining design tokens.
-3. **Replace arbitrary hex values with design tokens**
+2. **Use Tailwind design tokens**
    - Avoid inline styles or `style` attributes. Use `bg-surface`, `text-ink-2`, `border-edge`, etc.
    - For chart colors and special one-offs, use arbitrary values such as `text-[#0891b2]` or `bg-[#0f172a]` only when a token does not already exist.
-4. **Keep JS hooks minimal**
+3. **Keep JS hooks minimal**
    - Retain `show-password-button`, `input-pair`, and any modal JS hooks as plain class names with no CSS rules.
-5. **Final verification**
+4. **Final verification**
    - Run `pytest -q` after each batch of template edits.
    - Spot-check rendered pages in both light and dark mode.
    - Confirm Chart.js charts update correctly on `themeChanged`.
@@ -148,9 +94,9 @@ Goal: reduce custom CSS to near zero. Use Tailwind utility classes and arbitrary
 ### Macro cheat sheet
 
 ```jinja
-{% from 'macros.forms.html' import input, textarea, select, file_input %}
-{% from 'macros.ui.html' import button, button_link, card, badge, alert, empty_state %}
-{% from 'macros.icons.html' import lucide %}
+{% from 'macros/forms.html' import input, textarea, select, file_input %}
+{% from 'macros/ui.html' import button, button_link, card, badge, alert, empty_state %}
+{% from 'macros/icons.html' import lucide %}
 ```
 
 Example button:
