@@ -537,11 +537,11 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
-### 4.7 Migrate to React + TypeScript frontend and FastAPI backend
+### 4.7 Migrate to FastAPI backend + SPA
 
-**Why it matters**: A modern React frontend with TypeScript provides type-safe UI components and a better development experience, while FastAPI offers high-performance async endpoints and automatic OpenAPI documentation. This also fully decouples the frontend from the backend.
+**Why it matters**: FastAPI offers high-performance async endpoints, automatic OpenAPI documentation, and Pydantic-native validation. A fully decoupled FastAPI backend serves as the API layer for the SPA and future mobile clients.
 
-**Scope**: New `frontend/` with React + TypeScript + Tailwind CSS, new `api/` with FastAPI, `services/`, `repositories/`, `config/`
+**Scope**: New `api/` with FastAPI, `services/`, `repositories/`, `config/`
 
 **Checklist**
 - [ ] Complete Phase 4.6 (database abstraction layer) and Phase 4.5 (API/SPA evaluation) before starting.
@@ -549,15 +549,33 @@ Phase 4 prepares the application for a real production environment and explores 
 - [ ] Create Pydantic request/response models for all resources (users, events, concept papers, documents, financial reports, meetings, board resolutions).
 - [ ] Reimplement authentication and authorization with FastAPI dependencies and JWT tokens.
 - [ ] Reimplement all routes as REST endpoints under `/api/v1/`.
+- [ ] Update CI/CD to run the FastAPI backend and API tests.
+- [ ] Update `README.md`, `ARCHITECTURE.md`, and `DESIGN.md` to document the new backend stack.
+- [ ] Add integration tests for the FastAPI endpoints.
+
+**Acceptance criteria**: The FastAPI backend has feature parity with the current Flask server-rendered application, all existing functionality is preserved through REST endpoints, and tests pass.
+
+**Effort**: Extra Large
+
+---
+
+### 4.8 Migrate to React + TypeScript frontend
+
+**Why it matters**: A modern React frontend with TypeScript provides type-safe UI components, a better development experience, and full decoupling from the backend. It also enables richer interactivity and a shared component library.
+
+**Scope**: New `frontend/` with React + TypeScript + Tailwind CSS
+
+**Checklist**
+- [ ] Complete Phase 4.7 (FastAPI backend + SPA) before starting.
 - [ ] Create a React frontend with TypeScript and Vite (or a similar build tool).
 - [ ] Port templates to React components/pages, preserving the Tailwind CSS 4 design system and existing macro behavior.
 - [ ] Build shared React components (Button, Card, Input, Select, etc.) to replace the Jinja2 macro system.
 - [ ] Add an API client layer (e.g., TanStack Query, Axios, or `fetch` wrappers) with TypeScript types.
 - [ ] Update CI/CD to build the frontend and run the FastAPI backend.
-- [ ] Update `README.md`, `ARCHITECTURE.md`, and `DESIGN.md` to document the new stack.
+- [ ] Update `README.md`, `ARCHITECTURE.md`, and `DESIGN.md` to document the new frontend stack.
 - [ ] Add end-to-end tests for the most critical user flows.
 
-**Acceptance criteria**: The React + FastAPI implementation has feature parity with the current Flask server-rendered application, all existing functionality is preserved, and tests pass.
+**Acceptance criteria**: The React + TypeScript frontend has feature parity with the current Flask server-rendered UI and all end-to-end tests pass.
 
 **Effort**: Extra Large
 
@@ -571,7 +589,8 @@ Phase 4 prepares the application for a real production environment and explores 
 | 2026-07-09 | Use Flask-WTF for forms | Tight integration with Jinja2 and built-in CSRF |
 | 2026-07-09 | Keep server-side rendering for now | Faster to secure current UI; evaluate API separately |
 | 2026-07-09 | Introduce a database abstraction layer | Makes the system database-agnostic and eases migration to FastAPI |
-| 2026-07-09 | Migrate frontend to React + TypeScript + Tailwind CSS and backend to FastAPI | Modern type-safe stack, decoupled API, and better scalability |
+| 2026-07-09 | Migrate backend to FastAPI | High-performance async API, automatic OpenAPI docs, and Pydantic validation |
+| 2026-07-09 | Migrate frontend to React + TypeScript + Tailwind CSS | Type-safe UI components and full decoupling from the backend |
 
 ## Appendix: Definition of done
 
@@ -586,4 +605,5 @@ For each recommendation:
 - **2026-07-09**: Created initial roadmap from `docs/IMPROVEMENT_ANALYSIS.md`.
 - **2026-07-09**: Migrated AI SDK from `google-generativeai` to `google-genai` (Phase 3.2); all AI generation endpoints and tests updated.
 - **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
+- **2026-07-09**: Split Phase 4.7 into 4.7 (FastAPI backend + SPA) and 4.8 (React + TypeScript frontend).
 - **2026-07-09**: Completed Phase 2.5 test coverage and fixtures (124 tests passing, 1 skipped `generate_concept_paper_pdf`).
