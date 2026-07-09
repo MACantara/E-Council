@@ -23,7 +23,7 @@ def mock_model(monkeypatch):
     mock = MagicMock()
     mock.generate_content.return_value = MagicMock(text="Generated AI content")
     monkeypatch.setattr("services.ai._model", lambda: mock)
-    monkeypatch.setattr("routes.board_resolutions.model", mock)
+    monkeypatch.setattr("services.board_resolutions.model", mock)
     return mock
 
 

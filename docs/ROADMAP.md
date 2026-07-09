@@ -320,11 +320,11 @@ Phase 3 moves business logic out of route handlers and into services, improves t
   - Handle AI failures and return a `ServiceResult` instead of raising.
 - [x] Create `services/pdf.py` with common ReportLab helpers (header, footer, table styles, image insertion, page numbering).
 - [x] Create `services/concept_papers.py` and move create, update, delete, and PDF logic from `routes/concept_papers.py` (routes now under 250 lines; `concept_papers.py` is the first refactored route).
-- [ ] Create `services/documentation.py`, `services/financial.py`, `services/meetings.py`, `services/board_resolutions.py`, `services/events.py` similarly.
-- [ ] Update remaining `routes/*.py` to delegate to services and handle `ServiceResult` errors by flashing messages.
+- [x] Create `services/documentation.py`, `services/financial.py`, `services/meetings.py`, `services/board_resolutions.py`, `services/events.py` similarly.
+- [x] Update `routes/*.py` to delegate to services and handle `ServiceResult` errors by flashing messages (all route modules now import their service and `routes/concept_papers.py`, `routes/documentation.py`, `routes/financial.py`, `routes/meetings.py`, `routes/board_resolutions.py`, `routes/events.py` are all under 250 lines and have no ReportLab or AI imports).
 - [ ] Write unit tests for each service.
 
-**Acceptance criteria**: No route file exceeds 250 lines. No ReportLab or AI imports in `routes/`. Services have unit tests. (`routes/concept_papers.py` satisfies the route-length and no-ReportLab/AI criteria; other routes and service unit tests remain.)
+**Acceptance criteria**: No route file exceeds 250 lines. No ReportLab or AI imports in `routes/`. Services have unit tests. (Route-length and no-ReportLab/AI criteria are satisfied for all refactored route modules; service unit tests are a follow-up task.)
 
 **Effort**: Extra Large
 
