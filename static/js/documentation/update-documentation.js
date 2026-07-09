@@ -358,14 +358,14 @@ function initializeAcademicYearToggle() {
 
     academicYearSelect.addEventListener('change', function () {
         if (academicYearSelect.value === 'Other') {
-            otherAcademicYearContainer.style.display = 'flex';
+            otherAcademicYearContainer.classList.remove('hidden');
         } else {
-            otherAcademicYearContainer.style.display = 'none';
+            otherAcademicYearContainer.classList.add('hidden');
         }
     });
 
     // Initialize academic year toggle
     if (academicYearSelect.value === 'Other') {
-        otherAcademicYearContainer.style.display = 'flex';
+        otherAcademicYearContainer.classList.remove('hidden');
     }
 }

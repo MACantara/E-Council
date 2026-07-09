@@ -17,10 +17,10 @@ function initializeAddFinancialReportForm() {
     if (academicYearSelect) {
         academicYearSelect.addEventListener('change', function () {
             if (this.value === 'Other') {
-                otherAcademicYearInput.style.display = 'block';
+                otherAcademicYearInput.classList.remove('hidden');
                 otherAcademicYearInput.required = true;
             } else {
-                otherAcademicYearInput.style.display = 'none';
+                otherAcademicYearInput.classList.add('hidden');
                 otherAcademicYearInput.required = false;
             }
         });

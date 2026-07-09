@@ -25,7 +25,7 @@
                     <option value="existing">Create from Existing Concept Paper</option>
                 {% endcall %}
 
-                <div id="concept-paper-container" style="display: none;">
+                <div id="concept-paper-container" class="hidden">
                     {% call select('concept-paper-forms-id', 'concept-paper-forms-id', label='Concept Paper') %}
                         <option value="" disabled selected>Select Concept Paper</option>
                         {% for concept_paper in concept_papers %}
@@ -50,7 +50,7 @@
                     <option value="Other">Other A.Y.</option>
                 {% endcall %}
 
-                <div id="other-academic-year-container" style="display: none;">
+                <div id="other-academic-year-container" class="hidden">
                     {{ input('other-academic-year', 'other-academic-year', label='Other Academic Year', placeholder='Enter Academic Year') }}
                 </div>
 

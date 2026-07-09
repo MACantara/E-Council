@@ -22,26 +22,26 @@ function initializeModal(openButtonId, closeButtonId, cancelButtonId, modalConte
 
     if (openButton && modalContent) {
         openButton.addEventListener('click', () => {
-            modalContent.style.display = 'block';
+            modalContent.classList.remove('hidden');
         });
     }
 
     if (closeButton && modalContent) {
         closeButton.addEventListener('click', () => {
-            modalContent.style.display = 'none';
+            modalContent.classList.add('hidden');
         });
     }
 
     if (cancelButton && modalContent) {
         cancelButton.addEventListener('click', () => {
-            modalContent.style.display = 'none';
+            modalContent.classList.add('hidden');
         });
     }
 
     if (modalContent) {
         window.addEventListener('click', (event) => {
             if (event.target === modalContent) {
-                modalContent.style.display = 'none';
+                modalContent.classList.add('hidden');
             }
         });
     }
@@ -255,7 +255,7 @@ function toggleConditionalField(triggerSelectId, targetContainerId, targetInputI
         const shouldShow = triggerSelect.value === triggerValue;
         const display = showOnMatch ? shouldShow : !shouldShow;
 
-        targetContainer.style.display = display ? 'block' : 'none';
+        targetContainer.classList.toggle('hidden', !display);
 
         if (targetInput) {
             if (display) {
@@ -291,7 +291,7 @@ function toggleMultipleConditionalFields(triggerSelectId, targets, triggerValue,
             const targetInput = inputId ? document.getElementById(inputId) : null;
 
             if (targetContainer) {
-                targetContainer.style.display = display ? 'block' : 'none';
+                targetContainer.classList.toggle('hidden', !display);
 
                 if (targetInput) {
                     if (display) {

@@ -15,9 +15,9 @@ function initializeUpdateTransactionForm() {
     if (transactionCategorySelect) {
         transactionCategorySelect.addEventListener('change', function () {
             if (transactionCategorySelect.value === 'Other') {
-                otherTransactionCategoryContainer.style.display = 'block';
+                otherTransactionCategoryContainer.classList.remove('hidden');
             } else {
-                otherTransactionCategoryContainer.style.display = 'none';
+                otherTransactionCategoryContainer.classList.add('hidden');
             }
         });
     }

@@ -46,7 +46,7 @@
             <option value="Staff">Staff</option>
             {% endcall %}
 
-            <div id="users-student-organization-container" class="w-full" style="display: none;">
+            <div id="users-student-organization-container" class="w-full hidden">
                 {% call select('users-student-organization', 'users-student-organization', label='Student Organization') %}
                 <option value="" disabled selected>Select a Student Organization</option>
                 {% for organization in student_organizations %}
@@ -55,7 +55,7 @@
                 {% endcall %}
             </div>
 
-            <div id="users-student-organization-position-container" class="w-full" style="display: none;">
+            <div id="users-student-organization-position-container" class="w-full hidden">
                 {% call select('users-student-organization-position', 'users-student-organization-position', label='Student Organization Position') %}
                 <option value="" disabled selected>Select a Student Organization Position</option>
                 <option value="President">President</option>

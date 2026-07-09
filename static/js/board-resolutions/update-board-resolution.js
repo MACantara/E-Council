@@ -20,10 +20,10 @@ function toggleOtherAcademicYear() {
     const otherAcademicYearContainer = document.getElementById('other-academic-year-container');
     const otherAcademicYearInput = document.getElementById('other-academic-year-input');
     if (academicYearSelect.value === 'Other') {
-        if (otherAcademicYearContainer) otherAcademicYearContainer.style.display = 'block';
+        if (otherAcademicYearContainer) otherAcademicYearContainer.classList.remove('hidden');
         if (otherAcademicYearInput) otherAcademicYearInput.required = true;
     } else {
-        if (otherAcademicYearContainer) otherAcademicYearContainer.style.display = 'none';
+        if (otherAcademicYearContainer) otherAcademicYearContainer.classList.add('hidden');
         if (otherAcademicYearInput) otherAcademicYearInput.required = false;
     }
 }

@@ -111,10 +111,10 @@ Phase 1 focuses on low-risk cleanup that improves security, documentation, and p
 **Scope**: `templates/financial-reports/add-financial-report.html`, `templates/documentation/add-documentation.html`, `templates/concept-papers/add-concept-paper.html`, `templates/concept-papers/update-concept-paper.html`, `templates/documentation/update-documentation.html`
 
 **Checklist**
-- [ ] Search templates for `style="display:none"` and `style="display: none"`.
-- [ ] Replace each with `class="hidden"` or a conditional class via a `data-*` attribute and JS toggle.
-- [ ] For elements that need to be shown by JS, ensure the toggle logic adds `hidden` or removes it.
-- [ ] Run `pytest -q` and visually check the affected add/update forms.
+- [x] Search templates for `style="display:none"` and `style="display: none"`.
+- [x] Replace each with `class="hidden"` or a conditional class via a `data-*` attribute and JS toggle.
+- [x] For elements that need to be shown by JS, ensure the toggle logic adds `hidden` or removes it.
+- [x] Run `pytest -q` and visually check the affected add/update forms.
 
 **Acceptance criteria**: No `style="display:none"` remains in templates. Forms still show/hide the correct fields.
 

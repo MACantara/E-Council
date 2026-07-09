@@ -15,15 +15,15 @@ function initializeUpdateMinutesOfMeetingForm() {
     if (academicYearSelect) {
         academicYearSelect.addEventListener('change', function () {
             if (academicYearSelect.value === 'Other') {
-                otherAcademicYearContainer.style.display = 'block';
+                otherAcademicYearContainer.classList.remove('hidden');
             } else {
-                otherAcademicYearContainer.style.display = 'none';
+                otherAcademicYearContainer.classList.add('hidden');
             }
         });
 
         // Initialize academic year toggle on page load
         if (academicYearSelect.value === 'Other') {
-            otherAcademicYearContainer.style.display = 'block';
+            otherAcademicYearContainer.classList.remove('hidden');
         }
     }
 
@@ -57,7 +57,7 @@ function toggleNewSignatoryFields(selectElement, prefix) {
         if (fieldElement) {
             const wrapper = fieldElement.closest('.new-signatory-field');
             if (wrapper) {
-                wrapper.style.display = selectElement.value === `add-new-${prefix}` ? 'flex' : 'none';
+                wrapper.classList.toggle('hidden', selectElement.value !== `add-new-${prefix}`);
             }
         }
     });

@@ -27,9 +27,9 @@ function initializeAddEventForm() {
     if (academicYearSelect) {
         academicYearSelect.addEventListener('change', function () {
             if (academicYearSelect.value === 'Other') {
-                otherAcademicYearContainer.style.display = 'flex';
+                otherAcademicYearContainer.classList.remove('hidden');
             } else {
-                otherAcademicYearContainer.style.display = 'none';
+                otherAcademicYearContainer.classList.add('hidden');
             }
         });
     }
@@ -38,20 +38,20 @@ function initializeAddEventForm() {
     if (creationMethodSelect) {
         creationMethodSelect.addEventListener('change', function () {
             if (creationMethodSelect.value === 'existing') {
-                conceptPaperContainer.style.display = 'flex';
+                conceptPaperContainer.classList.remove('hidden');
                 fieldsToToggle.forEach(function (fieldId) {
                     const field = document.getElementById(fieldId);
                     if (field) {
-                        field.closest('.input-pair').style.display = 'none';
+                        field.closest('.input-pair').classList.add('hidden');
                         field.required = false;
                     }
                 });
             } else {
-                conceptPaperContainer.style.display = 'none';
+                conceptPaperContainer.classList.add('hidden');
                 fieldsToToggle.forEach(function (fieldId) {
                     const field = document.getElementById(fieldId);
                     if (field) {
-                        field.closest('.input-pair').style.display = 'flex';
+                        field.closest('.input-pair').classList.remove('hidden');
                         field.required = true;
                     }
                 });

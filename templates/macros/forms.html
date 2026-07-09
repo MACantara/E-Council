@@ -1,7 +1,7 @@
 {% from 'macros/icons.html' import lucide %}
 
 {% macro input(name, id, label='', type='text', value='', placeholder='', required=False, class='', attrs='') %}
-<div class="w-full {{ class }}">
+<div class="w-full">
     {% if label %}
     <label for="{{ id }}" class="mb-1.5 block text-sm font-medium text-ink-2">
         {% if required %}<span class="text-danger" aria-hidden="true">*</span> {% endif %}{{ label }}

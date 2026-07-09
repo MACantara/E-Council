@@ -50,7 +50,7 @@
                         <option value="Other">Other A.Y.</option>
                     {% endcall %}
 
-                    <div id="other-academic-year-container" class="new-signatory-field flex-col" style="display:none;">
+                    <div id="other-academic-year-container" class="new-signatory-field flex-col hidden">
                         {{ input('other-academic-year', 'other-academic-year', label='Other Academic Year', placeholder='Enter Academic Year') }}
                     </div>
 
@@ -131,25 +131,25 @@
                         <option value="add-new-noted-by">Add new signatory</option>
                     {% endcall %}
 
-                    <div class="new-signatory-field flex-col" style="display:none;">
+                    <div class="new-signatory-field flex-col hidden">
                         {{ input('new-noted-by-title', 'new-noted-by-title', label='Title', placeholder='Title') }}
                     </div>
-                    <div class="new-signatory-field flex-col" style="display:none;">
+                    <div class="new-signatory-field flex-col hidden">
                         {{ input('new-noted-by-first-name', 'new-noted-by-first-name', label='First Name', placeholder='First Name') }}
                     </div>
-                    <div class="new-signatory-field flex-col" style="display:none;">
+                    <div class="new-signatory-field flex-col hidden">
                         {{ input('new-noted-by-middle-name', 'new-noted-by-middle-name', label='Middle Name', placeholder='Middle Name') }}
                     </div>
-                    <div class="new-signatory-field flex-col" style="display:none;">
+                    <div class="new-signatory-field flex-col hidden">
                         {{ input('new-noted-by-last-name', 'new-noted-by-last-name', label='Last Name', placeholder='Last Name') }}
                     </div>
-                    <div class="new-signatory-field flex-col" style="display:none;">
+                    <div class="new-signatory-field flex-col hidden">
                         {{ input('new-noted-by-suffix', 'new-noted-by-suffix', label='Suffix', placeholder='Suffix') }}
                     </div>
-                    <div class="new-signatory-field flex-col" style="display:none;">
+                    <div class="new-signatory-field flex-col hidden">
                         {{ input('new-noted-by-position', 'new-noted-by-position', label='Position', placeholder='Position') }}
                     </div>
-                    <div class="new-signatory-field flex-col" style="display:none;">
+                    <div class="new-signatory-field flex-col hidden">
                         {{ input('new-noted-by-department', 'new-noted-by-department', label='Department', placeholder='Department') }}
                     </div>
                 {% endcall %}

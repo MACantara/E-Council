@@ -28,14 +28,14 @@ function toggleStudentOrganizationFields() {
 
     if (roleSelect && studentOrgContainer && studentOrgSelect && studentOrgPositionContainer && studentOrgPositionSelect) {
         if (roleSelect.value === 'Student Council Officer') {
-            studentOrgContainer.style.display = 'flex';
+            studentOrgContainer.classList.remove('hidden');
             studentOrgSelect.setAttribute('required', 'required');
-            studentOrgPositionContainer.style.display = 'flex';
+            studentOrgPositionContainer.classList.remove('hidden');
             studentOrgPositionSelect.setAttribute('required', 'required');
         } else {
-            studentOrgContainer.style.display = 'none';
+            studentOrgContainer.classList.add('hidden');
             studentOrgSelect.removeAttribute('required');
-            studentOrgPositionContainer.style.display = 'none';
+            studentOrgPositionContainer.classList.add('hidden');
             studentOrgPositionSelect.removeAttribute('required');
         }
     }

@@ -41,7 +41,7 @@
                     <option value="Other">Other</option>
                 {% endcall %}
 
-                {{ input('other-academic-year', 'other-academic-year', placeholder='Enter Academic Year', attrs='style="display:none;"') }}
+                {{ input('other-academic-year', 'other-academic-year', placeholder='Enter Academic Year', class='hidden') }}
 
                 {% call select('financial-reports-semester', 'financial-reports-semester', label='Semester', required=true) %}
                     <option value="" disabled>Select a Semester</option>
