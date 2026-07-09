@@ -667,6 +667,28 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
+### 4.13 Seed sample users and data for testing and demos
+
+**Why it matters**: A fresh environment currently has no users, departments, events, or documents, which makes manual and end-to-end testing tedious. A seeding layer creates representative sample data so developers and testers can verify workflows immediately without relying on manually created records.
+
+**Scope**: `seeds/`, `factories/`, `tests/conftest.py`, `README.md`, `cli/` or `manage.py`
+
+**Checklist**
+- [ ] Create a `seeds/` package with idempotent seed scripts for each domain (departments, users, events, concept papers, documents, financial reports, meetings, board resolutions).
+- [ ] Create sample users with realistic roles (e.g., `Admin`, `Student Council Officer`, `Faculty`, `Staff`) and strong, documented demo passwords.
+- [ ] Reuse or create `factory-boy` factories for test data so seeds and tests share the same data generation logic.
+- [ ] Add a CLI command or management script (e.g., `flask seed` or `python seed.py`) that runs all seed scripts.
+- [ ] Ensure seeding is safe by default and does not run in production unless explicitly enabled.
+- [ ] Make seeding idempotent so running it twice does not create duplicates.
+- [ ] Update `README.md` with instructions on how to seed a development or test environment.
+- [ ] Add integration tests that verify the seed scripts create the expected records and associations.
+
+**Acceptance criteria**: A new developer can run a single command and have a populated environment with users, departments, and representative records for all major features. End-to-end tests can depend on the seeded data.
+
+**Effort**: Medium
+
+---
+
 ## Appendix: Decision log
 
 | Date | Decision | Rationale |
@@ -681,6 +703,7 @@ Phase 4 prepares the application for a real production environment and explores 
 | 2026-07-09 | Abstract PDF generation | Currently coupled to ReportLab; abstraction enables WeasyPrint, HTML rendering, and external services |
 | 2026-07-09 | Migrate backend to FastAPI | High-performance async API, automatic OpenAPI docs, and Pydantic validation |
 | 2026-07-09 | Migrate frontend to React + TypeScript + Tailwind CSS | Type-safe UI components and full decoupling from the backend |
+| 2026-07-09 | Seed sample users and data | Fresh environments have no records; seeding accelerates manual and E2E testing |
 
 ## Appendix: Definition of done
 
@@ -696,4 +719,5 @@ For each recommendation:
 - **2026-07-09**: Migrated AI SDK from `google-generativeai` to `google-genai` (Phase 3.2); all AI generation endpoints and tests updated.
 - **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
 - **2026-07-09**: Added object storage, email, AI, and PDF abstraction layers to Phase 4; migration phases renumbered to 4.11 and 4.12.
+- **2026-07-09**: Added Phase 4.13 for seeding sample users and data for testing and demos.
 - **2026-07-09**: Completed Phase 2.5 test coverage and fixtures (124 tests passing, 1 skipped `generate_concept_paper_pdf`).
