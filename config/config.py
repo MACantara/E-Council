@@ -125,6 +125,9 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Provide a default secret key for tests so tokens/serializers work without env vars
+    SECRET_KEY = "test-secret-key"
+
 
 class DatabaseConfig:
     """Database configuration settings."""
