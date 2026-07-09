@@ -504,7 +504,7 @@ Phase 4 prepares the application for a real production environment and explores 
 
 **Checklist**
 - [ ] Document current data flows and identify REST resource boundaries.
-- [ ] Prototype `api/v1/concept_papers` using FastAPI, with Pydantic request/response models.
+- [ ] Prototype `api/v1/auth` using FastAPI, with Pydantic request/response models for user registration, login, and token refresh.
 - [ ] Add JWT-based API authentication for the FastAPI prototype.
 - [ ] Evaluate how FastAPI integrates with the existing SQLAlchemy repository layer from Phase 4.6.
 - [ ] Decide whether to migrate the entire UI or keep server-rendered pages for the MVP.
