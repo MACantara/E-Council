@@ -108,9 +108,9 @@
 <body class="min-h-screen flex flex-col bg-surface-bg text-ink antialiased font-sans">
     {% include "partials/navbar.html" %}
     {% include "partials/flash_messages.html" %}
-    <main class="flex-1 w-full">
+    <div class="flex-1 w-full">
         {% block content %}{% endblock %}
-    </main>
+    </div>
     {% include "partials/footer.html" %}
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
