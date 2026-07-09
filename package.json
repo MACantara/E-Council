@@ -1,0 +1,14 @@
+{
+  "name": "e-council",
+  "version": "1.0.0",
+  "private": true,
+  "description": "E-Council Flask application with Tailwind CSS",
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i static/css/input.css -o static/css/output.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i static/css/input.css -o static/css/output.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

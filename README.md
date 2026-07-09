@@ -445,6 +445,30 @@ celery -A tasks worker -l info
 
 For local development without Redis, omit `BROKER_URL`. Tasks will run synchronously as a fallback.
 
+### Building the CSS Bundle
+
+Styles are written with Tailwind CSS v4 and bundled with the Tailwind CLI.
+
+1. Install Node dependencies (requires Node.js and npm):
+
+```bash
+npm install
+```
+
+2. Build the production CSS bundle:
+
+```bash
+npm run build:css
+```
+
+3. Watch for changes during development:
+
+```bash
+npm run watch:css
+```
+
+The compiled stylesheet is written to `static/css/output.css`, which is served by the Flask app. The source file is `static/css/input.css`.
+
 ## Testing
 
 Tests are written with pytest and configured via `pytest.ini`. From the project root with the virtual environment active:

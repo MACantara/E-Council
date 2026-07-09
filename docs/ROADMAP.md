@@ -462,15 +462,15 @@ Phase 4 prepares the application for a real production environment and explores 
 **Scope**: `templates/base.html`, `package.json`, `static/css/` (new), build scripts
 
 **Checklist**
-- [ ] Add `package.json` with `@tailwindcss/cli` or `tailwindcss`.
-- [ ] Create `static/css/input.css` with `@import "tailwindcss"` and the theme variables.
-- [ ] Configure `tailwind.config.js` (or CSS-based config) for the project.
-- [ ] Add npm scripts `build:css` and `watch:css`.
-- [ ] Update `templates/base.html` to load `{{ url_for('static', filename='css/main.css') }}` instead of the CDN.
+- [x] Add `package.json` with `@tailwindcss/cli` and `tailwindcss`.
+- [x] Create `static/css/input.css` with `@import "tailwindcss"` and the theme variables.
+- [x] Configure Tailwind via CSS-based `@source` and `@theme` directives.
+- [x] Add npm scripts `build:css` and `watch:css`.
+- [x] Update `templates/base.html` to load the bundled `static/css/output.css` instead of the CDN.
 - [ ] Update CI to build CSS before running tests.
-- [ ] Update `README.md` with build instructions.
+- [x] Update `README.md` with build instructions.
 
-**Acceptance criteria**: `npm run build:css` produces a minified `static/css/main.css`. The app works without internet CSS.
+**Acceptance criteria**: `npm run build:css` produces a minified `static/css/output.css`. The app works without internet CSS.
 
 **Effort**: Medium
 
