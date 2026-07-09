@@ -16,63 +16,28 @@
 
         {% call card(body_class='p-6 sm:p-8') %}
         <form id="signup-form" method="POST" class="space-y-5">
+            {{ form.hidden_tag() }}
             <div class="grid gap-5 sm:grid-cols-2">
-                {{ input('users-first-name', 'users-first-name', label='First Name', placeholder='First Name', required=true) }}
-                {{ input('users-last-name', 'users-last-name', label='Last Name', placeholder='Last Name', required=true) }}
+                {{ input(field=form.users_first_name) }}
+                {{ input(field=form.users_last_name) }}
             </div>
 
-            {{ input('users-username', 'users-username', label='Username', placeholder='Username', required=true) }}
-            {{ input('users-email', 'users-email', label='Email', type='email', placeholder='Email', required=true) }}
+            {{ input(field=form.users_username) }}
+            {{ input(field=form.users_email) }}
 
-            {% call select('users-department', 'users-department', label='Department', required=true) %}
-            <option value="" disabled selected>Select a Department</option>
-            <option value="College of Computer Studies">College of Computer Studies</option>
-            <option value="College of Engineering">College of Engineering</option>
-            <option value="College of Architecture">College of Architecture</option>
-            <option value="College of Criminology">College of Criminology</option>
-            <option value="College of Nursing">College of Nursing</option>
-            <option value="College of Arts, Sciences and Education">College of Arts, Sciences and Education</option>
-            <option value="College of Business Administration and Accountancy">College of Business Administration and Accountancy</option>
-            <option value="College of Physical and Occupational Therapy">College of Physical and Occupational Therapy</option>
-            <option value="College of International Tourism and Hospitality Management">College of International Tourism and Hospitality Management</option>
-            <option value="College of Pharmacy">College of Pharmacy</option>
-            <option value="College of Radiologic Technology">College of Radiologic Technology</option>
-            {% endcall %}
+            {{ select(field=form.users_department) }}
 
-            {% call select('users-role', 'users-role', label='Role', required=true) %}
-            <option value="" disabled selected>Select a Role</option>
-            <option value="Student Council Officer">Student Council Officer</option>
-            <option value="Faculty">Faculty</option>
-            <option value="Staff">Staff</option>
-            {% endcall %}
+            {{ select(field=form.users_role) }}
 
             <div id="users-student-organization-container" class="w-full hidden">
-                {% call select('users-student-organization', 'users-student-organization', label='Student Organization') %}
-                <option value="" disabled selected>Select a Student Organization</option>
-                {% for organization in student_organizations %}
-                <option value="{{ organization.student_organizations_id }}">{{ organization.student_organizations_name }}</option>
-                {% endfor %}
-                {% endcall %}
+                {{ select(field=form.users_student_organization) }}
             </div>
 
             <div id="users-student-organization-position-container" class="w-full hidden">
-                {% call select('users-student-organization-position', 'users-student-organization-position', label='Student Organization Position') %}
-                <option value="" disabled selected>Select a Student Organization Position</option>
-                <option value="President">President</option>
-                <option value="Vice President">Vice President</option>
-                <option value="Secretary">Secretary</option>
-                <option value="Treasurer">Treasurer</option>
-                <option value="Auditor">Auditor</option>
-                <option value="Business Manager">Business Manager</option>
-                <option value="Public Relations Officer">Public Relations Officer (P.R.O)</option>
-                <option value="1st Year Representative">1st Year Representative</option>
-                <option value="2nd Year Representative">2nd Year Representative</option>
-                <option value="3rd Year Representative">3rd Year Representative</option>
-                <option value="4th Year Representative">4th Year Representative</option>
-                {% endcall %}
+                {{ select(field=form.users_student_organization_position) }}
             </div>
 
-            {{ input('users-password', 'users-password', label='Password', type='password', placeholder='Password', required=true) }}
+            {{ input(field=form.users_password) }}
 
             <div id="password-strength" class="hidden">
                 <div class="h-2 rounded-full bg-surface-lowered overflow-hidden">
@@ -108,11 +73,9 @@
                 </p>
             </div>
 
-            {{ input('users-repeat-password', 'users-repeat-password', label='Repeat Password', type='password', placeholder='Repeat Password', required=true) }}
+            {{ input(field=form.users_repeat_password) }}
 
             <p id="password-match" class="hidden text-sm text-danger">Passwords do not match</p>
-
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             {{ button('Sign Up', type='submit', variant='primary', class='w-full') }}
 

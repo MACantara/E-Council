@@ -133,19 +133,19 @@ Phase 2 builds the infrastructure needed for safer, faster development: validati
 **Scope**: `routes/*.py`, `templates/**/*.html`, possibly new `forms/` package
 
 **Checklist**
-- [ ] Decide on Flask-WTF `Form` classes vs. Pydantic models. For template-rendered forms, Flask-WTF is the natural fit.
-- [ ] Create `forms/auth.py` with `SignupForm`, `LoginForm`, `ForgotPasswordForm`, `ResetPasswordForm`.
-- [ ] Create `forms/concept_papers.py` with `ConceptPaperForm`.
-- [ ] Create `forms/documentation.py` with `DocumentationForm`.
-- [ ] Create `forms/events.py` with `EventForm`, `TransactionForm`.
-- [ ] Create `forms/financial.py` with `FinancialReportForm`.
-- [ ] Create `forms/meetings.py` with `MinutesOfTheMeetingForm`.
-- [ ] Create `forms/board_resolutions.py` with `BoardResolutionForm`.
-- [ ] Refactor `routes/auth.py` to use `SignupForm` and `LoginForm` first.
-- [ ] Centralize password rules in a `validators.py` helper and reuse them in the form and tests.
-- [ ] Replace manual `<input type="hidden" name="csrf_token">` with `form.hidden_tag()` or CSRF token injection.
-- [ ] Update templates to use `form.field()` or keep the existing markup while passing the form object.
-- [ ] Run `pytest -q` and update `tests/test_signup.py` to match the form-based flow.
+- [x] Decide on Flask-WTF `Form` classes vs. Pydantic models. For template-rendered forms, Flask-WTF is the natural fit.
+- [x] Create `forms/auth.py` with `SignupForm`, `LoginForm`, `ForgotPasswordForm`, `ResetPasswordForm`.
+- [x] Create `forms/concept_papers.py` with `ConceptPaperForm`.
+- [x] Create `forms/documentation.py` with `DocumentationForm`.
+- [x] Create `forms/events.py` with `EventForm`, `TransactionForm`.
+- [x] Create `forms/financial.py` with `FinancialReportForm`.
+- [x] Create `forms/meetings.py` with `MinutesOfTheMeetingForm`.
+- [x] Create `forms/board_resolutions.py` with `BoardResolutionForm`.
+- [x] Refactor `routes/auth.py` to use `SignupForm`, `LoginForm`, `ForgotPasswordForm`, and `ResetPasswordForm`.
+- [x] Centralize password rules in a `validators.py` helper and reuse them in the form and tests.
+- [x] Replace manual `<input type="hidden" name="csrf_token">` with `form.hidden_tag()` in auth templates.
+- [x] Update auth templates to use form fields via `form.field()` macros.
+- [x] Run `pytest -q` and update `tests/test_signup.py` to match the form-based flow.
 
 **Acceptance criteria**: All POST routes validate with form classes; no route manually checks `len(password) >= 8` or date formats. `pytest -q` passes.
 

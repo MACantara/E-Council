@@ -23,6 +23,9 @@ from models import (
 # Import email functions from utils.email
 from utils.email import send_verification_email, send_reset_password_email
 
+# Import authentication forms
+from forms.auth import SignupForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
+
 # Import current app to get SECRET_KEY for serializer
 from flask import current_app
 
@@ -34,107 +37,66 @@ def get_serializer():
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
+def _flash_form_errors(form):
+    """Flash form validation errors, grouping required field errors."""
+    has_required = False
+    for field_name, errors in form.errors.items():
+        for error in errors:
+            # Treat any input-required style message as a generic required-field error
+            if isinstance(error, str) and error.lower() in {
+                'this field is required.',
+                'input is required.',
+            }:
+                has_required = True
+            else:
+                flash(error, 'error')
+    if has_required:
+        flash('All fields are required.', 'error')
+
+
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
-    if request.method == "GET":
-        student_organizations = StudentOrganizations.query.all()
-        return render_template("auth/signup.html", student_organizations=student_organizations)
-    elif request.method == "POST":
-        users_first_name = request.form.get("users-first-name")
-        users_last_name = request.form.get("users-last-name")
-        users_username = request.form.get("users-username")
-        users_email = request.form.get("users-email")
-        users_department = request.form.get("users-department")
-        users_role = request.form.get("users-role")
-        users_password = request.form.get("users-password")
-        users_repeat_password = request.form.get("users-repeat-password")
-        users_email_verified = 0
-        
-        users_student_organization = request.form.get("users-student-organization") if request.form.get("users-student-organization") else None
-        users_student_organization_position = request.form.get("users-student-organization-position") if request.form.get("users-student-organization-position") else None
+    department_choices = [(d.departments_name, d.departments_name) for d in Departments.query.all()]
+    organization_choices = [
+        (str(o.student_organizations_id), o.student_organizations_name)
+        for o in StudentOrganizations.query.all()
+    ]
 
-        # Validation
-        if not users_first_name or not users_last_name or not users_username or not users_email or not users_department or not users_role or not users_password:
-            flash("All fields are required.", "error")
-            return render_template("auth/signup.html")
+    form = SignupForm(
+        departments=department_choices,
+        organizations=organization_choices,
+    )
 
-        if users_role == "Student Council Officer":
-            if not users_student_organization or not users_student_organization_position:
-                flash("Student Organization and Position are required for Student Council Officers.", "error")
-                return render_template("auth/signup.html")
-
-        # Check if username already exists
-        if Users.query.filter_by(users_username=users_username).first():
-            flash("Username already exists.", "error")
-            return render_template("auth/signup.html")
-
-        # Check if passwords match
-        if users_password != users_repeat_password:
-            flash("Passwords do not match.", "error")
-            return render_template("auth/signup.html")
-
-        # Check password requirements
-        if len(users_password) < 8:
-            flash("Password must be at least 8 characters.", "error")
-            return render_template("auth/signup.html")
-        if not any(char.isupper() for char in users_password):
-            flash("Password must contain at least one uppercase letter.", "error")
-            return render_template("auth/signup.html")
-        if not any(char.islower() for char in users_password):
-            flash("Password must contain at least one lowercase letter.", "error")
-            return render_template("auth/signup.html")
-        if not any(char.isdigit() for char in users_password):
-            flash("Password must contain at least one number.", "error")
-            return render_template("auth/signup.html")
-        if not any(char in "!@#$%^&*(),.?\":{}|<>" for char in users_password):
-            flash("Password must contain at least one special character.", "error")
-            return render_template("auth/signup.html")
-
-        # Ensure the role, student organization, and position are valid Enum values
-        if users_role not in Users.users_role.type.enums:
-            flash("Invalid role.", "error")
-            return render_template("auth/signup.html")
-        if users_student_organization and not db.session.get(StudentOrganizations, users_student_organization):
-            flash("Invalid student organization.", "error")
-            return render_template("auth/signup.html")
-        if users_student_organization_position and users_student_organization_position not in Users.users_student_organization_position.type.enums:
-            flash("Invalid student organization position.", "error")
-            return render_template("auth/signup.html")
-
-        # Get the departments_id through the departments_name
-        department = Departments.query.filter_by(departments_name=users_department).first()
-        if not department:
-            flash("Department not found.", "error")
-            return render_template("auth/signup.html")
+    if form.validate_on_submit():
+        department = Departments.query.filter_by(departments_name=form.users_department.data).first()
         users_departments_id = department.departments_id
 
-        # Clear student organization fields if the role is Faculty or Staff
-        if users_role in ["Faculty", "Staff"]:
-            users_student_organization = None
-            users_student_organization_position = None
-
         user = Users(
-            users_first_name=users_first_name,
-            users_last_name=users_last_name,
-            users_username=users_username,
-            users_email=users_email,
+            users_first_name=form.users_first_name.data,
+            users_last_name=form.users_last_name.data,
+            users_username=form.users_username.data,
+            users_email=form.users_email.data,
             users_departments_id=users_departments_id,
-            users_role=users_role,
-            users_student_organization=users_student_organization,
-            users_student_organization_position=users_student_organization_position,
-            users_email_verified=users_email_verified,
+            users_role=form.users_role.data,
+            users_student_organization=form.users_student_organization.data,
+            users_student_organization_position=form.users_student_organization_position.data,
+            users_email_verified=0,
         )
 
-        user.set_password(users_password)
+        user.set_password(form.users_password.data)
 
         db.session.add(user)
         db.session.commit()
-        
-        send_verification_email(users_email)
+
+        send_verification_email(form.users_email.data)
 
         flash("Account created! Please check your email to verify your account.", "success")
-
         return redirect(url_for("auth.login"))
+
+    if request.method == "POST":
+        _flash_form_errors(form)
+
+    return render_template("auth/signup.html", form=form)
 
 
 @auth_bp.route("/confirm_email/<token>")
@@ -173,11 +135,11 @@ def confirm_email(token):
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "GET":
-        return render_template("auth/login.html")
-    elif request.method == "POST":
-        users_username_email = request.form.get("users-username-email")
-        users_password = request.form.get("users-password")
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        users_username_email = form.users_username_email.data
+        users_password = form.users_password.data
         ip_address = request.remote_addr
 
         # Check login attempts
@@ -243,6 +205,11 @@ def login():
 
         return redirect(url_for("auth.login"))
 
+    if request.method == "POST":
+        _flash_form_errors(form)
+
+    return render_template("auth/login.html", form=form)
+
 
 @auth_bp.route("/send_verification_email/<users_email>")
 def send_verification_email_route(users_email):
@@ -280,8 +247,10 @@ def logout():
 
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
-    if request.method == "POST":
-        users_email = request.form.get("users-email")
+    form = ForgotPasswordForm()
+
+    if form.validate_on_submit():
+        users_email = form.users_email.data
         user = Users.query.filter_by(users_email=users_email).first()
         if user:
             # Check for existing password reset records
@@ -299,7 +268,11 @@ def forgot_password():
         else:
             flash("Email address not found.", "error")
             return redirect(url_for("auth.forgot_password"))
-    return render_template("auth/forgot-password.html")
+
+    if request.method == "POST":
+        _flash_form_errors(form)
+
+    return render_template("auth/forgot-password.html", form=form)
 
 
 @auth_bp.route("/reset-password/<selector>/<token>", methods=["GET", "POST"])
@@ -319,16 +292,11 @@ def reset_password(selector, token):
         flash("The password reset link is invalid or has expired.", "error")
         return redirect(url_for("auth.forgot_password"))
 
-    if request.method == "POST":
-        users_password = request.form.get("users-password")
-        users_repeat_password = request.form.get("users-repeat-password")
+    form = ResetPasswordForm()
 
-        if users_password != users_repeat_password:
-            flash("Passwords do not match.", "error")
-            return redirect(url_for("auth.reset_password", selector=selector, token=token))
-
+    if form.validate_on_submit():
         user = Users.query.filter_by(users_id=password_reset.password_reset_users_id).first_or_404()
-        user.set_password(users_password)
+        user.set_password(form.users_password.data)
         db.session.commit()
 
         # Delete the password reset record
@@ -338,4 +306,7 @@ def reset_password(selector, token):
         flash("Your password has been reset. Please log in.", "success")
         return redirect(url_for("auth.login"))
 
-    return render_template("auth/reset-password.html", selector=selector, token=token)
+    if request.method == "POST":
+        _flash_form_errors(form)
+
+    return render_template("auth/reset-password.html", form=form, selector=selector, token=token)

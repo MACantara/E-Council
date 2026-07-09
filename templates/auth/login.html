@@ -16,8 +16,9 @@
 
         {% call card(body_class='p-6 sm:p-8') %}
         <form method="POST" class="space-y-5">
-            {{ input('users-username-email', 'users-username-email', label='Username / Email', placeholder='Username or email', required=true) }}
-            {{ input('users-password', 'users-password', label='Password', type='password', placeholder='Password', required=true) }}
+            {{ form.hidden_tag() }}
+            {{ input(field=form.users_username_email) }}
+            {{ input(field=form.users_password) }}
 
             <div class="flex items-center justify-between">
                 <button type="button" class="show-password-button inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-accent" data-target="users-password">
@@ -25,8 +26,6 @@
                 </button>
                 <a href="{{ url_for('auth.forgot_password') }}" class="text-sm font-medium text-accent hover:text-accent-hover">Forgot password?</a>
             </div>
-
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             {{ button('Log In', type='submit', variant='primary', class='w-full') }}
 
