@@ -145,7 +145,9 @@ def add_documentation():
 
         # Update learning journal observations and learnings as JSON lists
         if concept_paper_learning_journal:
-            concept_paper_learning_journal.learnings = [learning for learning in request.form.getlist("learnings") if learning.strip()]
+            concept_paper_learning_journal.learnings = [
+                learning for learning in request.form.getlist("learnings") if learning.strip()
+            ]
             concept_paper_learning_journal.observations = [o for o in request.form.getlist("observations") if o.strip()]
 
         # Build tally items JSON list
@@ -408,7 +410,9 @@ def update_documentation(documentation_id):
         learning_journal.learning_journal_forms_checked_by = request.form.get("learning-journal-forms-checked-by")
 
         # Update learnings and observations as JSON lists
-        learning_journal.learnings = [learning.strip() for learning in request.form.getlist("learnings[]") if learning.strip()]
+        learning_journal.learnings = [
+            learning.strip() for learning in request.form.getlist("learnings[]") if learning.strip()
+        ]
         learning_journal.observations = [o.strip() for o in request.form.getlist("observations[]") if o.strip()]
 
         # Handle evaluation images (delete removed, then append new uploads)

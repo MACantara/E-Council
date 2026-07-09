@@ -113,10 +113,7 @@ def belongs_to_user_or_department(record: Any, user: Any) -> bool:
         return (
             record.concept_paper_forms_departments_id is not None
             and record.concept_paper_forms_departments_id == user_dept_id
-        ) or (
-            record.concept_paper_forms_prepared_by is not None
-            and record.concept_paper_forms_prepared_by == user_id
-        )
+        ) or (record.concept_paper_forms_prepared_by is not None and record.concept_paper_forms_prepared_by == user_id)
 
     if isinstance(record, Events):
         if DepartmentsEvents.query.filter_by(events_id=record.events_id, departments_id=user_dept_id).first():
