@@ -487,6 +487,53 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ---
 
+### 4.6 Introduce a database abstraction layer
+
+**Why it matters**: The application currently depends on SQLAlchemy directly in routes and services. A repository-style abstraction makes the system database-agnostic, easier to unit test, and smoother to migrate to FastAPI or another backend later.
+
+**Scope**: `models/base.py`, `repositories/` (new), `services/` (new), `routes/*.py`, `config/config.py`
+
+**Checklist**
+- [ ] Define a repository protocol / interface for each entity (create, read, update, delete, list).
+- [ ] Implement SQLAlchemy-backed repositories in `repositories/` (e.g., `repositories/concept_papers.py`).
+- [ ] Move all direct `db.session.query`, `db.session.add`, and `db.session.commit` calls out of routes and services into repositories.
+- [ ] Keep SQLAlchemy imports confined to the repository layer; business logic should operate on plain models / Pydantic DTOs.
+- [ ] Add configuration to support any SQLAlchemy-compatible engine (MySQL, PostgreSQL, SQLite) without changing route/service code.
+- [ ] Add integration tests that can swap the repository to an in-memory SQLite implementation.
+- [ ] Update `ARCHITECTURE.md` and `README.md` with the repository pattern.
+
+**Acceptance criteria**: The application can connect to a different SQLAlchemy-compatible database without any changes to routes or services. All existing tests pass.
+
+**Effort**: Large
+
+---
+
+### 4.7 Migrate to React + TypeScript frontend and FastAPI backend
+
+**Why it matters**: A modern React frontend with TypeScript provides type-safe UI components and a better development experience, while FastAPI offers high-performance async endpoints and automatic OpenAPI documentation. This also fully decouples the frontend from the backend.
+
+**Scope**: New `frontend/` with React + TypeScript + Tailwind CSS, new `api/` with FastAPI, `services/`, `repositories/`, `config/`
+
+**Checklist**
+- [ ] Complete Phase 4.6 (database abstraction layer) and Phase 4.5 (API/SPA evaluation) before starting.
+- [ ] Set up FastAPI project structure (`api/main.py`, `api/routers/`, `api/services/`, `api/repositories/`).
+- [ ] Create Pydantic request/response models for all resources (users, events, concept papers, documents, financial reports, meetings, board resolutions).
+- [ ] Reimplement authentication and authorization with FastAPI dependencies and JWT tokens.
+- [ ] Reimplement all routes as REST endpoints under `/api/v1/`.
+- [ ] Create a React frontend with TypeScript and Vite (or a similar build tool).
+- [ ] Port templates to React components/pages, preserving the Tailwind CSS 4 design system and existing macro behavior.
+- [ ] Build shared React components (Button, Card, Input, Select, etc.) to replace the Jinja2 macro system.
+- [ ] Add an API client layer (e.g., TanStack Query, Axios, or `fetch` wrappers) with TypeScript types.
+- [ ] Update CI/CD to build the frontend and run the FastAPI backend.
+- [ ] Update `README.md`, `ARCHITECTURE.md`, and `DESIGN.md` to document the new stack.
+- [ ] Add end-to-end tests for the most critical user flows.
+
+**Acceptance criteria**: The React + FastAPI implementation has feature parity with the current Flask server-rendered application, all existing functionality is preserved, and tests pass.
+
+**Effort**: Extra Large
+
+---
+
 ## Appendix: Decision log
 
 | Date | Decision | Rationale |
@@ -494,6 +541,8 @@ Phase 4 prepares the application for a real production environment and explores 
 | 2026-07-09 | Use service layer for business logic | `routes/concept_papers.py` is too large and mixes concerns |
 | 2026-07-09 | Use Flask-WTF for forms | Tight integration with Jinja2 and built-in CSRF |
 | 2026-07-09 | Keep server-side rendering for now | Faster to secure current UI; evaluate API separately |
+| 2026-07-09 | Introduce a database abstraction layer | Makes the system database-agnostic and eases migration to FastAPI |
+| 2026-07-09 | Migrate frontend to React + TypeScript + Tailwind CSS and backend to FastAPI | Modern type-safe stack, decoupled API, and better scalability |
 
 ## Appendix: Definition of done
 
@@ -506,3 +555,4 @@ For each recommendation:
 ## Changelog
 
 - **2026-07-09**: Created initial roadmap from `docs/IMPROVEMENT_ANALYSIS.md`.
+- **2026-07-09**: Added database abstraction layer and React + TypeScript + FastAPI migration to Phase 4.
