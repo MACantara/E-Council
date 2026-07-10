@@ -1,12 +1,16 @@
 import { api } from './axios';
 import type { User, AuditLog, PaginatedList } from '@/types';
 
-export const fetchUsers = async (params?: Record<string, unknown>): Promise<PaginatedList<User>> => {
+export const fetchUsers = async (
+  params?: Record<string, unknown>
+): Promise<PaginatedList<User>> => {
   const response = await api.get('/api/v1/admin/users', { params });
   return response.data;
 };
 
-export const fetchAuditLogs = async (params?: Record<string, unknown>): Promise<PaginatedList<AuditLog>> => {
+export const fetchAuditLogs = async (
+  params?: Record<string, unknown>
+): Promise<PaginatedList<AuditLog>> => {
   const response = await api.get('/api/v1/admin/audit-logs', { params });
   return response.data;
 };

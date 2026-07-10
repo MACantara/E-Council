@@ -6,13 +6,15 @@ import { Card } from '@/components/ui/Card';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
+import type { ReactNode } from 'react';
 import type { CrudConfig, CrudListField } from './CrudList';
 
 interface CrudDetailProps {
   config: CrudConfig;
+  renderExtra?: (item: Record<string, unknown>) => ReactNode;
 }
 
-export const CrudDetail = ({ config }: CrudDetailProps) => {
+export const CrudDetail = ({ config, renderExtra }: CrudDetailProps) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data, isLoading, error } = useQuery({
@@ -45,7 +47,7 @@ export const CrudDetail = ({ config }: CrudDetailProps) => {
   return (
     <Card>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">{config.title} Details</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{config.title} Details</h2>
         <div className="flex gap-2">
           <Link to={`${config.baseRoute}/${id}/edit`}>
             <Button variant="secondary">Edit</Button>
@@ -59,11 +61,15 @@ export const CrudDetail = ({ config }: CrudDetailProps) => {
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {config.listFields.map((field) => (
           <div key={field.key}>
-            <dt className="text-sm font-medium text-gray-500">{field.label}</dt>
-            <dd className="mt-1 text-base text-gray-900">{renderValue(field)}</dd>
+            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{field.label}</dt>
+            <dd className="mt-1 text-base text-gray-900 dark:text-gray-100">
+              {renderValue(field)}
+            </dd>
           </div>
         ))}
       </dl>
+
+      {renderExtra?.(item)}
     </Card>
   );
 };

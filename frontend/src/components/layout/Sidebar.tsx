@@ -30,7 +30,7 @@ export const Sidebar = () => {
   if (!isAuthenticated) return null;
 
   return (
-    <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white md:flex">
+    <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white md:flex dark:border-gray-700 dark:bg-gray-900">
       <nav className="flex-1 space-y-1 p-4">
         {links.map((link) => {
           const Icon = link.icon;
@@ -38,7 +38,7 @@ export const Sidebar = () => {
             <Link
               key={link.to}
               to={link.to}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
             >
               <Icon className="h-5 w-5" />
               {link.label}

@@ -34,7 +34,9 @@ export const UserList = () => {
             <tbody className="divide-y divide-gray-100">
               {users.map((user) => (
                 <tr key={user.users_id}>
-                  <td className="py-3">{user.users_first_name} {user.users_last_name}</td>
+                  <td className="py-3">
+                    {user.users_first_name} {user.users_last_name}
+                  </td>
                   <td className="py-3">{user.users_username}</td>
                   <td className="py-3">{user.users_email}</td>
                   <td className="py-3">

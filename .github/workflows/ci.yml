@@ -53,6 +53,22 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Lint frontend
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Check frontend formatting
+        working-directory: frontend
+        run: npm run format:check
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npm run e2e:install
+
+      - name: Run Playwright E2E tests
+        working-directory: frontend
+        run: npm run e2e
+
       - name: Verify migrations
         env:
           FLASK_APP: app.py

@@ -44,7 +44,9 @@ import { UserList } from '@/pages/admin/UserList';
 import { AuditLogs } from '@/pages/admin/AuditLogs';
 
 const withAuth = (element: React.ReactNode) => <ProtectedRoute>{element}</ProtectedRoute>;
-const withAdmin = (element: React.ReactNode) => <ProtectedRoute requireAdmin>{element}</ProtectedRoute>;
+const withAdmin = (element: React.ReactNode) => (
+  <ProtectedRoute requireAdmin>{element}</ProtectedRoute>
+);
 
 export const AppRoutes = () => (
   <Routes>

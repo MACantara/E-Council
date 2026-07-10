@@ -180,10 +180,10 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
 
 ### Backend
 - **Python** — 3.9+
-- **Flask** — server-rendered web framework and UI
+- **Flask** — server-rendered web framework (legacy UI, deprecated)
 - **FastAPI** — REST API backend (`api/`) with automatic OpenAPI docs, JWT auth, and Pydantic validation
 - **Uvicorn** — ASGI server for the FastAPI application
-- **Jinja2** — templating
+- **Jinja2** — legacy templating (deprecated in favor of the React SPA)
 
 ### Database
 - **SQLite / MySQL / PostgreSQL** — any SQLAlchemy-compatible engine (configurable via `SQLALCHEMY_DATABASE_URI` or `DATABASE_URL`)
@@ -236,7 +236,7 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
 - **Axios** — HTTP client with JWT access/refresh token interceptors
 - **React Hook Form + Zod** — form state and validation
 - **Recharts** — dashboard charts
-- **Jinja2 macros** — legacy reusable form and UI components (`templates/macros/`); being replaced by React components
+- **Jinja2 macros** — deprecated legacy reusable form and UI components (`templates/macros/`); retained for a soak period and will be removed after the React SPA is fully validated
 
 ### Testing & Tooling
 - **pytest** — test runner (config in `pytest.ini`)
@@ -395,7 +395,7 @@ E-Council/
 └── LICENSE                # MIT
 ```
 
-> **Note on architecture:** The application uses a modular Flask blueprint architecture plus a FastAPI REST API in `api/`. `app.py` contains the `create_app` factory for the server-rendered UI, and `api/main.py` contains the FastAPI application. Business logic is split into `routes/` (Flask), `api/routers/` (FastAPI), `services/`, `models/`, `repositories/`, `utils/`, and `config/`. The `repositories/` layer is the only layer that touches SQLAlchemy session internals; routes and services use `repo` and `get_repository()` for persistence. The `services/storage/`, `services/email/`, and `services/ai/` layers abstract file uploads, email delivery, and AI generation so the same backends work for both Flask and FastAPI. Legacy `static/css/` files were removed during the Tailwind CSS 4 migration.
+> **Note on architecture:** The application uses a modular Flask blueprint architecture plus a FastAPI REST API in `api/`. `app.py` contains the `create_app` factory for the legacy server-rendered UI, and `api/main.py` contains the FastAPI application. Business logic is split into `routes/` (Flask, deprecated), `api/routers/` (FastAPI), `services/`, `models/`, `repositories/`, `utils/`, and `config/`. The `repositories/` layer is the only layer that touches SQLAlchemy session internals; routes and services use `repo` and `get_repository()` for persistence. The `services/storage/`, `services/email/`, and `services/ai/` layers abstract file uploads, email delivery, and AI generation so the same backends work for both Flask and FastAPI. Legacy `static/css/` files were removed during the Tailwind CSS 4 migration. The React + TypeScript SPA in `frontend/` is the primary UI; the Jinja2 templates in `templates/` are deprecated and will be removed in a later phase after a soak period.
 
 ## Prerequisites
 

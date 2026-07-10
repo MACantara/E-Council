@@ -45,6 +45,11 @@ export interface MessageResponse {
   message: string;
 }
 
+export interface ImageItem {
+  url: string;
+  public_id?: string | null;
+}
+
 export interface Resource {
   [key: string]: unknown;
 }

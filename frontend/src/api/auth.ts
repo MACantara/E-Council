@@ -33,6 +33,8 @@ export interface User {
   users_email_verified: number;
   users_student_organization?: number | null;
   users_student_organization_position?: string | null;
+  profile_picture?: { url: string } | null;
+  signature?: { url: string } | null;
 }
 
 export const login = async (credentials: LoginCredentials): Promise<TokenResponse> => {

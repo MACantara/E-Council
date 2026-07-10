@@ -16,7 +16,8 @@ This document describes the architecture of the E-Council application following 
 - **Modular structure**: Flask blueprints in `routes/`, models in `models/`, utilities in `utils/`, and configuration in `config/`
 - **Clear separation**: Templates, static assets, utilities, configuration, and business logic are separated
 - **Refactoring complete**: The monolithic `app.py` was reduced to an application factory; remaining improvements are tracked in `docs/ROADMAP.md`
-- **Tailwind CSS 4 migration complete**: Legacy custom CSS files were removed and the UI uses Tailwind utility classes and shared Jinja2 macros
+- **Tailwind CSS 4 migration complete**: Legacy custom CSS files were removed and the UI uses Tailwind utility classes
+- **React + TypeScript SPA complete**: The React frontend in `frontend/` has feature parity with the legacy server-rendered UI and is the primary interface; the Jinja2 templates in `templates/` are deprecated and will be removed after a soak period
 - **FastAPI backend complete**: A FastAPI REST API is in `api/` with JWT auth, Pydantic schemas, and a lifespan-managed app. All Flask features (auth, account, admin, concept papers, events, meetings, board resolutions, financial, documentation, dashboard) are exposed under `/api/v1/`, and the service, storage, email, and AI abstraction layers are reused from both Flask and FastAPI.
 
 ## Directory Structure
@@ -631,7 +632,7 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 - **Forms**: React Hook Form + Zod
 - **Charts**: Recharts
 - **Icons**: Lucide React
-- **Legacy UI**: Jinja2 templates with vanilla JavaScript (`templates/` and `static/js/`) are still present and will be deprecated once the React SPA reaches full parity
+- **Legacy UI (deprecated)**: Jinja2 templates with vanilla JavaScript (`templates/` and `static/js/`) are retained for a soak period; the React SPA is the primary interface and will replace them in a later phase
 
 ### External Services
 - **Email**: SMTP (Gmail)
@@ -767,8 +768,8 @@ The current refactoring has established a solid foundation for future improvemen
 - **Approach**: See `docs/ROADMAP.md` Phase 3
 
 #### 4. Tech Stack Migration (Backend Complete)
-- **Current**: FastAPI backend is complete in `api/` with JWT auth, Pydantic schemas, and all feature routers mounted under `/api/v1/`. The Flask server-rendered UI remains in place and functional.
-- **Future**: Migrate the frontend to React/TypeScript (Phase 4.21) and eventually retire the Jinja2 templates once parity is reached.
+- **Current**: FastAPI backend is complete in `api/` with JWT auth, Pydantic schemas, and all feature routers mounted under `/api/v1/`. The Flask server-rendered UI is deprecated and retained only for the soak period.
+- **Future**: Retire the Jinja2 templates after the soak period; the React/TypeScript SPA (Phase 4.21) is the primary interface.
 - **Approach**: API-first design; Flask routes were migrated to FastAPI endpoints feature-by-feature (see `docs/ROADMAP.md` Phases 4.10-4.20).
 
 ### Migration Strategy

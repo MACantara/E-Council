@@ -10,6 +10,7 @@ interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  refetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -61,6 +62,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const refetchUser = async () => {
+    const currentUser = await getMe();
+    setUser(currentUser);
+  };
+
   const isAuthenticated = user !== null;
   const isAdmin = user?.users_role === 'Admin';
 
@@ -74,6 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         logout,
+        refetchUser,
       }}
     >
       {children}

@@ -39,12 +39,30 @@ export const conceptPapers: ResourceDefinition = {
   statusField: 'concept_paper_forms_status',
   fields: [
     { name: 'concept_paper_forms_subject', label: 'Subject', required: true },
-    { name: 'concept_paper_forms_semester', label: 'Semester', type: 'select', options: SEMESTER_OPTIONS },
+    {
+      name: 'concept_paper_forms_semester',
+      label: 'Semester',
+      type: 'select',
+      options: SEMESTER_OPTIONS,
+    },
     { name: 'concept_paper_forms_academic_year', label: 'Academic Year' },
-    { name: 'concept_paper_forms_status', label: 'Status', type: 'select', options: STATUS_OPTIONS },
+    {
+      name: 'concept_paper_forms_status',
+      label: 'Status',
+      type: 'select',
+      options: STATUS_OPTIONS,
+    },
     { name: 'concept_paper_forms_location', label: 'Location' },
-    { name: 'concept_paper_forms_event_start_date_and_time', label: 'Start Date & Time', type: 'datetime-local' },
-    { name: 'concept_paper_forms_event_end_date_and_time', label: 'End Date & Time', type: 'datetime-local' },
+    {
+      name: 'concept_paper_forms_event_start_date_and_time',
+      label: 'Start Date & Time',
+      type: 'datetime-local',
+    },
+    {
+      name: 'concept_paper_forms_event_end_date_and_time',
+      label: 'End Date & Time',
+      type: 'datetime-local',
+    },
     { name: 'concept_paper_forms_body', label: 'Body', type: 'textarea' },
     { name: 'concept_paper_forms_descriptions', label: 'Descriptions', type: 'textarea' },
     { name: 'concept_paper_forms_expected_number_of_participants', label: 'Expected Participants' },
@@ -93,9 +111,19 @@ export const meetings: ResourceDefinition = {
   statusField: 'minutes_of_the_meeting_status',
   fields: [
     { name: 'minutes_of_the_meeting_agenda', label: 'Agenda', required: true },
-    { name: 'minutes_of_the_meeting_semester', label: 'Semester', type: 'select', options: SEMESTER_OPTIONS },
+    {
+      name: 'minutes_of_the_meeting_semester',
+      label: 'Semester',
+      type: 'select',
+      options: SEMESTER_OPTIONS,
+    },
     { name: 'minutes_of_the_meeting_academic_year', label: 'Academic Year' },
-    { name: 'minutes_of_the_meeting_status', label: 'Status', type: 'select', options: STATUS_OPTIONS },
+    {
+      name: 'minutes_of_the_meeting_status',
+      label: 'Status',
+      type: 'select',
+      options: STATUS_OPTIONS,
+    },
     { name: 'minutes_of_the_meeting_presiding_officer', label: 'Presiding Officer' },
     { name: 'minutes_of_the_meeting_date', label: 'Date', type: 'datetime-local' },
     { name: 'minutes_of_the_meeting_notes', label: 'Notes', type: 'textarea' },
@@ -117,7 +145,12 @@ export const boardResolutions: ResourceDefinition = {
   fields: [
     { name: 'board_resolutions_title', label: 'Title', required: true },
     { name: 'board_resolutions_description', label: 'Description', type: 'textarea' },
-    { name: 'board_resolutions_semester', label: 'Semester', type: 'select', options: SEMESTER_OPTIONS },
+    {
+      name: 'board_resolutions_semester',
+      label: 'Semester',
+      type: 'select',
+      options: SEMESTER_OPTIONS,
+    },
     { name: 'board_resolutions_academic_year', label: 'Academic Year' },
     { name: 'board_resolutions_status', label: 'Status', type: 'select', options: STATUS_OPTIONS },
     { name: 'board_resolutions_date', label: 'Date', type: 'datetime-local' },
@@ -139,7 +172,12 @@ export const financialReports: ResourceDefinition = {
   statusField: 'financial_reports_status',
   fields: [
     { name: 'financial_reports_title', label: 'Title', required: true },
-    { name: 'financial_reports_semester', label: 'Semester', type: 'select', options: SEMESTER_OPTIONS },
+    {
+      name: 'financial_reports_semester',
+      label: 'Semester',
+      type: 'select',
+      options: SEMESTER_OPTIONS,
+    },
     { name: 'financial_reports_academic_year', label: 'Academic Year' },
     { name: 'financial_reports_status', label: 'Status', type: 'select', options: STATUS_OPTIONS },
     { name: 'financial_reports_date', label: 'Date', type: 'datetime-local' },
@@ -160,16 +198,34 @@ export const documentation: ResourceDefinition = {
   ],
   statusField: 'documentation_status',
   fields: [
-    { name: 'documentation_type', label: 'Type', type: 'select', options: [
-      { value: 'Activity Report', label: 'Activity Report' },
-      { value: 'After Documentation', label: 'After Documentation' },
-    ]},
-    { name: 'documentation_semester', label: 'Semester', type: 'select', options: SEMESTER_OPTIONS },
+    {
+      name: 'documentation_type',
+      label: 'Type',
+      type: 'select',
+      options: [
+        { value: 'Activity Report', label: 'Activity Report' },
+        { value: 'After Documentation', label: 'After Documentation' },
+      ],
+    },
+    {
+      name: 'documentation_semester',
+      label: 'Semester',
+      type: 'select',
+      options: SEMESTER_OPTIONS,
+    },
     { name: 'documentation_academic_year', label: 'Academic Year' },
     { name: 'documentation_status', label: 'Status', type: 'select', options: STATUS_OPTIONS },
-    { name: 'documentation_date_of_submission', label: 'Date of Submission', type: 'datetime-local' },
+    {
+      name: 'documentation_date_of_submission',
+      label: 'Date of Submission',
+      type: 'datetime-local',
+    },
     { name: 'documentation_rating', label: 'Rating', type: 'number' },
-    { name: 'documentation_comments_suggestions', label: 'Comments / Suggestions', type: 'textarea' },
+    {
+      name: 'documentation_comments_suggestions',
+      label: 'Comments / Suggestions',
+      type: 'textarea',
+    },
   ],
 };
 

@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+.env.e2e.local
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +23,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright
+storageState.json
+test-results/
+playwright-report/

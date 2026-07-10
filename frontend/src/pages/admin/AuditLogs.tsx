@@ -34,9 +34,13 @@ export const AuditLogs = () => {
                 <tr key={log.audit_log_id}>
                   <td className="py-3">{new Date(log.audit_log_timestamp).toLocaleString()}</td>
                   <td className="py-3">{log.audit_log_action}</td>
-                  <td className="py-3">{log.audit_log_entity_type} #{log.audit_log_entity_id}</td>
                   <td className="py-3">
-                    {log.user ? `${log.user.users_first_name} ${log.user.users_last_name}` : 'System'}
+                    {log.audit_log_entity_type} #{log.audit_log_entity_id}
+                  </td>
+                  <td className="py-3">
+                    {log.user
+                      ? `${log.user.users_first_name} ${log.user.users_last_name}`
+                      : 'System'}
                   </td>
                 </tr>
               ))}

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { fetchResources, deleteResource } from '@/api/resources';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -39,8 +40,13 @@ export const CrudList = ({ config, createLabel = 'Create' }: CrudListProps) => {
 
   const handleDelete = async (id: string | number) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
-    await deleteResource(config.endpoint, id);
-    refetch();
+    try {
+      await deleteResource(config.endpoint, id);
+      toast.success(`${config.title} deleted successfully`);
+      refetch();
+    } catch (error) {
+      toast.error((error as Error)?.message || 'Failed to delete item.');
+    }
   };
 
   const renderCell = (item: Record<string, unknown>, field: CrudListField) => {
@@ -55,7 +61,12 @@ export const CrudList = ({ config, createLabel = 'Create' }: CrudListProps) => {
   };
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <Alert>Error loading {config.title.toLowerCase()}. {(error as Error).message}</Alert>;
+  if (error)
+    return (
+      <Alert>
+        Error loading {config.title.toLowerCase()}. {(error as Error).message}
+      </Alert>
+    );
 
   const items = data?.data?.items ?? [];
 
@@ -115,11 +126,7 @@ export const CrudList = ({ config, createLabel = 'Create' }: CrudListProps) => {
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(String(id))}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(String(id))}>
                           <Trash className="h-4 w-4 text-red-600" />
                         </Button>
                       </div>

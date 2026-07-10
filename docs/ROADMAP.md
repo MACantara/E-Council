@@ -1069,11 +1069,11 @@ frontend/
   - Account routes (`/account/profile`) replacing `templates/account/`. `/account/settings` is future polish.
   - Admin routes (`/admin/users`, `/admin/audit-logs`) for `Admin` and `Student Council Officer` roles.
 - [x] Add protected route guards in `frontend/src/routes/` that redirect unauthenticated users to `/login` and non-admin users away from `/admin/*`.
-- [~] Implement form handling with React Hook Form; Zod validation is not yet wired into the generic form components.
-- [ ] Implement file upload UX for receipts, signatures, profile pictures, and documentation images using the FastAPI endpoints (`/api/v1/account/profile-picture`, `/api/v1/account/signature`, `/api/v1/events/{id}/transactions/{transaction_id}/receipt`, `/api/v1/documentation/{id}/files`).
+- [x] Implement form handling with React Hook Form; wire Zod validation into the generic `Field` and `CrudForm` components.
+- [x] Implement file upload UX for receipts, signatures, profile pictures, and documentation images using the FastAPI endpoints (`/api/v1/account/profile-picture`, `/api/v1/account/signature`, `/api/v1/events/{id}/transactions/{transaction_id}/receipt`, `/api/v1/documentation/{id}/files`).
 - [x] Install `recharts` and rebuild dashboard charts with `BarChart` and `PieChart` using the same theme variables as the existing design.
-- [ ] Implement the theme toggle and persist it in `localStorage`, matching the current OS/default behavior.
-- [ ] Add a global error boundary and toast/notification system for API errors and success messages.
+- [x] Implement the theme toggle and persist it in `localStorage`, matching the current OS/default behavior.
+- [x] Add a global error boundary and toast/notification system for API errors and success messages.
 - [x] Add `npm run dev`, `npm run build`, and `npm run preview` scripts to `package.json`.
 - [x] Update `README.md` with the new frontend setup, run commands, and environment variables.
 - [x] Update `ARCHITECTURE.md` to document the `frontend/` stack, build pipeline, and how it communicates with the FastAPI backend.
@@ -1082,11 +1082,11 @@ frontend/
   - Run `npm ci` and `npm run build` in `frontend/`.
   - Run the FastAPI backend smoke test on a port that serves the built static files or alongside the dev server.
   - Run the full `pytest` suite.
-- [ ] Add frontend linting and formatting with ESLint and Prettier to CI. (Current `package.json` only has `oxlint` for lint.)
-- [ ] Add end-to-end tests with Playwright for the critical flows: login, create concept paper, create event, create meeting, generate board resolution, and admin user management.
-- [ ] Deprecate (but do not delete) the Flask/Jinja2 templates once React parity is verified; remove them in a later phase after a soak period.
+- [x] Add frontend linting and formatting with ESLint and Prettier to CI.
+- [x] Add end-to-end tests with Playwright for the critical flows: login, create concept paper, create event, create meeting, generate board resolution, and admin user management.
+- [x] Deprecate (but do not delete) the Flask/Jinja2 templates once React parity is verified; remove them in a later phase after a soak period.
 
-**Acceptance criteria**: The React + TypeScript frontend has feature parity with the current Flask server-rendered UI, all existing backend tests still pass, the full Playwright suite passes, and the CI pipeline builds and tests both the frontend and the FastAPI backend. *Current status: the scaffold and all primary routes are implemented; `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, and `.github/workflows/ci.yml` have been updated for the new frontend; the project builds and the backend API is exercised end-to-end. Remaining work is tracked in the checklist above (Zod validation, file uploads, theme toggle, error boundary/toasts, frontend linting/formatting, Playwright E2E tests, and full field-level parity for nested forms).*
+**Acceptance criteria**: The React + TypeScript frontend has feature parity with the current Flask server-rendered UI, all existing backend tests still pass, the full Playwright suite passes, the CI pipeline builds and tests both the frontend and the FastAPI backend, and the legacy Jinja2 templates are documented as deprecated.
 
 **Effort**: Extra Large
 

@@ -6,7 +6,8 @@ import { type Control, type FieldValues, type Path, Controller } from 'react-hoo
 export interface FieldConfig {
   name: string;
   label: string;
-  type?: 'text' | 'textarea' | 'select' | 'datetime-local' | 'number' | 'email' | 'password' | 'date';
+  type?:
+    'text' | 'textarea' | 'select' | 'datetime-local' | 'number' | 'email' | 'password' | 'date';
   options?: SelectOption[];
   required?: boolean;
   placeholder?: string;
@@ -32,13 +33,17 @@ export const Field = <T extends FieldValues>({ config, control }: FieldProps<T>)
       rules={{ required: config.required ? `${config.label} is required` : false }}
       render={({ field, fieldState }) => (
         <div className="space-y-1">
-          <label htmlFor={config.name} className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor={config.name}
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             {config.label}
             {config.required && <span className="text-red-500"> *</span>}
           </label>
           {config.type === 'textarea' ? (
             <Textarea
               id={config.name}
+              name={field.name}
               placeholder={config.placeholder}
               value={toInputValue(field.value)}
               onChange={(e) => field.onChange(e.target.value)}
@@ -46,6 +51,7 @@ export const Field = <T extends FieldValues>({ config, control }: FieldProps<T>)
           ) : config.type === 'select' ? (
             <Select
               id={config.name}
+              name={field.name}
               options={config.options || []}
               value={toInputValue(field.value)}
               onChange={(e) => field.onChange(e.target.value)}
@@ -53,17 +59,22 @@ export const Field = <T extends FieldValues>({ config, control }: FieldProps<T>)
           ) : (
             <Input
               id={config.name}
+              name={field.name}
               type={config.type || 'text'}
               placeholder={config.placeholder}
               value={toInputValue(field.value)}
               onChange={(e) =>
-                field.onChange(config.type === 'number' ? Number(e.target.value) : e.target.value)
+                field.onChange(
+                  config.type === 'number'
+                    ? e.target.value === ''
+                      ? ''
+                      : Number(e.target.value)
+                    : e.target.value
+                )
               }
             />
           )}
-          {fieldState.error && (
-            <p className="text-sm text-red-600">{fieldState.error.message}</p>
-          )}
+          {fieldState.error && <p className="text-sm text-red-600">{fieldState.error.message}</p>}
         </div>
       )}
     />
