@@ -930,21 +930,163 @@ Phase 4 prepares the application for a real production environment and explores 
 
 ### 4.21 Migrate to React + TypeScript frontend
 
-**Why it matters**: A modern React frontend with TypeScript provides type-safe UI components, a better development experience, and full decoupling from the backend. It also enables richer interactivity and a shared component library.
+**Why it matters**: A modern React frontend with TypeScript provides type-safe UI components, a better development experience, and full decoupling from the backend. It also enables richer interactivity, a shared component library, and a single-page application that consumes the FastAPI REST API.
 
-**Scope**: New `frontend/` with React + TypeScript + Tailwind CSS
+**Scope**: New `frontend/` directory with React + TypeScript + Vite + Tailwind CSS + React Router. Replaces the Jinja2 server-rendered UI once parity is reached.
+
+**Prerequisites**
+- [x] Phase 4.20 is complete and the FastAPI backend is the primary API.
+
+**Architecture and technology choices**
+- Use **Vite** with the React + TypeScript template.
+- Use **Tailwind CSS 4** via the `@tailwindcss/vite` Vite plugin and match the existing `static/css/input.css` design tokens.
+- Use **React Router v7** for client-side routing.
+- Use **TanStack Query (React Query)** for server state, caching, and mutations.
+- Use **Axios** for the HTTP client with interceptors for JWT access/refresh tokens.
+- Use **Zod** for runtime form validation; use **React Hook Form** for form state.
+- Use **Lucide React** for icons (replaces `lucide` CDN).
+- Use **Recharts** for dashboard charts (replaces `charts-theme.js`).
+
+**Directory structure**
+```
+frontend/
+├── public/                       # Static assets (favicon, hero images)
+├── src/
+│   ├── api/                      # Axios instance, query keys, and API functions
+│   │   ├── axios.ts              # Base URL, request/response interceptors, token refresh
+│   │   ├── auth.ts               # /api/v1/auth/* endpoints
+│   │   ├── conceptPapers.ts
+│   │   ├── events.ts
+│   │   ├── meetings.ts
+│   │   ├── boardResolutions.ts
+│   │   ├── financial.ts
+│   │   ├── documentation.ts
+│   │   ├── dashboard.ts
+│   │   └── account.ts
+│   ├── components/               # Shared UI components
+│   │   ├── ui/                   # Atomic components (Button, Card, Input, Select, Badge, Modal)
+│   │   ├── layout/               # RootLayout, Navbar, Sidebar, Footer
+│   │   └── forms/                # Form wrappers and field components
+│   ├── hooks/                    # Custom React hooks (useAuth, useCurrentUser, useApiError)
+│   ├── pages/                    # Route-level pages
+│   │   ├── auth/
+│   │   │   ├── Login.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── ForgotPassword.tsx
+│   │   │   └── ResetPassword.tsx
+│   │   ├── dashboard/
+│   │   │   └── Dashboard.tsx
+│   │   ├── concept-papers/
+│   │   │   ├── ConceptPaperList.tsx
+│   │   │   ├── ConceptPaperCreate.tsx
+│   │   │   ├── ConceptPaperDetail.tsx
+│   │   │   └── ConceptPaperEdit.tsx
+│   │   ├── events/
+│   │   │   ├── EventList.tsx
+│   │   │   ├── EventCreate.tsx
+│   │   │   ├── EventDetail.tsx
+│   │   │   └── EventEdit.tsx
+│   │   ├── meetings/
+│   │   │   ├── MeetingList.tsx
+│   │   │   ├── MeetingCreate.tsx
+│   │   │   ├── MeetingDetail.tsx
+│   │   │   └── MeetingEdit.tsx
+│   │   ├── board-resolutions/
+│   │   │   ├── BoardResolutionList.tsx
+│   │   │   ├── BoardResolutionCreate.tsx
+│   │   │   ├── BoardResolutionDetail.tsx
+│   │   │   └── BoardResolutionEdit.tsx
+│   │   ├── financial/
+│   │   │   ├── FinancialList.tsx
+│   │   │   ├── FinancialCreate.tsx
+│   │   │   ├── FinancialDetail.tsx
+│   │   │   └── FinancialEdit.tsx
+│   │   ├── documentation/
+│   │   │   ├── DocumentationList.tsx
+│   │   │   ├── DocumentationCreate.tsx
+│   │   │   ├── DocumentationDetail.tsx
+│   │   │   └── DocumentationEdit.tsx
+│   │   ├── account/
+│   │   │   ├── Profile.tsx
+│   │   │   └── Settings.tsx
+│   │   └── admin/
+│   │       ├── UserList.tsx
+│   │       └── AuditLogs.tsx
+│   ├── providers/                # AuthProvider, ThemeProvider
+│   ├── routes/                   # Route definitions and protected-route guards
+│   ├── stores/                   # Optional Zustand store for global UI state
+│   ├── types/                    # Shared TypeScript interfaces (mirrors FastAPI schemas)
+│   ├── utils/                    # Formatting, validation helpers, and error parsers
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css                 # @import "tailwindcss" and custom CSS variables
+├── .env.example                  # VITE_API_BASE_URL, VITE_APP_TITLE
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
 
 **Checklist**
-- [ ] Complete Phase 4.20 (FastAPI backend + SPA) before starting.
-- [ ] Create a React frontend with TypeScript and Vite (or a similar build tool).
-- [ ] Port templates to React components/pages, preserving the Tailwind CSS 4 design system and existing macro behavior.
-- [ ] Build shared React components (Button, Card, Input, Select, etc.) to replace the Jinja2 macro system.
-- [ ] Add an API client layer (e.g., TanStack Query, Axios, or `fetch` wrappers) with TypeScript types.
-- [ ] Update CI/CD to build the frontend and run the FastAPI backend.
-- [ ] Update `README.md`, `ARCHITECTURE.md`, and `DESIGN.md` to document the new frontend stack.
-- [ ] Add end-to-end tests for the most critical user flows.
+- [x] Complete Phase 4.20 (FastAPI backend + SPA) before starting.
+- [ ] Create `frontend/` with Vite + React + TypeScript and a `package.json` with the pinned versions above.
+- [ ] Configure `frontend/tsconfig.json` with strict mode, path aliases (`@/` for `src/`), and Node types.
+- [ ] Add `frontend/.env.example` with `VITE_API_BASE_URL=http://localhost:8000` and `VITE_APP_TITLE=E-Council`.
+- [ ] Install Tailwind CSS 4 as a Vite plugin: `npm install tailwindcss @tailwindcss/vite`.
+- [ ] Register the Tailwind plugin in `frontend/vite.config.ts`:
+  ```ts
+  import { defineConfig } from 'vite';
+  import react from '@vitejs/plugin-react';
+  import tailwindcss from '@tailwindcss/vite';
 
-**Acceptance criteria**: The React + TypeScript frontend has feature parity with the current Flask server-rendered UI and all end-to-end tests pass.
+  export default defineConfig({
+    plugins: [react(), tailwindcss()],
+  });
+  ```
+- [ ] Import Tailwind in `frontend/src/index.css` with `@import "tailwindcss";` and copy the custom design tokens from `static/css/input.css` into the same file.
+- [ ] Build the shared UI component library in `frontend/src/components/ui/`: `Button`, `Card`, `Input`, `Textarea`, `Select`, `Badge`, `Modal`, `Alert`, `LoadingSpinner`, and `EmptyState`. Match the existing Tailwind class names in the Jinja2 macros.
+- [ ] Build layout components in `frontend/src/components/layout/`: `RootLayout`, `Navbar`, `Sidebar`, `Footer`, and `MobileMenu`. Preserve the responsive two-column layout and theme toggle.
+- [ ] Build `frontend/src/api/axios.ts` with:
+  - Base URL read from `VITE_API_BASE_URL`.
+  - Request interceptor attaching `Authorization: Bearer <access_token>`.
+  - Response interceptor handling `401` by refreshing the access token via `POST /api/v1/auth/refresh` and retrying the request once.
+  - Queue failed requests during token refresh and redirect to `/login` if refresh fails.
+- [ ] Create `frontend/src/providers/AuthProvider.tsx` that:
+  - Stores access/refresh tokens in `httpOnly` cookies if possible; otherwise use `localStorage` with a clear security note.
+  - Exposes `user`, `isAuthenticated`, `isAdmin`, `login`, `logout`, and `register`.
+  - Calls `GET /api/v1/account/me` on mount to restore the session.
+- [ ] Generate or hand-write TypeScript types in `frontend/src/types/` that mirror the FastAPI response schemas from `/docs`.
+- [ ] Create `frontend/src/api/*.ts` modules for each feature using TanStack Query and Axios.
+- [ ] Port each Flask/Jinja2 page to a React route:
+  - Auth routes (`/login`, `/register`, `/forgot-password`, `/reset-password`) replacing `templates/auth/`.
+  - Dashboard route (`/`) replacing `templates/dashboard/dashboard.html`.
+  - Concept paper routes (`/concept-papers`, `/concept-papers/:id`, `/concept-papers/create`, `/concept-papers/:id/edit`) replacing `templates/concept-papers/`.
+  - Event routes (`/events`, `/events/:id`, `/events/create`, `/events/:id/edit`) replacing `templates/events/`.
+  - Meeting routes (`/meetings`, `/meetings/:id`, `/meetings/create`, `/meetings/:id/edit`) replacing `templates/minutes-of-meeting/`.
+  - Board resolution routes (`/board-resolutions`, `/board-resolutions/:id`, `/board-resolutions/create`, `/board-resolutions/:id/edit`) replacing `templates/board-resolutions/`.
+  - Financial routes (`/financial-reports`, `/financial-reports/:id`, `/financial-reports/create`, `/financial-reports/:id/edit`) replacing `templates/financial-reports/`.
+  - Documentation routes (`/documentation`, `/documentation/:id`, `/documentation/create`, `/documentation/:id/edit`) replacing `templates/documentation/`.
+  - Account routes (`/account/profile`, `/account/settings`) replacing `templates/account/`.
+  - Admin routes (`/admin/users`, `/admin/audit-logs`) for `Admin` and `Student Council Officer` roles.
+- [ ] Add protected route guards in `frontend/src/routes/` that redirect unauthenticated users to `/login` and non-admin users away from `/admin/*`.
+- [ ] Implement form handling with React Hook Form + Zod, matching server-side validation rules exactly.
+- [ ] Implement file upload UX for receipts, signatures, profile pictures, and documentation images using the FastAPI endpoints (`/api/v1/account/profile-picture`, `/api/v1/account/signature`, `/api/v1/events/{id}/transactions/{transaction_id}/receipt`, `/api/v1/documentation/{id}/files`).
+- [ ] Install `recharts` (`npm install recharts`) and rebuild dashboard charts with `BarChart`, `LineChart`, `PieChart`, etc., using the same color/theme variables as `static/js/charts-theme.js`.
+- [ ] Implement the theme toggle and persist it in `localStorage`, matching the current OS/default behavior.
+- [ ] Add a global error boundary and toast/notification system for API errors and success messages.
+- [ ] Add `npm run dev`, `npm run build`, and `npm run preview` scripts to `package.json`.
+- [ ] Update `README.md` with the new frontend setup, run commands, and environment variables.
+- [ ] Update `ARCHITECTURE.md` to document the `frontend/` stack, build pipeline, and how it communicates with the FastAPI backend.
+- [ ] Update `DESIGN.md` to replace the Jinja2 macro guidance with the React component library conventions and Tailwind v4 usage.
+- [ ] Update `.github/workflows/ci.yml` to:
+  - Run `npm ci` and `npm run build` in `frontend/`.
+  - Run the FastAPI backend smoke test on a port that serves the built static files or alongside the dev server.
+  - Run the full `pytest` suite.
+- [ ] Add frontend linting and formatting with ESLint and Prettier to CI.
+- [ ] Add end-to-end tests with Playwright for the critical flows: login, create concept paper, create event, create meeting, generate board resolution, and admin user management.
+- [ ] Deprecate (but do not delete) the Flask/Jinja2 templates once React parity is verified; remove them in a later phase after a soak period.
+
+**Acceptance criteria**: The React + TypeScript frontend has feature parity with the current Flask server-rendered UI, all existing backend tests still pass, the full Playwright suite passes, and the CI pipeline builds and tests both the frontend and the FastAPI backend.
 
 **Effort**: Extra Large
 
