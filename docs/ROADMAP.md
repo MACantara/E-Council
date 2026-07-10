@@ -1099,14 +1099,14 @@ frontend/
 **Scope**: `seeds/`, `factories/`, `tests/conftest.py`, `README.md`, `cli/` or `manage.py`
 
 **Checklist**
-- [ ] Create a `seeds/` package with idempotent seed scripts for each domain (departments, users, events, concept papers, documents, financial reports, meetings, board resolutions).
-- [ ] Create sample users with realistic roles (e.g., `Admin`, `Student Council Officer`, `Faculty`, `Staff`) and strong, documented demo passwords.
-- [ ] Reuse or create `factory-boy` factories for test data so seeds and tests share the same data generation logic.
-- [ ] Add a CLI command or management script (e.g., `flask seed` or `python seed.py`) that runs all seed scripts.
-- [ ] Ensure seeding is safe by default and does not run in production unless explicitly enabled.
-- [ ] Make seeding idempotent so running it twice does not create duplicates.
-- [ ] Update `README.md` with instructions on how to seed a development or test environment.
-- [ ] Add integration tests that verify the seed scripts create the expected records and associations.
+- [x] Create a `seeds/` package with idempotent seed scripts for each domain (departments, users, events, concept papers, documents, financial reports, meetings, board resolutions).
+- [x] Create sample users with realistic roles (e.g., `Admin`, `Student Council Officer`, `Faculty`, `Staff`) and strong, documented demo passwords.
+- [x] Reuse or create `factory-boy` factories for test data so seeds and tests share the same data generation logic.
+- [x] Add a CLI command or management script (e.g., `flask seed` or `python seed.py`) that runs all seed scripts.
+- [x] Ensure seeding is safe by default and does not run in production unless explicitly enabled.
+- [x] Make seeding idempotent so running it twice does not create duplicates.
+- [x] Update `README.md` with instructions on how to seed a development or test environment.
+- [x] Add integration tests that verify the seed scripts create the expected records and associations.
 
 **Acceptance criteria**: A new developer can run a single command and have a populated environment with users, departments, and representative records for all major features. End-to-end tests can depend on the seeded data.
 
@@ -1176,3 +1176,4 @@ For each recommendation:
 - **2026-07-09**: Completed Phase 4.6 database abstraction layer. Added `BaseRepository`, `repo`, and `get_repository()` in `repositories/`; refactored `routes/`, `services/`, `utils/`, and `forms/` to use the repository layer; updated `DatabaseConfig` to support SQLite, MySQL, and PostgreSQL; added `tests/test_repositories.py` integration tests; updated `ARCHITECTURE.md` and `README.md`.
 - **2026-07-10**: Completed Phase 4.20 FastAPI integration and parity. Wired all feature routers into `api/main.py`, added root/health/API-discovery endpoints, added `api/tests/test_integration.py`, updated CI with FastAPI smoke test, updated `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, and `.env.example`, and added `docs/adr/002-fastapi-migration-completion.md`. Full suite: `388 passed, 1 skipped`.
 - **2026-07-10**: Completed Phase 4.21 React + TypeScript frontend scaffold. Added `frontend/` with Vite, React 19, TypeScript 6, Tailwind CSS 4 via `@tailwindcss/vite`, React Router, TanStack Query, Axios, React Hook Form, Zod, Recharts, and Lucide React. Implemented `AuthProvider`, protected routes, shared UI components, and CRUD pages for concept papers, events, meetings, board resolutions, financial reports, documentation, account, and admin. Added CORS to `api/main.py` to serve the SPA. Verified `npm run build` and `pytest -q` (`395 passed, 1 skipped`).
+- **2026-07-10**: Completed Phase 4.22 seeding. Added the `seeds/` package with idempotent seed scripts for departments, users, signatories, events, concept papers, meetings, financial reports, board resolutions, and documentation. Reused `factory-boy` factories in `tests/factories.py`. Added `seed.py` CLI with `--force` protection and production guard. Updated `README.md` with seeding instructions and demo credentials. Added `tests/test_seeds.py` integration tests. Verified `pytest -q`.

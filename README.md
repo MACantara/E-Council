@@ -495,6 +495,29 @@ flask db upgrade
 
 Migrations are versioned in the `migrations/` directory. For a fresh database, this will create the full schema. For an existing database, it will apply any pending migrations.
 
+### 7. Seed Sample Data (Optional)
+
+Populate the database with representative departments, users, events, concept papers, meeting minutes, financial reports, board resolutions, and documentation for local development and demos:
+
+```bash
+python seed.py
+```
+
+The script is idempotent, so you can run it more than once without creating duplicates. By default, it refuses to run when `FLASK_ENV=production` to avoid overwriting production data. Override this with the `--force` flag if you are absolutely sure:
+
+```bash
+python seed.py --force
+```
+
+Sample demo accounts are created with the password `DemoPass123!`:
+
+| Username | Email | Role |
+|----------|-------|------|
+| `admin` | `admin@example.com` | Admin |
+| `officer` | `officer@example.com` | Student Council Officer |
+| `faculty` | `faculty@example.com` | Faculty |
+| `staff` | `staff@example.com` | Staff |
+
 ## Running the Application
 
 Start the Flask development server:
