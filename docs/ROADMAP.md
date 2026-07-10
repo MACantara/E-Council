@@ -1121,16 +1121,16 @@ frontend/
 **Scope**: `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, `HAND-OVER.md`, `TESTING.md`, `docs/adr/`, API docs, `docs/ROADMAP.md`
 
 **Checklist**
-- [ ] Audit all documentation files against the current codebase and identify stale or missing sections.
-- [ ] Update `README.md` with current setup steps, environment variables, dependency installation, and run commands (including FastAPI, Celery, and Tailwind CSS).
-- [ ] Update `ARCHITECTURE.md` with the repository pattern, service abstractions, FastAPI entry point, and directory structure.
-- [ ] Update `DESIGN.md` with the current Tailwind CSS 4 design system, shared components, and macro/component mapping.
-- [ ] Update `HAND-OVER.md` with deployment, environment configuration, and operational runbook notes.
-- [ ] Update `TESTING.md` with the full test suite commands, fixtures, and how to run FastAPI and E2E tests.
-- [ ] Add or update ADRs for any new major architectural decisions made during Phase 4.
-- [ ] Document API endpoints (using FastAPI's OpenAPI docs as a source) and how to authenticate.
-- [ ] Verify that all environment variables in `.env.example` (or `.env`) are documented.
-- [ ] Add a final changelog entry and ensure the roadmap decision log is complete.
+- [x] Audit all documentation files against the current codebase and identify stale or missing sections.
+- [x] Update `README.md` with current setup steps, environment variables, dependency installation, and run commands (including FastAPI, Celery, and Tailwind CSS).
+- [x] Update `ARCHITECTURE.md` with the repository pattern, service abstractions, FastAPI entry point, and directory structure.
+- [x] Update `DESIGN.md` with the current Tailwind CSS 4 design system, shared components, and macro/component mapping.
+- [x] Update `HAND-OVER.md` with deployment, environment configuration, and operational runbook notes.
+- [x] Update `TESTING.md` with the full test suite commands, fixtures, and how to run FastAPI and E2E tests.
+- [x] Add or update ADRs for any new major architectural decisions made during Phase 4.
+- [x] Document API endpoints (using FastAPI's OpenAPI docs as a source) and how to authenticate.
+- [x] Verify that all environment variables in `.env.example` (or `.env`) are documented.
+- [x] Add a final changelog entry and ensure the roadmap decision log is complete.
 
 **Acceptance criteria**: Every architectural change in Phase 4 is reflected in documentation. A new developer can clone the repository, follow the README, and start a fully functional local environment with tests passing.
 
@@ -1177,3 +1177,4 @@ For each recommendation:
 - **2026-07-10**: Completed Phase 4.20 FastAPI integration and parity. Wired all feature routers into `api/main.py`, added root/health/API-discovery endpoints, added `api/tests/test_integration.py`, updated CI with FastAPI smoke test, updated `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, and `.env.example`, and added `docs/adr/002-fastapi-migration-completion.md`. Full suite: `388 passed, 1 skipped`.
 - **2026-07-10**: Completed Phase 4.21 React + TypeScript frontend scaffold. Added `frontend/` with Vite, React 19, TypeScript 6, Tailwind CSS 4 via `@tailwindcss/vite`, React Router, TanStack Query, Axios, React Hook Form, Zod, Recharts, and Lucide React. Implemented `AuthProvider`, protected routes, shared UI components, and CRUD pages for concept papers, events, meetings, board resolutions, financial reports, documentation, account, and admin. Added CORS to `api/main.py` to serve the SPA. Verified `npm run build` and `pytest -q` (`395 passed, 1 skipped`).
 - **2026-07-10**: Completed Phase 4.22 seeding. Added the `seeds/` package with idempotent seed scripts for departments, users, signatories, events, concept papers, meetings, financial reports, board resolutions, and documentation. Reused `factory-boy` factories in `tests/factories.py`. Added `seed.py` CLI with `--force` protection and production guard. Updated `README.md` with seeding instructions and demo credentials. Added `tests/test_seeds.py` integration tests. Verified `pytest -q`.
+- **2026-07-10**: Completed Phase 4.23 documentation audit. Updated `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, `HAND-OVER.md`, `TESTING.md`, `.env.example`, and `docs/ROADMAP.md`; added `docs/API.md` and ADRs 003-005 (React SPA, service abstractions, idempotent seeding). Verified `pytest -q`.

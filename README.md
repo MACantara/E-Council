@@ -270,6 +270,10 @@ E-Council/
 │   ├── ROADMAP.md
 │   └── TESTING.md
 ├── extensions.py          # Flask extensions (SQLAlchemy, Login, Mail, CSRF, serializer)
+├── seed.py                # Seed script for development and demo data
+├── seeds/                 # Idempotent seed scripts
+├── tasks.py               # Celery task definitions
+├── wsgi.py                # WSGI entry point for production servers
 ├── fonts/                 # Fonts used in PDF generation
 ├── frontend/              # React + TypeScript SPA
 │   ├── src/
@@ -285,14 +289,22 @@ E-Council/
 │   └── vite.config.ts
 ├── models/                # Database models
 │   ├── __init__.py
+│   ├── activity_report_item.py
+│   ├── audit.py
 │   ├── base.py
 │   ├── board_resolution.py
 │   ├── concept_paper.py
 │   ├── department.py
 │   ├── documentation.py
+│   ├── evaluation_form.py
 │   ├── event.py
 │   ├── financial.py
+│   ├── learning_outcome.py
 │   ├── meeting.py
+│   ├── meeting_attendee.py
+│   ├── objective.py
+│   ├── tally_item.py
+│   ├── transaction.py
 │   └── user.py
 ├── pytest.ini             # pytest configuration
 ├── repositories/          # SQLAlchemy repository abstraction layer
@@ -382,10 +394,27 @@ E-Council/
 │   ├── financial-reports/
 │   └── minutes-of-meeting/
 ├── tests/                 # pytest tests
+│   ├── __init__.py
 │   ├── conftest.py
+│   ├── factories.py        # Shared factory-boy factories
+│   ├── services/
+│   │   └── test_ai_service.py
+│   ├── test_ai.py
+│   ├── test_api.py
+│   ├── test_audit.py
+│   ├── test_authorization.py
+│   ├── test_cloudinary.py
 │   ├── test_config.py
+│   ├── test_email.py
+│   ├── test_logging.py
+│   ├── test_pagination.py
+│   ├── test_pdf_generation.py
+│   ├── test_rate_limiting.py
 │   ├── test_repositories.py
 │   ├── test_routes.py
+│   ├── test_routes_crud.py
+│   ├── test_seeds.py
+│   ├── test_security.py
 │   ├── test_signup.py
 │   ├── test_storage.py
 │   └── test_utils.py
@@ -480,6 +509,11 @@ Open `.env` and replace every placeholder with your own credentials. The example
 | `API_BASE_URL` | No | Base URL for FastAPI-generated links (default: `http://localhost:8000`) |
 | `FRONTEND_URL` | No | Base URL for the frontend/React app (default: `http://localhost:3000`) |
 | `SENTRY_DSN` | No | Optional; create a project at [Sentry](https://sentry.io/) and paste the DSN |
+| `BROKER_URL` | No | Celery broker URL, e.g. `redis://localhost:6379/0` or `amqp://user:pass@localhost` |
+| `RESULT_BACKEND` | No | Celery result backend, e.g. `redis://localhost:6379/0` |
+| `REDIS_URL` | No | Redis URL used for caching or rate limiting, e.g. `redis://localhost:6379` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | No | JWT access token lifetime in minutes (default: `30`) |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | No | JWT refresh token lifetime in days (default: `7`) |
 
 > **Security:** Never commit your `.env` file. It is listed in `.gitignore`. Use App Passwords for Gmail rather than your account password, and rotate any keys if they have ever been exposed.
 
@@ -637,7 +671,7 @@ The compiled stylesheet is written to `static/css/output.css`, which is served b
 
 ## Testing
 
-Tests are written with pytest and configured via `pytest.ini`. From the project root with the virtual environment active:
+Tests are written with pytest and configured via `pytest.ini`. The full suite currently passes around **397 tests** with 1 skipped (run `pytest -q` to confirm). From the project root with the virtual environment active:
 
 ```bash
 pytest
@@ -656,6 +690,7 @@ The suite includes both the Flask tests in `tests/` and the FastAPI tests in `ap
 - `tests/test_ai.py` — AI generation route tests (mock provider)
 - `tests/services/test_ai_service.py` — AI service and provider abstraction tests
 - `tests/test_utils.py` — utility and filter tests
+- `tests/test_seeds.py` — idempotent seed script integration tests
 - `api/tests/conftest.py` — FastAPI test fixtures (in-memory DB, authenticated client, admin user)
 - `api/tests/test_infrastructure.py` — shared FastAPI infrastructure tests
 - `api/tests/test_auth.py`, `test_account.py`, `test_admin.py` — FastAPI auth, account, and admin tests

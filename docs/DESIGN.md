@@ -204,14 +204,28 @@ Tailwind classes: `bg-accent text-white hover:bg-accent-hover`, `border border-e
 </div>
 ```
 
+## React component structure
+
+The React SPA in `frontend/src/` mirrors the Tailwind tokens and Jinja macro patterns above:
+
+- `frontend/src/components/ui/` — shared UI primitives (`Button`, `Card`, `Badge`, `Alert`, `Modal`, `Input`, `Select`, `Table`, `EmptyState`, `Spinner`, `Toast`, `Sidebar`, `Layout`, `Navbar`, `Footer`, `Container`, `Stack`, `Grid`, `Divider`, `Avatar`, `Tooltip`).
+- `frontend/src/components/forms/` — form components (`FormInput`, `FormSelect`, `FormTextarea`, `FormFileInput`, `FormDatePicker`, `FormRichText`, `FormSwitch`, `FormCheckbox`, `FormRadio`, `FormLabel`).
+- `frontend/src/components/feature/` — feature-specific components (e.g., `EventCard`, `DocumentCard`, `FinancialReportCard`, `ConceptPaperCard`, `DashboardStat`, `RecentActivity`, `StatusBadge`, `ApprovalBadge`, `SignatureInput`, `FileUploader`, `ImagePreview`, `PdfPreview`, `SearchFilter`, `Pagination`, `SortableTable`, `DataTable`, `ListView`, `GridView`, `Timeline`, `CalendarView`, `NotificationBell`, `ThemeToggle`).
+- `frontend/src/pages/` — route-level page components (auth, dashboard, account, admin, concept papers, events, meetings, financial reports, board resolutions, documentation).
+- `frontend/src/api/` — Axios instances and per-feature API functions using the same resource names as the backend.
+- `frontend/src/providers/` — `AuthProvider` (JWT access/refresh), `QueryProvider` (TanStack Query), and `ThemeProvider` (light/dark mode).
+- `frontend/src/types/` — shared TypeScript interfaces for API requests/responses.
+- `frontend/src/hooks/` — reusable React hooks (`useAuth`, `useCurrentUser`, `useTheme`, `useFeature`, `usePagination`, `useSearch`, `useNotification`, `useMediaQuery`, `useDebounce`, `useLocalStorage`).
+- `frontend/src/utils/` — helpers for formatting, validation, and token handling.
+
 ## Implementation notes
 
-- Tailwind v4 Play CDN: `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>`.
-- Lucide icons: `<script src="https://unpkg.com/lucide@latest"></script>`; initialize with `lucide.createIcons()`.
-- Theme toggle is stored in `localStorage`; default follows OS `prefers-color-scheme`.
-- Chart.js uses CSS custom properties for axis/grid/dataset colors via `static/js/charts-theme.js`.
-- Email templates require table-based layouts and inline styles for client compatibility.
+- Tailwind v4 Play CDN (legacy server UI): `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>`; the React SPA uses `frontend/src/index.css` with the same token theme.
+- Lucide icons: `<script src="https://unpkg.com/lucide@latest"></script>` and `lucide.createIcons()` for the server UI; the React SPA uses `lucide-react`.
+- Theme toggle is stored in `localStorage`; default follows OS `prefers-color-scheme`. The React `ThemeProvider` reads the same key and updates `<html class="dark">`.
+- Chart.js in the legacy UI uses CSS custom properties via `static/js/charts-theme.js`; the React SPA uses `recharts` with the same CSS variables.
+- Email templates still require table-based layouts and inline styles for client compatibility.
 
 ### API and Frontend
 
-The FastAPI backend (`api/`) exposes the full application surface at `/api/v1/` with OpenAPI/Swagger documentation at `/docs` and `/redoc`. The new React + TypeScript frontend in `frontend/` is now the primary SPA; the legacy Jinja2/Tailwind UI in `templates/` remains until full React parity is verified. When working on the React frontend, reuse the existing Tailwind tokens and component patterns above, and consume the API using the same semantic color and spacing scale. Auth is JWT-based; store access tokens securely and refresh them as needed.
+The FastAPI backend (`api/`) exposes the full application surface at `/api/v1/` with OpenAPI/Swagger documentation at `/docs` and `/redoc`. The React + TypeScript frontend in `frontend/` is now the primary SPA; the legacy Jinja2/Tailwind UI in `templates/` is deprecated and will be removed after a soak period. When building React components, reuse the Tailwind tokens and patterns above, and consume the API through the typed `frontend/src/api` clients. Auth is JWT-based using access and refresh tokens; store tokens securely and refresh them as needed.

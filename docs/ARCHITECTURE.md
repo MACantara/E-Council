@@ -100,20 +100,35 @@ E-Council/
 │   ├── __init__.py
 │   └── config.py
 ├── docs/                           # Documentation
+│   ├── adr/                        # Architectural decision records
+│   ├── API.md                      # FastAPI API documentation
 │   ├── ARCHITECTURE.md
+│   ├── DESIGN.md
+│   ├── HAND-OVER.md
 │   ├── IMPROVEMENT_ANALYSIS.md
+│   ├── PROGRESS.md
 │   ├── ROADMAP.md
 │   └── TESTING.md
-├── models/                         # Database models (20 SQLAlchemy models)
+├── forms/                          # Flask-WTF forms
+├── migrations/                     # Flask-Migrate migration scripts
+├── models/                         # Database models
 │   ├── __init__.py
+│   ├── activity_report_item.py
+│   ├── audit.py
 │   ├── base.py
 │   ├── board_resolution.py
 │   ├── concept_paper.py
 │   ├── department.py
 │   ├── documentation.py
+│   ├── evaluation_form.py
 │   ├── event.py
 │   ├── financial.py
+│   ├── learning_outcome.py
 │   ├── meeting.py
+│   ├── meeting_attendee.py
+│   ├── objective.py
+│   ├── tally_item.py
+│   ├── transaction.py
 │   └── user.py
 ├── repositories/                   # Repository abstraction layer (BaseRepository, per-entity repos)
 │   ├── __init__.py
@@ -170,9 +185,27 @@ E-Council/
 │   ├── helpers.py
 │   └── processing.py
 ├── tests/                          # pytest test suite
+│   ├── __init__.py
 │   ├── conftest.py
+│   ├── factories.py                # Shared factory-boy factories
+│   ├── services/
+│   │   └── test_ai_service.py
+│   ├── test_ai.py
+│   ├── test_api.py
+│   ├── test_audit.py
+│   ├── test_authorization.py
+│   ├── test_cloudinary.py
 │   ├── test_config.py
+│   ├── test_email.py
+│   ├── test_logging.py
+│   ├── test_pagination.py
+│   ├── test_pdf_generation.py
+│   ├── test_rate_limiting.py
+│   ├── test_repositories.py
 │   ├── test_routes.py
+│   ├── test_routes_crud.py
+│   ├── test_seeds.py
+│   ├── test_security.py
 │   ├── test_signup.py
 │   ├── test_storage.py
 │   └── test_utils.py
@@ -219,6 +252,10 @@ E-Council/
 ├── requirements.txt                # Python dependencies
 ├── pytest.ini                     # pytest configuration
 ├── run_tests.py                   # Test runner helper
+├── seed.py                        # Seed script for development and demo data
+├── seeds/                         # Idempotent seed scripts
+├── tasks.py                       # Celery task definitions
+├── wsgi.py                        # WSGI entry point for production servers
 ├── .env                           # Environment variables (gitignored)
 ├── .gitignore
 └── LICENSE                        # MIT
@@ -254,7 +291,7 @@ E-Council/
 All runtime secrets and service credentials are read from environment variables. A complete example is in `.env.example` (do not commit `.env`).
 - **Required core**: `SECRET_KEY`, `SQLALCHEMY_DATABASE_URI` or `DATABASE_URL`, `MAIL_DEFAULT_SENDER`
 - **Feature-required**: `MAIL_*`, `CLOUDINARY_*`, `GOOGLE_GEMINI_AI_API_KEY`
-- **Optional**: `SENTRY_DSN`, `FLASK_ENV`
+- **Optional**: `SENTRY_DSN`, `FLASK_ENV`, `FASTAPI_DATABASE_URI`, `API_BASE_URL`, `FRONTEND_URL`, `BROKER_URL`, `RESULT_BACKEND`, `REDIS_URL`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`
 
 **Database configuration**:
 `DatabaseConfig.get_database_uri()` reads `SQLALCHEMY_DATABASE_URI` or `DATABASE_URL` and falls back to `sqlite:///e_council.db` for local development. `DatabaseConfig.get_engine_options(uri)` returns engine-specific options (e.g., `pool_pre_ping` for PostgreSQL/MySQL, `check_same_thread=False` for SQLite). The repository layer means routes and services do not need to change when switching engines.
@@ -354,17 +391,50 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 - `Events` - Event model
 - `DepartmentsEvents` - Department-event relationship
 - `EventInvitations` - Event invitations
-- `TransactionHistory` - Financial transactions
 
-#### `models/concept_paper.py`
-**Purpose**: Concept paper models (partial)
+#### `models/transaction.py`
+**Purpose**: Event financial transactions
 
 **Classes**:
-- `ConceptPaperForms` - Concept paper form
-- `ObjectivesOfTheActivity` - Activity objectives
-- `LearningOutcomes` - Learning outcomes
+- `Transaction` - Per-event income/expense records
+
+#### `models/concept_paper.py`
+**Purpose**: Concept paper and related forms
+
+**Classes**:
+- `ConceptPaperForms` - Concept paper submission
 - `ExcuseLetterForms` - Excuse letter forms
 - `ActivityReportForms` - Activity report forms
+
+#### `models/objective.py`
+**Purpose**: Concept paper objectives
+
+**Classes**:
+- `Objective` - Activity objective
+
+#### `models/learning_outcome.py`
+**Purpose**: Concept paper learning outcomes
+
+**Classes**:
+- `LearningOutcome` - Activity learning outcome
+
+#### `models/activity_report_item.py`
+**Purpose**: Activity report strengths/weaknesses/recommendations
+
+**Classes**:
+- `ActivityReportItem` - Activity report item
+
+#### `models/evaluation_form.py`
+**Purpose**: Post-event evaluation forms
+
+**Classes**:
+- `EvaluationForm` - Evaluation form
+
+#### `models/tally_item.py`
+**Purpose**: Evaluation tally items
+
+**Classes**:
+- `TallyItem` - Tally item
 
 ### Repository Layer (`repositories/`)
 
@@ -496,7 +566,7 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 
 ## Database Schema
 
-### Current Models (20 total)
+### Current Models
 
 #### Core Models
 - `Users` - User accounts with authentication
@@ -512,17 +582,23 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 - `Events` - Events and activities
 - `DepartmentsEvents` - Department-event relationships
 - `EventInvitations` - Event invitations
+- `Transaction` - Per-event income/expense records
 
 #### Concept Paper Models
 - `ConceptPaperForms` - Concept paper submissions
+- `Objective` - Activity objectives
+- `LearningOutcome` - Activity learning outcomes
 - `ExcuseLetterForms` - Excuse letters
-- `ActivityReportForms` - Activity reports
+- `ActivityReportForms` - Activity report forms
+- `ActivityReportItem` - Strengths, weaknesses, and recommendations
 - `PersonnelInChargeForms` - Personnel assignments
 - `LearningJournalForms` - Learning journals
 - `ParentGuardianConsentForms` - Parent/guardian consents
 
 #### Documentation Models
 - `Documentation` - Activity documentation
+- `EvaluationForm` - Post-event evaluation forms
+- `TallyItem` - Evaluation tally items
 
 #### Financial Models
 - `FinancialReports` - Financial reports
@@ -533,8 +609,12 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 #### Meeting Models
 - `MinutesOfTheMeeting` - Meeting minutes
 - `Signatories` - Shared signatory records used across concept papers, documentation, financial reports, and meetings
+- `MeetingAttendee` - Attendance records for meetings
 
-> **Note:** Collections such as objectives, learning outcomes, strengths, weaknesses, recommendations, tally items, evaluation forms, attendance images, student names, event photos, and meeting attendees are currently stored as `JSON` fields on the parent models. Future improvements may normalize these into dedicated child tables; see `docs/ROADMAP.md` Phase 3.3.
+#### Audit Models
+- `AuditLog` - State change audit log
+
+> **Note:** Several JSON collections have been normalized into dedicated child tables (`Objective`, `LearningOutcome`, `ActivityReportItem`, `EvaluationForm`, `TallyItem`, `Transaction`, `MeetingAttendee`). A few legacy collections still remain in JSON fields; future improvements may normalize the rest, see `docs/ROADMAP.md`.
 
 ## Route Structure
 
@@ -696,6 +776,9 @@ GOOGLE_GEMINI_AI_API_KEY="your-gemini-api-key"
 - Login attempt tracking
 - Email verification for new accounts
 - Secure token generation for password resets
+- JWT-based authentication for FastAPI endpoints
+- CORS configured for the React frontend URL
+- Rate limiting on sensitive endpoints
 
 ### Security Settings by Environment
 - **Development**: Less strict, easier debugging
@@ -717,6 +800,8 @@ GOOGLE_GEMINI_AI_API_KEY="your-gemini-api-key"
 - Uses SQLite for development (configurable for MySQL)
 - Environment variables loaded from `.env`
 - Static files served by Flask
+- FastAPI runs with `uvicorn api.main:app`; React dev server runs with `npm run dev` in `frontend/`
+- Production serves the built React SPA from `frontend/dist/` behind a reverse proxy and proxies API requests to the FastAPI app
 
 ### Production Deployment Recommendations
 
@@ -858,9 +943,12 @@ The current refactoring has established a solid foundation for future improvemen
 ## Testing Guidelines
 
 ### Current Testing State
-- Automated pytest suite is implemented in `tests/`
+- Automated pytest suite is implemented in `tests/` and `api/tests/`
+- Current suite passes approximately **397 tests** with 1 skipped
+- FastAPI infrastructure, feature, and end-to-end integration tests are in `api/tests/`
 - Repository integration tests in `tests/test_repositories.py` verify the abstraction layer works with an in-memory SQLite database
-- Route, CRUD, utility, and configuration tests cover the main application paths
+- Flask route, CRUD, utility, configuration, and service tests cover the legacy server-rendered UI
+- FastAPI route, schema, dependency, and service tests cover the API/SPA surface
 
 ### Recommended Testing Approach
 
@@ -953,24 +1041,26 @@ The current refactoring has established a solid foundation for future improvemen
 - ROADMAP.md (prioritized action plan)
 - PROGRESS.md (refactoring progress)
 - DESIGN.md (design system)
-- HAND-OVER.md (redesign hand-over notes)
+- HAND-OVER.md (deployment and operational hand-over notes)
+- API.md (FastAPI endpoint and authentication documentation)
+- docs/adr/ (architectural decision records)
 - Code docstrings in modules
 
 ### Recommended Additional Documentation
-- API documentation (if API endpoints added)
-- Deployment guide
+- Deployment guide (see HAND-OVER.md)
 - Troubleshooting guide
 - Contributor guidelines
 - User manual
 
 ## Conclusion
 
-The E-Council application has undergone significant refactoring, and the modular blueprint/model structure is now complete. The remaining improvement work is documented in `docs/ROADMAP.md`. The application now has:
+The E-Council application has completed the Phase 4 migration: a FastAPI REST API (`api/`) with JWT auth, a React + TypeScript SPA (`frontend/`), service/storage/email/AI abstraction layers, and an idempotent seeding package. The legacy Flask server-rendered UI remains during a soak period. The remaining improvement work is documented in `docs/ROADMAP.md`. The application now has:
 
 - **Well-organized structure** with clear separation of concerns
 - **Modular architecture** that's easier to maintain and extend
 - **Configuration management** for different environments
 - **Utility functions** extracted and reusable
+- **FastAPI + React SPA** as the primary frontend/backend architecture
 - **Foundation established** for future improvements
 
 The application is now in a much better state for:
