@@ -226,11 +226,17 @@ All dependencies are listed in [`requirements.txt`](requirements.txt). Pin or up
 - **pandas** / **openpyxl** — Excel import of student lists
 
 ### Frontend
-- **Tailwind CSS 4** — utility-first styling via CDN (`@tailwindcss/browser@4`) with custom theme in `base.html`
-- **Lucide Icons** — icon set via CDN
-- **Jinja2 macros** — reusable form and UI components (`templates/macros/`)
-- **Chart.js** — dashboard charts
-- Vanilla JavaScript (`static/js/`)
+- **Vite** — build tool for the React + TypeScript SPA
+- **React 19** — client-side UI
+- **TypeScript 6** — type safety
+- **Tailwind CSS 4** — utility-first styling via the `@tailwindcss/vite` plugin and custom CSS variables in `frontend/src/index.css`
+- **Lucide React** — icon set
+- **React Router v7** — client-side routing
+- **TanStack Query (React Query)** — server state, caching, and mutations
+- **Axios** — HTTP client with JWT access/refresh token interceptors
+- **React Hook Form + Zod** — form state and validation
+- **Recharts** — dashboard charts
+- **Jinja2 macros** — legacy reusable form and UI components (`templates/macros/`); being replaced by React components
 
 ### Testing & Tooling
 - **pytest** — test runner (config in `pytest.ini`)
@@ -265,6 +271,18 @@ E-Council/
 │   └── TESTING.md
 ├── extensions.py          # Flask extensions (SQLAlchemy, Login, Mail, CSRF, serializer)
 ├── fonts/                 # Fonts used in PDF generation
+├── frontend/              # React + TypeScript SPA
+│   ├── src/
+│   │   ├── api/           # Axios instances and API functions
+│   │   ├── components/    # Shared UI and layout components
+│   │   ├── config/        # Feature resource definitions
+│   │   ├── pages/         # Route-level pages
+│   │   ├── providers/     # Auth and query providers
+│   │   ├── routes/        # Route definitions
+│   │   ├── types/         # Shared TypeScript interfaces
+│   │   └── utils/         # Utility helpers
+│   ├── package.json
+│   └── vite.config.ts
 ├── models/                # Database models
 │   ├── __init__.py
 │   ├── base.py
@@ -507,6 +525,32 @@ The API runs on `http://127.0.0.1:8000`. Interactive documentation is available 
 - ReDoc: `http://127.0.0.1:8000/redoc`
 
 API endpoints are grouped under `/api/v1/` (e.g., `/api/v1/auth/register`, `/api/v1/concept-papers`).
+
+### React + TypeScript Frontend
+
+The SPA is in the `frontend/` directory. It expects the FastAPI backend to be running.
+
+1. Copy the environment example:
+
+```bash
+cd frontend
+cp .env.example .env
+```
+
+2. Install dependencies and start the dev server:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend runs on `http://localhost:3000` by default. Build the production bundle with:
+
+```bash
+cd frontend
+npm run build
+```
 
 ### Production
 

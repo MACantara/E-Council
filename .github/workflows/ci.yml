@@ -45,6 +45,14 @@ jobs:
       - name: Build CSS bundle
         run: npm run build:css
 
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
       - name: Verify migrations
         env:
           FLASK_APP: app.py

@@ -27,6 +27,18 @@ E-Council/
 ├── extensions.py                   # Flask extensions initialization
 ├── api/                            # FastAPI REST API backend
 │   ├── __init__.py
+├── frontend/                       # React + TypeScript SPA
+│   ├── src/
+│   │   ├── api/                    # Axios and API functions
+│   │   ├── components/             # UI, layout, and form components
+│   │   ├── config/                 # Feature resource definitions
+│   │   ├── pages/                  # Route-level pages
+│   │   ├── providers/              # AuthProvider and QueryProvider
+│   │   ├── routes/                 # Route definitions and guards
+│   │   ├── types/                  # Shared TypeScript interfaces
+│   │   └── utils/                  # Utility helpers
+│   ├── package.json
+│   └── vite.config.ts
 │   ├── database.py                 # SQLAlchemy engine and FastAPI session dependency
 │   ├── dependencies.py             # JWT, pagination, storage, and role dependencies
 │   ├── emails.py                   # Token-based verification, reset, and email change helpers
@@ -610,10 +622,16 @@ All service modules use the repository layer (`repo`) for persistence and no lon
 - **PDF Generation**: ReportLab
 
 ### Frontend
-- **Templates**: Jinja2
+- **Framework**: React 19 + TypeScript 6
+- **Build Tool**: Vite with the `@tailwindcss/vite` plugin
+- **Routing**: React Router v7
+- **Server State**: TanStack Query (React Query)
+- **HTTP Client**: Axios with request/response interceptors for JWT and refresh
 - **Styling**: Tailwind CSS 4 with custom theme
-- **JavaScript**: Vanilla JavaScript
-- **Icons**: Lucide Icons
+- **Forms**: React Hook Form + Zod
+- **Charts**: Recharts
+- **Icons**: Lucide React
+- **Legacy UI**: Jinja2 templates with vanilla JavaScript (`templates/` and `static/js/`) are still present and will be deprecated once the React SPA reaches full parity
 
 ### External Services
 - **Email**: SMTP (Gmail)

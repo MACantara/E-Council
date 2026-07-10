@@ -1,8 +1,10 @@
 """FastAPI application for the E-Council API."""
 
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api.database import create_tables, get_engine
@@ -27,11 +29,28 @@ async def lifespan(app: FastAPI):
     get_engine().dispose()
 
 
+_frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 app = FastAPI(
     title="E-Council API",
     description="FastAPI backend for the E-Council API/SPA architecture.",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        _frontend_url,
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:4173",
+        "http://localhost:4174",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 register_exception_handlers(app)

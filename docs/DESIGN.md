@@ -15,7 +15,7 @@
 
 1. Copy this file to the project root as `DESIGN.md`.
 2. Reference `DESIGN.md` when building or updating any UI in the project.
-3. Use the Tailwind v4 Play CDN and the Lucide icon CDN from `templates/base.html` to match these tokens in code.
+3. Use the Tailwind v4 Play CDN and the Lucide icon CDN from `templates/base.html` to match these tokens in code, or import the same tokens in `frontend/src/index.css` for the React + TypeScript SPA.
 
 ## E-Council Design System
 
@@ -180,7 +180,7 @@ Tailwind classes: `bg-accent text-white hover:bg-accent-hover`, `border border-e
 - Use Lucide icons at `20px` default, `16px` inline, and `24px` for empty-state/hero illustrations.
 - Use the accent color only for primary actions, active navigation, and focus states.
 - Call `lucide.createIcons()` after any JavaScript that injects new icons.
-- Use the form and UI Jinja macros defined in `templates/macros/` to keep pages consistent.
+- Use the form and UI Jinja macros defined in `templates/macros/` to keep pages consistent. In the React SPA, use the components in `frontend/src/components/ui/` and `frontend/src/components/forms/` instead.
 
 #### Don't
 
@@ -214,4 +214,4 @@ Tailwind classes: `bg-accent text-white hover:bg-accent-hover`, `border border-e
 
 ### API and Frontend
 
-The FastAPI backend (`api/`) exposes the full application surface at `/api/v1/` with OpenAPI/Swagger documentation at `/docs` and `/redoc`. The current Jinja2/Tailwind UI remains the production frontend while the React + TypeScript frontend is planned for Phase 4.21. When building the new frontend, reuse the existing Tailwind tokens and component patterns above, and consume the API using the same semantic color and spacing scale. Auth is JWT-based; store access tokens securely and refresh them as needed.
+The FastAPI backend (`api/`) exposes the full application surface at `/api/v1/` with OpenAPI/Swagger documentation at `/docs` and `/redoc`. The new React + TypeScript frontend in `frontend/` is now the primary SPA; the legacy Jinja2/Tailwind UI in `templates/` remains until full React parity is verified. When working on the React frontend, reuse the existing Tailwind tokens and component patterns above, and consume the API using the same semantic color and spacing scale. Auth is JWT-based; store access tokens securely and refresh them as needed.
