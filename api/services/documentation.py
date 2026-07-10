@@ -77,9 +77,15 @@ def generate_documentation_pdf(
     details = [
         [Paragraph("Type:", label_style), Paragraph(str(documentation.documentation_type or ""), normal_style)],
         [Paragraph("Status:", label_style), Paragraph(str(documentation.documentation_status or ""), normal_style)],
-        [Paragraph("Academic Year:", label_style), Paragraph(str(documentation.documentation_academic_year or ""), normal_style)],
+        [
+            Paragraph("Academic Year:", label_style),
+            Paragraph(str(documentation.documentation_academic_year or ""), normal_style),
+        ],
         [Paragraph("Semester:", label_style), Paragraph(str(documentation.documentation_semester or ""), normal_style)],
-        [Paragraph("Date of Submission:", label_style), Paragraph(_fmt(documentation.documentation_date_of_submission), normal_style)],
+        [
+            Paragraph("Date of Submission:", label_style),
+            Paragraph(_fmt(documentation.documentation_date_of_submission), normal_style),
+        ],
         [Paragraph("Rating:", label_style), Paragraph(str(documentation.documentation_rating or ""), normal_style)],
     ]
 

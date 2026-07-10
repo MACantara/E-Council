@@ -8,7 +8,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-
 BOARD_RESOLUTION_STATUS_CHOICES = (
     "Upcoming",
     "Postponed",

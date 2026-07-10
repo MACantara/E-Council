@@ -104,13 +104,9 @@ class TestFinancial:
 
     def test_get_financial_report(self, authenticated_client):
         report = _create_report(authenticated_client)
-        response = authenticated_client.get(
-            f"/api/v1/financial/{report['financial_reports_id']}"
-        )
+        response = authenticated_client.get(f"/api/v1/financial/{report['financial_reports_id']}")
         assert response.status_code == 200
-        assert response.json()["data"]["financial_reports_id"] == report[
-            "financial_reports_id"
-        ]
+        assert response.json()["data"]["financial_reports_id"] == report["financial_reports_id"]
 
     def test_update_financial_report(self, authenticated_client):
         report = _create_report(authenticated_client)
@@ -132,21 +128,15 @@ class TestFinancial:
 
     def test_delete_financial_report(self, authenticated_client, fastapi_db):
         report = _create_report(authenticated_client)
-        response = authenticated_client.delete(
-            f"/api/v1/financial/{report['financial_reports_id']}"
-        )
+        response = authenticated_client.delete(f"/api/v1/financial/{report['financial_reports_id']}")
         assert response.status_code == 200
-        assert (
-            fastapi_db.get(FinancialReports, report["financial_reports_id"]) is None
-        )
+        assert fastapi_db.get(FinancialReports, report["financial_reports_id"]) is None
 
     def test_summary(self, authenticated_client, fastapi_db):
         event = _create_event(fastapi_db)
         report = _create_report(authenticated_client, event_id=event.events_id)
 
-        response = authenticated_client.get(
-            f"/api/v1/financial/{report['financial_reports_id']}/summary"
-        )
+        response = authenticated_client.get(f"/api/v1/financial/{report['financial_reports_id']}/summary")
         assert response.status_code == 200
         data = response.json()["data"]
         assert data["budget"] == "10000"
@@ -194,9 +184,7 @@ class TestFinancial:
             data={"data": json.dumps(_transaction_payload())},
         )
 
-        response = authenticated_client.get(
-            f"/api/v1/financial/{report['financial_reports_id']}/transactions"
-        )
+        response = authenticated_client.get(f"/api/v1/financial/{report['financial_reports_id']}/transactions")
         assert response.status_code == 200
         assert len(response.json()["data"]) == 1
 
@@ -209,9 +197,7 @@ class TestFinancial:
             data={"data": json.dumps(_transaction_payload())},
         )
 
-        response = authenticated_client.get(
-            f"/api/v1/financial/{report['financial_reports_id']}/summary"
-        )
+        response = authenticated_client.get(f"/api/v1/financial/{report['financial_reports_id']}/summary")
         assert response.status_code == 200
         data = response.json()["data"]
         assert data["total_expenses"] == 1000
@@ -221,9 +207,7 @@ class TestFinancial:
         event = _create_event(fastapi_db)
         report = _create_report(authenticated_client, event_id=event.events_id)
 
-        response = authenticated_client.get(
-            f"/api/v1/financial/{report['financial_reports_id']}/pdf"
-        )
+        response = authenticated_client.get(f"/api/v1/financial/{report['financial_reports_id']}/pdf")
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/pdf"
 

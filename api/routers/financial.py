@@ -130,12 +130,7 @@ def _get_event(db: Session, event_id: int | None) -> Events | None:
 
 def _get_event_or_404(db: Session, event_id: int) -> Events:
     """Get an event with transactions eagerly loaded or raise 404."""
-    event = (
-        db.query(Events)
-        .options(selectinload(Events.transactions))
-        .filter_by(events_id=event_id)
-        .first()
-    )
+    event = db.query(Events).options(selectinload(Events.transactions)).filter_by(events_id=event_id).first()
     if event is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -217,33 +212,21 @@ def list_financial_reports(
         query = query.filter(FinancialReports.financial_reports_status == status)
 
     if search:
-        query = query.filter(
-            FinancialReports.financial_reports_title.ilike(f"%{search}%")
-        )
+        query = query.filter(FinancialReports.financial_reports_title.ilike(f"%{search}%"))
 
     if pagination.sort:
-        sort_field = getattr(
-            FinancialReports, pagination.sort, FinancialReports.financial_reports_date
-        )
-        query = query.order_by(
-            sort_field.desc() if pagination.order == "desc" else sort_field.asc()
-        )
+        sort_field = getattr(FinancialReports, pagination.sort, FinancialReports.financial_reports_date)
+        query = query.order_by(sort_field.desc() if pagination.order == "desc" else sort_field.asc())
     else:
         query = query.order_by(FinancialReports.financial_reports_date.desc())
 
     total = query.count()
-    items = (
-        query.offset((pagination.page - 1) * pagination.per_page)
-        .limit(pagination.per_page)
-        .all()
-    )
+    items = query.offset((pagination.page - 1) * pagination.per_page).limit(pagination.per_page).all()
 
     return ResponseEnvelope(
         data=PaginatedResponse(
             items=items,
-            pagination=build_pagination_metadata(
-                total=total, page=pagination.page, per_page=pagination.per_page
-            ),
+            pagination=build_pagination_metadata(total=total, page=pagination.page, per_page=pagination.per_page),
         )
     )
 
@@ -503,11 +486,7 @@ def update_financial_transaction(
 
     event = _get_event_or_404(db, report.financial_reports_events_id)
 
-    transaction = (
-        db.query(Transaction)
-        .filter_by(transaction_id=transaction_id, events_id=event.events_id)
-        .first()
-    )
+    transaction = db.query(Transaction).filter_by(transaction_id=transaction_id, events_id=event.events_id).first()
     if transaction is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -529,9 +508,7 @@ def update_financial_transaction(
     if payload.total is not None:
         transaction.total = payload.total
     else:
-        transaction.total = Decimal(transaction.unit_amount or 0) * (
-            transaction.unit_price or Decimal("0.00")
-        )
+        transaction.total = Decimal(transaction.unit_amount or 0) * (transaction.unit_price or Decimal("0.00"))
 
     category = _resolve_transaction_category(payload)
     if category is not None:
@@ -563,7 +540,5 @@ def download_financial_report_pdf(
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=financial_report_{report_id}.pdf"
-        },
+        headers={"Content-Disposition": f"attachment; filename=financial_report_{report_id}.pdf"},
     )

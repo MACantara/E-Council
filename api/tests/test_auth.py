@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 from models import EmailVerification, LoginAttempts, PasswordReset, Users
 
 
@@ -139,9 +138,7 @@ class TestAuth:
         )
         refresh_token = login_response.json()["refresh_token"]
 
-        refresh_response = fastapi_client.post(
-            "/api/v1/auth/refresh", json={"refresh_token": refresh_token}
-        )
+        refresh_response = fastapi_client.post("/api/v1/auth/refresh", json={"refresh_token": refresh_token})
         assert refresh_response.status_code == 200
         new_tokens = refresh_response.json()
         assert "access_token" in new_tokens
@@ -170,13 +167,11 @@ class TestAuth:
 
     def test_verify_email(self, fastapi_client, fastapi_db):
         _register(fastapi_client)
-        verification = fastapi_db.query(EmailVerification).filter_by(
-            email_verification_new_email="auth@example.com"
-        ).first()
-
-        response = fastapi_client.get(
-            f"/api/v1/auth/verify-email/{verification.email_verification_token}"
+        verification = (
+            fastapi_db.query(EmailVerification).filter_by(email_verification_new_email="auth@example.com").first()
         )
+
+        response = fastapi_client.get(f"/api/v1/auth/verify-email/{verification.email_verification_token}")
         assert response.status_code == 200
         user = fastapi_db.query(Users).filter_by(users_email="auth@example.com").first()
         assert user.users_email_verified == 1

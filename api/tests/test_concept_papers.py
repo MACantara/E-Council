@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 from models import ConceptPaperForms
 
 
@@ -94,9 +93,7 @@ class TestConceptPapers:
 
     def test_delete_concept_paper(self, authenticated_client, fastapi_db):
         paper = _create_paper(authenticated_client)
-        response = authenticated_client.delete(
-            f"/api/v1/concept-papers/{paper['concept_paper_forms_id']}"
-        )
+        response = authenticated_client.delete(f"/api/v1/concept-papers/{paper['concept_paper_forms_id']}")
         assert response.status_code == 200
         assert fastapi_db.query(ConceptPaperForms).get(paper["concept_paper_forms_id"]) is None
 
@@ -155,9 +152,7 @@ class TestConceptPapers:
 
     def test_download_pdf(self, authenticated_client):
         paper = _create_paper(authenticated_client)
-        response = authenticated_client.get(
-            f"/api/v1/concept-papers/{paper['concept_paper_forms_id']}/pdf"
-        )
+        response = authenticated_client.get(f"/api/v1/concept-papers/{paper['concept_paper_forms_id']}/pdf")
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/pdf"
 

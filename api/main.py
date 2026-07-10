@@ -1,8 +1,9 @@
-"""FastAPI application for the E-Council API prototype."""
+"""FastAPI application for the E-Council API."""
 
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 from api.database import create_tables, get_engine
 from api.exceptions import register_exception_handlers
@@ -28,7 +29,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="E-Council API",
-    description="FastAPI prototype for the E-Council API/SPA architecture.",
+    description="FastAPI backend for the E-Council API/SPA architecture.",
     version="0.1.0",
     lifespan=lifespan,
 )
@@ -45,3 +46,40 @@ app.include_router(board_resolutions_router, prefix="/api/v1")
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(financial_router, prefix="/api/v1")
 app.include_router(documentation_router, prefix="/api/v1")
+
+
+@app.get("/", tags=["root"])
+def read_root():
+    """Root endpoint with basic API metadata."""
+    return {
+        "name": app.title,
+        "version": app.version,
+        "docs": "/docs",
+        "redoc": "/redoc",
+    }
+
+
+@app.get("/health", tags=["health"])
+def read_health():
+    """Health check endpoint."""
+    return JSONResponse(content={"status": "ok"})
+
+
+@app.get("/api/v1/", tags=["root"])
+def read_api_root():
+    """List the top-level API feature groups."""
+    return {
+        "version": "v1",
+        "features": [
+            "auth",
+            "account",
+            "admin",
+            "concept-papers",
+            "events",
+            "meetings",
+            "board-resolutions",
+            "dashboard",
+            "financial",
+            "documentation",
+        ],
+    }

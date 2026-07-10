@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from api.dependencies import create_access_token
 from models import Events
 
@@ -201,9 +199,9 @@ class TestEvents:
         )
         assert response.status_code == 201
 
-        invitation = fastapi_db.query(EventInvitations).filter_by(
-            event_invitations_events_id=event["events_id"]
-        ).first()
+        invitation = (
+            fastapi_db.query(EventInvitations).filter_by(event_invitations_events_id=event["events_id"]).first()
+        )
         assert invitation is not None
 
         headers = _headers_for_user(other_user)
@@ -233,9 +231,9 @@ class TestEvents:
         )
         assert response.status_code == 201
 
-        invitation = fastapi_db.query(EventInvitations).filter_by(
-            event_invitations_events_id=event["events_id"]
-        ).first()
+        invitation = (
+            fastapi_db.query(EventInvitations).filter_by(event_invitations_events_id=event["events_id"]).first()
+        )
 
         headers = _headers_for_user(other_user)
 
@@ -246,9 +244,12 @@ class TestEvents:
         )
         assert response.status_code == 200
 
-        assert fastapi_db.query(EventInvitations).filter_by(
-            event_invitations_token=invitation.event_invitations_token
-        ).first() is None
+        assert (
+            fastapi_db.query(EventInvitations)
+            .filter_by(event_invitations_token=invitation.event_invitations_token)
+            .first()
+            is None
+        )
 
     def test_department_scoping(self, authenticated_client, fastapi_client):
         """Users can only see events linked to their department."""

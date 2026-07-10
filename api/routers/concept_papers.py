@@ -7,26 +7,24 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
-from sqlalchemy.orm import Session, joinedload, selectinload
+from sqlalchemy.orm import Session, selectinload
 
 from api.database import get_db
 from api.dependencies import get_current_user, get_pagination_params, is_admin
 from api.schemas.common import (
     MessageResponse,
     PaginatedResponse,
-    PaginationMetadata,
     ResponseEnvelope,
     build_pagination_metadata,
 )
 from api.schemas.concept_papers import (
     ConceptPaperAIRequestBody,
     ConceptPaperAIResponse,
+    ConceptPaperAITextRequest,
     ConceptPaperCreate,
-    ConceptPaperListParams,
     ConceptPaperResponse,
     ConceptPaperStatusUpdate,
     ConceptPaperUpdate,
-    ConceptPaperAITextRequest,
 )
 from api.services.concept_papers import generate_concept_paper_pdf
 from models import (
@@ -42,13 +40,10 @@ from models import (
     Users,
 )
 
-
 router = APIRouter(prefix="/concept-papers", tags=["concept-papers"])
 
 
-def _require_concept_paper_access(
-    paper: ConceptPaperForms, current_user: Users
-) -> None:
+def _require_concept_paper_access(paper: ConceptPaperForms, current_user: Users) -> None:
     """Raise 403 if the user cannot access the concept paper."""
     if is_admin(current_user):
         return
@@ -81,24 +76,17 @@ def _get_paper(db: Session, paper_id: int) -> ConceptPaperForms:
 
 def _paper_query(db: Session) -> Any:
     """Return a query with all concept paper relationships eagerly loaded."""
-    return (
-        db.query(ConceptPaperForms)
-        .options(
-            selectinload(ConceptPaperForms.objectives),
-            selectinload(ConceptPaperForms.learning_outcomes),
-            selectinload(ConceptPaperForms.activity_report_forms).selectinload(
-                ActivityReportForms.activity_report_items
-            ),
-            selectinload(ConceptPaperForms.excuse_letter_forms),
-            selectinload(ConceptPaperForms.learning_journal_forms),
-            selectinload(ConceptPaperForms.parent_guardian_consent_forms),
-        )
+    return db.query(ConceptPaperForms).options(
+        selectinload(ConceptPaperForms.objectives),
+        selectinload(ConceptPaperForms.learning_outcomes),
+        selectinload(ConceptPaperForms.activity_report_forms).selectinload(ActivityReportForms.activity_report_items),
+        selectinload(ConceptPaperForms.excuse_letter_forms),
+        selectinload(ConceptPaperForms.learning_journal_forms),
+        selectinload(ConceptPaperForms.parent_guardian_consent_forms),
     )
 
 
-def _set_paper_attributes(
-    paper: ConceptPaperForms, data: ConceptPaperCreate | ConceptPaperUpdate
-) -> None:
+def _set_paper_attributes(paper: ConceptPaperForms, data: ConceptPaperCreate | ConceptPaperUpdate) -> None:
     """Apply scalar concept paper fields from the request data."""
     for field in ConceptPaperUpdate.model_fields:
         if field in {
@@ -116,9 +104,7 @@ def _set_paper_attributes(
             setattr(paper, field, value)
 
 
-def _create_personnel_in_charge(
-    db: Session, data: Any
-) -> PersonnelInChargeForms | None:
+def _create_personnel_in_charge(db: Session, data: Any) -> PersonnelInChargeForms | None:
     """Create a personnel in charge record from the provided data."""
     if data is None:
         return None
@@ -145,16 +131,12 @@ def _create_or_update_activity_report(
         .first()
     )
     if existing:
-        existing.activity_report_forms_nature_of_the_activity = (
-            data.activity_report_forms_nature_of_the_activity
-        )
+        existing.activity_report_forms_nature_of_the_activity = data.activity_report_forms_nature_of_the_activity
         existing.activity_report_forms_contact_numbers = data.activity_report_forms_contact_numbers
         existing.activity_report_forms_prepared_by = data.activity_report_forms_prepared_by
         existing.activity_report_forms_noted_by = data.activity_report_forms_noted_by
         existing.activity_report_date_submission = data.activity_report_date_submission
-        db.query(ActivityReportItem).filter_by(
-            activity_report_forms_id=existing.activity_report_forms_id
-        ).delete()
+        db.query(ActivityReportItem).filter_by(activity_report_forms_id=existing.activity_report_forms_id).delete()
         items = data.activity_report_items or []
     else:
         existing = ActivityReportForms(
@@ -182,9 +164,7 @@ def _create_or_update_activity_report(
         existing.activity_report_forms_personnel_in_charge_forms_id = personnel_id
 
 
-def _create_or_update_excuse_letter(
-    db: Session, paper: ConceptPaperForms, data: Any, personnel_id: int | None
-) -> None:
+def _create_or_update_excuse_letter(db: Session, paper: ConceptPaperForms, data: Any, personnel_id: int | None) -> None:
     """Create or update the excuse letter form for a concept paper."""
     if data is None:
         return
@@ -207,14 +187,14 @@ def _create_or_update_excuse_letter(
         db.add(existing)
 
     if data.excuse_letter_forms_personnel_in_charge_forms_id is not None:
-        existing.excuse_letter_forms_personnel_in_charge_forms_id = data.excuse_letter_forms_personnel_in_charge_forms_id
+        existing.excuse_letter_forms_personnel_in_charge_forms_id = (
+            data.excuse_letter_forms_personnel_in_charge_forms_id
+        )
     elif personnel_id is not None:
         existing.excuse_letter_forms_personnel_in_charge_forms_id = personnel_id
 
 
-def _create_or_update_learning_journal(
-    db: Session, paper: ConceptPaperForms, data: Any
-) -> None:
+def _create_or_update_learning_journal(db: Session, paper: ConceptPaperForms, data: Any) -> None:
     """Create or update the learning journal form for a concept paper."""
     if data is None:
         return
@@ -253,9 +233,7 @@ def _create_or_update_parent_guardian_consent(
         return
     existing = (
         db.query(ParentGuardianConsentForms)
-        .filter_by(
-            parent_guardian_consent_forms_concept_paper_forms_id=paper.concept_paper_forms_id
-        )
+        .filter_by(parent_guardian_consent_forms_concept_paper_forms_id=paper.concept_paper_forms_id)
         .first()
     )
     values = {
@@ -281,7 +259,9 @@ def _create_or_update_parent_guardian_consent(
         db.add(new)
 
     if data.parent_guardian_consent_forms_personnel_in_charge_forms_id is not None:
-        existing.parent_guardian_consent_forms_personnel_in_charge_forms_id = data.parent_guardian_consent_forms_personnel_in_charge_forms_id
+        existing.parent_guardian_consent_forms_personnel_in_charge_forms_id = (
+            data.parent_guardian_consent_forms_personnel_in_charge_forms_id
+        )
     elif personnel_id is not None:
         existing.parent_guardian_consent_forms_personnel_in_charge_forms_id = personnel_id
 
@@ -324,9 +304,7 @@ def _update_related_records(
             db.add(Objective(objective_text=objective.objective_text, concept_paper_form=paper))
 
     if data.learning_outcomes is not None:
-        db.query(LearningOutcome).filter_by(
-            concept_paper_forms_id=paper.concept_paper_forms_id
-        ).delete()
+        db.query(LearningOutcome).filter_by(concept_paper_forms_id=paper.concept_paper_forms_id).delete()
         for outcome in data.learning_outcomes:
             db.add(
                 LearningOutcome(
@@ -367,8 +345,7 @@ def list_concept_papers(
     if not is_admin(current_user):
         query = query.filter(
             or_(
-                ConceptPaperForms.concept_paper_forms_departments_id
-                == current_user.users_departments_id,
+                ConceptPaperForms.concept_paper_forms_departments_id == current_user.users_departments_id,
                 ConceptPaperForms.concept_paper_forms_prepared_by == current_user.users_id,
             )
         )
@@ -377,29 +354,21 @@ def list_concept_papers(
         query = query.filter(ConceptPaperForms.concept_paper_forms_status == status)
 
     if search:
-        query = query.filter(
-            ConceptPaperForms.concept_paper_forms_subject.ilike(f"%{search}%")
-        )
+        query = query.filter(ConceptPaperForms.concept_paper_forms_subject.ilike(f"%{search}%"))
 
     if pagination.sort:
         sort_field = getattr(ConceptPaperForms, pagination.sort, ConceptPaperForms.concept_paper_forms_date)
-        query = query.order_by(
-            sort_field.desc() if pagination.order == "desc" else sort_field.asc()
-        )
+        query = query.order_by(sort_field.desc() if pagination.order == "desc" else sort_field.asc())
     else:
         query = query.order_by(ConceptPaperForms.concept_paper_forms_date.desc())
 
     total = query.count()
-    items = query.offset((pagination.page - 1) * pagination.per_page).limit(
-        pagination.per_page
-    ).all()
+    items = query.offset((pagination.page - 1) * pagination.per_page).limit(pagination.per_page).all()
 
     return ResponseEnvelope(
         data=PaginatedResponse(
             items=items,
-            pagination=build_pagination_metadata(
-                total=total, page=pagination.page, per_page=pagination.per_page
-            ),
+            pagination=build_pagination_metadata(total=total, page=pagination.page, per_page=pagination.per_page),
         )
     )
 
@@ -521,9 +490,7 @@ def generate_body(
     """Generate a concept paper body using the AI service."""
     from services.ai.generation import generate_concept_paper_body
 
-    result = generate_concept_paper_body(
-        data.subject, data.start_date, data.end_date, data.location
-    )
+    result = generate_concept_paper_body(data.subject, data.start_date, data.end_date, data.location)
     if not result:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -623,9 +590,7 @@ def generate_consent(
     """Generate parent/guardian consent text using the AI service."""
     from services.ai.generation import generate_concept_paper_consent
 
-    result = generate_concept_paper_consent(
-        data.subject, data.start_date, data.end_date, data.location
-    )
+    result = generate_concept_paper_consent(data.subject, data.start_date, data.end_date, data.location)
     if not result:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -650,7 +615,5 @@ def download_pdf(
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=concept_paper_{paper_id}.pdf"
-        },
+        headers={"Content-Disposition": f"attachment; filename=concept_paper_{paper_id}.pdf"},
     )

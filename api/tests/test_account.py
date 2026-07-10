@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 from models import Departments, EmailVerification, StudentOrganizations, Users
 
 
@@ -24,9 +23,7 @@ def _register_and_verify(client, db, **overrides):
     response = client.post("/api/v1/auth/register", json=payload)
     assert response.status_code == 201
 
-    verification = db.query(EmailVerification).filter_by(
-        email_verification_new_email=payload["users_email"]
-    ).first()
+    verification = db.query(EmailVerification).filter_by(email_verification_new_email=payload["users_email"]).first()
     assert verification is not None
     verify_email_token(db, verification.email_verification_token)
 
@@ -51,9 +48,7 @@ class TestAccount:
         assert response.json()["users_username"] == "fastapiuser"
 
     def test_update_account(self, fastapi_client, fastapi_db, authenticated_client):
-        department = fastapi_db.query(Departments).filter_by(
-            departments_name="FastAPI Test Department"
-        ).first()
+        department = fastapi_db.query(Departments).filter_by(departments_name="FastAPI Test Department").first()
         assert department is not None
 
         response = authenticated_client.put(
@@ -156,9 +151,9 @@ class TestAccount:
             },
         )
 
-        verification = fastapi_db.query(EmailVerification).filter_by(
-            email_verification_new_email="newemail@example.com"
-        ).first()
+        verification = (
+            fastapi_db.query(EmailVerification).filter_by(email_verification_new_email="newemail@example.com").first()
+        )
         assert verification is not None
 
         response = authenticated_client.get(

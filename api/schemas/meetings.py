@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from api.schemas.auth import UserResponse
-
 
 MEETING_STATUS_CHOICES = (
     "Upcoming",

@@ -25,8 +25,7 @@ def generate_board_resolution_pdf(
         db.query(Users, StudentOrganizations)
         .join(
             StudentOrganizations,
-            Users.users_student_organization
-            == StudentOrganizations.student_organizations_id,
+            Users.users_student_organization == StudentOrganizations.student_organizations_id,
         )
         .filter(Users.users_id.in_(resolution.student_signatory_ids or []))
         .order_by(StudentOrganizations.student_organizations_name)
@@ -124,9 +123,7 @@ def generate_board_resolution_pdf(
     )
 
     story.append(Paragraph("College of Computer Studies Council", title_style))
-    story.append(
-        Paragraph(f"A.Y. {resolution.board_resolutions_academic_year or ''}", academic_year_style)
-    )
+    story.append(Paragraph(f"A.Y. {resolution.board_resolutions_academic_year or ''}", academic_year_style))
     story.append(Paragraph("Resolution", resolution_style))
 
     content_style = ParagraphStyle(
@@ -175,9 +172,7 @@ def generate_board_resolution_pdf(
             signature_text = f"<b>{user.users_first_name} {user.users_last_name}</b>"
             if user.users_student_organization_position:
                 org_acronym = org_acronyms.get(org_name, org_name)
-                signature_text += (
-                    f"<br/><i>{org_acronym}, {user.users_student_organization_position}</i>"
-                )
+                signature_text += f"<br/><i>{org_acronym}, {user.users_student_organization_position}</i>"
             story.append(Paragraph(signature_text, signature_style))
             story.append(Spacer(1, 5))
 
@@ -186,17 +181,13 @@ def generate_board_resolution_pdf(
         prepared_by_text = f"<b>{prepared_by.users_first_name} {prepared_by.users_last_name}</b>"
         if prepared_by.users_student_organization_position:
             org_acronym = org_acronyms.get("College of Computer Studies - Student Council", "CCSC")
-            prepared_by_text += (
-                f"<br/><i>{org_acronym}, {prepared_by.users_student_organization_position}</i>"
-            )
+            prepared_by_text += f"<br/><i>{org_acronym}, {prepared_by.users_student_organization_position}</i>"
         story.append(Paragraph(prepared_by_text, signature_style))
         story.append(Spacer(1, 20))
 
     if approved_by:
         story.append(Paragraph("Approved by:", signature_style))
-        approved_by_text = (
-            f"<b>{approved_by.signatory_first_name} {approved_by.signatory_last_name}</b>"
-        )
+        approved_by_text = f"<b>{approved_by.signatory_first_name} {approved_by.signatory_last_name}</b>"
         approved_by_text += "<br/><i>Adviser, College of Computer Studies - Student Council</i>"
         story.append(Paragraph(approved_by_text, signature_style))
 

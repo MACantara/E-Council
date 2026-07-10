@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import contextlib
 from datetime import datetime
-from io import BytesIO
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, selectinload
 
@@ -28,7 +28,6 @@ from api.schemas.common import (
 from api.schemas.documentation import (
     ActivityReportDetails,
     DocumentationCreate,
-    DocumentationListParams,
     DocumentationResponse,
     DocumentationStatusUpdate,
     DocumentationUpdate,
@@ -50,7 +49,6 @@ from models import (
     TallyItem,
     Users,
 )
-
 
 router = APIRouter(prefix="/documentation", tags=["documentation"])
 
@@ -81,12 +79,8 @@ def _doc_access(doc: Documentation, user: Users) -> bool:
     if is_admin(user):
         return True
     return (
-        doc.documentation_departments_id is not None
-        and doc.documentation_departments_id == user.users_departments_id
-    ) or (
-        doc.documentation_prepared_by is not None
-        and doc.documentation_prepared_by == user.users_id
-    )
+        doc.documentation_departments_id is not None and doc.documentation_departments_id == user.users_departments_id
+    ) or (doc.documentation_prepared_by is not None and doc.documentation_prepared_by == user.users_id)
 
 
 def _require_doc_access(doc: Documentation, user: Users) -> None:
@@ -161,9 +155,7 @@ def _process_image_uploads(
         if file is None or not file.filename:
             continue
         result = save_upload(file, storage, folder=folder, resource_type="auto")
-        items.append(
-            {"url": result.get("url", ""), "public_id": result.get("public_id", "")}
-        )
+        items.append({"url": result.get("url", ""), "public_id": result.get("public_id", "")})
     return items
 
 
@@ -185,9 +177,7 @@ def _apply_scalar_fields(
 def _set_child_lists(doc: Documentation, payload: DocumentationCreate) -> None:
     """Create child objects for activity report items, tally items, and forms."""
     for item in payload.activity_report_items:
-        doc.activity_report_items.append(
-            ActivityReportItem(item_type=item.item_type, item_text=item.item_text)
-        )
+        doc.activity_report_items.append(ActivityReportItem(item_type=item.item_type, item_text=item.item_text))
     for tally in payload.tally_items:
         doc.tally_items.append(
             TallyItem(
@@ -200,9 +190,7 @@ def _set_child_lists(doc: Documentation, payload: DocumentationCreate) -> None:
             )
         )
     for form in payload.evaluation_forms:
-        doc.evaluation_forms.append(
-            EvaluationForm(name=form.name, rating=form.rating)
-        )
+        doc.evaluation_forms.append(EvaluationForm(name=form.name, rating=form.rating))
     doc.evaluation_student_names = list(payload.evaluation_student_names)
 
 
@@ -237,10 +225,7 @@ def _update_child_lists(doc: Documentation, payload: DocumentationUpdate, db: Se
             for tally in payload.tally_items
         ]
     if payload.evaluation_forms is not None:
-        doc.evaluation_forms = [
-            EvaluationForm(name=form.name, rating=form.rating)
-            for form in payload.evaluation_forms
-        ]
+        doc.evaluation_forms = [EvaluationForm(name=form.name, rating=form.rating) for form in payload.evaluation_forms]
     if payload.evaluation_student_names is not None:
         doc.evaluation_student_names = list(payload.evaluation_student_names)
 
@@ -308,10 +293,8 @@ def _delete_document_images(doc: Documentation, storage: Any) -> None:
         for image in getattr(doc, attr) or []:
             public_id = image.get("public_id") if isinstance(image, dict) else image.public_id
             if public_id:
-                try:
+                with contextlib.suppress(Exception):
                     storage.delete(public_id, resource_type="image")
-                except Exception:
-                    pass
 
 
 def _find_image(doc: Documentation, public_id: str) -> dict[str, Any] | None:
@@ -340,14 +323,11 @@ def list_documentation(
     current_user: Users = Depends(get_current_user),
 ):
     """List documentation records with pagination, filtering, and department scoping."""
-    query = (
-        db.query(Documentation)
-        .options(
-            selectinload(Documentation.tally_items),
-            selectinload(Documentation.evaluation_forms),
-            selectinload(Documentation.activity_report_items),
-            selectinload(Documentation.events),
-        )
+    query = db.query(Documentation).options(
+        selectinload(Documentation.tally_items),
+        selectinload(Documentation.evaluation_forms),
+        selectinload(Documentation.activity_report_items),
+        selectinload(Documentation.events),
     )
 
     if not is_admin(current_user):
@@ -371,12 +351,8 @@ def list_documentation(
         )
 
     if pagination.sort:
-        sort_field = getattr(
-            Documentation, pagination.sort, Documentation.documentation_date_of_submission
-        )
-        query = query.order_by(
-            sort_field.desc() if pagination.order == "desc" else sort_field.asc()
-        )
+        sort_field = getattr(Documentation, pagination.sort, Documentation.documentation_date_of_submission)
+        query = query.order_by(sort_field.desc() if pagination.order == "desc" else sort_field.asc())
     else:
         query = query.order_by(
             Documentation.documentation_academic_year.desc(),
@@ -385,18 +361,12 @@ def list_documentation(
         )
 
     total = query.count()
-    items = (
-        query.offset((pagination.page - 1) * pagination.per_page)
-        .limit(pagination.per_page)
-        .all()
-    )
+    items = query.offset((pagination.page - 1) * pagination.per_page).limit(pagination.per_page).all()
 
     return ResponseEnvelope(
         data=PaginatedResponse(
             items=items,
-            pagination=build_pagination_metadata(
-                total=total, page=pagination.page, per_page=pagination.per_page
-            ),
+            pagination=build_pagination_metadata(total=total, page=pagination.page, per_page=pagination.per_page),
         )
     )
 
@@ -426,15 +396,9 @@ def create_documentation(
     _derive_event_fields(doc, payload, db)
 
     # Upload and attach image files.
-    doc.evaluation_images = _process_image_uploads(
-        evaluation_images, storage, "results_of_the_evaluation_images"
-    )
-    doc.attendance_images = _process_image_uploads(
-        attendance_images, storage, "summary_of_attendance_images"
-    )
-    doc.event_photo_images = _process_image_uploads(
-        event_photo_images, storage, "event_photo_documentation_images"
-    )
+    doc.evaluation_images = _process_image_uploads(evaluation_images, storage, "results_of_the_evaluation_images")
+    doc.attendance_images = _process_image_uploads(attendance_images, storage, "summary_of_attendance_images")
+    doc.event_photo_images = _process_image_uploads(event_photo_images, storage, "event_photo_documentation_images")
 
     # If the JSON payload also contained image references, merge them.
     if payload.evaluation_images:
@@ -451,9 +415,7 @@ def create_documentation(
 
     # Update linked learning journal observations/learnings if requested.
     if payload.documentation_learning_journal_forms_id:
-        learning_journal = db.get(
-            LearningJournalForms, payload.documentation_learning_journal_forms_id
-        )
+        learning_journal = db.get(LearningJournalForms, payload.documentation_learning_journal_forms_id)
         if learning_journal:
             if payload.learning_journal_observations:
                 learning_journal.observations = list(payload.learning_journal_observations)
@@ -499,9 +461,7 @@ def update_documentation(
     """Update a documentation record and its associated image lists."""
     doc = _get_doc_or_404(db, doc_id)
     _require_doc_access(doc, current_user)
-    _update_from_json(
-        doc, data, evaluation_images, attendance_images, event_photo_images, storage, db
-    )
+    _update_from_json(doc, data, evaluation_images, attendance_images, event_photo_images, storage, db)
     db.commit()
     db.refresh(doc)
     return ResponseEnvelope(data=doc)
@@ -563,9 +523,7 @@ def download_documentation_pdf(
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=documentation-{doc_id}.pdf"
-        },
+        headers={"Content-Disposition": f"attachment; filename=documentation-{doc_id}.pdf"},
     )
 
 
@@ -631,9 +589,7 @@ def download_documentation_file(
         )
 
     is_direct = url.startswith("http") or url.startswith("/")
-    return ResponseEnvelope(
-        data=DownloadUrlResponse(download_url=url, is_direct=is_direct)
-    )
+    return ResponseEnvelope(data=DownloadUrlResponse(download_url=url, is_direct=is_direct))
 
 
 @router.get(
@@ -656,16 +612,24 @@ def get_related_forms(
 
     concept_paper_id = event.events_concept_paper_forms_id
     activity_reports = (
-        db.query(ActivityReportForms)
-        .filter(ActivityReportForms.activity_report_forms_concept_paper_forms_id == concept_paper_id)
-        .all()
-    ) if concept_paper_id else []
+        (
+            db.query(ActivityReportForms)
+            .filter(ActivityReportForms.activity_report_forms_concept_paper_forms_id == concept_paper_id)
+            .all()
+        )
+        if concept_paper_id
+        else []
+    )
 
     learning_journals = (
-        db.query(LearningJournalForms)
-        .filter(LearningJournalForms.learning_journal_forms_concept_paper_forms_id == concept_paper_id)
-        .all()
-    ) if concept_paper_id else []
+        (
+            db.query(LearningJournalForms)
+            .filter(LearningJournalForms.learning_journal_forms_concept_paper_forms_id == concept_paper_id)
+            .all()
+        )
+        if concept_paper_id
+        else []
+    )
 
     checked_by_ids = {
         journal.learning_journal_forms_checked_by
@@ -673,24 +637,26 @@ def get_related_forms(
         if journal.learning_journal_forms_checked_by
     }
     signatories = (
-        db.query(Signatories)
-        .filter(Signatories.signatory_id.in_(checked_by_ids))
-        .all()
-    ) if checked_by_ids else []
+        (db.query(Signatories).filter(Signatories.signatory_id.in_(checked_by_ids)).all()) if checked_by_ids else []
+    )
 
     return ResponseEnvelope(
         data={
             "activity_reports": [
                 {
                     "activity_report_forms_id": report.activity_report_forms_id,
-                    "events_name": report.concept_paper_form.concept_paper_forms_subject if report.concept_paper_form else None,
+                    "events_name": report.concept_paper_form.concept_paper_forms_subject
+                    if report.concept_paper_form
+                    else None,
                 }
                 for report in activity_reports
             ],
             "learning_journals": [
                 {
                     "learning_journal_forms_id": journal.learning_journal_forms_id,
-                    "events_name": journal.concept_paper_form.concept_paper_forms_subject if journal.concept_paper_form else None,
+                    "events_name": journal.concept_paper_form.concept_paper_forms_subject
+                    if journal.concept_paper_form
+                    else None,
                     "learning_journal_forms_checked_by": journal.learning_journal_forms_checked_by,
                 }
                 for journal in learning_journals
@@ -727,26 +693,12 @@ def get_activity_report_details(
             detail="Activity report not found",
         )
 
-    items = (
-        db.query(ActivityReportItem)
-        .filter_by(activity_report_forms_id=activity_report_id)
-        .all()
-    )
+    items = db.query(ActivityReportItem).filter_by(activity_report_forms_id=activity_report_id).all()
 
-    strengths = [
-        {"activity_strengths_content": item.item_text}
-        for item in items
-        if item.item_type == "strength"
-    ]
-    weaknesses = [
-        {"activity_weaknesses_content": item.item_text}
-        for item in items
-        if item.item_type == "weakness"
-    ]
+    strengths = [{"activity_strengths_content": item.item_text} for item in items if item.item_type == "strength"]
+    weaknesses = [{"activity_weaknesses_content": item.item_text} for item in items if item.item_type == "weakness"]
     recommendations = [
-        {"activity_recommendations_content": item.item_text}
-        for item in items
-        if item.item_type == "recommendation"
+        {"activity_recommendations_content": item.item_text} for item in items if item.item_type == "recommendation"
     ]
 
     return ResponseEnvelope(

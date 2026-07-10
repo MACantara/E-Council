@@ -30,7 +30,6 @@ from api.services.board_resolutions import generate_board_resolution_pdf
 from models import BoardResolutions, DepartmentsEvents, Events, Users
 from services.ai import generate_content
 
-
 router = APIRouter(prefix="/board-resolutions", tags=["board-resolutions"])
 
 
@@ -143,8 +142,7 @@ def list_board_resolutions(
     if not is_admin(current_user):
         query = query.filter(
             or_(
-                BoardResolutions.board_resolutions_departments_id
-                == current_user.users_departments_id,
+                BoardResolutions.board_resolutions_departments_id == current_user.users_departments_id,
                 BoardResolutions.board_resolutions_prepared_by == current_user.users_id,
             )
         )
@@ -153,33 +151,21 @@ def list_board_resolutions(
         query = query.filter(BoardResolutions.board_resolutions_status == status)
 
     if search:
-        query = query.filter(
-            BoardResolutions.board_resolutions_title.ilike(f"%{search}%")
-        )
+        query = query.filter(BoardResolutions.board_resolutions_title.ilike(f"%{search}%"))
 
     if pagination.sort:
-        sort_field = getattr(
-            BoardResolutions, pagination.sort, BoardResolutions.board_resolutions_date
-        )
-        query = query.order_by(
-            sort_field.desc() if pagination.order == "desc" else sort_field.asc()
-        )
+        sort_field = getattr(BoardResolutions, pagination.sort, BoardResolutions.board_resolutions_date)
+        query = query.order_by(sort_field.desc() if pagination.order == "desc" else sort_field.asc())
     else:
         query = query.order_by(BoardResolutions.board_resolutions_date.desc())
 
     total = query.count()
-    items = (
-        query.offset((pagination.page - 1) * pagination.per_page)
-        .limit(pagination.per_page)
-        .all()
-    )
+    items = query.offset((pagination.page - 1) * pagination.per_page).limit(pagination.per_page).all()
 
     return ResponseEnvelope(
         data=PaginatedResponse(
             items=items,
-            pagination=build_pagination_metadata(
-                total=total, page=pagination.page, per_page=pagination.per_page
-            ),
+            pagination=build_pagination_metadata(total=total, page=pagination.page, per_page=pagination.per_page),
         )
     )
 
@@ -208,8 +194,7 @@ def create_board_resolution(
         board_resolutions_semester=data.board_resolutions_semester,
         board_resolutions_status=data.board_resolutions_status,
         board_resolutions_date=_parse_datetime(data.board_resolutions_date),
-        board_resolutions_prepared_by=data.board_resolutions_prepared_by
-        or current_user.users_id,
+        board_resolutions_prepared_by=data.board_resolutions_prepared_by or current_user.users_id,
         board_resolutions_approved_by=data.board_resolutions_approved_by,
         student_signatory_ids=data.student_signatory_ids or [],
     )
@@ -294,9 +279,7 @@ def delete_board_resolution(
     _require_resolution_access(resolution, current_user)
 
     if resolution.board_resolutions_events_id:
-        db.query(DepartmentsEvents).filter_by(
-            events_id=resolution.board_resolutions_events_id
-        ).delete()
+        db.query(DepartmentsEvents).filter_by(events_id=resolution.board_resolutions_events_id).delete()
 
     db.delete(resolution)
     db.commit()
@@ -340,17 +323,11 @@ def generate_description(
                 f"in the name of the Lord Jesus Christ {date_obj.year}"
             )
         else:
-            formatted_date = (
-                "Signed this 13th of May in the name of the Lord Jesus Christ 2024"
-            )
+            formatted_date = "Signed this 13th of May in the name of the Lord Jesus Christ 2024"
     except ValueError:
-        formatted_date = (
-            "Signed this 13th of May in the name of the Lord Jesus Christ 2024"
-        )
+        formatted_date = "Signed this 13th of May in the name of the Lord Jesus Christ 2024"
 
-    formatted_amount = (
-        f"₱{float(data.total_amount):,.2f}" if data.total_amount else "the specified amount"
-    )
+    formatted_amount = f"₱{float(data.total_amount):,.2f}" if data.total_amount else "the specified amount"
 
     prompt = f"""Generate a formal description for a proposed board resolution with the following details:
             Event: {data.event_name}
@@ -403,7 +380,5 @@ def download_board_resolution_pdf(
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=board_resolution_{resolution_id}.pdf"
-        },
+        headers={"Content-Disposition": f"attachment; filename=board_resolution_{resolution_id}.pdf"},
     )

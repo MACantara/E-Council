@@ -49,13 +49,35 @@ def get_storage(app: Flask | None = None) -> StorageBackend:
         StorageError: If the configured provider is unknown.
     """
     if app is not None:
-        provider = app.config.get("STORAGE_PROVIDER") or os.environ.get("STORAGE_PROVIDER") or StorageConfig.STORAGE_PROVIDER
-        upload_dir = app.config.get("STORAGE_LOCAL_PATH") or os.environ.get("STORAGE_LOCAL_PATH") or StorageConfig.STORAGE_LOCAL_PATH
-        base_url = app.config.get("STORAGE_LOCAL_BASE_URL") or os.environ.get("STORAGE_LOCAL_BASE_URL") or StorageConfig.STORAGE_LOCAL_BASE_URL
+        provider = (
+            app.config.get("STORAGE_PROVIDER") or os.environ.get("STORAGE_PROVIDER") or StorageConfig.STORAGE_PROVIDER
+        )
+        upload_dir = (
+            app.config.get("STORAGE_LOCAL_PATH")
+            or os.environ.get("STORAGE_LOCAL_PATH")
+            or StorageConfig.STORAGE_LOCAL_PATH
+        )
+        base_url = (
+            app.config.get("STORAGE_LOCAL_BASE_URL")
+            or os.environ.get("STORAGE_LOCAL_BASE_URL")
+            or StorageConfig.STORAGE_LOCAL_BASE_URL
+        )
     elif has_app_context():
-        provider = current_app.config.get("STORAGE_PROVIDER") or os.environ.get("STORAGE_PROVIDER") or StorageConfig.STORAGE_PROVIDER
-        upload_dir = current_app.config.get("STORAGE_LOCAL_PATH") or os.environ.get("STORAGE_LOCAL_PATH") or StorageConfig.STORAGE_LOCAL_PATH
-        base_url = current_app.config.get("STORAGE_LOCAL_BASE_URL") or os.environ.get("STORAGE_LOCAL_BASE_URL") or StorageConfig.STORAGE_LOCAL_BASE_URL
+        provider = (
+            current_app.config.get("STORAGE_PROVIDER")
+            or os.environ.get("STORAGE_PROVIDER")
+            or StorageConfig.STORAGE_PROVIDER
+        )
+        upload_dir = (
+            current_app.config.get("STORAGE_LOCAL_PATH")
+            or os.environ.get("STORAGE_LOCAL_PATH")
+            or StorageConfig.STORAGE_LOCAL_PATH
+        )
+        base_url = (
+            current_app.config.get("STORAGE_LOCAL_BASE_URL")
+            or os.environ.get("STORAGE_LOCAL_BASE_URL")
+            or StorageConfig.STORAGE_LOCAL_BASE_URL
+        )
     else:
         provider = os.environ.get("STORAGE_PROVIDER") or StorageConfig.STORAGE_PROVIDER
         upload_dir = os.environ.get("STORAGE_LOCAL_PATH") or StorageConfig.STORAGE_LOCAL_PATH

@@ -36,10 +36,7 @@ def send_verification_email(
     link = f"{FRONTEND_URL}/verify-email?token={token}"
     subject = "New Account Email Verification"
     recipients = [user.users_email]
-    html = (
-        f"<html><body><p>Please verify your email by clicking "
-        f"<a href='{link}'>this link</a>.</p></body></html>"
-    )
+    html = f"<html><body><p>Please verify your email by clicking <a href='{link}'>this link</a>.</p></body></html>"
     body = f"Please verify your email by visiting: {link}"
 
     backend.send(recipients, subject, html=html, body=body)
@@ -134,10 +131,7 @@ def send_new_email_verification(
     link = f"{API_BASE_URL}/api/v1/account/confirm-new-email/{token}"
     subject = "Email Change Verification"
     recipients = [new_email]
-    html = (
-        f"<html><body><p>Confirm your new email by clicking "
-        f"<a href='{link}'>this link</a>.</p></body></html>"
-    )
+    html = f"<html><body><p>Confirm your new email by clicking <a href='{link}'>this link</a>.</p></body></html>"
     body = f"Confirm your new email by visiting: {link}"
 
     backend.send(recipients, subject, html=html, body=body)
@@ -190,10 +184,7 @@ def send_email_change_notification(
 ) -> None:
     """Send a notification to the old email address when the email is changed."""
     subject = "Email Change Notification"
-    html = (
-        f"<html><body><p>Your email has been changed from {users_old_email} "
-        f"to {users_new_email}.</p></body></html>"
-    )
+    html = f"<html><body><p>Your email has been changed from {users_old_email} to {users_new_email}.</p></body></html>"
     body = f"Your email has been changed from {users_old_email} to {users_new_email}."
     backend.send([users_old_email], subject, html=html, body=body)
 

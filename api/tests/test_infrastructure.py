@@ -19,7 +19,6 @@ from api.schemas.auth import UserResponse
 from api.schemas.common import (
     OrderEnum,
     PaginatedResponse,
-    PaginationMetadata,
     PaginationParams,
     ResponseEnvelope,
     build_pagination_metadata,

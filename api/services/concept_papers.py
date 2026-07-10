@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from io import BytesIO
 
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -14,7 +15,6 @@ from reportlab.platypus import (
     Table,
     TableStyle,
 )
-from reportlab.lib import colors
 from sqlalchemy.orm import Session
 
 from models import ConceptPaperForms, Users
@@ -81,15 +81,33 @@ def generate_concept_paper_pdf(
 
     details = [
         [Paragraph("Status:", label_style), Paragraph(str(paper.concept_paper_forms_status or ""), normal_style)],
-        [Paragraph("Academic Year:", label_style), Paragraph(str(paper.concept_paper_forms_academic_year or ""), normal_style)],
+        [
+            Paragraph("Academic Year:", label_style),
+            Paragraph(str(paper.concept_paper_forms_academic_year or ""), normal_style),
+        ],
         [Paragraph("Semester:", label_style), Paragraph(str(paper.concept_paper_forms_semester or ""), normal_style)],
-        [Paragraph("Date of Submission:", label_style), Paragraph(_fmt_dt(paper.concept_paper_forms_date), normal_style)],
-        [Paragraph("Event Start:", label_style), Paragraph(_fmt_dt(paper.concept_paper_forms_event_start_date_and_time), normal_style)],
-        [Paragraph("Event End:", label_style), Paragraph(_fmt_dt(paper.concept_paper_forms_event_end_date_and_time), normal_style)],
+        [
+            Paragraph("Date of Submission:", label_style),
+            Paragraph(_fmt_dt(paper.concept_paper_forms_date), normal_style),
+        ],
+        [
+            Paragraph("Event Start:", label_style),
+            Paragraph(_fmt_dt(paper.concept_paper_forms_event_start_date_and_time), normal_style),
+        ],
+        [
+            Paragraph("Event End:", label_style),
+            Paragraph(_fmt_dt(paper.concept_paper_forms_event_end_date_and_time), normal_style),
+        ],
         [Paragraph("Location:", label_style), Paragraph(str(paper.concept_paper_forms_location or ""), normal_style)],
-        [Paragraph("Participants:", label_style), Paragraph(str(paper.concept_paper_forms_participants or ""), normal_style)],
+        [
+            Paragraph("Participants:", label_style),
+            Paragraph(str(paper.concept_paper_forms_participants or ""), normal_style),
+        ],
         [Paragraph("Budget:", label_style), Paragraph(str(paper.concept_paper_forms_budget or ""), normal_style)],
-        [Paragraph("Expected Participants:", label_style), Paragraph(str(paper.concept_paper_forms_expected_number_of_participants or ""), normal_style)],
+        [
+            Paragraph("Expected Participants:", label_style),
+            Paragraph(str(paper.concept_paper_forms_expected_number_of_participants or ""), normal_style),
+        ],
     ]
 
     table = Table(details, colWidths=[2 * inch, 4.5 * inch])

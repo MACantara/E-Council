@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import json
-from io import BytesIO
-
-import pytest
 
 from api.dependencies import create_access_token
 from models import Documentation
@@ -113,9 +110,7 @@ class TestDocumentation:
 
     def test_get_documentation(self, authenticated_client):
         doc = _create_documentation(authenticated_client)
-        response = authenticated_client.get(
-            f"/api/v1/documentation/{doc['documentation_id']}"
-        )
+        response = authenticated_client.get(f"/api/v1/documentation/{doc['documentation_id']}")
         assert response.status_code == 200
         assert response.json()["data"]["documentation_id"] == doc["documentation_id"]
 
@@ -139,9 +134,7 @@ class TestDocumentation:
 
     def test_delete_documentation(self, authenticated_client, fastapi_db):
         doc = _create_documentation(authenticated_client)
-        response = authenticated_client.delete(
-            f"/api/v1/documentation/{doc['documentation_id']}"
-        )
+        response = authenticated_client.delete(f"/api/v1/documentation/{doc['documentation_id']}")
         assert response.status_code == 200
         assert fastapi_db.get(Documentation, doc["documentation_id"]) is None
 
@@ -165,31 +158,23 @@ class TestDocumentation:
         assert upload_response.status_code == 201
         public_id = upload_response.json()["data"]["file"]["public_id"]
 
-        response = authenticated_client.get(
-            f"/api/v1/documentation/{doc['documentation_id']}/files/{public_id}"
-        )
+        response = authenticated_client.get(f"/api/v1/documentation/{doc['documentation_id']}/files/{public_id}")
         assert response.status_code == 200
         data = response.json()["data"]
         assert data["download_url"]
 
     def test_download_pdf(self, authenticated_client):
         doc = _create_documentation(authenticated_client)
-        response = authenticated_client.get(
-            f"/api/v1/documentation/{doc['documentation_id']}/pdf"
-        )
+        response = authenticated_client.get(f"/api/v1/documentation/{doc['documentation_id']}/pdf")
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/pdf"
 
     def test_department_scoping(self, authenticated_client, fastapi_client):
         """Users can only see documentation from their own department or prepared by them."""
         _create_documentation(authenticated_client)
-        other_user = _register_user(
-            fastapi_client, "scopedoc", "scopedoc@example.com", "Scoped Doc Department"
-        )
+        other_user = _register_user(fastapi_client, "scopedoc", "scopedoc@example.com", "Scoped Doc Department")
 
-        response = fastapi_client.get(
-            "/api/v1/documentation", headers=_headers_for_user(other_user)
-        )
+        response = fastapi_client.get("/api/v1/documentation", headers=_headers_for_user(other_user))
         assert response.status_code == 200
         assert len(response.json()["data"]["items"]) == 0
 

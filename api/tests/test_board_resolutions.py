@@ -25,9 +25,7 @@ def _default_payload(**overrides):
 
 def _create_resolution(authenticated_client, **overrides):
     """Create a board resolution through the API and return the response."""
-    response = authenticated_client.post(
-        "/api/v1/board-resolutions", json=_default_payload(**overrides)
-    )
+    response = authenticated_client.post("/api/v1/board-resolutions", json=_default_payload(**overrides))
     assert response.status_code == 201
     return response.json()["data"]
 
@@ -36,9 +34,7 @@ class TestBoardResolutions:
     """FastAPI board resolution endpoint tests."""
 
     def test_create_board_resolution(self, authenticated_client):
-        response = authenticated_client.post(
-            "/api/v1/board-resolutions", json=_default_payload()
-        )
+        response = authenticated_client.post("/api/v1/board-resolutions", json=_default_payload())
         assert response.status_code == 201
         data = response.json()["data"]
         assert data["board_resolutions_title"] == "FastAPI Test Board Resolution"
@@ -66,13 +62,9 @@ class TestBoardResolutions:
 
     def test_get_board_resolution(self, authenticated_client):
         resolution = _create_resolution(authenticated_client)
-        response = authenticated_client.get(
-            f"/api/v1/board-resolutions/{resolution['board_resolutions_id']}"
-        )
+        response = authenticated_client.get(f"/api/v1/board-resolutions/{resolution['board_resolutions_id']}")
         assert response.status_code == 200
-        assert response.json()["data"]["board_resolutions_id"] == resolution[
-            "board_resolutions_id"
-        ]
+        assert response.json()["data"]["board_resolutions_id"] == resolution["board_resolutions_id"]
 
     def test_update_board_resolution(self, authenticated_client):
         resolution = _create_resolution(authenticated_client)
@@ -94,9 +86,7 @@ class TestBoardResolutions:
 
     def test_delete_board_resolution(self, authenticated_client, fastapi_db):
         resolution = _create_resolution(authenticated_client)
-        response = authenticated_client.delete(
-            f"/api/v1/board-resolutions/{resolution['board_resolutions_id']}"
-        )
+        response = authenticated_client.delete(f"/api/v1/board-resolutions/{resolution['board_resolutions_id']}")
         assert response.status_code == 200
         assert fastapi_db.get(BoardResolutions, resolution["board_resolutions_id"]) is None
 
@@ -110,9 +100,7 @@ class TestBoardResolutions:
 
     def test_download_pdf(self, authenticated_client):
         resolution = _create_resolution(authenticated_client)
-        response = authenticated_client.get(
-            f"/api/v1/board-resolutions/{resolution['board_resolutions_id']}/pdf"
-        )
+        response = authenticated_client.get(f"/api/v1/board-resolutions/{resolution['board_resolutions_id']}/pdf")
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/pdf"
 

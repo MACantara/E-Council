@@ -4,10 +4,8 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-import pytest
-from models import AuditLog, Users
-
 from api.dependencies import create_access_token
+from models import AuditLog
 
 
 def _admin_headers(admin_user):

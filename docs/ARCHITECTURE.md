@@ -17,7 +17,7 @@ This document describes the architecture of the E-Council application following 
 - **Clear separation**: Templates, static assets, utilities, configuration, and business logic are separated
 - **Refactoring complete**: The monolithic `app.py` was reduced to an application factory; remaining improvements are tracked in `docs/ROADMAP.md`
 - **Tailwind CSS 4 migration complete**: Legacy custom CSS files were removed and the UI uses Tailwind utility classes and shared Jinja2 macros
-- **FastAPI prototype in progress**: A FastAPI API prototype exists in `api/` with JWT auth, Pydantic schemas, and a lifespan-managed app. It reuses the existing SQLAlchemy models and repository layer.
+- **FastAPI backend complete**: A FastAPI REST API is in `api/` with JWT auth, Pydantic schemas, and a lifespan-managed app. All Flask features (auth, account, admin, concept papers, events, meetings, board resolutions, financial, documentation, dashboard) are exposed under `/api/v1/`, and the service, storage, email, and AI abstraction layers are reused from both Flask and FastAPI.
 
 ## Directory Structure
 
@@ -25,27 +25,64 @@ This document describes the architecture of the E-Council application following 
 E-Council/
 ├── app.py                          # Application factory (entry point)
 ├── extensions.py                   # Flask extensions initialization
-├── api/                            # FastAPI prototype application
+├── api/                            # FastAPI REST API backend
 │   ├── __init__.py
 │   ├── database.py                 # SQLAlchemy engine and FastAPI session dependency
 │   ├── dependencies.py             # JWT, pagination, storage, and role dependencies
+│   ├── emails.py                   # Token-based verification, reset, and email change helpers
 │   ├── exceptions.py               # Shared API exceptions and handlers
-│   ├── main.py                     # FastAPI app factory with lifespan
-│   ├── repositories/               # FastAPI repository wrappers
+│   ├── main.py                     # FastAPI app with lifespan, router registration, and root/health endpoints
+│   ├── settings.py                 # FastAPI-specific settings
+│   ├── repositories/               # FastAPI-facing repository wrappers
 │   │   ├── __init__.py
 │   │   └── base.py
-│   ├── routers/
+│   ├── routers/                    # FastAPI feature routers mounted under /api/v1/
 │   │   ├── __init__.py
-│   │   └── auth.py                 # FastAPI auth prototype endpoints
-│   ├── schemas/
+│   │   ├── account.py
+│   │   ├── admin.py
+│   │   ├── auth.py
+│   │   ├── board_resolutions.py
+│   │   ├── concept_papers.py
+│   │   ├── dashboard.py
+│   │   ├── documentation.py
+│   │   ├── events.py
+│   │   ├── financial.py
+│   │   └── meetings.py
+│   ├── schemas/                    # Pydantic request/response models
 │   │   ├── __init__.py
-│   │   ├── auth.py                 # Pydantic auth schemas
-│   │   └── common.py               # Shared response/pagination schemas
-│   ├── settings.py                 # FastAPI-specific settings
-│   └── tests/                      # FastAPI test fixtures and infrastructure tests
+│   │   ├── account.py
+│   │   ├── admin.py
+│   │   ├── auth.py
+│   │   ├── board_resolutions.py
+│   │   ├── common.py               # Response envelopes, pagination, and sorting schemas
+│   │   ├── concept_papers.py
+│   │   ├── documentation.py
+│   │   ├── events.py
+│   │   ├── financial.py
+│   │   ├── meetings.py
+│   │   └── settings.py
+│   ├── services/                   # FastAPI-specific service helpers
+│   │   ├── __init__.py
+│   │   ├── board_resolutions.py
+│   │   ├── concept_papers.py
+│   │   ├── documentation.py
+│   │   ├── events.py
+│   │   └── financial.py
+│   └── tests/                      # FastAPI test fixtures and feature/integration tests
 │       ├── __init__.py
 │       ├── conftest.py
-│       └── test_infrastructure.py
+│       ├── test_account.py
+│       ├── test_admin.py
+│       ├── test_auth.py
+│       ├── test_board_resolutions.py
+│       ├── test_concept_papers.py
+│       ├── test_dashboard.py
+│       ├── test_documentation.py
+│       ├── test_events.py
+│       ├── test_financial.py
+│       ├── test_infrastructure.py
+│       ├── test_integration.py
+│       └── test_meetings.py
 ├── config/                         # Configuration management
 │   ├── __init__.py
 │   └── config.py
@@ -330,23 +367,24 @@ The `TestingConfig` class overrides some defaults (e.g. in-memory SQLite, `WTF_C
 
 ### FastAPI API Prototype (`api/`)
 
-**Purpose**: A FastAPI prototype that demonstrates the future API/SPA architecture and serves as the starting point for migrating Flask routes to REST endpoints.
+**Purpose**: The FastAPI REST API backend for the API/SPA architecture. It exposes the full application feature set under `/api/v1/` and is the primary backend for future frontend integrations.
 
 **Key components**:
-- `api/main.py` - FastAPI application with lifespan management, SQLAlchemy engine disposal, router registration, and global exception handlers.
+- `api/main.py` - FastAPI application with lifespan management, SQLAlchemy engine disposal, router registration, root/health endpoints, and global exception handlers.
 - `api/database.py` - SQLAlchemy engine, session factory, `get_db` dependency, and `set_engine`/`get_engine` helpers for test isolation.
 - `api/settings.py` - FastAPI-specific configuration derived from the existing Flask config and environment variables.
 - `api/dependencies.py` - JWT helpers, `get_current_user`, `get_pagination_params`, `get_storage`, `save_upload`, `require_admin`, `require_role`, and `check_ownership`.
-- `api/routers/auth.py` - Prototype auth endpoints (`/api/v1/auth/register`, `/login`, `/refresh`, `/me`).
-- `api/schemas/auth.py` - Pydantic request/response models for auth.
-- `api/schemas/common.py` - Reusable response envelopes, pagination schemas, and `PaginationParams`.
-- `api/exceptions.py` - Shared `APIException` hierarchy and exception handlers for HTTP, validation, and Werkzeug errors.
+- `api/emails.py` - Token generation and verification helpers for email-based flows.
+- `api/routers/` - Feature routers: `auth`, `account`, `admin`, `concept_papers`, `events`, `meetings`, `board_resolutions`, `financial`, `documentation`, and `dashboard`.
+- `api/schemas/` - Pydantic request/response models for every feature, plus `common.py` for response envelopes and pagination.
+- `api/services/` - FastAPI-specific service helpers (PDF generation, etc.) that reuse the shared `services/` layer.
+- `api/exceptions.py` - Shared `APIError` hierarchy and exception handlers for HTTP, validation, and Werkzeug errors.
 - `api/repositories/` - FastAPI-facing repository wrappers (`APIBaseRepository`) reusing `BaseRepository`.
-- `api/tests/` - Shared FastAPI test fixtures (`fastapi_client`, `authenticated_client`, `fastapi_db`, `admin_user`).
+- `api/tests/` - FastAPI test fixtures (`fastapi_client`, `authenticated_client`, `fastapi_db`, `admin_user`) and per-feature tests plus `test_integration.py`.
 
-**Pattern**: The FastAPI prototype reuses the existing SQLAlchemy models and the repository layer, so it does not duplicate business logic. Shared infrastructure (pagination, role checks, file uploads, and exception handling) is centralized in `api/dependencies.py`, `api/schemas/common.py`, and `api/exceptions.py` so future feature routers need minimal boilerplate. The `api.database.set_engine` helper lets tests rebind to a test database without re-importing modules. The application is designed to run alongside the Flask application during the migration.
+**Pattern**: The FastAPI backend reuses the existing SQLAlchemy models, the repository layer, and the service abstraction layers (`services/storage/`, `services/email/`, `services/ai/`) so it does not duplicate business logic. Shared infrastructure (pagination, role checks, file uploads, and exception handling) is centralized in `api/dependencies.py`, `api/schemas/common.py`, and `api/exceptions.py` so feature routers need minimal boilerplate. The `api.database.set_engine` helper lets tests rebind to a test database without re-importing modules. The application is designed to run alongside the Flask application during the transition.
 
-**Tests**: `tests/test_api.py` verifies the FastAPI auth endpoints and `api/tests/test_infrastructure.py` covers the shared schemas, dependencies, repositories, and fixtures. The FastAPI test suite is discovered from `pytest.ini` (`testpaths = tests api/tests`).
+**Tests**: `tests/test_api.py` verifies the FastAPI auth prototype, `api/tests/test_*.py` cover each feature router, and `api/tests/test_integration.py` exercises the full API surface end-to-end. The FastAPI test suite is discovered from `pytest.ini` (`testpaths = tests api/tests`).
 
 ### Service Layer (`services/`)
 
@@ -701,8 +739,8 @@ The current refactoring has established a solid foundation for future improvemen
 - **Approach**: See `docs/ROADMAP.md` Phase 3.3
 
 #### 2. Route Modularization (Complete)
-- **Current**: All routes are in `routes/` as Flask blueprints
-- **Future**: Extract business logic into a `services/` layer
+- **Current**: Flask routes are in `routes/` as blueprints and FastAPI routes are in `api/routers/`; both call the shared `services/` layer for business logic
+- **Future**: Continue refining shared abstractions as new features are added
 - **Approach**: See `docs/ROADMAP.md` Phase 3.1
 
 #### 3. Application Factory Pattern (Complete)
@@ -710,10 +748,10 @@ The current refactoring has established a solid foundation for future improvemen
 - **Future**: Move remaining cloud/AI configuration out of `app.py` and into `services/` or `extensions.py`
 - **Approach**: See `docs/ROADMAP.md` Phase 3
 
-#### 4. Tech Stack Migration (Prototype Active)
-- **Current**: FastAPI prototype is active in `api/` with JWT auth and a reusable router/schema structure
-- **Future**: Complete migration of Flask routes to FastAPI endpoints, then migrate the frontend to React/TypeScript
-- **Approach**: API-first design, migrate feature-by-feature (see `docs/ROADMAP.md` Phases 4.10-4.20)
+#### 4. Tech Stack Migration (Backend Complete)
+- **Current**: FastAPI backend is complete in `api/` with JWT auth, Pydantic schemas, and all feature routers mounted under `/api/v1/`. The Flask server-rendered UI remains in place and functional.
+- **Future**: Migrate the frontend to React/TypeScript (Phase 4.21) and eventually retire the Jinja2 templates once parity is reached.
+- **Approach**: API-first design; Flask routes were migrated to FastAPI endpoints feature-by-feature (see `docs/ROADMAP.md` Phases 4.10-4.20).
 
 ### Migration Strategy
 

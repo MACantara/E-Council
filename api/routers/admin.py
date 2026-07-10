@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from api.database import get_db
-from api.dependencies import get_current_user, get_pagination_params, require_admin
+from api.dependencies import get_pagination_params, require_admin
 from api.schemas.admin import UserListResponse, UserRoleUpdate
 from api.schemas.auth import UserResponse
 from api.schemas.common import MessageResponse, PaginationParams
@@ -58,10 +58,7 @@ def list_users(
     if params.sort:
         column = getattr(Users, params.sort, None)
         if column is not None:
-            if params.order.value == "desc":
-                query = query.order_by(column.desc())
-            else:
-                query = query.order_by(column.asc())
+            query = query.order_by(column.desc() if params.order.value == "desc" else column.asc())
 
     total = query.count()
     users = query.offset((params.page - 1) * params.per_page).limit(params.per_page).all()

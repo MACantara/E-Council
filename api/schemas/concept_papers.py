@@ -7,7 +7,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-
 # Concept paper status values from the existing Flask templates.
 CONCEPT_PAPER_STATUS_CHOICES = (
     "Upcoming",
@@ -309,7 +308,9 @@ class ConceptPaperResponse(ConceptPaperBase):
             base["activity_report"] = obj.activity_report_forms[0] if obj.activity_report_forms else None
             base["excuse_letter"] = obj.excuse_letter_forms[0] if obj.excuse_letter_forms else None
             base["learning_journal"] = obj.learning_journal_forms[0] if obj.learning_journal_forms else None
-            base["parent_guardian_consent"] = obj.parent_guardian_consent_forms[0] if obj.parent_guardian_consent_forms else None
+            base["parent_guardian_consent"] = (
+                obj.parent_guardian_consent_forms[0] if obj.parent_guardian_consent_forms else None
+            )
             return base
         return data
 

@@ -97,22 +97,19 @@ def generate_financial_report_pdf(
 
     details = [
         [Paragraph("Title:", label_style), Paragraph(report.financial_reports_title or "", normal_style)],
-        [Paragraph("Academic Year:", label_style), Paragraph(report.financial_reports_academic_year or "", normal_style)],
+        [
+            Paragraph("Academic Year:", label_style),
+            Paragraph(report.financial_reports_academic_year or "", normal_style),
+        ],
         [Paragraph("Semester:", label_style), Paragraph(report.financial_reports_semester or "", normal_style)],
         [Paragraph("Status:", label_style), Paragraph(report.financial_reports_status or "", normal_style)],
     ]
 
     event = db.get(Events, report.financial_reports_events_id) if report.financial_reports_events_id else None
     if event:
-        details.append(
-            [Paragraph("Event:", label_style), Paragraph(event.events_name or "", normal_style)]
-        )
+        details.append([Paragraph("Event:", label_style), Paragraph(event.events_name or "", normal_style)])
 
-        dept_event = (
-            db.query(DepartmentsEvents)
-            .filter_by(events_id=event.events_id)
-            .first()
-        )
+        dept_event = db.query(DepartmentsEvents).filter_by(events_id=event.events_id).first()
         department = db.get(Departments, dept_event.departments_id) if dept_event else None
         if department:
             details.append(
@@ -196,10 +193,20 @@ def generate_financial_report_pdf(
 
     story.append(Paragraph("III. Signatories", heading_style))
 
-    auditor = db.get(Users, report.financial_reports_audited_and_prepared_by) if report.financial_reports_audited_and_prepared_by else None
+    auditor = (
+        db.get(Users, report.financial_reports_audited_and_prepared_by)
+        if report.financial_reports_audited_and_prepared_by
+        else None
+    )
     treasurer = db.get(Users, report.financial_reports_noted_by) if report.financial_reports_noted_by else None
-    president = db.get(Users, report.financial_reports_recommending_approval_by) if report.financial_reports_recommending_approval_by else None
-    adviser = db.get(Signatories, report.financial_reports_approved_by) if report.financial_reports_approved_by else None
+    president = (
+        db.get(Users, report.financial_reports_recommending_approval_by)
+        if report.financial_reports_recommending_approval_by
+        else None
+    )
+    adviser = (
+        db.get(Signatories, report.financial_reports_approved_by) if report.financial_reports_approved_by else None
+    )
 
     def _user_name(user: Users | None) -> str:
         if user is None:

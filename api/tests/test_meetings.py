@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from api.dependencies import create_access_token
 from models import MeetingAttendee, MinutesOfTheMeeting
 

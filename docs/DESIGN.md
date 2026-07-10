@@ -211,3 +211,7 @@ Tailwind classes: `bg-accent text-white hover:bg-accent-hover`, `border border-e
 - Theme toggle is stored in `localStorage`; default follows OS `prefers-color-scheme`.
 - Chart.js uses CSS custom properties for axis/grid/dataset colors via `static/js/charts-theme.js`.
 - Email templates require table-based layouts and inline styles for client compatibility.
+
+### API and Frontend
+
+The FastAPI backend (`api/`) exposes the full application surface at `/api/v1/` with OpenAPI/Swagger documentation at `/docs` and `/redoc`. The current Jinja2/Tailwind UI remains the production frontend while the React + TypeScript frontend is planned for Phase 4.21. When building the new frontend, reuse the existing Tailwind tokens and component patterns above, and consume the API using the same semantic color and spacing scale. Auth is JWT-based; store access tokens securely and refresh them as needed.

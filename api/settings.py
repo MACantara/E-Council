@@ -13,7 +13,7 @@ DATABASE_URL = os.getenv("FASTAPI_DATABASE_URI", DatabaseConfig.get_database_uri
 # SQLAlchemy defaults to the mysqlclient (MySQLdb) driver for mysql:// URLs, but
 # this project uses PyMySQL. If a plain mysql:// URL is provided, rewrite it.
 if DATABASE_URL.startswith("mysql://"):
-    DATABASE_URL = "mysql+pymysql://" + DATABASE_URL[len("mysql://"):]
+    DATABASE_URL = "mysql+pymysql://" + DATABASE_URL[len("mysql://") :]
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))

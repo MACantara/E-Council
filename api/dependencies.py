@@ -19,8 +19,10 @@ from api.settings import (
 )
 from models import Users
 from repositories.users import UserRepository
-from services.email import EmailBackend, get_email as _get_email_service
-from services.storage import StorageBackend, StorageError, get_storage as _get_storage_service
+from services.email import EmailBackend
+from services.email import get_email as _get_email_service
+from services.storage import StorageBackend, StorageError
+from services.storage import get_storage as _get_storage_service
 
 security = HTTPBearer(auto_error=False)
 

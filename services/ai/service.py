@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from flask import current_app
@@ -9,20 +10,31 @@ from flask import current_app
 from config import AIConfig
 from services.base import ServiceResult
 
+from .errors import AIError
+from .protocol import AIProvider
+from .providers import (
+    AnthropicProvider,
+    GeminiProvider,
+    LocalAIProvider,
+    MockAIProvider,
+    OpenAIProvider,
+)
+
 
 class _AIConfigProxy:
     """A Flask-like config object for AI provider settings.
 
     Uses the current Flask app config when available, otherwise falls back to
     the shared ``AIConfig`` class so the AI service can be used from FastAPI or
-    other non-Flask contexts.
+    other non-Flask contexts. Environment variables take precedence over the
+    class defaults so tests can switch providers without re-importing modules.
     """
 
     def __init__(self):
         try:
             self.config = current_app.config
         except RuntimeError:
-            self.config = {k: v for k, v in vars(AIConfig).items() if not k.startswith("_")}
+            self.config = {k: os.environ.get(k, v) for k, v in vars(AIConfig).items() if not k.startswith("_")}
 
     def get(self, key, default=None):
         if isinstance(self.config, dict):
@@ -39,16 +51,6 @@ class _AIConfigProxy:
             return key in self.config
         return key in self.config
 
-
-from .errors import AIError
-from .protocol import AIProvider
-from .providers import (
-    AnthropicProvider,
-    GeminiProvider,
-    LocalAIProvider,
-    MockAIProvider,
-    OpenAIProvider,
-)
 
 PROVIDER_MAP: dict[str, type[AIProvider]] = {
     "gemini": GeminiProvider,
@@ -69,10 +71,7 @@ def get_ai(app=None):
     Returns:
         An AIProvider instance.
     """
-    if app is None:
-        config = _AIConfigProxy()
-    else:
-        config = getattr(app, "config", app)
+    config = _AIConfigProxy() if app is None else getattr(app, "config", app)
 
     if "AI_BACKEND" in config:
         return config["AI_BACKEND"]

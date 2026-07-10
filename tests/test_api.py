@@ -19,7 +19,6 @@ from api.emails import verify_email_token
 from api.main import app
 from models import EmailVerification, db
 
-
 _FILE_DATABASE_URI = "sqlite:///./fastapi_test.db"
 
 if _original_flask_env is None:
@@ -63,9 +62,7 @@ class TestFastAPIAuth:
         if response.status_code == 201:
             db_session = api.database.SessionLocal()
             try:
-                verification = db_session.query(EmailVerification).filter_by(
-                    email_verification_new_email=email
-                ).first()
+                verification = db_session.query(EmailVerification).filter_by(email_verification_new_email=email).first()
                 if verification:
                     verify_email_token(db_session, verification.email_verification_token)
             finally:

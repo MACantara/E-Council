@@ -109,17 +109,10 @@ def get_audit_logs(
     if params.sort:
         column = SORT_COLUMNS.get(params.sort) or getattr(AuditLog, params.sort, None)
         if column is not None:
-            if params.order.value == "desc":
-                query = query.order_by(column.desc())
-            else:
-                query = query.order_by(column.asc())
+            query = query.order_by(column.desc() if params.order.value == "desc" else column.asc())
 
     total = query.count()
-    items = (
-        query.offset((params.page - 1) * params.per_page)
-        .limit(params.per_page)
-        .all()
-    )
+    items = query.offset((params.page - 1) * params.per_page).limit(params.per_page).all()
     pages = (total + params.per_page - 1) // params.per_page if params.per_page else 0
 
     return {
@@ -147,20 +140,12 @@ def get_recent_activity(session: Session, limit: int = 10) -> list[AuditLog]:
 def get_user_stats(session: Session) -> dict:
     """Return aggregate user statistics."""
     total = session.query(func.count(Users.users_id)).scalar()
-    verified = (
-        session.query(func.count(Users.users_id))
-        .filter(Users.users_email_verified == 1)
-        .scalar()
-    )
-    role_counts = (
-        session.query(Users.users_role, func.count(Users.users_id))
-        .group_by(Users.users_role)
-        .all()
-    )
+    verified = session.query(func.count(Users.users_id)).filter(Users.users_email_verified == 1).scalar()
+    role_counts = session.query(Users.users_role, func.count(Users.users_id)).group_by(Users.users_role).all()
     return {
         "total": total or 0,
         "verified": verified or 0,
-        "by_role": {role: count for role, count in role_counts},
+        "by_role": dict(role_counts),
     }
 
 

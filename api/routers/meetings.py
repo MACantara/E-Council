@@ -41,7 +41,6 @@ from api.schemas.meetings import (
 )
 from models import MeetingAttendee, MinutesOfTheMeeting, Users
 
-
 router = APIRouter(prefix="/meetings", tags=["meetings"])
 
 
@@ -128,10 +127,8 @@ def list_meetings(
     if not is_admin(current_user):
         query = query.filter(
             or_(
-                MinutesOfTheMeeting.minutes_of_the_meeting_departments_id
-                == current_user.users_departments_id,
-                MinutesOfTheMeeting.minutes_of_the_meeting_prepared_by
-                == current_user.users_id,
+                MinutesOfTheMeeting.minutes_of_the_meeting_departments_id == current_user.users_departments_id,
+                MinutesOfTheMeeting.minutes_of_the_meeting_prepared_by == current_user.users_id,
             )
         )
 
@@ -139,33 +136,21 @@ def list_meetings(
         query = query.filter(MinutesOfTheMeeting.minutes_of_the_meeting_status == status)
 
     if search:
-        query = query.filter(
-            MinutesOfTheMeeting.minutes_of_the_meeting_agenda.ilike(f"%{search}%")
-        )
+        query = query.filter(MinutesOfTheMeeting.minutes_of_the_meeting_agenda.ilike(f"%{search}%"))
 
     if pagination.sort:
-        sort_field = getattr(
-            MinutesOfTheMeeting, pagination.sort, MinutesOfTheMeeting.minutes_of_the_meeting_date
-        )
-        query = query.order_by(
-            sort_field.desc() if pagination.order == "desc" else sort_field.asc()
-        )
+        sort_field = getattr(MinutesOfTheMeeting, pagination.sort, MinutesOfTheMeeting.minutes_of_the_meeting_date)
+        query = query.order_by(sort_field.desc() if pagination.order == "desc" else sort_field.asc())
     else:
         query = query.order_by(MinutesOfTheMeeting.minutes_of_the_meeting_date.desc())
 
     total = query.count()
-    items = (
-        query.offset((pagination.page - 1) * pagination.per_page)
-        .limit(pagination.per_page)
-        .all()
-    )
+    items = query.offset((pagination.page - 1) * pagination.per_page).limit(pagination.per_page).all()
 
     return ResponseEnvelope(
         data=PaginatedResponse(
             items=items,
-            pagination=build_pagination_metadata(
-                total=total, page=pagination.page, per_page=pagination.per_page
-            ),
+            pagination=build_pagination_metadata(total=total, page=pagination.page, per_page=pagination.per_page),
         )
     )
 
@@ -181,9 +166,7 @@ def _process_photos(
         for photo in photos:
             if photo:
                 result = save_upload(photo, storage, folder="meeting_photos")
-                new_photos.append(
-                    {"url": result.get("url"), "public_id": result.get("public_id")}
-                )
+                new_photos.append({"url": result.get("url"), "public_id": result.get("public_id")})
     if existing_photos:
         for photo in existing_photos:
             try:
@@ -229,10 +212,7 @@ def create_meeting(
     )
 
     if payload.attendees:
-        meeting.attendees = [
-            MeetingAttendee(users_id=int(user_id), attended=True)
-            for user_id in payload.attendees
-        ]
+        meeting.attendees = [MeetingAttendee(users_id=int(user_id), attended=True) for user_id in payload.attendees]
 
     db.add(meeting)
     db.flush()
@@ -304,15 +284,10 @@ def update_meeting(
         meeting.minutes_of_the_meeting_noted_by = payload.minutes_of_the_meeting_noted_by
 
     if payload.attendees is not None:
-        meeting.attendees = [
-            MeetingAttendee(users_id=int(user_id), attended=True)
-            for user_id in payload.attendees
-        ]
+        meeting.attendees = [MeetingAttendee(users_id=int(user_id), attended=True) for user_id in payload.attendees]
 
     if photos:
-        meeting.photo_documentation = _process_photos(
-            photos, storage, meeting.photo_documentation
-        )
+        meeting.photo_documentation = _process_photos(photos, storage, meeting.photo_documentation)
 
     db.commit()
     db.refresh(meeting)
@@ -590,7 +565,5 @@ def generate_meeting_pdf(
     return StreamingResponse(
         buffer,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=meeting-{meeting_id}.pdf"
-        },
+        headers={"Content-Disposition": f"attachment; filename=meeting-{meeting_id}.pdf"},
     )

@@ -16,7 +16,7 @@ except ImportError:  # pragma: no cover
     WerkzeugHTTPException = None
 
 
-class APIException(Exception):
+class APIError(Exception):
     """Base exception for API errors with an HTTP status code."""
 
     def __init__(
@@ -31,42 +31,42 @@ class APIException(Exception):
         self.headers = headers or {}
 
 
-class BadRequestError(APIException):
+class BadRequestError(APIError):
     """400 Bad Request."""
 
     def __init__(self, detail: str = "Bad request", headers: dict[str, str] | None = None) -> None:
         super().__init__(status_code=400, detail=detail, headers=headers)
 
 
-class UnauthorizedError(APIException):
+class UnauthorizedError(APIError):
     """401 Unauthorized."""
 
     def __init__(self, detail: str = "Unauthorized", headers: dict[str, str] | None = None) -> None:
         super().__init__(status_code=401, detail=detail, headers=headers)
 
 
-class ForbiddenError(APIException):
+class ForbiddenError(APIError):
     """403 Forbidden."""
 
     def __init__(self, detail: str = "Forbidden", headers: dict[str, str] | None = None) -> None:
         super().__init__(status_code=403, detail=detail, headers=headers)
 
 
-class NotFoundError(APIException):
+class NotFoundError(APIError):
     """404 Not Found."""
 
     def __init__(self, detail: str = "Resource not found", headers: dict[str, str] | None = None) -> None:
         super().__init__(status_code=404, detail=detail, headers=headers)
 
 
-class ConflictError(APIException):
+class ConflictError(APIError):
     """409 Conflict."""
 
     def __init__(self, detail: str = "Conflict", headers: dict[str, str] | None = None) -> None:
         super().__init__(status_code=409, detail=detail, headers=headers)
 
 
-class UnprocessableEntityError(APIException):
+class UnprocessableEntityError(APIError):
     """422 Unprocessable Entity."""
 
     def __init__(self, detail: str = "Validation error", headers: dict[str, str] | None = None) -> None:
@@ -101,8 +101,8 @@ def _error_response(status_code: int, detail: str, errors: list[Any] | None = No
 def register_exception_handlers(app: FastAPI) -> None:
     """Register shared exception handlers on the FastAPI application."""
 
-    @app.exception_handler(APIException)
-    async def api_exception_handler(request: Request, exc: APIException) -> JSONResponse:
+    @app.exception_handler(APIError)
+    async def api_exception_handler(request: Request, exc: APIError) -> JSONResponse:
         return JSONResponse(
             status_code=exc.status_code,
             content=_error_response(exc.status_code, exc.detail),

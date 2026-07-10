@@ -4,7 +4,6 @@ from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, model_validator
 
-
 # Shared role literals used in both schemas and validators.
 ROLE_CHOICES = (
     "Student Council Officer",

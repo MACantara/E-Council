@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import contextlib
 from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
-from sqlalchemy.orm import Session, joinedload, selectinload
+from sqlalchemy.orm import Session, selectinload
 
 from api.database import get_db
 from api.dependencies import (
@@ -46,7 +47,6 @@ from models import (
     Transaction,
     Users,
 )
-
 
 router = APIRouter(prefix="/events", tags=["events"])
 
@@ -94,12 +94,7 @@ def _get_event(db: Session, event_id: int) -> Events:
 
 def _get_event_or_404(db: Session, event_id: int) -> Events:
     """Retrieve an event with transactions eagerly loaded or raise 404."""
-    event = (
-        db.query(Events)
-        .options(selectinload(Events.transactions))
-        .filter_by(events_id=event_id)
-        .first()
-    )
+    event = db.query(Events).options(selectinload(Events.transactions)).filter_by(events_id=event_id).first()
     if event is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -112,9 +107,7 @@ def _events_query(db: Session, user: Users) -> Any:
     """Return a base query scoped to the user's department."""
     query = db.query(Events).options(selectinload(Events.transactions))
     if not is_admin(user):
-        query = query.join(DepartmentsEvents).filter(
-            DepartmentsEvents.departments_id == user.users_departments_id
-        )
+        query = query.join(DepartmentsEvents).filter(DepartmentsEvents.departments_id == user.users_departments_id)
     return query
 
 
@@ -165,23 +158,17 @@ def list_events(
 
     if pagination.sort:
         sort_field = getattr(Events, pagination.sort, Events.events_start_date_and_time)
-        query = query.order_by(
-            sort_field.desc() if pagination.order == "desc" else sort_field.asc()
-        )
+        query = query.order_by(sort_field.desc() if pagination.order == "desc" else sort_field.asc())
     else:
         query = query.order_by(Events.events_start_date_and_time.desc())
 
     total = query.count()
-    items = query.offset((pagination.page - 1) * pagination.per_page).limit(
-        pagination.per_page
-    ).all()
+    items = query.offset((pagination.page - 1) * pagination.per_page).limit(pagination.per_page).all()
 
     return ResponseEnvelope(
         data=PaginatedResponse(
             items=items,
-            pagination=build_pagination_metadata(
-                total=total, page=pagination.page, per_page=pagination.per_page
-            ),
+            pagination=build_pagination_metadata(total=total, page=pagination.page, per_page=pagination.per_page),
         )
     )
 
@@ -352,10 +339,8 @@ def delete_event(
     storage = get_storage()
     for transaction in event.transactions or []:
         if transaction.receipt_public_id:
-            try:
+            with contextlib.suppress(Exception):
                 storage.delete(transaction.receipt_public_id)
-            except Exception:
-                pass
 
     db.query(DepartmentsEvents).filter_by(events_id=event_id).delete()
     db.query(EventInvitations).filter_by(event_invitations_events_id=event_id).delete()
@@ -401,10 +386,8 @@ def _save_receipt(
     if file is None:
         return None, None
     if old_public_id:
-        try:
+        with contextlib.suppress(Exception):
             storage.delete(old_public_id)
-        except Exception:
-            pass
     result = save_upload(file, storage, folder="transactions")
     return result.get("url"), result.get("public_id")
 
@@ -474,11 +457,7 @@ def update_transaction(
     event = _get_event(db, event_id)
     _require_event_access(db, event, current_user)
 
-    transaction = (
-        db.query(Transaction)
-        .filter_by(transaction_id=transaction_id, events_id=event_id)
-        .first()
-    )
+    transaction = db.query(Transaction).filter_by(transaction_id=transaction_id, events_id=event_id).first()
     if transaction is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -503,9 +482,7 @@ def update_transaction(
     if payload.total is not None:
         transaction.total = payload.total
     else:
-        transaction.total = Decimal(transaction.unit_amount or 0) * (
-            transaction.unit_price or Decimal("0.00")
-        )
+        transaction.total = Decimal(transaction.unit_amount or 0) * (transaction.unit_price or Decimal("0.00"))
 
     category = _resolve_transaction_category(payload)
     if category is not None:
@@ -545,9 +522,7 @@ def invite_user(
         )
 
     existing_entry = (
-        db.query(DepartmentsEvents)
-        .filter_by(departments_id=user.users_departments_id, events_id=event_id)
-        .first()
+        db.query(DepartmentsEvents).filter_by(departments_id=user.users_departments_id, events_id=event_id).first()
     )
     if existing_entry is not None:
         raise HTTPException(
@@ -566,11 +541,9 @@ def invite_user(
             detail="An invitation has already been sent to this email",
         )
 
-    token = send_event_invite_email(db, backend, current_user, user, event)
+    send_event_invite_email(db, backend, current_user, user, event)
 
-    return ResponseEnvelope(
-        data=EventInviteResponse(message=f"Invitation sent to {data.email}")
-    )
+    return ResponseEnvelope(data=EventInviteResponse(message=f"Invitation sent to {data.email}"))
 
 
 @router.post(
@@ -591,16 +564,16 @@ def accept_invite(
     s = get_serializer()
     try:
         email = s.loads(data.token, salt="invite-user", max_age=3600)
-    except SignatureExpired:
+    except SignatureExpired as err:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The invitation link has expired",
-        )
-    except BadSignature:
+        ) from err
+    except BadSignature as err:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The invitation link is invalid",
-        )
+        ) from err
 
     if email != current_user.users_email:
         raise HTTPException(
@@ -608,11 +581,7 @@ def accept_invite(
             detail="You are not authorized to accept this invitation",
         )
 
-    invitation = (
-        db.query(EventInvitations)
-        .filter_by(event_invitations_token=data.token)
-        .first()
-    )
+    invitation = db.query(EventInvitations).filter_by(event_invitations_token=data.token).first()
     if invitation is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -664,16 +633,16 @@ def reject_invite(
     s = get_serializer()
     try:
         email = s.loads(data.token, salt="invite-user", max_age=3600)
-    except SignatureExpired:
+    except SignatureExpired as err:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The invitation link has expired",
-        )
-    except BadSignature:
+        ) from err
+    except BadSignature as err:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The invitation link is invalid",
-        )
+        ) from err
 
     if email != current_user.users_email:
         raise HTTPException(
@@ -681,11 +650,7 @@ def reject_invite(
             detail="You are not authorized to reject this invitation",
         )
 
-    invitation = (
-        db.query(EventInvitations)
-        .filter_by(event_invitations_token=data.token)
-        .first()
-    )
+    invitation = db.query(EventInvitations).filter_by(event_invitations_token=data.token).first()
     if invitation is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

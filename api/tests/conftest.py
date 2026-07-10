@@ -16,11 +16,9 @@ os.environ["EMAIL_PROVIDER"] = "memory"
 os.environ["AI_PROVIDER"] = "mock"
 
 import api.database
-
-from api.dependencies import create_access_token, reset_email_backend
+from api.dependencies import reset_email_backend
 from api.main import app
 from models import Departments, Users, db
-
 
 _MEMORY_DATABASE_URI = "sqlite:///:memory:"
 
@@ -86,9 +84,9 @@ def fastapi_user(fastapi_client, fastapi_db):
     )
     assert response.status_code == 201
 
-    verification = fastapi_db.query(EmailVerification).filter_by(
-        email_verification_new_email="fastapi@example.com"
-    ).first()
+    verification = (
+        fastapi_db.query(EmailVerification).filter_by(email_verification_new_email="fastapi@example.com").first()
+    )
     assert verification is not None
     verify_email_token(fastapi_db, verification.email_verification_token)
 

@@ -24,7 +24,7 @@ class AccountUpdate(BaseModel):
     users_current_password: str
 
     @model_validator(mode="after")
-    def _check_student_organization(self) -> "AccountUpdate":
+    def _check_student_organization(self) -> AccountUpdate:
         """Student organization and position are required for Student Council Officers."""
         if self.users_role == "Student Council Officer":
             if self.users_student_organization is None:
@@ -42,7 +42,7 @@ class PasswordChange(BaseModel):
     users_repeat_password: str = Field(..., min_length=8, max_length=128)
 
     @model_validator(mode="after")
-    def _check_passwords(self) -> "PasswordChange":
+    def _check_passwords(self) -> PasswordChange:
         if self.users_new_password != self.users_repeat_password:
             raise ValueError("Passwords do not match.")
         return self

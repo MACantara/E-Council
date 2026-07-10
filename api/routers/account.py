@@ -82,7 +82,9 @@ def update_account(
 
     if (
         payload.users_student_organization is not None
-        and db.query(StudentOrganizations).filter_by(student_organizations_id=payload.users_student_organization).first()
+        and db.query(StudentOrganizations)
+        .filter_by(student_organizations_id=payload.users_student_organization)
+        .first()
         is None
     ):
         raise HTTPException(
